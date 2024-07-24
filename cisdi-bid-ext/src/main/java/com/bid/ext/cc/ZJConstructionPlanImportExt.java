@@ -258,7 +258,7 @@ public class ZJConstructionPlanImportExt {
         //获取上传的excel文件
 //        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
 //        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/基坑点位.xlsx";
+        String filePath = "/Users/hejialun/Documents/湛江/导入/副本湛江标点(2).xlsx";
 
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
@@ -301,22 +301,8 @@ public class ZJConstructionPlanImportExt {
                     CcEquipIot equip = CcEquipIot.selectOneByWhere(queryPoint);
 
                     if (equip==null){
-                        System.out.println(false);
+                        throw new BaseException("设备id错误");
                     }else{
-//                        System.out.println(equip.getPointName());
-
-//                        String latFir = y.substring(0,2);
-//                        String latSec = y.substring(2);
-//                        BigDecimal lat =  new BigDecimal(latSec).divide(new BigDecimal("60"),8, RoundingMode.HALF_UP);
-//                        lat = new BigDecimal(latFir).add(lat);
-//
-//                        String lonFir = x.substring(0,3);
-//                        String lonSec = x.substring(3);
-//                        BigDecimal lon =  new BigDecimal(lonSec).divide(new BigDecimal("60"),8,RoundingMode.HALF_UP);
-//                        lon = new BigDecimal(lonFir).add(lon);
-
-                        System.out.println(x+","+y+","+z);
-
                         equip.setLongitude(new BigDecimal(x));
                         equip.setLatitude(new BigDecimal(y));
                         equip.setAltitude(new BigDecimal(z));
@@ -325,7 +311,9 @@ public class ZJConstructionPlanImportExt {
                     }
                 }
             }
-        } catch (IOException e) {
+        }catch (BaseException e){
+            throw new BaseException(e.getMessage());
+        }catch (IOException e) {
             throw  new BaseException("上传文件失败");
         }
 
@@ -386,6 +374,7 @@ public class ZJConstructionPlanImportExt {
                 throw new BaseException("所选记录返回资料为空，不可完成");
             }
             constructionplan.setIsComplete(true);
+            constructionplan.setActDate(LocalDate.now());
 
             constructionplan.updateById();
 

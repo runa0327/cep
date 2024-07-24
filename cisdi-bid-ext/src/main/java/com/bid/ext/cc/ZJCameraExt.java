@@ -34,6 +34,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.poi.ss.usermodel.CellType.BLANK;
 
@@ -54,6 +55,9 @@ public class ZJCameraExt {
     public static final String BY_ACCESS_TOKEN_KEY = "by_access_token";//宝冶tokenKey
     public static final String SQY_ACCESS_TOKEN_KEY = "sqy_access_token";//十七冶tokenKey
 
+    public static final String BY_CAMERA_LIST_KEY = "by_camera_list";//宝冶tokenKey
+    public static final String SQY_CAMERA_LIST_KEY = "sqy_camera_list";//十七冶tokenKey
+
 
 
     /**
@@ -66,7 +70,7 @@ public class ZJCameraExt {
     }
 
     /**
-     * 获取湛江十七冶摄像头列表
+     * 获取湛江宝冶摄像头列表
      */
     public void getByDeviceCameraList(){
 
@@ -173,32 +177,50 @@ public class ZJCameraExt {
 
         String value = getToken(company);
 
-
-        // 2、换accessToken：
-        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type","application/x-www-form-urlencoded");
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("accessToken", value);
-        if ("sqy".equals(company)) {
-            body.add("deviceSerial", SQY_DEVICE_SERIAL);
+        String res  = null;
+        if ("sqy".equals(company)){
+            res = stringRedisTemplate.opsForValue().get(SQY_CAMERA_LIST_KEY);
         }else if("by".equals(company)){
-            body.add("deviceSerial", BY_DEVICE_SERIAL);
+            res = stringRedisTemplate.opsForValue().get(BY_CAMERA_LIST_KEY);
         }
 
-        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body,headers);
+        if (SharedUtil.isEmpty(res)) {
 
-        ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL+"/lapp/device/camera/list", HttpMethod.POST, entity, String.class);
+            // 2、换accessToken：
+            RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
 
-        if (response.getStatusCode() != HttpStatus.OK) {
-            String message = "获取萤石云摄像头列表失败！";
-            log.error(message + response);
-            throw new BaseException(message);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/x-www-form-urlencoded");
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("accessToken", value);
+            if ("sqy".equals(company)) {
+                body.add("deviceSerial", SQY_DEVICE_SERIAL);
+            } else if ("by".equals(company)) {
+                body.add("deviceSerial", BY_DEVICE_SERIAL);
+            }
+
+            HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL + "/lapp/device/camera/list", HttpMethod.POST, entity, String.class);
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                String message = "获取萤石云摄像头列表失败！";
+                log.error(message + response);
+                throw new BaseException(message);
+            }
+
+             res = response.getBody();
+
+
+            if ("sqy".equals(company)) {
+                stringRedisTemplate.opsForValue().set(SQY_CAMERA_LIST_KEY, res, 24, TimeUnit.HOURS);
+            }else if("by".equals(company)){
+                stringRedisTemplate.opsForValue().set(BY_CAMERA_LIST_KEY, res, 24, TimeUnit.HOURS);
+            }
+
         }
 
-        String res = response.getBody();
         Map<String,Object> map = JsonUtil.fromJson(res, Map.class);
 
         return map;

@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "施工计划方案", "ZH_CN": "施工计划方案", "ZH_TW": "施工计划方案"}。
+ * {"EN": "质量评估", "ZH_CN": "质量评估", "ZH_TW": "质量评估"}。
  */
-public class CcConstructionplan {
+public class CcQualityCheckRecord {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcConstructionplan> modelHelper = new ModelHelper<>("CC_CONSTRUCTIONPLAN", new CcConstructionplan());
+    private static final ModelHelper<CcQualityCheckRecord> modelHelper = new ModelHelper<>("CC_QUALITY_CHECK_RECORD", new CcQualityCheckRecord());
 
     /**
      * 待更新的列。
@@ -38,7 +38,7 @@ public class CcConstructionplan {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_CONSTRUCTIONPLAN";
+    public static final String ENT_CODE = "CC_QUALITY_CHECK_RECORD";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -116,49 +116,41 @@ public class CcConstructionplan {
          */
         public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
         /**
-         * {"EN": "方案名称", "ZH_CN": "方案名称", "ZH_TW": "方案名称"}。
+         * {"EN": "质量检测主体", "ZH_CN": "质量检测主体", "ZH_TW": "质量检测主体"}。
          */
-        public static final String PLAN_NAME = "PLAN_NAME";
+        public static final String CC_QUALITY_CHECK_MAIN_BODY_ID = "CC_QUALITY_CHECK_MAIN_BODY_ID";
         /**
-         * {"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+         * {"EN": "检测时间", "ZH_CN": "检测时间", "ZH_TW": "检测时间"}。
          */
-        public static final String CC_COMPANY_ID = "CC_COMPANY_ID";
+        public static final String CC_QULITY_CHECK_DATE = "CC_QULITY_CHECK_DATE";
         /**
-         * {"EN": "COMPL_PLAN_DATE", "ZH_CN": "计划完成日期", "ZH_TW": "繁：计划完成日期"}。
+         * {"EN": "检测时间从", "ZH_CN": "检测时间从", "ZH_TW": "检测时间从"}。
          */
-        public static final String COMPL_PLAN_DATE = "COMPL_PLAN_DATE";
+        public static final String CC_QUALITY_CHECK_DATE_FOR = "CC_QUALITY_CHECK_DATE_FOR";
         /**
-         * {"EN": "实际日期", "ZH_CN": "实际日期", "ZH_TW": "实际日期"}。
+         * {"EN": "检测时间到", "ZH_CN": "检测时间到", "ZH_TW": "检测时间到"}。
          */
-        public static final String ACT_DATE = "ACT_DATE";
+        public static final String CC_QUALITY_CHECK_DATE_TO = "CC_QUALITY_CHECK_DATE_TO";
         /**
-         * {"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
+         * {"EN": "质量检测类型", "ZH_CN": "质量检测类型", "ZH_TW": "质量检测类型"}。
          */
-        public static final String ADVANCE_WARNING_DAYS = "ADVANCE_WARNING_DAYS";
+        public static final String CC_QUALITY_CHECK_TYPE_ID = "CC_QUALITY_CHECK_TYPE_ID";
         /**
-         * {"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
+         * {"EN": "质量检测类型内容", "ZH_CN": "质量检测类型内容", "ZH_TW": "质量检测类型内容"}。
          */
-        public static final String AD_USER_ID = "AD_USER_ID";
+        public static final String CC_QUALITY_CHECK_TYPE_CONTENT_ID = "CC_QUALITY_CHECK_TYPE_CONTENT_ID";
         /**
-         * {"EN": "是否需要专家论证", "ZH_CN": "是否需要专家论证", "ZH_TW": "是否需要专家论证"}。
+         * {"EN": "送检批次", "ZH_CN": "送检批次", "ZH_TW": "送检批次"}。
          */
-        public static final String IS_EXPERT_VALIDATION = "IS_EXPERT_VALIDATION";
+        public static final String CC_QULITY_CHECK_BATCH_NUM = "CC_QULITY_CHECK_BATCH_NUM";
         /**
-         * {"EN": "REMARK_LONG_ONE", "ZH_CN": "备注1", "ZH_TW": "繁：备注1"}。
+         * {"EN": "送检合格批次", "ZH_CN": "送检合格批次", "ZH_TW": "送检合格批次"}。
          */
-        public static final String REMARK_LONG_ONE = "REMARK_LONG_ONE";
+        public static final String CC_QULITY_CHECK_BATCH_QULIFIED_NUM = "CC_QULITY_CHECK_BATCH_QULIFIED_NUM";
         /**
-         * {"EN": "IS_START", "ZH_CN": "是否发起", "ZH_TW": "繁：是否发起"}。
+         * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
          */
-        public static final String IS_START = "IS_START";
-        /**
-         * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-         */
-        public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
-        /**
-         * {"EN": "是否完成", "ZH_CN": "是否完成", "ZH_TW": "是否完成"}。
-         */
-        public static final String IS_COMPLETE = "IS_COMPLETE";
+        public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
     }
 
     // </editor-fold>
@@ -181,7 +173,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
      */
-    public CcConstructionplan setId(String id) {
+    public CcQualityCheckRecord setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -217,7 +209,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
      */
-    public CcConstructionplan setVer(Integer ver) {
+    public CcQualityCheckRecord setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -253,7 +245,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
      */
-    public CcConstructionplan setTs(LocalDateTime ts) {
+    public CcQualityCheckRecord setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -289,7 +281,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
      */
-    public CcConstructionplan setIsPreset(Boolean isPreset) {
+    public CcQualityCheckRecord setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -325,7 +317,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
      */
-    public CcConstructionplan setCrtDt(LocalDateTime crtDt) {
+    public CcQualityCheckRecord setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -361,7 +353,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
      */
-    public CcConstructionplan setCrtUserId(String crtUserId) {
+    public CcQualityCheckRecord setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -397,7 +389,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
      */
-    public CcConstructionplan setLastModiDt(LocalDateTime lastModiDt) {
+    public CcQualityCheckRecord setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -433,7 +425,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
      */
-    public CcConstructionplan setLastModiUserId(String lastModiUserId) {
+    public CcQualityCheckRecord setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -469,7 +461,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
      */
-    public CcConstructionplan setStatus(String status) {
+    public CcQualityCheckRecord setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -505,7 +497,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
-    public CcConstructionplan setLkWfInstId(String lkWfInstId) {
+    public CcQualityCheckRecord setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -541,7 +533,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
      */
-    public CcConstructionplan setCode(String code) {
+    public CcQualityCheckRecord setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -577,7 +569,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public CcConstructionplan setName(String name) {
+    public CcQualityCheckRecord setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -613,7 +605,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
-    public CcConstructionplan setRemark(String remark) {
+    public CcQualityCheckRecord setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -649,7 +641,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
-    public CcConstructionplan setFastCode(String fastCode) {
+    public CcQualityCheckRecord setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -685,7 +677,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
      */
-    public CcConstructionplan setIconFileGroupId(String iconFileGroupId) {
+    public CcQualityCheckRecord setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -721,7 +713,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    public CcConstructionplan setCcPrjId(String ccPrjId) {
+    public CcQualityCheckRecord setCcPrjId(String ccPrjId) {
         if (this.ccPrjId == null && ccPrjId == null) {
             // 均为null，不做处理。
         } else if (this.ccPrjId != null && ccPrjId != null) {
@@ -757,7 +749,7 @@ public class CcConstructionplan {
     /**
      * 设置：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
      */
-    public CcConstructionplan setCcPrjStructNodeId(String ccPrjStructNodeId) {
+    public CcQualityCheckRecord setCcPrjStructNodeId(String ccPrjStructNodeId) {
         if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
             // 均为null，不做处理。
         } else if (this.ccPrjStructNodeId != null && ccPrjStructNodeId != null) {
@@ -779,396 +771,324 @@ public class CcConstructionplan {
     }
 
     /**
-     * {"EN": "方案名称", "ZH_CN": "方案名称", "ZH_TW": "方案名称"}。
+     * {"EN": "质量检测主体", "ZH_CN": "质量检测主体", "ZH_TW": "质量检测主体"}。
      */
-    private String planName;
+    private String ccQualityCheckMainBodyId;
 
     /**
-     * 获取：{"EN": "方案名称", "ZH_CN": "方案名称", "ZH_TW": "方案名称"}。
+     * 获取：{"EN": "质量检测主体", "ZH_CN": "质量检测主体", "ZH_TW": "质量检测主体"}。
      */
-    public String getPlanName() {
-        return this.planName;
+    public String getCcQualityCheckMainBodyId() {
+        return this.ccQualityCheckMainBodyId;
     }
 
     /**
-     * 设置：{"EN": "方案名称", "ZH_CN": "方案名称", "ZH_TW": "方案名称"}。
+     * 设置：{"EN": "质量检测主体", "ZH_CN": "质量检测主体", "ZH_TW": "质量检测主体"}。
      */
-    public CcConstructionplan setPlanName(String planName) {
-        if (this.planName == null && planName == null) {
+    public CcQualityCheckRecord setCcQualityCheckMainBodyId(String ccQualityCheckMainBodyId) {
+        if (this.ccQualityCheckMainBodyId == null && ccQualityCheckMainBodyId == null) {
             // 均为null，不做处理。
-        } else if (this.planName != null && planName != null) {
+        } else if (this.ccQualityCheckMainBodyId != null && ccQualityCheckMainBodyId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.planName.compareTo(planName) != 0) {
-                this.planName = planName;
-                if (!this.toUpdateCols.contains("PLAN_NAME")) {
-                    this.toUpdateCols.add("PLAN_NAME");
+            if (this.ccQualityCheckMainBodyId.compareTo(ccQualityCheckMainBodyId) != 0) {
+                this.ccQualityCheckMainBodyId = ccQualityCheckMainBodyId;
+                if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_MAIN_BODY_ID")) {
+                    this.toUpdateCols.add("CC_QUALITY_CHECK_MAIN_BODY_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.planName = planName;
-            if (!this.toUpdateCols.contains("PLAN_NAME")) {
-                this.toUpdateCols.add("PLAN_NAME");
+            this.ccQualityCheckMainBodyId = ccQualityCheckMainBodyId;
+            if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_MAIN_BODY_ID")) {
+                this.toUpdateCols.add("CC_QUALITY_CHECK_MAIN_BODY_ID");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+     * {"EN": "检测时间", "ZH_CN": "检测时间", "ZH_TW": "检测时间"}。
      */
-    private String ccCompanyId;
+    private LocalDate ccQulityCheckDate;
 
     /**
-     * 获取：{"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+     * 获取：{"EN": "检测时间", "ZH_CN": "检测时间", "ZH_TW": "检测时间"}。
      */
-    public String getCcCompanyId() {
-        return this.ccCompanyId;
+    public LocalDate getCcQulityCheckDate() {
+        return this.ccQulityCheckDate;
     }
 
     /**
-     * 设置：{"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+     * 设置：{"EN": "检测时间", "ZH_CN": "检测时间", "ZH_TW": "检测时间"}。
      */
-    public CcConstructionplan setCcCompanyId(String ccCompanyId) {
-        if (this.ccCompanyId == null && ccCompanyId == null) {
+    public CcQualityCheckRecord setCcQulityCheckDate(LocalDate ccQulityCheckDate) {
+        if (this.ccQulityCheckDate == null && ccQulityCheckDate == null) {
             // 均为null，不做处理。
-        } else if (this.ccCompanyId != null && ccCompanyId != null) {
+        } else if (this.ccQulityCheckDate != null && ccQulityCheckDate != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccCompanyId.compareTo(ccCompanyId) != 0) {
-                this.ccCompanyId = ccCompanyId;
-                if (!this.toUpdateCols.contains("CC_COMPANY_ID")) {
-                    this.toUpdateCols.add("CC_COMPANY_ID");
+            if (this.ccQulityCheckDate.compareTo(ccQulityCheckDate) != 0) {
+                this.ccQulityCheckDate = ccQulityCheckDate;
+                if (!this.toUpdateCols.contains("CC_QULITY_CHECK_DATE")) {
+                    this.toUpdateCols.add("CC_QULITY_CHECK_DATE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccCompanyId = ccCompanyId;
-            if (!this.toUpdateCols.contains("CC_COMPANY_ID")) {
-                this.toUpdateCols.add("CC_COMPANY_ID");
+            this.ccQulityCheckDate = ccQulityCheckDate;
+            if (!this.toUpdateCols.contains("CC_QULITY_CHECK_DATE")) {
+                this.toUpdateCols.add("CC_QULITY_CHECK_DATE");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "COMPL_PLAN_DATE", "ZH_CN": "计划完成日期", "ZH_TW": "繁：计划完成日期"}。
+     * {"EN": "检测时间从", "ZH_CN": "检测时间从", "ZH_TW": "检测时间从"}。
      */
-    private LocalDate complPlanDate;
+    private LocalDate ccQualityCheckDateFor;
 
     /**
-     * 获取：{"EN": "COMPL_PLAN_DATE", "ZH_CN": "计划完成日期", "ZH_TW": "繁：计划完成日期"}。
+     * 获取：{"EN": "检测时间从", "ZH_CN": "检测时间从", "ZH_TW": "检测时间从"}。
      */
-    public LocalDate getComplPlanDate() {
-        return this.complPlanDate;
+    public LocalDate getCcQualityCheckDateFor() {
+        return this.ccQualityCheckDateFor;
     }
 
     /**
-     * 设置：{"EN": "COMPL_PLAN_DATE", "ZH_CN": "计划完成日期", "ZH_TW": "繁：计划完成日期"}。
+     * 设置：{"EN": "检测时间从", "ZH_CN": "检测时间从", "ZH_TW": "检测时间从"}。
      */
-    public CcConstructionplan setComplPlanDate(LocalDate complPlanDate) {
-        if (this.complPlanDate == null && complPlanDate == null) {
+    public CcQualityCheckRecord setCcQualityCheckDateFor(LocalDate ccQualityCheckDateFor) {
+        if (this.ccQualityCheckDateFor == null && ccQualityCheckDateFor == null) {
             // 均为null，不做处理。
-        } else if (this.complPlanDate != null && complPlanDate != null) {
+        } else if (this.ccQualityCheckDateFor != null && ccQualityCheckDateFor != null) {
             // 均非null，判定不等，再做处理：
-            if (this.complPlanDate.compareTo(complPlanDate) != 0) {
-                this.complPlanDate = complPlanDate;
-                if (!this.toUpdateCols.contains("COMPL_PLAN_DATE")) {
-                    this.toUpdateCols.add("COMPL_PLAN_DATE");
+            if (this.ccQualityCheckDateFor.compareTo(ccQualityCheckDateFor) != 0) {
+                this.ccQualityCheckDateFor = ccQualityCheckDateFor;
+                if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_DATE_FOR")) {
+                    this.toUpdateCols.add("CC_QUALITY_CHECK_DATE_FOR");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.complPlanDate = complPlanDate;
-            if (!this.toUpdateCols.contains("COMPL_PLAN_DATE")) {
-                this.toUpdateCols.add("COMPL_PLAN_DATE");
+            this.ccQualityCheckDateFor = ccQualityCheckDateFor;
+            if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_DATE_FOR")) {
+                this.toUpdateCols.add("CC_QUALITY_CHECK_DATE_FOR");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "实际日期", "ZH_CN": "实际日期", "ZH_TW": "实际日期"}。
+     * {"EN": "检测时间到", "ZH_CN": "检测时间到", "ZH_TW": "检测时间到"}。
      */
-    private LocalDate actDate;
+    private LocalDate ccQualityCheckDateTo;
 
     /**
-     * 获取：{"EN": "实际日期", "ZH_CN": "实际日期", "ZH_TW": "实际日期"}。
+     * 获取：{"EN": "检测时间到", "ZH_CN": "检测时间到", "ZH_TW": "检测时间到"}。
      */
-    public LocalDate getActDate() {
-        return this.actDate;
+    public LocalDate getCcQualityCheckDateTo() {
+        return this.ccQualityCheckDateTo;
     }
 
     /**
-     * 设置：{"EN": "实际日期", "ZH_CN": "实际日期", "ZH_TW": "实际日期"}。
+     * 设置：{"EN": "检测时间到", "ZH_CN": "检测时间到", "ZH_TW": "检测时间到"}。
      */
-    public CcConstructionplan setActDate(LocalDate actDate) {
-        if (this.actDate == null && actDate == null) {
+    public CcQualityCheckRecord setCcQualityCheckDateTo(LocalDate ccQualityCheckDateTo) {
+        if (this.ccQualityCheckDateTo == null && ccQualityCheckDateTo == null) {
             // 均为null，不做处理。
-        } else if (this.actDate != null && actDate != null) {
+        } else if (this.ccQualityCheckDateTo != null && ccQualityCheckDateTo != null) {
             // 均非null，判定不等，再做处理：
-            if (this.actDate.compareTo(actDate) != 0) {
-                this.actDate = actDate;
-                if (!this.toUpdateCols.contains("ACT_DATE")) {
-                    this.toUpdateCols.add("ACT_DATE");
+            if (this.ccQualityCheckDateTo.compareTo(ccQualityCheckDateTo) != 0) {
+                this.ccQualityCheckDateTo = ccQualityCheckDateTo;
+                if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_DATE_TO")) {
+                    this.toUpdateCols.add("CC_QUALITY_CHECK_DATE_TO");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.actDate = actDate;
-            if (!this.toUpdateCols.contains("ACT_DATE")) {
-                this.toUpdateCols.add("ACT_DATE");
+            this.ccQualityCheckDateTo = ccQualityCheckDateTo;
+            if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_DATE_TO")) {
+                this.toUpdateCols.add("CC_QUALITY_CHECK_DATE_TO");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
+     * {"EN": "质量检测类型", "ZH_CN": "质量检测类型", "ZH_TW": "质量检测类型"}。
      */
-    private String advanceWarningDays;
+    private String ccQualityCheckTypeId;
 
     /**
-     * 获取：{"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
+     * 获取：{"EN": "质量检测类型", "ZH_CN": "质量检测类型", "ZH_TW": "质量检测类型"}。
      */
-    public String getAdvanceWarningDays() {
-        return this.advanceWarningDays;
+    public String getCcQualityCheckTypeId() {
+        return this.ccQualityCheckTypeId;
     }
 
     /**
-     * 设置：{"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
+     * 设置：{"EN": "质量检测类型", "ZH_CN": "质量检测类型", "ZH_TW": "质量检测类型"}。
      */
-    public CcConstructionplan setAdvanceWarningDays(String advanceWarningDays) {
-        if (this.advanceWarningDays == null && advanceWarningDays == null) {
+    public CcQualityCheckRecord setCcQualityCheckTypeId(String ccQualityCheckTypeId) {
+        if (this.ccQualityCheckTypeId == null && ccQualityCheckTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.advanceWarningDays != null && advanceWarningDays != null) {
+        } else if (this.ccQualityCheckTypeId != null && ccQualityCheckTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.advanceWarningDays.compareTo(advanceWarningDays) != 0) {
-                this.advanceWarningDays = advanceWarningDays;
-                if (!this.toUpdateCols.contains("ADVANCE_WARNING_DAYS")) {
-                    this.toUpdateCols.add("ADVANCE_WARNING_DAYS");
+            if (this.ccQualityCheckTypeId.compareTo(ccQualityCheckTypeId) != 0) {
+                this.ccQualityCheckTypeId = ccQualityCheckTypeId;
+                if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_QUALITY_CHECK_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.advanceWarningDays = advanceWarningDays;
-            if (!this.toUpdateCols.contains("ADVANCE_WARNING_DAYS")) {
-                this.toUpdateCols.add("ADVANCE_WARNING_DAYS");
+            this.ccQualityCheckTypeId = ccQualityCheckTypeId;
+            if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_TYPE_ID")) {
+                this.toUpdateCols.add("CC_QUALITY_CHECK_TYPE_ID");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
+     * {"EN": "质量检测类型内容", "ZH_CN": "质量检测类型内容", "ZH_TW": "质量检测类型内容"}。
      */
-    private String adUserId;
+    private String ccQualityCheckTypeContentId;
 
     /**
-     * 获取：{"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
+     * 获取：{"EN": "质量检测类型内容", "ZH_CN": "质量检测类型内容", "ZH_TW": "质量检测类型内容"}。
      */
-    public String getAdUserId() {
-        return this.adUserId;
+    public String getCcQualityCheckTypeContentId() {
+        return this.ccQualityCheckTypeContentId;
     }
 
     /**
-     * 设置：{"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
+     * 设置：{"EN": "质量检测类型内容", "ZH_CN": "质量检测类型内容", "ZH_TW": "质量检测类型内容"}。
      */
-    public CcConstructionplan setAdUserId(String adUserId) {
-        if (this.adUserId == null && adUserId == null) {
+    public CcQualityCheckRecord setCcQualityCheckTypeContentId(String ccQualityCheckTypeContentId) {
+        if (this.ccQualityCheckTypeContentId == null && ccQualityCheckTypeContentId == null) {
             // 均为null，不做处理。
-        } else if (this.adUserId != null && adUserId != null) {
+        } else if (this.ccQualityCheckTypeContentId != null && ccQualityCheckTypeContentId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.adUserId.compareTo(adUserId) != 0) {
-                this.adUserId = adUserId;
-                if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                    this.toUpdateCols.add("AD_USER_ID");
+            if (this.ccQualityCheckTypeContentId.compareTo(ccQualityCheckTypeContentId) != 0) {
+                this.ccQualityCheckTypeContentId = ccQualityCheckTypeContentId;
+                if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_TYPE_CONTENT_ID")) {
+                    this.toUpdateCols.add("CC_QUALITY_CHECK_TYPE_CONTENT_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.adUserId = adUserId;
-            if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                this.toUpdateCols.add("AD_USER_ID");
+            this.ccQualityCheckTypeContentId = ccQualityCheckTypeContentId;
+            if (!this.toUpdateCols.contains("CC_QUALITY_CHECK_TYPE_CONTENT_ID")) {
+                this.toUpdateCols.add("CC_QUALITY_CHECK_TYPE_CONTENT_ID");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "是否需要专家论证", "ZH_CN": "是否需要专家论证", "ZH_TW": "是否需要专家论证"}。
+     * {"EN": "送检批次", "ZH_CN": "送检批次", "ZH_TW": "送检批次"}。
      */
-    private Boolean isExpertValidation;
+    private Integer ccQulityCheckBatchNum;
 
     /**
-     * 获取：{"EN": "是否需要专家论证", "ZH_CN": "是否需要专家论证", "ZH_TW": "是否需要专家论证"}。
+     * 获取：{"EN": "送检批次", "ZH_CN": "送检批次", "ZH_TW": "送检批次"}。
      */
-    public Boolean getIsExpertValidation() {
-        return this.isExpertValidation;
+    public Integer getCcQulityCheckBatchNum() {
+        return this.ccQulityCheckBatchNum;
     }
 
     /**
-     * 设置：{"EN": "是否需要专家论证", "ZH_CN": "是否需要专家论证", "ZH_TW": "是否需要专家论证"}。
+     * 设置：{"EN": "送检批次", "ZH_CN": "送检批次", "ZH_TW": "送检批次"}。
      */
-    public CcConstructionplan setIsExpertValidation(Boolean isExpertValidation) {
-        if (this.isExpertValidation == null && isExpertValidation == null) {
+    public CcQualityCheckRecord setCcQulityCheckBatchNum(Integer ccQulityCheckBatchNum) {
+        if (this.ccQulityCheckBatchNum == null && ccQulityCheckBatchNum == null) {
             // 均为null，不做处理。
-        } else if (this.isExpertValidation != null && isExpertValidation != null) {
+        } else if (this.ccQulityCheckBatchNum != null && ccQulityCheckBatchNum != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isExpertValidation.compareTo(isExpertValidation) != 0) {
-                this.isExpertValidation = isExpertValidation;
-                if (!this.toUpdateCols.contains("IS_EXPERT_VALIDATION")) {
-                    this.toUpdateCols.add("IS_EXPERT_VALIDATION");
+            if (this.ccQulityCheckBatchNum.compareTo(ccQulityCheckBatchNum) != 0) {
+                this.ccQulityCheckBatchNum = ccQulityCheckBatchNum;
+                if (!this.toUpdateCols.contains("CC_QULITY_CHECK_BATCH_NUM")) {
+                    this.toUpdateCols.add("CC_QULITY_CHECK_BATCH_NUM");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isExpertValidation = isExpertValidation;
-            if (!this.toUpdateCols.contains("IS_EXPERT_VALIDATION")) {
-                this.toUpdateCols.add("IS_EXPERT_VALIDATION");
+            this.ccQulityCheckBatchNum = ccQulityCheckBatchNum;
+            if (!this.toUpdateCols.contains("CC_QULITY_CHECK_BATCH_NUM")) {
+                this.toUpdateCols.add("CC_QULITY_CHECK_BATCH_NUM");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "REMARK_LONG_ONE", "ZH_CN": "备注1", "ZH_TW": "繁：备注1"}。
+     * {"EN": "送检合格批次", "ZH_CN": "送检合格批次", "ZH_TW": "送检合格批次"}。
      */
-    private String remarkLongOne;
+    private Integer ccQulityCheckBatchQulifiedNum;
 
     /**
-     * 获取：{"EN": "REMARK_LONG_ONE", "ZH_CN": "备注1", "ZH_TW": "繁：备注1"}。
+     * 获取：{"EN": "送检合格批次", "ZH_CN": "送检合格批次", "ZH_TW": "送检合格批次"}。
      */
-    public String getRemarkLongOne() {
-        return this.remarkLongOne;
+    public Integer getCcQulityCheckBatchQulifiedNum() {
+        return this.ccQulityCheckBatchQulifiedNum;
     }
 
     /**
-     * 设置：{"EN": "REMARK_LONG_ONE", "ZH_CN": "备注1", "ZH_TW": "繁：备注1"}。
+     * 设置：{"EN": "送检合格批次", "ZH_CN": "送检合格批次", "ZH_TW": "送检合格批次"}。
      */
-    public CcConstructionplan setRemarkLongOne(String remarkLongOne) {
-        if (this.remarkLongOne == null && remarkLongOne == null) {
+    public CcQualityCheckRecord setCcQulityCheckBatchQulifiedNum(Integer ccQulityCheckBatchQulifiedNum) {
+        if (this.ccQulityCheckBatchQulifiedNum == null && ccQulityCheckBatchQulifiedNum == null) {
             // 均为null，不做处理。
-        } else if (this.remarkLongOne != null && remarkLongOne != null) {
+        } else if (this.ccQulityCheckBatchQulifiedNum != null && ccQulityCheckBatchQulifiedNum != null) {
             // 均非null，判定不等，再做处理：
-            if (this.remarkLongOne.compareTo(remarkLongOne) != 0) {
-                this.remarkLongOne = remarkLongOne;
-                if (!this.toUpdateCols.contains("REMARK_LONG_ONE")) {
-                    this.toUpdateCols.add("REMARK_LONG_ONE");
+            if (this.ccQulityCheckBatchQulifiedNum.compareTo(ccQulityCheckBatchQulifiedNum) != 0) {
+                this.ccQulityCheckBatchQulifiedNum = ccQulityCheckBatchQulifiedNum;
+                if (!this.toUpdateCols.contains("CC_QULITY_CHECK_BATCH_QULIFIED_NUM")) {
+                    this.toUpdateCols.add("CC_QULITY_CHECK_BATCH_QULIFIED_NUM");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.remarkLongOne = remarkLongOne;
-            if (!this.toUpdateCols.contains("REMARK_LONG_ONE")) {
-                this.toUpdateCols.add("REMARK_LONG_ONE");
+            this.ccQulityCheckBatchQulifiedNum = ccQulityCheckBatchQulifiedNum;
+            if (!this.toUpdateCols.contains("CC_QULITY_CHECK_BATCH_QULIFIED_NUM")) {
+                this.toUpdateCols.add("CC_QULITY_CHECK_BATCH_QULIFIED_NUM");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "IS_START", "ZH_CN": "是否发起", "ZH_TW": "繁：是否发起"}。
+     * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
      */
-    private Boolean isStart;
+    private String ccAttachment;
 
     /**
-     * 获取：{"EN": "IS_START", "ZH_CN": "是否发起", "ZH_TW": "繁：是否发起"}。
+     * 获取：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
      */
-    public Boolean getIsStart() {
-        return this.isStart;
+    public String getCcAttachment() {
+        return this.ccAttachment;
     }
 
     /**
-     * 设置：{"EN": "IS_START", "ZH_CN": "是否发起", "ZH_TW": "繁：是否发起"}。
+     * 设置：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
      */
-    public CcConstructionplan setIsStart(Boolean isStart) {
-        if (this.isStart == null && isStart == null) {
+    public CcQualityCheckRecord setCcAttachment(String ccAttachment) {
+        if (this.ccAttachment == null && ccAttachment == null) {
             // 均为null，不做处理。
-        } else if (this.isStart != null && isStart != null) {
+        } else if (this.ccAttachment != null && ccAttachment != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isStart.compareTo(isStart) != 0) {
-                this.isStart = isStart;
-                if (!this.toUpdateCols.contains("IS_START")) {
-                    this.toUpdateCols.add("IS_START");
+            if (this.ccAttachment.compareTo(ccAttachment) != 0) {
+                this.ccAttachment = ccAttachment;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                    this.toUpdateCols.add("CC_ATTACHMENT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isStart = isStart;
-            if (!this.toUpdateCols.contains("IS_START")) {
-                this.toUpdateCols.add("IS_START");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-     */
-    private String ccAttachments;
-
-    /**
-     * 获取：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-     */
-    public String getCcAttachments() {
-        return this.ccAttachments;
-    }
-
-    /**
-     * 设置：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-     */
-    public CcConstructionplan setCcAttachments(String ccAttachments) {
-        if (this.ccAttachments == null && ccAttachments == null) {
-            // 均为null，不做处理。
-        } else if (this.ccAttachments != null && ccAttachments != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccAttachments.compareTo(ccAttachments) != 0) {
-                this.ccAttachments = ccAttachments;
-                if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                    this.toUpdateCols.add("CC_ATTACHMENTS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccAttachments = ccAttachments;
-            if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                this.toUpdateCols.add("CC_ATTACHMENTS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "是否完成", "ZH_CN": "是否完成", "ZH_TW": "是否完成"}。
-     */
-    private Boolean isComplete;
-
-    /**
-     * 获取：{"EN": "是否完成", "ZH_CN": "是否完成", "ZH_TW": "是否完成"}。
-     */
-    public Boolean getIsComplete() {
-        return this.isComplete;
-    }
-
-    /**
-     * 设置：{"EN": "是否完成", "ZH_CN": "是否完成", "ZH_TW": "是否完成"}。
-     */
-    public CcConstructionplan setIsComplete(Boolean isComplete) {
-        if (this.isComplete == null && isComplete == null) {
-            // 均为null，不做处理。
-        } else if (this.isComplete != null && isComplete != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.isComplete.compareTo(isComplete) != 0) {
-                this.isComplete = isComplete;
-                if (!this.toUpdateCols.contains("IS_COMPLETE")) {
-                    this.toUpdateCols.add("IS_COMPLETE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.isComplete = isComplete;
-            if (!this.toUpdateCols.contains("IS_COMPLETE")) {
-                this.toUpdateCols.add("IS_COMPLETE");
+            this.ccAttachment = ccAttachment;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                this.toUpdateCols.add("CC_ATTACHMENT");
             }
         }
         return this;
@@ -1261,8 +1181,8 @@ public class CcConstructionplan {
      *
      * @return
      */
-    public static CcConstructionplan newData() {
-        CcConstructionplan obj = modelHelper.newData();
+    public static CcQualityCheckRecord newData() {
+        CcQualityCheckRecord obj = modelHelper.newData();
         return obj;
     }
 
@@ -1271,8 +1191,8 @@ public class CcConstructionplan {
      *
      * @return
      */
-    public static CcConstructionplan insertData() {
-        CcConstructionplan obj = modelHelper.insertData();
+    public static CcQualityCheckRecord insertData() {
+        CcQualityCheckRecord obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1284,8 +1204,8 @@ public class CcConstructionplan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcConstructionplan selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcConstructionplan obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcQualityCheckRecord selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcQualityCheckRecord obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1295,7 +1215,7 @@ public class CcConstructionplan {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcConstructionplan selectById(String id) {
+    public static CcQualityCheckRecord selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1307,8 +1227,8 @@ public class CcConstructionplan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructionplan> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcConstructionplan> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcQualityCheckRecord> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcQualityCheckRecord> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1318,7 +1238,7 @@ public class CcConstructionplan {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructionplan> selectByIds(List<String> ids) {
+    public static List<CcQualityCheckRecord> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1330,8 +1250,8 @@ public class CcConstructionplan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructionplan> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcConstructionplan> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcQualityCheckRecord> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcQualityCheckRecord> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1341,7 +1261,7 @@ public class CcConstructionplan {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructionplan> selectByWhere(Where where) {
+    public static List<CcQualityCheckRecord> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1353,10 +1273,10 @@ public class CcConstructionplan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcConstructionplan selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcConstructionplan> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcQualityCheckRecord selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcQualityCheckRecord> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcConstructionplan.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcQualityCheckRecord.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1368,7 +1288,7 @@ public class CcConstructionplan {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcConstructionplan selectOneByWhere(Where where) {
+    public static CcQualityCheckRecord selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1482,7 +1402,7 @@ public class CcConstructionplan {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcConstructionplan fromModel, CcConstructionplan toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcQualityCheckRecord fromModel, CcQualityCheckRecord toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1492,7 +1412,7 @@ public class CcConstructionplan {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcConstructionplan fromModel, CcConstructionplan toModel) {
+    public static void copyCols(CcQualityCheckRecord fromModel, CcQualityCheckRecord toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 
