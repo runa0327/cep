@@ -199,21 +199,27 @@ public class InspectionExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
+
+//            System.out.println("ccQsInspection" + ccQsInspection);
+
             String ccQsIssueLevelId = ccQsInspection.getCcQsIssueLevelId();
             String ccPrjId = ccQsInspection.getCcPrjId();
             LocalDate ccQsInspectionTime = ccQsInspection.getCcQsInspectionTime();
-            String ccPrjPbsNodeId = ccQsInspection.getCcPrjPbsNodeId(); //单元工程
+//            String ccPrjPbsNodeId = ccQsInspection.getCcPrjPbsNodeId(); //单元工程
+            String ccPrjStructNodeId = ccQsInspection.getCcPrjStructNodeId();
 
-            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(ccPrjPbsNodeId);
+            System.out.println("ccPrjPbsNodeId" + ccPrjStructNodeId);
+
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(ccPrjStructNodeId);
             String ccPrjPbsNodeName = ccPrjStructNode.getName();
 
             // 该单元工程禁令预警查询
-            CcEarlyWarningSetting prjPbsNodeProhibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
+            CcEarlyWarningSetting prjPbsNodeProhibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId));
             String adUserIds = prjPbsNodeProhibition.getAdUserIds();
             Integer prjPbsNodeTriggeredWarningIssueCount = prjPbsNodeProhibition.getTriggeredWarningIssueCount();
 
             // 该单元工程A类预警查询
-            CcEarlyWarningSetting prjPbsNodeA = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
+            CcEarlyWarningSetting prjPbsNodeA = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId));
             String aAdUserIds = prjPbsNodeA.getAdUserIds();
             Integer prjPbsNodeATriggeredWarningIssueCount = prjPbsNodeA.getTriggeredWarningIssueCount();
 
@@ -221,7 +227,7 @@ public class InspectionExt {
             String sql = "SELECT * FROM cc_qs_inspection i WHERE i.CC_QS_ISSUE_LEVEL_ID = ? AND i.CC_PRJ_ID = ? AND ? >= CURDATE() - INTERVAL 1 MONTH AND i.CC_PRJ_STRUCT_NODE_ID = ?";
 
             // 执行查询
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, ccQsIssueLevelId, ccPrjId, ccQsInspectionTime, ccPrjPbsNodeId);
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, ccQsIssueLevelId, ccPrjId, ccQsInspectionTime, ccPrjStructNodeId);
 
             // 获取该单元工程预警数量
             int size = list.size();
@@ -245,12 +251,12 @@ public class InspectionExt {
             }
 
             // 禁令预警查询
-            CcEarlyWarningSetting allProhibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition"));
+            CcEarlyWarningSetting allProhibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, null));
             String allAdUserIds = allProhibition.getAdUserIds();
             Integer triggeredWarningIssueCount = allProhibition.getTriggeredWarningIssueCount();
 
             // A类预警查询
-            CcEarlyWarningSetting allA = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A"));
+            CcEarlyWarningSetting allA = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, null));
             String allAAdUserIds = allA.getAdUserIds();
             Integer aTriggeredWarningIssueCount = allA.getTriggeredWarningIssueCount();
 
