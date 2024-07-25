@@ -1,9 +1,6 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.CcEarlyWarning;
-import com.bid.ext.model.CcEarlyWarningSetting;
-import com.bid.ext.model.CcPrjMember;
-import com.bid.ext.model.CcQsInspection;
+import com.bid.ext.model.*;
 import com.bid.ext.utils.SysSettingUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -199,7 +196,6 @@ public class InspectionExt {
     public void safeEarlyWarning() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
-
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
@@ -207,44 +203,87 @@ public class InspectionExt {
             String ccPrjId = ccQsInspection.getCcPrjId();
             LocalDate ccQsInspectionTime = ccQsInspection.getCcQsInspectionTime();
             String ccPrjPbsNodeId = ccQsInspection.getCcPrjPbsNodeId(); //单元工程
-            // 禁令预警查询
-            CcEarlyWarningSetting prohibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
-            String adUserIds = prohibition.getAdUserIds();
-            Integer triggeredWarningIssueCount = prohibition.getTriggeredWarningIssueCount();
-            // A类预警查询
-            CcEarlyWarningSetting a = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
-            String aAdUserIds = a.getAdUserIds();
-            Integer aTriggeredWarningIssueCount = a.getTriggeredWarningIssueCount();
 
-            // 构建SQL查询
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(ccPrjPbsNodeId);
+            String ccPrjPbsNodeName = ccPrjStructNode.getName();
+
+            // 该单元工程禁令预警查询
+            CcEarlyWarningSetting prjPbsNodeProhibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
+            String adUserIds = prjPbsNodeProhibition.getAdUserIds();
+            Integer prjPbsNodeTriggeredWarningIssueCount = prjPbsNodeProhibition.getTriggeredWarningIssueCount();
+
+            // 该单元工程A类预警查询
+            CcEarlyWarningSetting prjPbsNodeA = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
+            String aAdUserIds = prjPbsNodeA.getAdUserIds();
+            Integer prjPbsNodeATriggeredWarningIssueCount = prjPbsNodeA.getTriggeredWarningIssueCount();
+
+            // 构建SQL查询该单元工程预警
             String sql = "SELECT * FROM cc_qs_inspection i WHERE i.CC_QS_ISSUE_LEVEL_ID = ? AND i.CC_PRJ_ID = ? AND ? >= CURDATE() - INTERVAL 1 MONTH AND i.CC_PRJ_STRUCT_NODE_ID = ?";
 
             // 执行查询
             List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, ccQsIssueLevelId, ccPrjId, ccQsInspectionTime, ccPrjPbsNodeId);
 
-            // 获取查询结果的大小
+            // 获取该单元工程预警数量
             int size = list.size();
 
-            // 根据问题等级发出预警
+            // 根据问题等级发出对该单元工程的预警
             if (!SharedUtil.isEmpty(list)) {
                 CcEarlyWarning ccEarlyWarning = null;
-                if ("prohibition".equals(ccQsIssueLevelId) && size >= triggeredWarningIssueCount) {
+                if ("prohibition".equals(ccQsIssueLevelId) && size >= prjPbsNodeTriggeredWarningIssueCount) {
                     ccEarlyWarning = CcEarlyWarning.newData();
                     ccEarlyWarning.setAdUserIds(adUserIds);
-                    ccEarlyWarning.setName("禁令类问题已达" + size + "个，请注意现场管控");
-                } else if ("A".equals(ccQsIssueLevelId) && size >= aTriggeredWarningIssueCount) {
+                    ccEarlyWarning.setName(ccPrjPbsNodeName + "单元工程禁令类问题已达" + size + "个，请注意现场管控");
+                } else if ("A".equals(ccQsIssueLevelId) && size >= prjPbsNodeATriggeredWarningIssueCount) {
                     ccEarlyWarning = CcEarlyWarning.newData();
                     ccEarlyWarning.setAdUserIds(aAdUserIds);
-                    ccEarlyWarning.setName("A类问题已达" + size + "个，请注意现场管控");
+                    ccEarlyWarning.setName(ccPrjPbsNodeName + "单元工程A类问题已达" + size + "个，请注意现场管控");
                 }
 
                 if (ccEarlyWarning != null) {
                     ccEarlyWarning.insertById();
                 }
             }
+
+            // 禁令预警查询
+            CcEarlyWarningSetting allProhibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition"));
+            String allAdUserIds = allProhibition.getAdUserIds();
+            Integer triggeredWarningIssueCount = allProhibition.getTriggeredWarningIssueCount();
+
+            // A类预警查询
+            CcEarlyWarningSetting allA = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A"));
+            String allAAdUserIds = allA.getAdUserIds();
+            Integer aTriggeredWarningIssueCount = allA.getTriggeredWarningIssueCount();
+
+            // 构建SQL查询预警总数
+            String allSql = "SELECT * FROM cc_qs_inspection i WHERE i.CC_QS_ISSUE_LEVEL_ID = ? AND i.CC_PRJ_ID = ? AND ? >= CURDATE() - INTERVAL 1 MONTH";
+
+            // 执行查询
+            List<Map<String, Object>> allList = myJdbcTemplate.queryForList(allSql, ccQsIssueLevelId, ccPrjId, ccQsInspectionTime);
+
+            // 获取所有预警的总数
+            int totalSize = allList.size();
+
+            // 根据问题等级发出预警
+            if (!SharedUtil.isEmpty(allList)) {
+                CcEarlyWarning ccEarlyWarning = null;
+                if ("prohibition".equals(ccQsIssueLevelId) && totalSize >= triggeredWarningIssueCount) {
+                    ccEarlyWarning = CcEarlyWarning.newData();
+                    ccEarlyWarning.setAdUserIds(allAdUserIds);
+                    ccEarlyWarning.setName("所有单元工程禁令类问题已达" + totalSize + "个，请注意现场管控");
+                } else if ("A".equals(ccQsIssueLevelId) && totalSize >= aTriggeredWarningIssueCount) {
+                    ccEarlyWarning = CcEarlyWarning.newData();
+                    ccEarlyWarning.setAdUserIds(allAAdUserIds);
+                    ccEarlyWarning.setName("所有单元工程A类问题已达" + totalSize + "个，请注意现场管控");
+                }
+
+                if (ccEarlyWarning != null) {
+                    ccEarlyWarning.insertById();
+                }
+
+
+            }
         }
     }
-
 
     /**
      * 节点扩展。
