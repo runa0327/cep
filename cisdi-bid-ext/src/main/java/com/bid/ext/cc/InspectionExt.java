@@ -199,16 +199,6 @@ public class InspectionExt {
     public void safeEarlyWarning() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
-        // 禁令预警查询
-        CcEarlyWarningSetting prohibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition"));
-        String adUserIds = prohibition.getAdUserIds();
-        Integer triggeredWarningIssueCount = prohibition.getTriggeredWarningIssueCount();
-
-        // A类预警查询
-        CcEarlyWarningSetting a = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A"));
-        String aAdUserIds = a.getAdUserIds();
-        Integer aTriggeredWarningIssueCount = a.getTriggeredWarningIssueCount();
-
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
@@ -216,12 +206,21 @@ public class InspectionExt {
             String ccQsIssueLevelId = ccQsInspection.getCcQsIssueLevelId();
             String ccPrjId = ccQsInspection.getCcPrjId();
             LocalDate ccQsInspectionTime = ccQsInspection.getCcQsInspectionTime();
+            String ccPrjPbsNodeId = ccQsInspection.getCcPrjPbsNodeId(); //单元工程
+            // 禁令预警查询
+            CcEarlyWarningSetting prohibition = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "prohibition").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
+            String adUserIds = prohibition.getAdUserIds();
+            Integer triggeredWarningIssueCount = prohibition.getTriggeredWarningIssueCount();
+            // A类预警查询
+            CcEarlyWarningSetting a = CcEarlyWarningSetting.selectOneByWhere(new Where().eq(CcEarlyWarningSetting.Cols.CC_QS_ISSUE_LEVEL_ID, "A").eq(CcEarlyWarningSetting.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjPbsNodeId));
+            String aAdUserIds = a.getAdUserIds();
+            Integer aTriggeredWarningIssueCount = a.getTriggeredWarningIssueCount();
 
             // 构建SQL查询
-            String sql = "SELECT * FROM cc_qs_inspection i WHERE i.CC_QS_ISSUE_LEVEL_ID = ? AND i.CC_PRJ_ID = ? AND ? >= CURDATE() - INTERVAL 1 MONTH";
+            String sql = "SELECT * FROM cc_qs_inspection i WHERE i.CC_QS_ISSUE_LEVEL_ID = ? AND i.CC_PRJ_ID = ? AND ? >= CURDATE() - INTERVAL 1 MONTH AND i.CC_PRJ_STRUCT_NODE_ID = ?";
 
             // 执行查询
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, ccQsIssueLevelId, ccPrjId, ccQsInspectionTime);
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, ccQsIssueLevelId, ccPrjId, ccQsInspectionTime, ccPrjPbsNodeId);
 
             // 获取查询结果的大小
             int size = list.size();

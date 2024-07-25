@@ -107,6 +107,10 @@ public class CcEarlyWarningSetting {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+         */
+        public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
+        /**
          * {"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
          */
         public static final String CC_QS_ISSUE_LEVEL_ID = "CC_QS_ISSUE_LEVEL_ID";
@@ -660,6 +664,42 @@ public class CcEarlyWarningSetting {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     */
+    private String ccPrjStructNodeId;
+
+    /**
+     * 获取：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     */
+    public String getCcPrjStructNodeId() {
+        return this.ccPrjStructNodeId;
+    }
+
+    /**
+     * 设置：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     */
+    public CcEarlyWarningSetting setCcPrjStructNodeId(String ccPrjStructNodeId) {
+        if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjStructNodeId != null && ccPrjStructNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjStructNodeId.compareTo(ccPrjStructNodeId) != 0) {
+                this.ccPrjStructNodeId = ccPrjStructNodeId;
+                if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjStructNodeId = ccPrjStructNodeId;
+            if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
             }
         }
         return this;
