@@ -22,4 +22,10 @@ public interface CcDrawingManagementMapper {
      * @param ccDrawingManagement 图纸管理实体
      */
     void updateConditionById(CcDrawingManagement ccDrawingManagement);
+
+    /**
+     * 模型取消
+     * @param ccDrawingManagement 图纸管理实体
+     */
+    void modelCancel(CcDrawingManagement ccDrawingManagement);
 }

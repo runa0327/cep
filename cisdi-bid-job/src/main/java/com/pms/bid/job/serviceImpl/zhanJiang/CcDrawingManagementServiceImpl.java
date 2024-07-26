@@ -95,19 +95,27 @@ public class CcDrawingManagementServiceImpl implements CcDrawingManagementServic
             ccDrawingManagement.setTs(now);
             ccDrawingManagement.setLastUpdateBy(createBy);
             ccDrawingManagement.setLastUpdateDate(now);
-            ccDrawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
-            String time = tmp.getCreateTime();
-            if (StringUtils.hasText(time)) {
-                ccDrawingManagement.setThreeDActDate(DateUtil.convertTimestampToDateString(time, "yyyy-MM-dd HH:mm:ss"));
-                ccDrawingManagement.setCcDrawingStatusId("DONE");
-            } else {
-                ccDrawingManagement.setCcDrawingStatusId("TODO");
-            }
             ccDrawingManagement.setMqMsgJson(message);
             ccDrawingManagement.setMqReceiveDateTime(now);
-            ccDrawingManagement.setUnitProjectCode(unitProjectCode);
-            ccDrawingManagement.setUnitProjectId(unitProjectId);
-            ccDrawingManagementMapper.updateConditionById(ccDrawingManagement);
+
+            Integer status = tmp.getStatus();
+            if (status == -1){  //  模型取消
+                ccDrawingManagement.setCcDrawingStatusId("TODO");
+                ccDrawingManagement.setThreeDActDate(null);
+                ccDrawingManagementMapper.modelCancel(ccDrawingManagement);
+            } else {
+                ccDrawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+                String time = tmp.getCreateTime();
+                if (StringUtils.hasText(time)) {
+                    ccDrawingManagement.setThreeDActDate(DateUtil.convertTimestampToDateString(time, "yyyy-MM-dd HH:mm:ss"));
+                    ccDrawingManagement.setCcDrawingStatusId("DONE");
+                } else {
+                    ccDrawingManagement.setCcDrawingStatusId("TODO");
+                }
+                ccDrawingManagement.setUnitProjectCode(unitProjectCode);
+                ccDrawingManagement.setUnitProjectId(unitProjectId);
+                ccDrawingManagementMapper.updateConditionById(ccDrawingManagement);
+            }
         }
     }
 }
