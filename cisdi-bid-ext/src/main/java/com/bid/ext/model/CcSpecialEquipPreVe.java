@@ -109,10 +109,6 @@ public class CcSpecialEquipPreVe {
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * {"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
-         */
-        public static final String ADVANCE_WARNING_DAYS = "ADVANCE_WARNING_DAYS";
-        /**
          * {"EN": "安装单位", "ZH_CN": "安装单位", "ZH_TW": "安装单位"}。
          */
         public static final String CC_SPECIAL_EQUIP_INS_COMPANY = "CC_SPECIAL_EQUIP_INS_COMPANY";
@@ -200,6 +196,26 @@ public class CcSpecialEquipPreVe {
          * {"EN": "设备具备验收条件时间", "ZH_CN": "设备具备验收条件时间", "ZH_TW": "设备具备验收条件时间"}。
          */
         public static final String CC_SPECIAL_EQUIP_CAN_CHECK_AND_ACC_DATE = "CC_SPECIAL_EQUIP_CAN_CHECK_AND_ACC_DATE";
+        /**
+         * {"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+         */
+        public static final String SLIPPAGE_WARNING_DAYS = "SLIPPAGE_WARNING_DAYS";
+        /**
+         * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
+         */
+        public static final String LK_WF_INST_ID_1 = "LK_WF_INST_ID_1";
+        /**
+         * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+         */
+        public static final String LK_WF_INST_ID_2 = "LK_WF_INST_ID_2";
+        /**
+         * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+         */
+        public static final String LK_WF_INST_ID_3 = "LK_WF_INST_ID_3";
+        /**
+         * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+         */
+        public static final String LK_WF_INST_ID_4 = "LK_WF_INST_ID_4";
         /**
          * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
          */
@@ -770,42 +786,6 @@ public class CcSpecialEquipPreVe {
             this.ccPrjId = ccPrjId;
             if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
                 this.toUpdateCols.add("CC_PRJ_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
-     */
-    private String advanceWarningDays;
-
-    /**
-     * 获取：{"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
-     */
-    public String getAdvanceWarningDays() {
-        return this.advanceWarningDays;
-    }
-
-    /**
-     * 设置：{"EN": "提前预警天数", "ZH_CN": "提前预警天数", "ZH_TW": "提前预警天数"}。
-     */
-    public CcSpecialEquipPreVe setAdvanceWarningDays(String advanceWarningDays) {
-        if (this.advanceWarningDays == null && advanceWarningDays == null) {
-            // 均为null，不做处理。
-        } else if (this.advanceWarningDays != null && advanceWarningDays != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.advanceWarningDays.compareTo(advanceWarningDays) != 0) {
-                this.advanceWarningDays = advanceWarningDays;
-                if (!this.toUpdateCols.contains("ADVANCE_WARNING_DAYS")) {
-                    this.toUpdateCols.add("ADVANCE_WARNING_DAYS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.advanceWarningDays = advanceWarningDays;
-            if (!this.toUpdateCols.contains("ADVANCE_WARNING_DAYS")) {
-                this.toUpdateCols.add("ADVANCE_WARNING_DAYS");
             }
         }
         return this;
@@ -1598,6 +1578,186 @@ public class CcSpecialEquipPreVe {
             this.ccSpecialEquipCanCheckAndAccDate = ccSpecialEquipCanCheckAndAccDate;
             if (!this.toUpdateCols.contains("CC_SPECIAL_EQUIP_CAN_CHECK_AND_ACC_DATE")) {
                 this.toUpdateCols.add("CC_SPECIAL_EQUIP_CAN_CHECK_AND_ACC_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+     */
+    private Integer slippageWarningDays;
+
+    /**
+     * 获取：{"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+     */
+    public Integer getSlippageWarningDays() {
+        return this.slippageWarningDays;
+    }
+
+    /**
+     * 设置：{"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+     */
+    public CcSpecialEquipPreVe setSlippageWarningDays(Integer slippageWarningDays) {
+        if (this.slippageWarningDays == null && slippageWarningDays == null) {
+            // 均为null，不做处理。
+        } else if (this.slippageWarningDays != null && slippageWarningDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.slippageWarningDays.compareTo(slippageWarningDays) != 0) {
+                this.slippageWarningDays = slippageWarningDays;
+                if (!this.toUpdateCols.contains("SLIPPAGE_WARNING_DAYS")) {
+                    this.toUpdateCols.add("SLIPPAGE_WARNING_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.slippageWarningDays = slippageWarningDays;
+            if (!this.toUpdateCols.contains("SLIPPAGE_WARNING_DAYS")) {
+                this.toUpdateCols.add("SLIPPAGE_WARNING_DAYS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    private String lkWfInstId1;
+
+    /**
+     * 获取：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    public String getLkWfInstId1() {
+        return this.lkWfInstId1;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    public CcSpecialEquipPreVe setLkWfInstId1(String lkWfInstId1) {
+        if (this.lkWfInstId1 == null && lkWfInstId1 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId1 != null && lkWfInstId1 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId1.compareTo(lkWfInstId1) != 0) {
+                this.lkWfInstId1 = lkWfInstId1;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID_1")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID_1");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId1 = lkWfInstId1;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID_1")) {
+                this.toUpdateCols.add("LK_WF_INST_ID_1");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    private String lkWfInstId2;
+
+    /**
+     * 获取：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    public String getLkWfInstId2() {
+        return this.lkWfInstId2;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    public CcSpecialEquipPreVe setLkWfInstId2(String lkWfInstId2) {
+        if (this.lkWfInstId2 == null && lkWfInstId2 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId2 != null && lkWfInstId2 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId2.compareTo(lkWfInstId2) != 0) {
+                this.lkWfInstId2 = lkWfInstId2;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID_2")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID_2");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId2 = lkWfInstId2;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID_2")) {
+                this.toUpdateCols.add("LK_WF_INST_ID_2");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+     */
+    private String lkWfInstId3;
+
+    /**
+     * 获取：{"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+     */
+    public String getLkWfInstId3() {
+        return this.lkWfInstId3;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+     */
+    public CcSpecialEquipPreVe setLkWfInstId3(String lkWfInstId3) {
+        if (this.lkWfInstId3 == null && lkWfInstId3 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId3 != null && lkWfInstId3 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId3.compareTo(lkWfInstId3) != 0) {
+                this.lkWfInstId3 = lkWfInstId3;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID_3")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID_3");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId3 = lkWfInstId3;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID_3")) {
+                this.toUpdateCols.add("LK_WF_INST_ID_3");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+     */
+    private String lkWfInstId4;
+
+    /**
+     * 获取：{"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+     */
+    public String getLkWfInstId4() {
+        return this.lkWfInstId4;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+     */
+    public CcSpecialEquipPreVe setLkWfInstId4(String lkWfInstId4) {
+        if (this.lkWfInstId4 == null && lkWfInstId4 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId4 != null && lkWfInstId4 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId4.compareTo(lkWfInstId4) != 0) {
+                this.lkWfInstId4 = lkWfInstId4;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID_4")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID_4");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId4 = lkWfInstId4;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID_4")) {
+                this.toUpdateCols.add("LK_WF_INST_ID_4");
             }
         }
         return this;

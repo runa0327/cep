@@ -1,7 +1,12 @@
 package com.pms.bid.job.service.processInstance;
 
 import com.pms.bid.job.domain.process.ConstructionPlan;
+import com.pms.bid.job.domain.process.SpecialEquipPreVe;
+import com.pms.bid.job.domain.processInstance.WfNode;
+import com.pms.bid.job.domain.processInstance.WfProcess;
 import com.pms.bid.job.domain.processInstance.WfProcessInstance;
+
+import java.util.Map;
 
 public interface WfProcessInstanceService {
 
@@ -17,4 +22,17 @@ public interface WfProcessInstanceService {
      * @param tmp 施工方案计划数据
      */
     String createWfProcessToSendNode(ConstructionPlan tmp);
+
+
+    /**
+     * 发起压力容器计划流程
+     * @param tmp 施工方案计划数据
+     */
+    Map<String,String> createWfProcessToSendNode(SpecialEquipPreVe tmp, String firstNodeId, String wfProcessId, String entId, String entCode, String adUserId);
+
+    /**
+     * 创建一般压力容器待办任务
+     * @param  processInstanceId
+     */
+    String  createUserTask(String  processInstanceId, String taskUser, Integer isCurrent, String now, String createBy);
 }

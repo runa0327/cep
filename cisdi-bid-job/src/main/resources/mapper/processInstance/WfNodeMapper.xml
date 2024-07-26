@@ -45,9 +45,12 @@
             a.NAME ->> '$.ZH_CN' AS wfNodeName,
             a.AD_VIEW_ID AS viewId,
             a.wf_process_id as wfProcessId,
-            a.SEQ_NO as seqNo
+            a.SEQ_NO as seqNo,
+            b.AD_ACT_ID as adActId,
+            b.TO_NODE_ID as toNodeId
         FROM
             wf_node a
+            left join wf_flow b on a.id = b.FROM_NODE_ID
         WHERE
             a.id = #{nodeId}
     </select>

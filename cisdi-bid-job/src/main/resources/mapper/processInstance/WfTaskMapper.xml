@@ -28,7 +28,8 @@
             WF_PROCESS_ID,
             WF_PROCESS_INSTANCE_ID,
             WF_NODE_ID,
-            AD_ACT_ID
+            AD_ACT_ID,
+            VER
         ) values (
             #{id},
             #{wfNodeInstanceId},
@@ -50,7 +51,8 @@
             #{wfProcessId},
             #{wfProcessInstanceId},
             #{wfNodeId},
-            #{adActId}
+            #{adActId},
+            #{ver}
         )
     </insert>
 </mapper>

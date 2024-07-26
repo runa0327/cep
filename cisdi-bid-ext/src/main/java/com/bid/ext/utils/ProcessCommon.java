@@ -161,8 +161,10 @@ public class ProcessCommon {
 
 
 
-    public static void closeTask(String wfProcessInstanceId,String wfNodeInstanceId,String wfProcessId,String wfNodeId,String taskUserId,String userId,String now,String actNow,String actId,String isClosed,String inCurrentRound,String isFirstTask) {
+    public static void closeTask(WfTask task) {
 
+        task.setIsClosed(true);
+        task.updateById();
     }
 
     /**

@@ -111,4 +111,9 @@
         where
             id = #{id}
     </update>
+
+
+    <select id="queryNodeInstanceId" resultType="string">
+        select id from wf_node_instance where wf_process_INSTANCE_ID = #{processInstanceId} AND WF_NODE_ID = '1816078659061559296' AND IS_CURRENT = 1
+    </select>
 </mapper>
