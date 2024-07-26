@@ -248,4 +248,99 @@ public class DocExt {
         }
     }
 
+    /**
+     * 批量上传项目文档
+     */
+    public void uploadDocFileBatch() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+        String ccPrjId = JdbcMapUtil.getString(varMap, "P_PRJ_ID");
+        String ccDocDirId = JdbcMapUtil.getString(varMap, "P_DOC_DIR_ID");
+        List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+
+        for (String attachmentId : ccAttachmentList) {
+            FlFile flFile = FlFile.selectById(attachmentId);
+            String dspName = flFile.getDspName();
+            String name = flFile.getName();
+            String dspSize = flFile.getDspSize();
+
+            CcDocFile ccDocFile = CcDocFile.newData();
+            ccDocFile.setCcPrjId(ccPrjId);
+            ccDocFile.setName(name);
+            ccDocFile.setCcPreviewDspSize(dspSize);
+
+            ccDocFile.setIsDefault(false);
+            ccDocFile.setIsFavorites(false);
+
+            dspName = dspName.toLowerCase();
+            String fileType = null;
+            if (dspName.endsWith("rar") || dspName.endsWith("7z") || dspName.endsWith("tar") || dspName.endsWith("gzip") || dspName.endsWith("bzip2") || dspName.endsWith("iso")) {
+                fileType = "ARCHIVE";
+            } else if (dspName.endsWith("rvt") || dspName.endsWith("ifc") || dspName.endsWith("bimx") || dspName.endsWith("pln")) {
+                fileType = "BIM";
+            } else if (dspName.endsWith("dwg") || dspName.endsWith("dxf") || dspName.endsWith("cad") || dspName.endsWith("stl")) {
+                fileType = "CAD";
+            } else if (dspName.endsWith("xls") || dspName.endsWith("xlsx") || dspName.endsWith("doc") || dspName.endsWith("docx")) {
+                fileType = "DOC";
+            } else if (dspName.endsWith("mp4") || dspName.endsWith("avi") || dspName.endsWith("mov") || dspName.endsWith("wmv") || dspName.endsWith("flv") || dspName.endsWith("mkv") || dspName.endsWith("webm") || dspName.endsWith("wp3") || dspName.endsWith("wav")) {
+                fileType = "MEDIA";
+            } else if (dspName.endsWith("vrml") || dspName.endsWith("obj") || dspName.endsWith("fbx") || dspName.endsWith("dae")) {
+                fileType = "VR";
+            } else {
+                continue; //todo 确认非法格式的逻辑是什么，前端过滤还是后端过滤，文件类型如何设置
+            }
+
+            ccDocFile.setCcDocFileTypeId(fileType);
+            ccDocFile.setCcDocDirId(ccDocDirId);
+            ccDocFile.insertById();
+
+        }
+
+    }
+
+    /**
+     * 批量上传CAD图纸或VR全景，CAD图纸格式要求dwg，VR全景格式要求jpg和png
+     */
+    public void uploadVrOrCadFileBatch() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+        String ccPrjId = JdbcMapUtil.getString(varMap, "P_PRJ_ID");
+        String ccDocDirId = JdbcMapUtil.getString(varMap, "P_DOC_DIR_ID");
+        List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+
+        for (String attachmentId : ccAttachmentList) {
+            FlFile flFile = FlFile.selectById(attachmentId);
+            String dspName = flFile.getDspName();
+            String name = flFile.getName();
+            String dspSize = flFile.getDspSize();
+
+            CcDocFile ccDocFile = CcDocFile.newData();
+            ccDocFile.setCcPrjId(ccPrjId);
+            ccDocFile.setName(name);
+            ccDocFile.setCcPreviewDspSize(dspSize);
+
+            ccDocFile.setIsDefault(false);
+            ccDocFile.setIsFavorites(false);
+
+            dspName = dspName.toLowerCase();
+            String fileType = null;
+            if (dspName.endsWith("dwg")) {
+                fileType = "CAD";
+            } else if (dspName.endsWith("jpg") || dspName.endsWith("png")) {
+                fileType = "VR";
+            } else {
+                continue;
+            }
+
+            ccDocFile.setCcDocFileTypeId(fileType);
+            ccDocFile.setCcDocDirId(ccDocDirId);
+            ccDocFile.insertById();
+
+        }
+
+
+    }
+
 }
