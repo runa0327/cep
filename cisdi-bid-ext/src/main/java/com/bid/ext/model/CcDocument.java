@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "预警", "ZH_CN": "预警设置", "ZH_TW": "预警"}。
+ * {"EN": "新增工文", "ZH_CN": "公文", "ZH_TW": "新增工文"}。
  */
-public class CcEarlyWarningSetting {
+public class CcDocument {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcEarlyWarningSetting> modelHelper = new ModelHelper<>("CC_EARLY_WARNING_SETTING", new CcEarlyWarningSetting());
+    private static final ModelHelper<CcDocument> modelHelper = new ModelHelper<>("CC_DOCUMENT", new CcDocument());
 
     /**
      * 待更新的列。
@@ -37,7 +37,7 @@ public class CcEarlyWarningSetting {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_EARLY_WARNING_SETTING";
+    public static final String ENT_CODE = "CC_DOCUMENT";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -46,6 +46,10 @@ public class CcEarlyWarningSetting {
     // <editor-fold>
 
     public static class Cols {
+        /**
+         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+         */
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
          * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
          */
@@ -107,27 +111,67 @@ public class CcEarlyWarningSetting {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+         * {"EN": "接收人", "ZH_CN": "接收人", "ZH_TW": "接收人"}。
          */
-        public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
+        public static final String RCV_USER_IDS = "RCV_USER_IDS";
         /**
-         * {"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+         * {"EN": "抄送人", "ZH_CN": "抄送人", "ZH_TW": "抄送人"}。
          */
-        public static final String CC_QS_ISSUE_LEVEL_ID = "CC_QS_ISSUE_LEVEL_ID";
+        public static final String CARBON_COPY_USER_IDS = "CARBON_COPY_USER_IDS";
         /**
-         * {"EN": "禁令类>时", "ZH_CN": "触发预警问题数", "ZH_TW": "禁令类>时"}。
+         * {"EN": "传输单位", "ZH_CN": "发文单位", "ZH_TW": "传输单位"}。
          */
-        public static final String TRIGGERED_WARNING_ISSUE_COUNT = "TRIGGERED_WARNING_ISSUE_COUNT";
+        public static final String TRANSMISSIONUNIT = "TRANSMISSIONUNIT";
         /**
-         * {"EN": "用户", "ZH_CN": "用户", "ZH_TW": "用户"}。
+         * {"EN": "CONTENT", "ZH_CN": "内容", "ZH_TW": "繁：内容"}。
          */
-        public static final String AD_USER_IDS = "AD_USER_IDS";
+        public static final String CONTENT = "CONTENT";
+        /**
+         * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+         */
+        public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
     }
 
     // </editor-fold>
 
     // 各个属性及setter、getter：
     // <editor-fold>
+
+    /**
+     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     */
+    private String ccPrjId;
+
+    /**
+     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     */
+    public String getCcPrjId() {
+        return this.ccPrjId;
+    }
+
+    /**
+     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     */
+    public CcDocument setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjId != null && ccPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
 
     /**
      * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
@@ -144,7 +188,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
      */
-    public CcEarlyWarningSetting setId(String id) {
+    public CcDocument setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -180,7 +224,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
      */
-    public CcEarlyWarningSetting setVer(Integer ver) {
+    public CcDocument setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -216,7 +260,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
      */
-    public CcEarlyWarningSetting setTs(LocalDateTime ts) {
+    public CcDocument setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -252,7 +296,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
      */
-    public CcEarlyWarningSetting setIsPreset(Boolean isPreset) {
+    public CcDocument setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -288,7 +332,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
      */
-    public CcEarlyWarningSetting setCrtDt(LocalDateTime crtDt) {
+    public CcDocument setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -324,7 +368,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
      */
-    public CcEarlyWarningSetting setCrtUserId(String crtUserId) {
+    public CcDocument setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -360,7 +404,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
      */
-    public CcEarlyWarningSetting setLastModiDt(LocalDateTime lastModiDt) {
+    public CcDocument setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -396,7 +440,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
      */
-    public CcEarlyWarningSetting setLastModiUserId(String lastModiUserId) {
+    public CcDocument setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -432,7 +476,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
      */
-    public CcEarlyWarningSetting setStatus(String status) {
+    public CcDocument setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -468,7 +512,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
-    public CcEarlyWarningSetting setLkWfInstId(String lkWfInstId) {
+    public CcDocument setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -504,7 +548,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
      */
-    public CcEarlyWarningSetting setCode(String code) {
+    public CcDocument setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -540,7 +584,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public CcEarlyWarningSetting setName(String name) {
+    public CcDocument setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -576,7 +620,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
-    public CcEarlyWarningSetting setRemark(String remark) {
+    public CcDocument setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -612,7 +656,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
-    public CcEarlyWarningSetting setFastCode(String fastCode) {
+    public CcDocument setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -648,7 +692,7 @@ public class CcEarlyWarningSetting {
     /**
      * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
      */
-    public CcEarlyWarningSetting setIconFileGroupId(String iconFileGroupId) {
+    public CcDocument setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -670,144 +714,180 @@ public class CcEarlyWarningSetting {
     }
 
     /**
-     * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * {"EN": "接收人", "ZH_CN": "接收人", "ZH_TW": "接收人"}。
      */
-    private String ccPrjStructNodeId;
+    private String rcvUserIds;
 
     /**
-     * 获取：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 获取：{"EN": "接收人", "ZH_CN": "接收人", "ZH_TW": "接收人"}。
      */
-    public String getCcPrjStructNodeId() {
-        return this.ccPrjStructNodeId;
+    public String getRcvUserIds() {
+        return this.rcvUserIds;
     }
 
     /**
-     * 设置：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 设置：{"EN": "接收人", "ZH_CN": "接收人", "ZH_TW": "接收人"}。
      */
-    public CcEarlyWarningSetting setCcPrjStructNodeId(String ccPrjStructNodeId) {
-        if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
+    public CcDocument setRcvUserIds(String rcvUserIds) {
+        if (this.rcvUserIds == null && rcvUserIds == null) {
             // 均为null，不做处理。
-        } else if (this.ccPrjStructNodeId != null && ccPrjStructNodeId != null) {
+        } else if (this.rcvUserIds != null && rcvUserIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccPrjStructNodeId.compareTo(ccPrjStructNodeId) != 0) {
-                this.ccPrjStructNodeId = ccPrjStructNodeId;
-                if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
+            if (this.rcvUserIds.compareTo(rcvUserIds) != 0) {
+                this.rcvUserIds = rcvUserIds;
+                if (!this.toUpdateCols.contains("RCV_USER_IDS")) {
+                    this.toUpdateCols.add("RCV_USER_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccPrjStructNodeId = ccPrjStructNodeId;
-            if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
-                this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
+            this.rcvUserIds = rcvUserIds;
+            if (!this.toUpdateCols.contains("RCV_USER_IDS")) {
+                this.toUpdateCols.add("RCV_USER_IDS");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+     * {"EN": "抄送人", "ZH_CN": "抄送人", "ZH_TW": "抄送人"}。
      */
-    private String ccQsIssueLevelId;
+    private String carbonCopyUserIds;
 
     /**
-     * 获取：{"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+     * 获取：{"EN": "抄送人", "ZH_CN": "抄送人", "ZH_TW": "抄送人"}。
      */
-    public String getCcQsIssueLevelId() {
-        return this.ccQsIssueLevelId;
+    public String getCarbonCopyUserIds() {
+        return this.carbonCopyUserIds;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+     * 设置：{"EN": "抄送人", "ZH_CN": "抄送人", "ZH_TW": "抄送人"}。
      */
-    public CcEarlyWarningSetting setCcQsIssueLevelId(String ccQsIssueLevelId) {
-        if (this.ccQsIssueLevelId == null && ccQsIssueLevelId == null) {
+    public CcDocument setCarbonCopyUserIds(String carbonCopyUserIds) {
+        if (this.carbonCopyUserIds == null && carbonCopyUserIds == null) {
             // 均为null，不做处理。
-        } else if (this.ccQsIssueLevelId != null && ccQsIssueLevelId != null) {
+        } else if (this.carbonCopyUserIds != null && carbonCopyUserIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccQsIssueLevelId.compareTo(ccQsIssueLevelId) != 0) {
-                this.ccQsIssueLevelId = ccQsIssueLevelId;
-                if (!this.toUpdateCols.contains("CC_QS_ISSUE_LEVEL_ID")) {
-                    this.toUpdateCols.add("CC_QS_ISSUE_LEVEL_ID");
+            if (this.carbonCopyUserIds.compareTo(carbonCopyUserIds) != 0) {
+                this.carbonCopyUserIds = carbonCopyUserIds;
+                if (!this.toUpdateCols.contains("CARBON_COPY_USER_IDS")) {
+                    this.toUpdateCols.add("CARBON_COPY_USER_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccQsIssueLevelId = ccQsIssueLevelId;
-            if (!this.toUpdateCols.contains("CC_QS_ISSUE_LEVEL_ID")) {
-                this.toUpdateCols.add("CC_QS_ISSUE_LEVEL_ID");
+            this.carbonCopyUserIds = carbonCopyUserIds;
+            if (!this.toUpdateCols.contains("CARBON_COPY_USER_IDS")) {
+                this.toUpdateCols.add("CARBON_COPY_USER_IDS");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "禁令类>时", "ZH_CN": "触发预警问题数", "ZH_TW": "禁令类>时"}。
+     * {"EN": "传输单位", "ZH_CN": "发文单位", "ZH_TW": "传输单位"}。
      */
-    private Integer triggeredWarningIssueCount;
+    private String transmissionunit;
 
     /**
-     * 获取：{"EN": "禁令类>时", "ZH_CN": "触发预警问题数", "ZH_TW": "禁令类>时"}。
+     * 获取：{"EN": "传输单位", "ZH_CN": "发文单位", "ZH_TW": "传输单位"}。
      */
-    public Integer getTriggeredWarningIssueCount() {
-        return this.triggeredWarningIssueCount;
+    public String getTransmissionunit() {
+        return this.transmissionunit;
     }
 
     /**
-     * 设置：{"EN": "禁令类>时", "ZH_CN": "触发预警问题数", "ZH_TW": "禁令类>时"}。
+     * 设置：{"EN": "传输单位", "ZH_CN": "发文单位", "ZH_TW": "传输单位"}。
      */
-    public CcEarlyWarningSetting setTriggeredWarningIssueCount(Integer triggeredWarningIssueCount) {
-        if (this.triggeredWarningIssueCount == null && triggeredWarningIssueCount == null) {
+    public CcDocument setTransmissionunit(String transmissionunit) {
+        if (this.transmissionunit == null && transmissionunit == null) {
             // 均为null，不做处理。
-        } else if (this.triggeredWarningIssueCount != null && triggeredWarningIssueCount != null) {
+        } else if (this.transmissionunit != null && transmissionunit != null) {
             // 均非null，判定不等，再做处理：
-            if (this.triggeredWarningIssueCount.compareTo(triggeredWarningIssueCount) != 0) {
-                this.triggeredWarningIssueCount = triggeredWarningIssueCount;
-                if (!this.toUpdateCols.contains("TRIGGERED_WARNING_ISSUE_COUNT")) {
-                    this.toUpdateCols.add("TRIGGERED_WARNING_ISSUE_COUNT");
+            if (this.transmissionunit.compareTo(transmissionunit) != 0) {
+                this.transmissionunit = transmissionunit;
+                if (!this.toUpdateCols.contains("TRANSMISSIONUNIT")) {
+                    this.toUpdateCols.add("TRANSMISSIONUNIT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.triggeredWarningIssueCount = triggeredWarningIssueCount;
-            if (!this.toUpdateCols.contains("TRIGGERED_WARNING_ISSUE_COUNT")) {
-                this.toUpdateCols.add("TRIGGERED_WARNING_ISSUE_COUNT");
+            this.transmissionunit = transmissionunit;
+            if (!this.toUpdateCols.contains("TRANSMISSIONUNIT")) {
+                this.toUpdateCols.add("TRANSMISSIONUNIT");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "用户", "ZH_CN": "用户", "ZH_TW": "用户"}。
+     * {"EN": "CONTENT", "ZH_CN": "内容", "ZH_TW": "繁：内容"}。
      */
-    private String adUserIds;
+    private String content;
 
     /**
-     * 获取：{"EN": "用户", "ZH_CN": "用户", "ZH_TW": "用户"}。
+     * 获取：{"EN": "CONTENT", "ZH_CN": "内容", "ZH_TW": "繁：内容"}。
      */
-    public String getAdUserIds() {
-        return this.adUserIds;
+    public String getContent() {
+        return this.content;
     }
 
     /**
-     * 设置：{"EN": "用户", "ZH_CN": "用户", "ZH_TW": "用户"}。
+     * 设置：{"EN": "CONTENT", "ZH_CN": "内容", "ZH_TW": "繁：内容"}。
      */
-    public CcEarlyWarningSetting setAdUserIds(String adUserIds) {
-        if (this.adUserIds == null && adUserIds == null) {
+    public CcDocument setContent(String content) {
+        if (this.content == null && content == null) {
             // 均为null，不做处理。
-        } else if (this.adUserIds != null && adUserIds != null) {
+        } else if (this.content != null && content != null) {
             // 均非null，判定不等，再做处理：
-            if (this.adUserIds.compareTo(adUserIds) != 0) {
-                this.adUserIds = adUserIds;
-                if (!this.toUpdateCols.contains("AD_USER_IDS")) {
-                    this.toUpdateCols.add("AD_USER_IDS");
+            if (this.content.compareTo(content) != 0) {
+                this.content = content;
+                if (!this.toUpdateCols.contains("CONTENT")) {
+                    this.toUpdateCols.add("CONTENT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.adUserIds = adUserIds;
-            if (!this.toUpdateCols.contains("AD_USER_IDS")) {
-                this.toUpdateCols.add("AD_USER_IDS");
+            this.content = content;
+            if (!this.toUpdateCols.contains("CONTENT")) {
+                this.toUpdateCols.add("CONTENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     */
+    private String ccAttachments;
+
+    /**
+     * 获取：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     */
+    public String getCcAttachments() {
+        return this.ccAttachments;
+    }
+
+    /**
+     * 设置：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     */
+    public CcDocument setCcAttachments(String ccAttachments) {
+        if (this.ccAttachments == null && ccAttachments == null) {
+            // 均为null，不做处理。
+        } else if (this.ccAttachments != null && ccAttachments != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccAttachments.compareTo(ccAttachments) != 0) {
+                this.ccAttachments = ccAttachments;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
+                    this.toUpdateCols.add("CC_ATTACHMENTS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccAttachments = ccAttachments;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
+                this.toUpdateCols.add("CC_ATTACHMENTS");
             }
         }
         return this;
@@ -900,8 +980,8 @@ public class CcEarlyWarningSetting {
      *
      * @return
      */
-    public static CcEarlyWarningSetting newData() {
-        CcEarlyWarningSetting obj = modelHelper.newData();
+    public static CcDocument newData() {
+        CcDocument obj = modelHelper.newData();
         return obj;
     }
 
@@ -910,8 +990,8 @@ public class CcEarlyWarningSetting {
      *
      * @return
      */
-    public static CcEarlyWarningSetting insertData() {
-        CcEarlyWarningSetting obj = modelHelper.insertData();
+    public static CcDocument insertData() {
+        CcDocument obj = modelHelper.insertData();
         return obj;
     }
 
@@ -923,8 +1003,8 @@ public class CcEarlyWarningSetting {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcEarlyWarningSetting selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcEarlyWarningSetting obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcDocument selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcDocument obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -934,7 +1014,7 @@ public class CcEarlyWarningSetting {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcEarlyWarningSetting selectById(String id) {
+    public static CcDocument selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -946,8 +1026,8 @@ public class CcEarlyWarningSetting {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcEarlyWarningSetting> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcEarlyWarningSetting> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcDocument> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcDocument> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -957,7 +1037,7 @@ public class CcEarlyWarningSetting {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcEarlyWarningSetting> selectByIds(List<String> ids) {
+    public static List<CcDocument> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -969,8 +1049,8 @@ public class CcEarlyWarningSetting {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcEarlyWarningSetting> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcEarlyWarningSetting> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcDocument> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcDocument> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -980,7 +1060,7 @@ public class CcEarlyWarningSetting {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcEarlyWarningSetting> selectByWhere(Where where) {
+    public static List<CcDocument> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -992,10 +1072,10 @@ public class CcEarlyWarningSetting {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcEarlyWarningSetting selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcEarlyWarningSetting> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcDocument selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcDocument> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcEarlyWarningSetting.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcDocument.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1007,7 +1087,7 @@ public class CcEarlyWarningSetting {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcEarlyWarningSetting selectOneByWhere(Where where) {
+    public static CcDocument selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1121,7 +1201,7 @@ public class CcEarlyWarningSetting {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcEarlyWarningSetting fromModel, CcEarlyWarningSetting toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcDocument fromModel, CcDocument toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1131,7 +1211,7 @@ public class CcEarlyWarningSetting {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcEarlyWarningSetting fromModel, CcEarlyWarningSetting toModel) {
+    public static void copyCols(CcDocument fromModel, CcDocument toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

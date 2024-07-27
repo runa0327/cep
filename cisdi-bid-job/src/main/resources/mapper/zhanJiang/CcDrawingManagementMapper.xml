@@ -98,4 +98,26 @@
         where
             id = #{id}
     </update>
+
+    <!--模型取消-->
+    <update id="modelCancel">
+        update CC_DRAWING_MANAGEMENT
+        <set>
+            <if test="ts != null and ts != ''">
+                ts = #{ts},
+            </if>
+            <if test="ccDrawingStatusId != null and ccDrawingStatusId != ''">
+                CC_MODEL_STATUS_ID = #{ccDrawingStatusId},
+            </if>
+            <if test="mqReceiveDateTime != null and mqReceiveDateTime != ''">
+                MQ_RECEIVE_DATETIME = #{mqReceiveDateTime},
+            </if>
+            <if test="mqMsgJson != null and mqMsgJson != ''">
+                MQ_MSG = #{mqMsgJson},
+            </if>
+            THREE_D_ACT_DATE = null,
+        </set>
+        where
+        id = #{id}
+    </update>
 </mapper>

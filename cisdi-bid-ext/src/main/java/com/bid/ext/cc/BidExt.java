@@ -99,7 +99,7 @@ public class BidExt {
                     case "钢结构":
                         ccEngineeringQuantityTypeId = "STEELSTRUCTURE";
                         break;
-                    case "桥架":
+                    case "电缆桥架":
                         ccEngineeringQuantityTypeId = "CABLETRAY";
                         break;
                     case "管道":
@@ -129,29 +129,29 @@ public class BidExt {
                     if (totalWeight == null) continue;
 
                     // 检查是否已经存在相同的记录
-                    CcEngineeringQuantity existingRecord = CcEngineeringQuantity.selectOneByWhere(
-                            new Where()
-                                    .eq(CcEngineeringQuantity.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId)
-//                                        .eq(CcEngineeringQuantity.Cols.CC_PO_ID, ccPoId)
-                                    .eq(CcEngineeringQuantity.Cols.CC_ENGINEERING_QUANTITY_TYPE_ID, ccEngineeringQuantityTypeId)
-                                    .eq(CcEngineeringQuantity.Cols.CC_UOM_TYPE_ID, ccUomTypeIdId)
-                    );
+//                    CcEngineeringQuantity existingRecord = CcEngineeringQuantity.selectOneByWhere(
+//                            new Where()
+//                                    .eq(CcEngineeringQuantity.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId)
+////                                        .eq(CcEngineeringQuantity.Cols.CC_PO_ID, ccPoId)
+//                                    .eq(CcEngineeringQuantity.Cols.CC_ENGINEERING_QUANTITY_TYPE_ID, ccEngineeringQuantityTypeId)
+//                                    .eq(CcEngineeringQuantity.Cols.CC_UOM_TYPE_ID, ccUomTypeIdId)
+//                    );
 
-                    if (existingRecord != null) {
-                        // 更新已有记录
-                        existingRecord.setTotalWeight(totalWeight);
-                        existingRecord.updateById();
-                    } else {
-                        // 插入新记录
-                        CcEngineeringQuantity eq = CcEngineeringQuantity.newData();
-                        eq.setCcPrjStructNodeId(ccPrjStructNodeId);
-                        eq.setCcEngineeringTypeId("BID");
-                        eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
-                        eq.setCcUomTypeId(ccUomTypeIdId);
-                        eq.setTotalWeight(totalWeight);
+//                    if (existingRecord != null) {
+//                        // 更新已有记录
+//                        existingRecord.setTotalWeight(totalWeight);
+//                        existingRecord.updateById();
+//                    } else {
+                    // 插入新记录
+                    CcEngineeringQuantity eq = CcEngineeringQuantity.newData();
+                    eq.setCcPrjStructNodeId(ccPrjStructNodeId);
+                    eq.setCcEngineeringTypeId("BID");
+                    eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
+                    eq.setCcUomTypeId(ccUomTypeIdId);
+                    eq.setTotalWeight(totalWeight);
 //                            eq.setCcPoId(ccPoId);
-                        eq.insertById();
-                    }
+                    eq.insertById();
+//                    }
                 }
             }
 

@@ -1,7 +1,9 @@
 package com.bid.ext.cc;
 
 import cn.hutool.json.JSONObject;
+import com.bid.ext.model.CcCoTask;
 import com.bid.ext.model.CcCoTaskProg;
+import com.bid.ext.model.CcMeeting;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
@@ -149,5 +151,38 @@ public class CoTaskExt {
             }
         }
     }
+
+    /**
+     * 获取协同任务责任人
+     */
+    public void getChiefUserId() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcCoTask ccCoTask = CcCoTask.selectById(csCommId);
+            String chiefUserId = ccCoTask.getChiefUserIds();
+            if (chiefUserId != null && !chiefUserId.isEmpty()) {
+                String[] userIds = chiefUserId.split(",");
+                ArrayList<String> userIdList = new ArrayList<>(Arrays.asList(userIds));
+                ExtJarHelper.setReturnValue(userIdList);
+            }
+        }
+    }
+
+    /**
+     * 获取协同任务督办人
+     */
+    public void getSuperviseUserId() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcCoTask ccCoTask = CcCoTask.selectById(csCommId);
+            String superviseUserIds = ccCoTask.getSuperviseUserIds();
+            if (superviseUserIds != null && !superviseUserIds.isEmpty()) {
+                String[] userIds = superviseUserIds.split(",");
+                ArrayList<String> userIdList = new ArrayList<>(Arrays.asList(userIds));
+                ExtJarHelper.setReturnValue(userIdList);
+            }
+        }
+    }
+
 
 }
