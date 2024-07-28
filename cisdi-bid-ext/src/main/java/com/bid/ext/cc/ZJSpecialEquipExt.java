@@ -3,8 +3,10 @@ package com.bid.ext.cc;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.ProcessCommon;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.tencentcloudapi.tchd.v20230306.TchdErrorCode;
@@ -21,7 +23,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,11 +40,12 @@ public class ZJSpecialEquipExt {
     public void importPressureVessel() {
 
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String  userId = ExtJarHelper.getLoginInfo().userInfo.id;
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/导入/一般压力容器导入模版.xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/湛江/导入/一般压力容器导入模版.xlsx";
 
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
@@ -66,10 +71,12 @@ public class ZJSpecialEquipExt {
 
         List<String> ids = new ArrayList<>();
         ids.add(conHeadId);
-        ids.add(superisorId);
         ids.add(regProId);
 
-        List<CcPrjMember> ccPrjMembers;
+        if (superisorId!=null)
+            ids.add(superisorId);
+
+        List<CcPrjMember> ccPrjMembers = null;
 
         try {
             ccPrjMembers = CcPrjMember.selectByIds(ids);
@@ -148,6 +155,24 @@ public class ZJSpecialEquipExt {
                     ccSpecialEquipPreVe1.setCcSpecialEquipRegProHeadId(regProId);
                     ccSpecialEquipPreVe1.setSlippageWarningDays(slippageWarningDay);
 
+                    if(planArriveDate.compareTo(LocalDate.now())>-1){//计划到货时间
+
+                        String taskUserId = null;
+                        for (CcPrjMember member:ccPrjMembers) {
+                            if (member.getId().equals(conHeadId)){
+                                taskUserId = member.getAdUserId();
+                            }
+                        }
+
+                        String now =  LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        String  wfProcessInstanceId = Crud.from("WF_PROCESS_INSTANCE").insertData();
+                        String wfTaskId = Crud.from("WF_TASK").insertData();
+                        //暂存流程
+                        ProcessCommon.autoSaveProcess(null,"CC_SPECIAL_EQUIP_PRE_VE",userId,wfProcessInstanceId,"1816043591190458368",ccSpecialEquipPreVe1.getId(), now,taskUserId,wfTaskId);
+                        ccSpecialEquipPreVe1.setLkWfInstId(wfProcessInstanceId);
+                        ccSpecialEquipPreVe1.setLkTaskId1(wfTaskId);
+                    }
+
                     ccSpecialEquipPreVe1.insertById();
 
                 }
@@ -215,14 +240,50 @@ public class ZJSpecialEquipExt {
         for (EntityRecord record : entityRecordList) {
 
             CcSpecialEquipPreVe ccSpecialEquipPreVe1 = CcSpecialEquipPreVe.selectById(record.valueMap.get("ID").toString());
-            if (ccSpecialEquipPreVe1.getLkWfInstId1() != null) { //存在流程
 
+            if (ccSpecialEquipPreVe1.getCcSpecialEquipConHeadId()!=null && !ccSpecialEquipPreVe1.getCcSpecialEquipConHeadId().equals(conHeadId)) {//施工责任人不同
+                if (ccSpecialEquipPreVe1.getLkTaskId1() != null) { //存在流程
+                    WfTask task = WfTask.selectById(ccSpecialEquipPreVe1.getLkTaskId1());
+                    ProcessCommon.closeTask(task);
+                    ccSpecialEquipPreVe1.setLkTaskId1(null);
+                }
+                if (ccSpecialEquipPreVe1.getLkTaskId2() != null) { //存在流程
+                    WfTask task = WfTask.selectById(ccSpecialEquipPreVe1.getLkTaskId2());
+                    ProcessCommon.closeTask(task);
+                    ccSpecialEquipPreVe1.setLkTaskId2(null);
+                }
+                if (ccSpecialEquipPreVe1.getLkTaskId3() != null) { //存在流程
+                    WfTask task = WfTask.selectById(ccSpecialEquipPreVe1.getLkTaskId3());
+                    ProcessCommon.closeTask(task);
+                    ccSpecialEquipPreVe1.setLkTaskId3(null);
+                }
+                if (ccSpecialEquipPreVe1.getLkTaskId4() != null) { //存在流程
+                    WfTask task = WfTask.selectById(ccSpecialEquipPreVe1.getLkTaskId4());
+                    ProcessCommon.closeTask(task);
+                    ccSpecialEquipPreVe1.setLkTaskId4(null);
+                }
+                if (ccSpecialEquipPreVe1.getLkTaskId5() != null) { //存在流程
+                    WfTask task = WfTask.selectById(ccSpecialEquipPreVe1.getLkTaskId5());
+                    ProcessCommon.closeTask(task);
+                    ccSpecialEquipPreVe1.setLkTaskId5(null);
+                }
+                if (ccSpecialEquipPreVe1.getLkTaskId6() != null) { //存在流程
+                    WfTask task = WfTask.selectById(ccSpecialEquipPreVe1.getLkTaskId6());
+                    ProcessCommon.closeTask(task);
+                    ccSpecialEquipPreVe1.setLkTaskId6(null);
+                }
             }
 
             ccSpecialEquipPreVe1.setCcSpecialEquipConHeadId(conHeadId);
-            ccSpecialEquipPreVe1.setCcSpecialEquipSupervisorId(superisorId);
             ccSpecialEquipPreVe1.setCcSpecialEquipRegProHeadId(regProId);
-            ccSpecialEquipPreVe1.setSlippageWarningDays(slippageWarningDay);
+            if(superisorId!=null){
+                ccSpecialEquipPreVe1.setCcSpecialEquipSupervisorId(superisorId);
+            }
+
+            if (slippageWarningDay!=null) {
+                ccSpecialEquipPreVe1.setSlippageWarningDays(slippageWarningDay);
+            }
+
             ccSpecialEquipPreVe1.updateById();
         }
     }
@@ -242,13 +303,15 @@ public class ZJSpecialEquipExt {
 
             CcSpecialEquipPreVe equipPreVe = CcSpecialEquipPreVe.selectById(id);
 
+            //判断是否
             CcPrjMember member1 = CcPrjMember.selectById(equipPreVe.getCcSpecialEquipConHeadId());//施工责任人
             CcPrjMember member2 = CcPrjMember.selectById(equipPreVe.getCcSpecialEquipConHeadId());//设备登记办理责任人
 
-            //判断是否
-            String ccSpecialEquipFactoryNo = equipPreVe.getCcSpecialEquipFactoryNo();//出厂编号
+
+
 
             //基本信息
+            String ccSpecialEquipFactoryNo = equipPreVe.getCcSpecialEquipFactoryNo();//出厂编号
             BigDecimal ccSpecialEquipVolume = equipPreVe.getCcSpecialEquipVolume();//容积
             BigDecimal ccSpecialEquipPressure = equipPreVe.getCcSpecialEquipPressure();//压力
             LocalDate ccSpecialEquipActArriveDate = equipPreVe.getCcSpecialEquipActArriveDate();//实际到货时间
@@ -259,63 +322,99 @@ public class ZJSpecialEquipExt {
             LocalDate ccSpecialEquipPlanUseDate = equipPreVe.getCcSpecialEquipPlanUseDate();//计划投用时间
 
             //完成基本信息填写
-            if (ccSpecialEquipVolume != null && ccSpecialEquipPressure != null && ccSpecialEquipActArriveDate != null
+            if (ccSpecialEquipFactoryNo!=null && ccSpecialEquipVolume != null && ccSpecialEquipPressure != null && ccSpecialEquipActArriveDate != null
                     && ccSpecialEquipPlanConNocDate != null && ccSpecialEquipPlanInstallDate != null && ccSpecialEquipPreGageCheckDate != null
                     && ccSpecialEquipSecValCheckDate != null && ccSpecialEquipPlanUseDate != null) {
-                String taskId = equipPreVe.getLkWfInstId1();
+                String taskId = equipPreVe.getLkTaskId1();
                 if (taskId != null) {
                     WfTask task = WfTask.selectById(taskId);
                     ProcessCommon.closeTask(task);
-                    equipPreVe.setLkWfInstId1(null);
                 }
             }
 
             //施工
             LocalDate comlConNocDate = equipPreVe.getCcSpecialEquipComlConNocDate();//完成施工告知时间
             String comlConRecAtts = equipPreVe.getCcSpecialEquipComlConRecAtts();//完成施工告知回执
-            LocalDate actInstallDate = equipPreVe.getCcSpecialEquipActInstallDate();//完成安装时间
-            String comlSecValRep = equipPreVe.getCcSpecialEquipComlSecValRep();//安全阀检验报告
-            String comlPreGageRep = equipPreVe.getCcSpecialEquipComlPreGageRep();//压力表检验报告
-
-            //完成施工完成信息填写
-            if (comlConNocDate != null && comlConRecAtts != null && actInstallDate != null
-                    && comlSecValRep != null && comlPreGageRep != null ) {
-                String taskId = equipPreVe.getLkWfInstId2();
+            //施工告知完成信息填写
+            if (comlConNocDate != null && comlConRecAtts != null  ) {
+                String taskId = equipPreVe.getLkTaskId2();
                 if (taskId != null) {
                     WfTask task = WfTask.selectById(taskId);
                     ProcessCommon.closeTask(task);
-                    equipPreVe.setLkWfInstId2(null);
+                }
+            }
+
+            LocalDate actInstallDate = equipPreVe.getCcSpecialEquipActInstallDate();//完成安装时间
+            //安装完成信息填写
+            if ( actInstallDate != null) {
+                String taskId = equipPreVe.getLkTaskId3();
+                if (taskId != null) {
+                    WfTask task = WfTask.selectById(taskId);
+                    ProcessCommon.closeTask(task);
+                }
+            }
+
+            String comlSecValRep = equipPreVe.getCcSpecialEquipComlSecValRep();//安全阀检验报告
+            //安全阀检验报告完成信息填写
+            if (comlSecValRep != null ) {
+                String taskId = equipPreVe.getLkTaskId4();
+                if (taskId != null) {
+                    WfTask task = WfTask.selectById(taskId);
+                    ProcessCommon.closeTask(task);
+                }
+            }
+
+            String comlPreGageRep = equipPreVe.getCcSpecialEquipComlPreGageRep();//压力表检验报告
+            //压力表检验报告完成信息填写
+            if ( comlPreGageRep != null ) {
+                String taskId = equipPreVe.getLkTaskId5();
+                if (taskId != null) {
+                    WfTask task = WfTask.selectById(taskId);
+                    ProcessCommon.closeTask(task);
                 }
             }
 
             //投用登记
             String insQualityCert = equipPreVe.getCcSpecialEquipInsQualityCert();//安装质量证明书
             LocalDate canCheckAndAccDate = equipPreVe.getCcSpecialEquipCanCheckAndAccDate();//具备验收时间点
-            LocalDate planUseReg = equipPreVe.getCcSpecialEquipPlanUseReg();//计划办理登记
-            //完成投用登记计划信息填写
-            if (insQualityCert != null && canCheckAndAccDate != null && planUseReg != null) {
-                String taskId = equipPreVe.getLkWfInstId3();
+            //安装质量证明书、具备验收时间点信息填写
+            if (insQualityCert != null && canCheckAndAccDate != null ) {
+                String taskId = equipPreVe.getLkTaskId6();
                 if (taskId != null) {
                     WfTask task = WfTask.selectById(taskId);
                     ProcessCommon.closeTask(task);
-                    equipPreVe.setLkWfInstId3(null);
+                }
+            }
+
+            LocalDate planUseReg = equipPreVe.getCcSpecialEquipPlanUseReg();//计划办理登记时间
+            //计划办理登记时间
+            if (insQualityCert != null && canCheckAndAccDate != null && planUseReg != null) {
+                String taskId = equipPreVe.getLkTaskId7();
+                if (taskId != null) {
+                    WfTask task = WfTask.selectById(taskId);
+                    ProcessCommon.closeTask(task);
                 }
             }
 
             //登记完成
             LocalDate actUseReg = equipPreVe.getCcSpecialEquipActUseReg();//实际办理登记时间
-            String useRegCert = equipPreVe.getCcSpecialEquipPlanUseRegCert();//登记证
-
-            //完成投用登记信息填写
-            if (actUseReg != null && useRegCert != null ) {
-                String taskId = equipPreVe.getLkWfInstId4();
+            if (actUseReg != null  ) {
+                String taskId = equipPreVe.getLkTaskId8();
                 if (taskId != null) {
                     WfTask task = WfTask.selectById(taskId);
                     ProcessCommon.closeTask(task);
-                    equipPreVe.setLkWfInstId4(null);
                 }
             }
-            //状态判定 未到货（实际到货时间还未填写）、已到货（实际到货时间已填写）、已安装（实际安装时间已填写）、已登记（项目单位实际办理使用登记的时间已填写）
+
+            String useRegCert = equipPreVe.getCcSpecialEquipPlanUseRegCert();//登记证
+            //完成投用登记信息填写
+            if (useRegCert != null ) {
+                String taskId = equipPreVe.getLkTaskId9();
+                if (taskId != null) {
+                    WfTask task = WfTask.selectById(taskId);
+                    ProcessCommon.closeTask(task);
+                }
+            }
 
             equipPreVe.updateById();
         }

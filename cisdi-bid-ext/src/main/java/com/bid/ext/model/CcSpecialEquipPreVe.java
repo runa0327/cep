@@ -203,19 +203,39 @@ public class CcSpecialEquipPreVe {
         /**
          * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
          */
-        public static final String LK_WF_INST_ID_1 = "LK_WF_INST_ID_1";
+        public static final String LK_TASK_ID_1 = "LK_TASK_ID_1";
         /**
-         * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+         * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工告知", "ZH_TW": "特种设备流程实例-基础数据"}。
          */
-        public static final String LK_WF_INST_ID_2 = "LK_WF_INST_ID_2";
+        public static final String LK_TASK_ID_2 = "LK_TASK_ID_2";
         /**
-         * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+         * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-安装完成完成", "ZH_TW": "特种设备流程实例-计划使用登记"}。
          */
-        public static final String LK_WF_INST_ID_3 = "LK_WF_INST_ID_3";
+        public static final String LK_TASK_ID_3 = "LK_TASK_ID_3";
         /**
-         * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+         * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程任务-安全阀", "ZH_TW": "特种设备流程实例-使用登记完成"}。
          */
-        public static final String LK_WF_INST_ID_4 = "LK_WF_INST_ID_4";
+        public static final String LK_TASK_ID_4 = "LK_TASK_ID_4";
+        /**
+         * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-压力表", "ZH_TW": "特种设备流程任务-安全阀"}。
+         */
+        public static final String LK_TASK_ID_5 = "LK_TASK_ID_5";
+        /**
+         * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-安装质量证明、具备验收时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+         */
+        public static final String LK_TASK_ID_6 = "LK_TASK_ID_6";
+        /**
+         * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-计划登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+         */
+        public static final String LK_TASK_ID_7 = "LK_TASK_ID_7";
+        /**
+         * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-实际登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+         */
+        public static final String LK_TASK_ID_8 = "LK_TASK_ID_8";
+        /**
+         * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-登记证书", "ZH_TW": "特种设备流程任务-安全阀"}。
+         */
+        public static final String LK_TASK_ID_9 = "LK_TASK_ID_9";
         /**
          * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
          */
@@ -1622,142 +1642,322 @@ public class CcSpecialEquipPreVe {
     /**
      * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
      */
-    private String lkWfInstId1;
+    private String lkTaskId1;
 
     /**
      * 获取：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
      */
-    public String getLkWfInstId1() {
-        return this.lkWfInstId1;
+    public String getLkTaskId1() {
+        return this.lkTaskId1;
     }
 
     /**
      * 设置：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
      */
-    public CcSpecialEquipPreVe setLkWfInstId1(String lkWfInstId1) {
-        if (this.lkWfInstId1 == null && lkWfInstId1 == null) {
+    public CcSpecialEquipPreVe setLkTaskId1(String lkTaskId1) {
+        if (this.lkTaskId1 == null && lkTaskId1 == null) {
             // 均为null，不做处理。
-        } else if (this.lkWfInstId1 != null && lkWfInstId1 != null) {
+        } else if (this.lkTaskId1 != null && lkTaskId1 != null) {
             // 均非null，判定不等，再做处理：
-            if (this.lkWfInstId1.compareTo(lkWfInstId1) != 0) {
-                this.lkWfInstId1 = lkWfInstId1;
-                if (!this.toUpdateCols.contains("LK_WF_INST_ID_1")) {
-                    this.toUpdateCols.add("LK_WF_INST_ID_1");
+            if (this.lkTaskId1.compareTo(lkTaskId1) != 0) {
+                this.lkTaskId1 = lkTaskId1;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_1")) {
+                    this.toUpdateCols.add("LK_TASK_ID_1");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.lkWfInstId1 = lkWfInstId1;
-            if (!this.toUpdateCols.contains("LK_WF_INST_ID_1")) {
-                this.toUpdateCols.add("LK_WF_INST_ID_1");
+            this.lkTaskId1 = lkTaskId1;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_1")) {
+                this.toUpdateCols.add("LK_TASK_ID_1");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工告知", "ZH_TW": "特种设备流程实例-基础数据"}。
      */
-    private String lkWfInstId2;
+    private String lkTaskId2;
 
     /**
-     * 获取：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+     * 获取：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工告知", "ZH_TW": "特种设备流程实例-基础数据"}。
      */
-    public String getLkWfInstId2() {
-        return this.lkWfInstId2;
+    public String getLkTaskId2() {
+        return this.lkTaskId2;
     }
 
     /**
-     * 设置：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+     * 设置：{"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工告知", "ZH_TW": "特种设备流程实例-基础数据"}。
      */
-    public CcSpecialEquipPreVe setLkWfInstId2(String lkWfInstId2) {
-        if (this.lkWfInstId2 == null && lkWfInstId2 == null) {
+    public CcSpecialEquipPreVe setLkTaskId2(String lkTaskId2) {
+        if (this.lkTaskId2 == null && lkTaskId2 == null) {
             // 均为null，不做处理。
-        } else if (this.lkWfInstId2 != null && lkWfInstId2 != null) {
+        } else if (this.lkTaskId2 != null && lkTaskId2 != null) {
             // 均非null，判定不等，再做处理：
-            if (this.lkWfInstId2.compareTo(lkWfInstId2) != 0) {
-                this.lkWfInstId2 = lkWfInstId2;
-                if (!this.toUpdateCols.contains("LK_WF_INST_ID_2")) {
-                    this.toUpdateCols.add("LK_WF_INST_ID_2");
+            if (this.lkTaskId2.compareTo(lkTaskId2) != 0) {
+                this.lkTaskId2 = lkTaskId2;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_2")) {
+                    this.toUpdateCols.add("LK_TASK_ID_2");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.lkWfInstId2 = lkWfInstId2;
-            if (!this.toUpdateCols.contains("LK_WF_INST_ID_2")) {
-                this.toUpdateCols.add("LK_WF_INST_ID_2");
+            this.lkTaskId2 = lkTaskId2;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_2")) {
+                this.toUpdateCols.add("LK_TASK_ID_2");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+     * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-安装完成完成", "ZH_TW": "特种设备流程实例-计划使用登记"}。
      */
-    private String lkWfInstId3;
+    private String lkTaskId3;
 
     /**
-     * 获取：{"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+     * 获取：{"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-安装完成完成", "ZH_TW": "特种设备流程实例-计划使用登记"}。
      */
-    public String getLkWfInstId3() {
-        return this.lkWfInstId3;
+    public String getLkTaskId3() {
+        return this.lkTaskId3;
     }
 
     /**
-     * 设置：{"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+     * 设置：{"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-安装完成完成", "ZH_TW": "特种设备流程实例-计划使用登记"}。
      */
-    public CcSpecialEquipPreVe setLkWfInstId3(String lkWfInstId3) {
-        if (this.lkWfInstId3 == null && lkWfInstId3 == null) {
+    public CcSpecialEquipPreVe setLkTaskId3(String lkTaskId3) {
+        if (this.lkTaskId3 == null && lkTaskId3 == null) {
             // 均为null，不做处理。
-        } else if (this.lkWfInstId3 != null && lkWfInstId3 != null) {
+        } else if (this.lkTaskId3 != null && lkTaskId3 != null) {
             // 均非null，判定不等，再做处理：
-            if (this.lkWfInstId3.compareTo(lkWfInstId3) != 0) {
-                this.lkWfInstId3 = lkWfInstId3;
-                if (!this.toUpdateCols.contains("LK_WF_INST_ID_3")) {
-                    this.toUpdateCols.add("LK_WF_INST_ID_3");
+            if (this.lkTaskId3.compareTo(lkTaskId3) != 0) {
+                this.lkTaskId3 = lkTaskId3;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_3")) {
+                    this.toUpdateCols.add("LK_TASK_ID_3");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.lkWfInstId3 = lkWfInstId3;
-            if (!this.toUpdateCols.contains("LK_WF_INST_ID_3")) {
-                this.toUpdateCols.add("LK_WF_INST_ID_3");
+            this.lkTaskId3 = lkTaskId3;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_3")) {
+                this.toUpdateCols.add("LK_TASK_ID_3");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+     * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程任务-安全阀", "ZH_TW": "特种设备流程实例-使用登记完成"}。
      */
-    private String lkWfInstId4;
+    private String lkTaskId4;
 
     /**
-     * 获取：{"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+     * 获取：{"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程任务-安全阀", "ZH_TW": "特种设备流程实例-使用登记完成"}。
      */
-    public String getLkWfInstId4() {
-        return this.lkWfInstId4;
+    public String getLkTaskId4() {
+        return this.lkTaskId4;
     }
 
     /**
-     * 设置：{"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+     * 设置：{"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程任务-安全阀", "ZH_TW": "特种设备流程实例-使用登记完成"}。
      */
-    public CcSpecialEquipPreVe setLkWfInstId4(String lkWfInstId4) {
-        if (this.lkWfInstId4 == null && lkWfInstId4 == null) {
+    public CcSpecialEquipPreVe setLkTaskId4(String lkTaskId4) {
+        if (this.lkTaskId4 == null && lkTaskId4 == null) {
             // 均为null，不做处理。
-        } else if (this.lkWfInstId4 != null && lkWfInstId4 != null) {
+        } else if (this.lkTaskId4 != null && lkTaskId4 != null) {
             // 均非null，判定不等，再做处理：
-            if (this.lkWfInstId4.compareTo(lkWfInstId4) != 0) {
-                this.lkWfInstId4 = lkWfInstId4;
-                if (!this.toUpdateCols.contains("LK_WF_INST_ID_4")) {
-                    this.toUpdateCols.add("LK_WF_INST_ID_4");
+            if (this.lkTaskId4.compareTo(lkTaskId4) != 0) {
+                this.lkTaskId4 = lkTaskId4;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_4")) {
+                    this.toUpdateCols.add("LK_TASK_ID_4");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.lkWfInstId4 = lkWfInstId4;
-            if (!this.toUpdateCols.contains("LK_WF_INST_ID_4")) {
-                this.toUpdateCols.add("LK_WF_INST_ID_4");
+            this.lkTaskId4 = lkTaskId4;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_4")) {
+                this.toUpdateCols.add("LK_TASK_ID_4");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-压力表", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    private String lkTaskId5;
+
+    /**
+     * 获取：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-压力表", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public String getLkTaskId5() {
+        return this.lkTaskId5;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-压力表", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public CcSpecialEquipPreVe setLkTaskId5(String lkTaskId5) {
+        if (this.lkTaskId5 == null && lkTaskId5 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkTaskId5 != null && lkTaskId5 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkTaskId5.compareTo(lkTaskId5) != 0) {
+                this.lkTaskId5 = lkTaskId5;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_5")) {
+                    this.toUpdateCols.add("LK_TASK_ID_5");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkTaskId5 = lkTaskId5;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_5")) {
+                this.toUpdateCols.add("LK_TASK_ID_5");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-安装质量证明、具备验收时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    private String lkTaskId6;
+
+    /**
+     * 获取：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-安装质量证明、具备验收时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public String getLkTaskId6() {
+        return this.lkTaskId6;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-安装质量证明、具备验收时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public CcSpecialEquipPreVe setLkTaskId6(String lkTaskId6) {
+        if (this.lkTaskId6 == null && lkTaskId6 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkTaskId6 != null && lkTaskId6 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkTaskId6.compareTo(lkTaskId6) != 0) {
+                this.lkTaskId6 = lkTaskId6;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_6")) {
+                    this.toUpdateCols.add("LK_TASK_ID_6");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkTaskId6 = lkTaskId6;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_6")) {
+                this.toUpdateCols.add("LK_TASK_ID_6");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-计划登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    private String lkTaskId7;
+
+    /**
+     * 获取：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-计划登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public String getLkTaskId7() {
+        return this.lkTaskId7;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-计划登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public CcSpecialEquipPreVe setLkTaskId7(String lkTaskId7) {
+        if (this.lkTaskId7 == null && lkTaskId7 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkTaskId7 != null && lkTaskId7 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkTaskId7.compareTo(lkTaskId7) != 0) {
+                this.lkTaskId7 = lkTaskId7;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_7")) {
+                    this.toUpdateCols.add("LK_TASK_ID_7");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkTaskId7 = lkTaskId7;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_7")) {
+                this.toUpdateCols.add("LK_TASK_ID_7");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-实际登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    private String lkTaskId8;
+
+    /**
+     * 获取：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-实际登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public String getLkTaskId8() {
+        return this.lkTaskId8;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-实际登记办理时间", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public CcSpecialEquipPreVe setLkTaskId8(String lkTaskId8) {
+        if (this.lkTaskId8 == null && lkTaskId8 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkTaskId8 != null && lkTaskId8 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkTaskId8.compareTo(lkTaskId8) != 0) {
+                this.lkTaskId8 = lkTaskId8;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_8")) {
+                    this.toUpdateCols.add("LK_TASK_ID_8");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkTaskId8 = lkTaskId8;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_8")) {
+                this.toUpdateCols.add("LK_TASK_ID_8");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-登记证书", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    private String lkTaskId9;
+
+    /**
+     * 获取：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-登记证书", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public String getLkTaskId9() {
+        return this.lkTaskId9;
+    }
+
+    /**
+     * 设置：{"EN": "特种设备流程任务-安全阀", "ZH_CN": "特种设备流程任务-登记证书", "ZH_TW": "特种设备流程任务-安全阀"}。
+     */
+    public CcSpecialEquipPreVe setLkTaskId9(String lkTaskId9) {
+        if (this.lkTaskId9 == null && lkTaskId9 == null) {
+            // 均为null，不做处理。
+        } else if (this.lkTaskId9 != null && lkTaskId9 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkTaskId9.compareTo(lkTaskId9) != 0) {
+                this.lkTaskId9 = lkTaskId9;
+                if (!this.toUpdateCols.contains("LK_TASK_ID_9")) {
+                    this.toUpdateCols.add("LK_TASK_ID_9");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkTaskId9 = lkTaskId9;
+            if (!this.toUpdateCols.contains("LK_TASK_ID_9")) {
+                this.toUpdateCols.add("LK_TASK_ID_9");
             }
         }
         return this;

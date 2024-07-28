@@ -112,22 +112,7 @@ public class SpecialEquipPreVe extends BaseDomain {
      * {"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
      */
     private   String slippageWarningDays;
-    /**
-     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
-     */
-    private   String lkWfInstId1;
-    /**
-     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
-     */
-    private   String lkWfInstId2;
-    /**
-     * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
-     */
-    private   String lkWfInstId3;
-    /**
-     * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
-     */
-    private   String  lkWfInstId4;
+
     /**
      * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
      */
@@ -161,5 +146,38 @@ public class SpecialEquipPreVe extends BaseDomain {
      * 当前责任人
      */
     private String  adUserId;
+
+    /**
+     * 逾期的设备的类型  1计划到到货时间已到,2计划施工告知时间已到,3计划完成安装时间已到,4计划上传安全阀检验报告时间已到,
+     *                  5计划上传压力表检验报告时间已到,6计划投用时间已到-施工,7计划投用时间已到-仙姑单位,8计划办理登记时间已到9实际办理登记时间已到
+     */
+    private Integer  recordType;
+
+    /**
+     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-基础数据", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    private   String lkTaskId1;
+    /**
+     * {"EN": "特种设备流程实例-基础数据", "ZH_CN": "特种设备流程实例-施工信息", "ZH_TW": "特种设备流程实例-基础数据"}。
+     */
+    private   String lkTaskId2;
+    /**
+     * {"EN": "特种设备流程实例-计划使用登记", "ZH_CN": "特种设备流程实例-计划使用登记", "ZH_TW": "特种设备流程实例-计划使用登记"}。
+     */
+    private   String lkTaskId3;
+    /**
+     * {"EN": "特种设备流程实例-使用登记完成", "ZH_CN": "特种设备流程实例-使用登记完成", "ZH_TW": "特种设备流程实例-使用登记完成"}。
+     */
+    private   String  lkTaskId4;
+
+    private   String  lkTaskId5;
+
+    private   String  lkTaskId6;
+
+    private   String  lkTaskId7;
+
+    private   String  lkTaskId8;
+
+    private   String  lkTaskId9;
 
 }

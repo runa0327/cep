@@ -36,16 +36,16 @@ public class CronTask {
     /**
      * 每天早上6点执行特种设备计划预警定时任务
      */
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "0 0 6 * * ?")
     public void checkSpecialEquipPlan(){
         System.out.println("CronTask.checkSpecialEquipPlan");
-//        try {
+        try {
             log.info("特种设备安装提醒-开始");
             specialEquipPreVeService.checkRecord();
             log.info("特种设备安装-结束");
-//        } catch (Exception e) {
-//            log.error("特种设备提醒失败");
-//        }
+        } catch (Exception e) {
+            log.error("特种设备提醒失败:"+e.getMessage());
+        }
     }
 
 

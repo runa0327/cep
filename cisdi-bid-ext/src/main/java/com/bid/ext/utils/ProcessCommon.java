@@ -108,6 +108,39 @@ public class ProcessCommon {
     }
 
     /**
+     * 自动发起流程-暂存流程，停留第一步，不进入第二步
+     * @param projectName 项目名称
+     * @param entCode 需要暂存的流程表名
+     * @param createBy 流程发起人
+     * @param wfProcessInstanceId 流程实例id
+     * @param entityRecordId 流程表单记录id
+     * @param now 当前时间
+     * @param taskUserId taskUserId
+     * @param taskId taskId
+     */
+    public static void autoSaveProcess(String projectName, String entCode, String createBy, String wfProcessInstanceId,String wfProcessId, String entityRecordId, String now,String taskUserId,String taskId){
+//        String wfProcessId = ProcessCommon.getProcessIdByEntCode(entCode,myJdbcTemplate); // 流程id
+        String wfProcessName = WfProcess.selectById(wfProcessId).getName();
+        wfProcessName = JsonUtil.getCN(wfProcessName);
+        String adEntId = AdEnt.selectByWhere(new Where().eq(AdEnt.Cols.CODE,entCode)).get(0).getId(); // 实体id
+        WfNode wfNode = WfNode.selectOneByWhere(new Where().eq(WfNode.Cols.WF_PROCESS_ID,wfProcessId).eq(WfNode.Cols.NODE_TYPE,"START_EVENT").eq(WfNode.Cols.STATUS,"AP")); // 发起节点信息
+        String viewId = wfNode.getAdViewId(); // 视图id
+        String wfNodeId = wfNode.getId(); // 节点id
+        String wfNodeName = wfNode.getName(); // 节点名称
+        wfNodeName = JsonUtil.getCN(wfNodeName);
+        String wfNodeInstanceId = Crud.from("WF_NODE_INSTANCE").insertData(); // 节点实例id
+//        String userName = AdUser.selectById(createBy).getName();
+//        userName = JsonUtil.getCN(userName);
+        String wfProcessInstanceName = StringUtil.concatStr("-",wfProcessName,projectName,now);
+        wfProcessInstanceName = JsonUtil.toJson(new Internationalization(null,wfProcessInstanceName,null));
+
+        ProcessCommon.createWfProcessInstance(wfProcessInstanceId,wfProcessInstanceName,createBy,now,wfProcessId,adEntId,entCode,entityRecordId,wfNodeId,wfNodeInstanceId,createBy,viewId); // 创建流程实例
+        ProcessCommon.createWfNodeInstance(wfNodeInstanceId,wfNodeId,wfNodeName,wfProcessInstanceId,now,null,null,null,createBy,"1","1",wfProcessId); // 创建节点实例
+
+        ProcessCommon.createTask(wfProcessInstanceId,wfNodeInstanceId,wfProcessId,wfNodeId,taskUserId,createBy,now,null,null,"0","1","1",taskId); // 创建任务
+    }
+
+    /**
      * 根据流程id，获取流程发起节点视图id(该视图非实体视图)
      * @param processId 流程id
      * @param myJdbcTemplate 数据源
@@ -146,6 +179,19 @@ public class ProcessCommon {
                     .set("IS_PROC_INST_FIRST_TODO_TASK",isFirstTask)
                     .exec();
         }
+
+    }
+
+    public static void createTask(String wfProcessInstanceId,String wfNodeInstanceId,String wfProcessId,String wfNodeId,String taskUserId,String userId,String now,String actNow,String actId,String isClosed,String inCurrentRound,String isFirstTask,String taskId) {
+            Crud.from("WF_TASK").where().eq("ID",taskId).update()
+                    .set("VER","1").set("WF_NODE_INSTANCE_ID",wfNodeInstanceId).set("AD_USER_ID",taskUserId).set("RECEIVE_DATETIME",now)
+                    .set("ACT_DATETIME",actNow).set("VIEW_DATETIME",actNow).set("AD_ACT_ID",actId).set("IS_CLOSED",isClosed)
+                    .set("STATUS","AP").set("CRT_DT",now).set("CRT_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                    .set("WF_TASK_TYPE_ID","TODO").set("SEQ_NO",IdUtil.getSnowflakeNextIdStr()).set("IN_CURRENT_ROUND",inCurrentRound).set("TS",now)
+                    .set("WF_PROCESS_ID",wfProcessId).set("WF_PROCESS_INSTANCE_ID",wfProcessInstanceId).set("WF_NODE_ID",wfNodeId)
+                    .set("IS_PROC_INST_FIRST_TODO_TASK",isFirstTask)
+                    .exec();
+
 
     }
 

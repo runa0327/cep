@@ -404,7 +404,7 @@ public class WfProcessInstanceServiceImpl implements WfProcessInstanceService {
         wfProcessInstance.setCreateDate(now);
         wfProcessInstance.setLastUpdateDate(now);
         wfProcessInstance.setStatus("AP");
-        String name = wfProcess.getWfProcessName() + "-" + tmp.getName() + "-" + now;
+        String name = wfProcess.getWfProcessName() + "-" + tmp.getName() + "-"+ "任务到期" + "-" + now;
         name = JsonUtil.toJson(new Internationalization(null,name,null));
         wfProcessInstance.setWfProcessInstanceName(name);
         wfProcessInstance.setStartUserId(tmp.getCreateBy());
