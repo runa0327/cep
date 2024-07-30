@@ -112,7 +112,7 @@ public class ImgExt {
             fos.write(imageBytes);
             Path path = Paths.get(imagePath);
             long fileSize = Files.size(path);//字节
-            Double size = fileSize/ 1024.0;
+            double size = Math.round(fileSize / 1024.0);//保留两位小鼠
             String nowDate = DateUtil.now();
             Crud.from("fl_file").where().eq("ID",id).update()
                     .set("CODE",id)
@@ -133,9 +133,9 @@ public class ImgExt {
                     .set("ORIGIN_FILE_PHYSICAL_LOCATION","/data/qygly/file3/prod/FileStore/"+DateUtil.year(new Date())+"/"+month+"/"+day+"/"+id+".png" )
                     .set("PHYSICAL_LOCATION","/data/qygly/file3/prod/FileStore/"+DateUtil.year(new Date())+"/"+month+"/"+day+"/"+id+".png" )
                     .set("REMARK","1" )
-                    .set("SIZE_KB",size+"KB" )
+                    .set("SIZE_KB",size)
                     .set("DSP_NAME",now+userName+".png" )
-                    .set("DSP_SIZE",size)
+                    .set("DSP_SIZE",size+"KB")
                     .exec();
         } catch (IOException e) {
             e.printStackTrace();
