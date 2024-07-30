@@ -449,12 +449,22 @@ public class DrawingExt {
                 for (String memberId : memberIdList) {
                     CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
                     String adUserId = ccPrjMember.getAdUserId();
-                    CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
-                    ccDrawingAuth.setCcDrawingManagementId(csCommId);
-                    ccDrawingAuth.setAdUserId(adUserId);
-                    ccDrawingAuth.setIsUpload(isUpload);
-                    ccDrawingAuth.setIsView(isView);
-                    ccDrawingAuth.insertById();
+
+                    List<CcDrawingAuth> ccDrawingAuths = CcDrawingAuth.selectByWhere(new Where().eq(CcDrawingAuth.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId).eq(CcDrawingAuth.Cols.AD_USER_ID, adUserId));
+                    if (SharedUtil.isEmpty(ccDrawingAuths)) {
+                        CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                        ccDrawingAuth.setCcDrawingManagementId(csCommId);
+                        ccDrawingAuth.setAdUserId(adUserId);
+                        ccDrawingAuth.setIsUpload(isUpload);
+                        ccDrawingAuth.setIsView(isView);
+                        ccDrawingAuth.insertById();
+                    } else {
+                        for (CcDrawingAuth ccDrawingAuth : ccDrawingAuths) {
+                            ccDrawingAuth.setIsUpload(isUpload);
+                            ccDrawingAuth.setIsView(isView);
+                            ccDrawingAuth.updateById();
+                        }
+                    }
                 }
             }
 
