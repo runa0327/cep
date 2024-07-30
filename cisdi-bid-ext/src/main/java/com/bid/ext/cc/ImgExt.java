@@ -11,6 +11,7 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
-
+@Slf4j
 public class ImgExt {
     /**
      * 考勤打卡 base64编码转为图片
@@ -83,7 +84,6 @@ public class ImgExt {
         SimpleDateFormat format = new SimpleDateFormat("YYYYMMDDHHSSmm");
         System.out.println(format.format(new Date()));
     }
-
     public void toImg(String id,String base64Str,String userId,String userName){
 //        SimpleDateFormat month = new SimpleDateFormat("MM");
 //        SimpleDateFormat day = new SimpleDateFormat("dd");
@@ -103,13 +103,15 @@ public class ImgExt {
         SimpleDateFormat format = new SimpleDateFormat("YYYYMMDDHHSSmm");
         String now = format.format(new Date());
         // 解压输出路径
-        String outputDir = flPath.getDir() + year + "/" + month + "/" + day + "/" + now+userName;
+        String outputDir = flPath.getDir() + year + "/" + month + "/" + day + "/" + id+".png";
         // 将Base64字符串解码为字节数组
         byte[] imageBytes = Base64.getDecoder().decode(base64Str);
         // 图片文件保存路径
         String imagePath = outputDir;
+        log.info("图片地址->{}",outputDir);
         try (FileOutputStream fos = new FileOutputStream(imagePath)) {
             fos.write(imageBytes);
+            log.info("开始转换");
             Path path = Paths.get(imagePath);
             long fileSize = Files.size(path);//字节
             double size = Math.round(fileSize / 1024.0);//保留两位小鼠
