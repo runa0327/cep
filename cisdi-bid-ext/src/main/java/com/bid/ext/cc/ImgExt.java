@@ -9,6 +9,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -126,27 +127,7 @@ public class ImgExt {
     }
 
 
-    public static void main(String[] args) {
-//        String str = "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";
-//        //转为img
-//        // 将Base64字符串解码为字节数组
-//        byte[] imageBytes = Base64.getDecoder().decode(str);
-//        // 图片文件保存路径
-//        String imagePath = "D:/img/123.png";
-//        try (FileOutputStream fos = new FileOutputStream(imagePath)) {
-//            fos.write(imageBytes);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//                            set("ORIGIN_FILE_PHYSICAL_LOCATION","/data/qygly/file3/prod/FileStore/"+DateUtil.year(new Date())+"/"+month.format(new Date())+"/"+day.format(new Date())+"/"+id+".png" )
-//        System.out.println(DateUtil.year(new Date()));
-//        SimpleDateFormat month = new SimpleDateFormat("MM");
-//        SimpleDateFormat day = new SimpleDateFormat("dd");
-//        System.out.println(month.format(new Date()));
-//        System.out.println(day.format(new Date()));
-        SimpleDateFormat format = new SimpleDateFormat("YYYYMMDDHHSSmm");
-        System.out.println(format.format(new Date()));
-    }
+
     public void toImg(String id,String base64Str,String userId,String userName){
 //        SimpleDateFormat month = new SimpleDateFormat("MM");
 //        SimpleDateFormat day = new SimpleDateFormat("dd");
@@ -202,6 +183,7 @@ public class ImgExt {
                     .exec();
         } catch (IOException e) {
             e.printStackTrace();
+            throw  new BaseException("无法写入文件到路径：" + imagePath, e);
         }
     }
 }
