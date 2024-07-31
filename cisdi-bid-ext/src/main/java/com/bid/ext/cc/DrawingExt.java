@@ -361,7 +361,7 @@ public class DrawingExt {
                         ccPartyCompanyId = JdbcMapUtil.getString(ccPartyCompany, "id");
                     }
 
-                    CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
+                    CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_STEEL_OWNER_DRAWING_ID, ccSteelOwnerDrawingId));
                     if (SharedUtil.isEmpty(ccDrawingManagement)) {
 
                         CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
@@ -417,7 +417,7 @@ public class DrawingExt {
                         ccDrawingManagement.updateById();
                     }
                 } catch (Exception e) {
-                    throw new BaseException("在第 " + (i + 1) + " 行的单元格格式错误!");
+                    throw new BaseException("在第 " + (i + 1) + " 行的单元格格式错误!" + e);
                 }
             }
 
