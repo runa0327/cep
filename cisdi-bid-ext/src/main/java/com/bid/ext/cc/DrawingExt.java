@@ -409,7 +409,9 @@ public class DrawingExt {
                             ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
                         }
                         ccDrawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
-                        ccDrawingManagement.setActDate(actDate);
+                        if (!SharedUtil.isEmpty(actDate)) {
+                            ccDrawingManagement.setActDate(actDate);
+                        }
                         ccDrawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
                         ccDrawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
 //                        ccDrawingManagement.setThreeDActDate(threeDPlanDate);
