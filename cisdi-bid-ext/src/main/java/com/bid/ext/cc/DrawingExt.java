@@ -775,7 +775,7 @@ public class DrawingExt {
                         ccDrawingManagement.updateById();
                     }
                 } else {
-                    System.out.println("文件未找到：" + path);
+                    throw new BaseException("文件未找到：" + path);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

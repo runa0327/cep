@@ -9,6 +9,7 @@ import com.deepoove.poi.data.Pictures;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -141,7 +142,7 @@ public class GenExt {
                 ccQsInspection.setCcQsNoticeId(fileId);
                 ccQsInspection.updateById();
             } else {
-                System.out.println("文件未找到：" + path);
+                throw new BaseException("文件未找到：" + path);
             }
         }
         invokeActResult.reFetchData = true;
