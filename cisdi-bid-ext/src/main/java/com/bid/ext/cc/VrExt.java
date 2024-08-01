@@ -1,8 +1,6 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.CcVr;
-import com.bid.ext.model.FlFile;
-import com.bid.ext.model.FlPath;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -10,6 +8,7 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -23,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.awt.Image;
 
+
+@Slf4j
 public class VrExt {
 
     /**
@@ -124,29 +125,105 @@ public class VrExt {
 
     }
 
-    public static void saveWordToFile(byte[] wordContent, String outputPath) {
-        try {
-            // 创建一个File对象，代表输出路径
-            File outputFile = new File(outputPath);
-
-            // 获取输出文件的父目录
-            File parentDir = outputFile.getParentFile();
-
-            // 如果父目录不存在，则创建它
-            if (!parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-
-            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-                fos.write(wordContent);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static boolean checkFileExists(String path) {
         File file = new File(path);
         return file.exists();
+    }
+
+    /**
+     * API:获取所有VR全景
+     */
+    public void getAllVr() {
+//        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+//        Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
+//        //全景id
+//        String ccDocFileId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_ID");
+//        String ccPrjIds = JdbcMapUtil.getString(inputMap, "ccPrjId");
+//        List<CcVr> ccVrs = CcVr.selectByWhere(new Where().eq(CcVr.Cols.CC_PRJ_ID, ccPrjIds));
+
+        String sqlPanoMonth = "SELECT DISTINCT(DATE_FORMAT(VR_DATE, '%Y-%m')) CC_PANO_MONTH, CONCAT(YEAR ( VR_DATE ), '年', MONTH ( VR_DATE ), '月' ) CC_PANO_RET_MONTH FROM CC_VR WHERE (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_PANO_MONTH DESC";
+        List<Map<String, Object>> ccPanoMonths = ExtJarHelper.getMyJdbcTemplate().queryForList(sqlPanoMonth);
+
+        List<Map<String, Object>> vrLst = new ArrayList<>();
+
+        for (Map<String, Object> mapPanoMonth : ccPanoMonths) {
+            String panoMonth = JdbcMapUtil.getString(mapPanoMonth, "CC_PANO_MONTH");
+            String sqlPanoLst = "SELECT `NAME`, VR_DATE,  CONCAT( YEAR ( VR_DATE ), '年', MONTH ( VR_DATE ), '月' ) CC_YEAR_MONTH, CC_VR_ATTACHMENT_PREVIEW, CC_VR_ATTACHMENT FROM CC_VR WHERE DATE_FORMAT(VR_DATE, '%Y-%m') LIKE ? AND  (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY VR_DATE DESC";
+            List<Map<String, Object>> ccVrs = ExtJarHelper.getMyJdbcTemplate().queryForList(sqlPanoLst, panoMonth);
+            List<Map<String, String>> panoLst = new ArrayList<>();
+
+            for (Map<String, Object> ccVr : ccVrs) {
+                String name = JdbcMapUtil.getString(ccVr, "NAME");
+                String vrDate = JdbcMapUtil.getString(ccVr, "VR_DATE");
+                String ccVrYearMonth = JdbcMapUtil.getString(ccVr, "CC_YEAR_MONTH");
+                String ccVrAttachment = JdbcMapUtil.getString(ccVr, "CC_VR_ATTACHMENT");
+                String ccVrAttachmentPreview = JdbcMapUtil.getString(ccVr, "CC_VR_ATTACHMENT_PREVIEW");
+
+                if (null == ccVrAttachment || null == ccVrAttachmentPreview) {
+                    continue;
+                }
+
+                FlFile ccVrAttachmentFlFile = FlFile.selectById(ccVrAttachment);
+                FlFile ccVrAttachmentPreviewFlFile = FlFile.selectById(ccVrAttachmentPreview);
+
+                if (!checkFileExists(ccVrAttachmentFlFile.getPhysicalLocation()) || !checkFileExists(ccVrAttachmentPreviewFlFile.getPhysicalLocation())) {
+                    continue;
+                }
+
+                Map<String, String> ccVrItem = new HashMap<>();
+                ccVrItem.put("NAME", name);
+                ccVrItem.put("VR_DATE", vrDate);
+                ccVrItem.put("CC_YEAR_MONTH", ccVrYearMonth);
+                ccVrItem.put("CC_VR_ATTACHMENT", ccVrAttachmentFlFile.getFileInlineUrl());
+                ccVrItem.put("CC_VR_ATTACHMENT_PREVIEW", ccVrAttachmentPreviewFlFile.getFileInlineUrl());
+                panoLst.add(ccVrItem);
+            }
+
+            if (!panoLst.isEmpty()) {
+                Map<String, Object> ccPano= new HashMap<>();
+                ccPano.put("pano-month", JdbcMapUtil.getString(mapPanoMonth,"CC_PANO_RET_MONTH"));
+                ccPano.put("pano-list", panoLst);
+                vrLst.add(ccPano);
+            }
+        }
+        Map<String,Object> result = new HashMap<>();
+        result.put("data",vrLst);
+        ExtJarHelper.setReturnValue(result);
+//        String sql = "SELECT `NAME`, VR_DATE,  CONCAT( YEAR ( VR_DATE ), '年', MONTH ( VR_DATE ), '月' ) CC_YEAR_MONTH, CC_VR_ATTACHMENT_PREVIEW, CC_VR_ATTACHMENT FROM CC_VR WHERE (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY VR_DATE DESC";
+//        List<Map<String, Object>> ccVrs = ExtJarHelper.getMyJdbcTemplate().queryForList(sql);
+//        List<Map<String, String>> vrLst = new ArrayList<>();
+
+//        ExtJarHelper.setReturnValue(vrLst);
+//        ExtJarHelper.setReturnValue();
+
+//        年月
+//        时间（年月日）
+//        缩略图地址
+//        全景图地址
+//        全景图名称
+
+//        Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
+//        //全景id
+//        String ccDocFileId = JdbcMapUtil.getString(inputMap, "ccDocFileId");
+//        //项目id
+//        CcDocFile ccDocFile = CcDocFile.selectById(ccDocFileId);
+//        String ccPrjId = ccDocFile.getCcPrjId();
+//        //坐标
+//        String position = JdbcMapUtil.getString(inputMap, "position");
+//        //全景文件id
+//        String ccAttachment = JdbcMapUtil.getString(inputMap, "ccAttachment");
+//        //热点名
+//        String name = JdbcMapUtil.getString(inputMap, "name");
+//        CcDocFileHotPoint ccDocFileHotPoint = CcDocFileHotPoint.newData();
+//        ccDocFileHotPoint.setCcDocFileId(ccDocFileId);
+//        ccDocFileHotPoint.setPosition(position);
+//        ccDocFileHotPoint.setCcAttachment(ccAttachment);
+//        ccDocFileHotPoint.setName(name);
+//        ccDocFileHotPoint.setCcPrjId(ccPrjId);
+//        ccDocFileHotPoint.insertById();
+//        String hotPointId = ccDocFileHotPoint.getId();
+//        Map<String, Object> outputMap = new HashMap<>();
+//        outputMap.put("hotPointId", hotPointId);
+//        ExtJarHelper.setReturnValue(outputMap);
     }
 }
