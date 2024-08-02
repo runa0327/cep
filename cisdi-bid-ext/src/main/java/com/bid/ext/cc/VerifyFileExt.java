@@ -8,6 +8,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,11 +25,16 @@ public class VerifyFileExt {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         String csCommId = entityRecord.csCommId;
         Map<String, Object> valueMap = entityRecord.valueMap;
+        String status = JdbcMapUtil.getString(valueMap, "STATUS");
+        if (status.equals("DR")) {
+            return;
+        }
         SevInfo sevInfo = ExtJarHelper.getSevInfo();
         EntityInfo entityInfo = sevInfo.entityInfo;
         String entityCode = entityInfo.code;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        String attachmentId = valueMap.get("CC_ATTACHMENT").toString();
+        String attachmentId = JdbcMapUtil.getString(valueMap, "CC_ATTACHMENT");
+
         FlFile flFile = FlFile.selectById(attachmentId);
         String dspSize = flFile.getDspSize();
         CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
