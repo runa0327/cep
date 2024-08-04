@@ -111,8 +111,10 @@ public class InspectionExt {
                 }
                 ExtJarHelper.setReturnValue(userIdList);
             } else {
+                ArrayList<String> userIdList = new ArrayList<>();
                 String crtUserId = ccQsInspection.getCrtUserId();
-                ExtJarHelper.setReturnValue(crtUserId);
+                userIdList.add(crtUserId);
+                ExtJarHelper.setReturnValue(userIdList);
             }
         }
     }
