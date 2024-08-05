@@ -91,6 +91,14 @@ public class CcDocFile {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+         */
+        public static final String CC_DRAWING_APPROVED_STATUS = "CC_DRAWING_APPROVED_STATUS";
+        /**
+         * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+         */
+        public static final String CC_PREVIEW_ATTACHMENT = "CC_PREVIEW_ATTACHMENT";
+        /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
@@ -552,6 +560,78 @@ public class CcDocFile {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     */
+    private Integer ccDrawingApprovedStatus;
+
+    /**
+     * 获取：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     */
+    public Integer getCcDrawingApprovedStatus() {
+        return this.ccDrawingApprovedStatus;
+    }
+
+    /**
+     * 设置：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     */
+    public CcDocFile setCcDrawingApprovedStatus(Integer ccDrawingApprovedStatus) {
+        if (this.ccDrawingApprovedStatus == null && ccDrawingApprovedStatus == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDrawingApprovedStatus != null && ccDrawingApprovedStatus != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDrawingApprovedStatus.compareTo(ccDrawingApprovedStatus) != 0) {
+                this.ccDrawingApprovedStatus = ccDrawingApprovedStatus;
+                if (!this.toUpdateCols.contains("CC_DRAWING_APPROVED_STATUS")) {
+                    this.toUpdateCols.add("CC_DRAWING_APPROVED_STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDrawingApprovedStatus = ccDrawingApprovedStatus;
+            if (!this.toUpdateCols.contains("CC_DRAWING_APPROVED_STATUS")) {
+                this.toUpdateCols.add("CC_DRAWING_APPROVED_STATUS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     */
+    private String ccPreviewAttachment;
+
+    /**
+     * 获取：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     */
+    public String getCcPreviewAttachment() {
+        return this.ccPreviewAttachment;
+    }
+
+    /**
+     * 设置：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     */
+    public CcDocFile setCcPreviewAttachment(String ccPreviewAttachment) {
+        if (this.ccPreviewAttachment == null && ccPreviewAttachment == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPreviewAttachment != null && ccPreviewAttachment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPreviewAttachment.compareTo(ccPreviewAttachment) != 0) {
+                this.ccPreviewAttachment = ccPreviewAttachment;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_ATTACHMENT")) {
+                    this.toUpdateCols.add("CC_PREVIEW_ATTACHMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPreviewAttachment = ccPreviewAttachment;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_ATTACHMENT")) {
+                this.toUpdateCols.add("CC_PREVIEW_ATTACHMENT");
             }
         }
         return this;
