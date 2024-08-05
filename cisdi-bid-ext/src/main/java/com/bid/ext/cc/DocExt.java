@@ -299,6 +299,7 @@ public class DocExt {
 
             ccDocFile.setCcDocFileTypeId(fileType);
             ccDocFile.setCcDocDirId(ccDocDirId);
+            ccDocFile.setCcAttachment(attachmentId);
             ccDocFile.insertById();
 
         }
@@ -346,6 +347,7 @@ public class DocExt {
 
             ccDocFile.setCcDocFileTypeId(fileType);
             ccDocFile.setCcDocDirId(ccDocDirId);
+            ccDocFile.setCcAttachment(attachmentId);
             ccDocFile.insertById();
 
         }
