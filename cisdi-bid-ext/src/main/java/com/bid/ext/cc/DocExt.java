@@ -404,12 +404,10 @@ public class DocExt {
                 ccDocFile.setCcAttachment(attachmentId);
                 ccDocFile.insertById();
             }
-            InvokeActResult invokeActResult = new InvokeActResult();
-            invokeActResult.reFetchData = true;
-            ExtJarHelper.setReturnValue(invokeActResult);
-
         }
-
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**
