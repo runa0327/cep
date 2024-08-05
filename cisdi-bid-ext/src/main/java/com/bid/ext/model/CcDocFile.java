@@ -7,6 +7,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,13 +92,13 @@ public class CcDocFile {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
-         */
-        public static final String CC_DRAWING_APPROVED_STATUS = "CC_DRAWING_APPROVED_STATUS";
-        /**
          * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
          */
         public static final String CC_PREVIEW_ATTACHMENT = "CC_PREVIEW_ATTACHMENT";
+        /**
+         * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+         */
+        public static final String CC_DOC_DATE = "CC_DOC_DATE";
         /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
@@ -126,6 +127,10 @@ public class CcDocFile {
          * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
          */
         public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
+        /**
+         * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+         */
+        public static final String CC_DRAWING_APPROVED_STATUS = "CC_DRAWING_APPROVED_STATUS";
         /**
          * {"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
          */
@@ -566,42 +571,6 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
-     */
-    private Integer ccDrawingApprovedStatus;
-
-    /**
-     * 获取：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
-     */
-    public Integer getCcDrawingApprovedStatus() {
-        return this.ccDrawingApprovedStatus;
-    }
-
-    /**
-     * 设置：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
-     */
-    public CcDocFile setCcDrawingApprovedStatus(Integer ccDrawingApprovedStatus) {
-        if (this.ccDrawingApprovedStatus == null && ccDrawingApprovedStatus == null) {
-            // 均为null，不做处理。
-        } else if (this.ccDrawingApprovedStatus != null && ccDrawingApprovedStatus != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccDrawingApprovedStatus.compareTo(ccDrawingApprovedStatus) != 0) {
-                this.ccDrawingApprovedStatus = ccDrawingApprovedStatus;
-                if (!this.toUpdateCols.contains("CC_DRAWING_APPROVED_STATUS")) {
-                    this.toUpdateCols.add("CC_DRAWING_APPROVED_STATUS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccDrawingApprovedStatus = ccDrawingApprovedStatus;
-            if (!this.toUpdateCols.contains("CC_DRAWING_APPROVED_STATUS")) {
-                this.toUpdateCols.add("CC_DRAWING_APPROVED_STATUS");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
      */
     private String ccPreviewAttachment;
@@ -632,6 +601,42 @@ public class CcDocFile {
             this.ccPreviewAttachment = ccPreviewAttachment;
             if (!this.toUpdateCols.contains("CC_PREVIEW_ATTACHMENT")) {
                 this.toUpdateCols.add("CC_PREVIEW_ATTACHMENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     */
+    private LocalDate ccDocDate;
+
+    /**
+     * 获取：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     */
+    public LocalDate getCcDocDate() {
+        return this.ccDocDate;
+    }
+
+    /**
+     * 设置：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     */
+    public CcDocFile setCcDocDate(LocalDate ccDocDate) {
+        if (this.ccDocDate == null && ccDocDate == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDocDate != null && ccDocDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDocDate.compareTo(ccDocDate) != 0) {
+                this.ccDocDate = ccDocDate;
+                if (!this.toUpdateCols.contains("CC_DOC_DATE")) {
+                    this.toUpdateCols.add("CC_DOC_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDocDate = ccDocDate;
+            if (!this.toUpdateCols.contains("CC_DOC_DATE")) {
+                this.toUpdateCols.add("CC_DOC_DATE");
             }
         }
         return this;
@@ -884,6 +889,42 @@ public class CcDocFile {
             this.ccAttachment = ccAttachment;
             if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
                 this.toUpdateCols.add("CC_ATTACHMENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     */
+    private Integer ccDrawingApprovedStatus;
+
+    /**
+     * 获取：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     */
+    public Integer getCcDrawingApprovedStatus() {
+        return this.ccDrawingApprovedStatus;
+    }
+
+    /**
+     * 设置：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     */
+    public CcDocFile setCcDrawingApprovedStatus(Integer ccDrawingApprovedStatus) {
+        if (this.ccDrawingApprovedStatus == null && ccDrawingApprovedStatus == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDrawingApprovedStatus != null && ccDrawingApprovedStatus != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDrawingApprovedStatus.compareTo(ccDrawingApprovedStatus) != 0) {
+                this.ccDrawingApprovedStatus = ccDrawingApprovedStatus;
+                if (!this.toUpdateCols.contains("CC_DRAWING_APPROVED_STATUS")) {
+                    this.toUpdateCols.add("CC_DRAWING_APPROVED_STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDrawingApprovedStatus = ccDrawingApprovedStatus;
+            if (!this.toUpdateCols.contains("CC_DRAWING_APPROVED_STATUS")) {
+                this.toUpdateCols.add("CC_DRAWING_APPROVED_STATUS");
             }
         }
         return this;

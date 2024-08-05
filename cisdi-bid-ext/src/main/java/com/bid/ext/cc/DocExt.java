@@ -293,9 +293,9 @@ public class DocExt {
             } else if (dspName.endsWith("mp4") || dspName.endsWith("avi") || dspName.endsWith("mov") || dspName.endsWith("wmv") || dspName.endsWith("flv") || dspName.endsWith("mkv") || dspName.endsWith("webm") || dspName.endsWith("wp3") || dspName.endsWith("wav")) {
                 fileType = "MEDIA";
             } else if (dspName.endsWith("vrml") || dspName.endsWith("obj") || dspName.endsWith("fbx") || dspName.endsWith("dae")) {
-                fileType = "VR";
+                fileType = "VR"; // todo 从资料文档批量上传VR的时候没有生成缩略图
             } else {
-                continue; //todo 确认非法格式的逻辑是什么，前端过滤还是后端过滤，文件类型如何设置
+                continue; // todo 确认非法格式的逻辑是什么，前端过滤还是后端过滤，文件类型如何设置
             }
 
             ccDocFile.setCcDocFileTypeId(fileType);
@@ -308,6 +308,107 @@ public class DocExt {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+
+    }
+
+    /**
+     * 批量上传VR全景，格式要求jpg和png
+     */
+    public void uploadVrFileBatch() throws IOException {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+        String ccPrjId = JdbcMapUtil.getString(varMap, "P_PRJ_ID");
+        String ccDocDirId = JdbcMapUtil.getString(varMap, "P_DOC_DIR_ID");
+        String ccDocDate = JdbcMapUtil.getString(varMap, "P_DOC_DATE");
+        List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+
+        for (String attachmentId : ccAttachmentList) {
+            FlFile flFile = FlFile.selectById(attachmentId);
+            String name = flFile.getName();
+            String dspSize = flFile.getDspSize();
+
+            CcDocFile ccDocFile = CcDocFile.newData();
+            ccDocFile.setCcPrjId(ccPrjId);
+            ccDocFile.setName(name);
+            ccDocFile.setCcPreviewDspSize(dspSize);
+
+            ccDocFile.setIsDefault(false);
+            ccDocFile.setIsFavorites(false);
+            ccDocFile.setCcDocDate(LocalDate.parse(ccDocDate));
+
+            String fileType = "VR";
+            String fileInlineUrl = flFile.getFileInlineUrl(); // 获取文件 URL
+            String flPathId = flFile.getFlPathId();
+            String sql = "select name from CC_QS_IMG_PREVIEW_URL LIMIT 1";
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+            Map<String, Object> map = myJdbcTemplate.queryForMap(sql);
+            String urlHead = JdbcMapUtil.getString(map, "name");
+            String sessionId = ExtJarHelper.getLoginInfo().sessionId;
+            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+            String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
+
+            BufferedImage originalImage = ImageIO.read(new URL(url));
+            int targetWidth = 300; // 目标宽度
+            int targetHeight = 300; // 目标高度
+            Image resizedImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+            BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            outputImage.getGraphics().drawImage(resizedImage, 0, 0, null);
+
+            Where pathWhere = new Where();
+            pathWhere.eq(FlPath.Cols.ID, flPathId);
+            FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+
+            LocalDate now = LocalDate.now();
+            int year = now.getYear();
+            String month = String.format("%02d", now.getMonthValue());
+            String day = String.format("%02d", now.getDayOfMonth());
+
+            String previewPath = flPath.getDir() + year + "/" + month + "/" + day + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
+            File outputFile = new File(previewPath); // 输出图片文件
+            ImageIO.write(outputImage, flFile.getExt(), outputFile);
+
+            if (checkFileExists(previewPath)) {
+                FlFile attachmentPreview = FlFile.newData();
+                String fileId = attachmentPreview.getId();
+
+                File file = new File(previewPath);
+                long bytes = file.length();
+                double kilobytes = bytes / 1024.0;
+
+                BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
+                String previewDspSize = String.format("%d KB", Math.round(kilobytes));
+                attachmentPreview.setCrtUserId(loginInfo.userInfo.id);
+                attachmentPreview.setLastModiUserId(loginInfo.userInfo.id);
+                attachmentPreview.setFlPathId(flPath.getId());
+                attachmentPreview.setCode(fileId);
+                attachmentPreview.setName(ccDocFile.getId() + "_preview");
+                attachmentPreview.setExt(flFile.getExt());
+                attachmentPreview.setDspName(ccDocFile.getId() + "_preview." + flFile.getExt());
+                attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
+                attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                attachmentPreview.setSizeKb(sizeKb);
+                attachmentPreview.setDspSize(previewDspSize);
+                attachmentPreview.setUploadDttm(LocalDateTime.now());
+                attachmentPreview.setPhysicalLocation(previewPath);
+                attachmentPreview.setOriginFilePhysicalLocation(previewPath);
+//                flFile.setIsPublicRead(flPath.getIsPublicRead());
+                attachmentPreview.setIsPublicRead(false);
+                attachmentPreview.setIsPublicRead(true);
+                attachmentPreview.insertById();
+//                    attachmentPreview.url;
+                ccDocFile.setCcPreviewAttachment(fileId);
+
+                ccDocFile.setCcDocFileTypeId(fileType);
+                ccDocFile.setCcDocDirId(ccDocDirId);
+                ccDocFile.setCcAttachment(attachmentId);
+                ccDocFile.insertById();
+            }
+            InvokeActResult invokeActResult = new InvokeActResult();
+            invokeActResult.reFetchData = true;
+            ExtJarHelper.setReturnValue(invokeActResult);
+
+        }
 
     }
 
