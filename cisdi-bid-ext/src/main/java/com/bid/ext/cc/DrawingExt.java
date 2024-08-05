@@ -403,7 +403,9 @@ public class DrawingExt {
                         ccDrawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
                         ccDrawingManagement.setCcDrawingTypeId(drawingTypeId);
                         ccDrawingManagement.setName(getStringCellValue(row.getCell(4)));
-                        ccDrawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
+                        if (!SharedUtil.isEmpty(ccConstructionDrawingId)) {
+                            ccDrawingManagement.setCcConstructionDrawingId(ccConstructionDrawingId);
+                        }
                         ccDrawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
                         if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
                             ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
