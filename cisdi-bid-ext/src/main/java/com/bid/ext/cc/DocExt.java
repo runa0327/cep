@@ -374,10 +374,10 @@ public class DocExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
             String id = JdbcMapUtil.getString(valueMap, "ID");
             CcDocFile ccDocFile = CcDocFile.selectById(id);
-
-            if (ccDocFile.getStatus().equals("DR")) {
+            if ("DR".equals(ccDocFile.getStatus()) || !"VR".equals(ccDocFile.getCcDocFileTypeId())) {
                 return;
             }
+
             FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment()); // 获取文件对象
             if (null != flFile) {
                 String fileInlineUrl = flFile.getFileInlineUrl(); // 获取文件 URL
