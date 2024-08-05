@@ -398,24 +398,20 @@ public class DrawingExt {
                         ccDrawingAuth.setAdUserId(userId);
                         ccDrawingAuth.insertById();
                     } else {
-                        ccDrawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
-                        ccDrawingManagement.setCcPrjId(ccPrjId);
-                        ccDrawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
-                        ccDrawingManagement.setCcDrawingTypeId(drawingTypeId);
-                        ccDrawingManagement.setName(getStringCellValue(row.getCell(4)));
-                        ccDrawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
-                        ccDrawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
-                        if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
-                            ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
-                        }
-                        ccDrawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
-                        if (!SharedUtil.isEmpty(actDate)) {
-                            ccDrawingManagement.setActDate(actDate);
-                        }
-                        ccDrawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
-                        ccDrawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
-//                        ccDrawingManagement.setThreeDActDate(threeDPlanDate);
-                        ccDrawingManagement.setCcPartyCompanyId(ccPartyCompanyId);
+                        ccDrawingManagement.setSeqNo(!SharedUtil.isEmpty(getNumericCellValue(row.getCell(0))) ? BigDecimal.valueOf(getNumericCellValue(row.getCell(0))) : ccDrawingManagement.getSeqNo());
+                        ccDrawingManagement.setCcPrjId(!SharedUtil.isEmpty(ccPrjId) ? ccPrjId : ccDrawingManagement.getCcPrjId());
+                        ccDrawingManagement.setCcPrjStructNodeId(!SharedUtil.isEmpty(ccPrjStructNodeId) ? ccPrjStructNodeId : ccDrawingManagement.getCcPrjStructNodeId());
+                        ccDrawingManagement.setCcDrawingTypeId(!SharedUtil.isEmpty(drawingTypeId) ? drawingTypeId : ccDrawingManagement.getCcDrawingTypeId());
+                        ccDrawingManagement.setName(!SharedUtil.isEmpty(getStringCellValue(row.getCell(4))) ? getStringCellValue(row.getCell(4)) : ccDrawingManagement.getName());
+                        ccDrawingManagement.setCcConstructionDrawingId(!SharedUtil.isEmpty(ccConstructionDrawingId) ? ccConstructionDrawingId : ccDrawingManagement.getCcConstructionDrawingId());
+                        ccDrawingManagement.setCcSteelOwnerDrawingId(!SharedUtil.isEmpty(getStringCellValue(row.getCell(6))) ? getStringCellValue(row.getCell(6)) : ccDrawingManagement.getCcSteelOwnerDrawingId());
+                        ccDrawingManagement.setCcPrjProfessionalCodeId(!SharedUtil.isEmpty(ccPrjProfessionalCode) ? lastLetter : ccDrawingManagement.getCcPrjProfessionalCodeId());
+                        ccDrawingManagement.setPlanDate(!SharedUtil.isEmpty(getLocalDateCellValue(row.getCell(7))) ? getLocalDateCellValue(row.getCell(7)) : ccDrawingManagement.getPlanDate());
+                        ccDrawingManagement.setActDate(!SharedUtil.isEmpty(actDate) ? actDate : ccDrawingManagement.getActDate());
+                        ccDrawingManagement.setIsThreeDimensional(!SharedUtil.isEmpty(getBooleanCellValue(row.getCell(9))) ? getBooleanCellValue(row.getCell(9)) : ccDrawingManagement.getIsThreeDimensional());
+                        ccDrawingManagement.setThreeDPlanDate(!SharedUtil.isEmpty(getLocalDateCellValue(row.getCell(10))) ? getLocalDateCellValue(row.getCell(10)) : ccDrawingManagement.getThreeDPlanDate());
+                        // ccDrawingManagement.setThreeDActDate(!SharedUtil.isEmpty(threeDActDate) ? threeDActDate : ccDrawingManagement.getThreeDActDate());
+                        ccDrawingManagement.setCcPartyCompanyId(!SharedUtil.isEmpty(ccPartyCompanyId) ? ccPartyCompanyId : ccDrawingManagement.getCcPartyCompanyId());
                         ccDrawingManagement.updateById();
                     }
                 } catch (Exception e) {
