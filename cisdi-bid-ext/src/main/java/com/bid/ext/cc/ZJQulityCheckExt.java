@@ -41,8 +41,8 @@ public class ZJQulityCheckExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/导入/检测管理-常规检测信息(1).xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/湛江/导入/检测管理-常规检测信息(1).xlsx";
 
         //单元工程
         Where queryUnitPrj = new Where();
