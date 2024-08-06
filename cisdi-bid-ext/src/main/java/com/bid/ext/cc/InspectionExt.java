@@ -454,8 +454,14 @@ public class InspectionExt {
             CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
             String ccSafeDutyUserIds = ccQsInspection.getCcSafeDutyUserIds();
             if (ccSafeDutyUserIds != null && !ccSafeDutyUserIds.isEmpty()) {
-                String[] userIds = ccSafeDutyUserIds.split(",");
-                ArrayList<String> userIdList = new ArrayList<>(Arrays.asList(userIds));
+                String[] dutyUserIds = ccSafeDutyUserIds.split(",");
+                ArrayList<String> dutyUserIdList = new ArrayList<>(Arrays.asList(dutyUserIds));
+                ArrayList<String> userIdList = new ArrayList<>();
+                for (String dutyUserId : dutyUserIdList) {
+                    CcSafeDutyUser ccSafeDutyUser = CcSafeDutyUser.selectById(dutyUserId);
+                    String adUserId = ccSafeDutyUser.getAdUserId();
+                    userIdList.add(adUserId);
+                }
                 ExtJarHelper.setReturnValue(userIdList);
             }
         }
