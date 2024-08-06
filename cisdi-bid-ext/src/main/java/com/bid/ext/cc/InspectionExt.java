@@ -443,4 +443,21 @@ public class InspectionExt {
         }
     }
 
+    /**
+     * 获取巡检责任人(预设)
+     */
+    public void getInspectionDutyUserPresets() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
+            String ccSafeDutyUserId = ccQsInspection.getCcSafeDutyUserId();
+            if (ccSafeDutyUserId != null && !ccSafeDutyUserId.isEmpty()) {
+                String[] userIds = ccSafeDutyUserId.split(",");
+                ArrayList<String> userIdList = new ArrayList<>(Arrays.asList(userIds));
+                ExtJarHelper.setReturnValue(userIdList);
+            }
+        }
+    }
+
 }
