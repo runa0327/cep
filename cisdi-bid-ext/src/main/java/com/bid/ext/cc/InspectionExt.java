@@ -452,9 +452,9 @@ public class InspectionExt {
 
             String csCommId = entityRecord.csCommId;
             CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
-            String ccSafeDutyUserId = ccQsInspection.getCcSafeDutyUserId();
-            if (ccSafeDutyUserId != null && !ccSafeDutyUserId.isEmpty()) {
-                String[] userIds = ccSafeDutyUserId.split(",");
+            String ccSafeDutyUserIds = ccQsInspection.getCcSafeDutyUserIds();
+            if (ccSafeDutyUserIds != null && !ccSafeDutyUserIds.isEmpty()) {
+                String[] userIds = ccSafeDutyUserIds.split(",");
                 ArrayList<String> userIdList = new ArrayList<>(Arrays.asList(userIds));
                 ExtJarHelper.setReturnValue(userIdList);
             }

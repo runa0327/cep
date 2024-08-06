@@ -176,9 +176,9 @@ public class CcQsInspection {
          */
         public static final String CC_QS_DUTY_USER = "CC_QS_DUTY_USER";
         /**
-         * {"EN": "质安分包单位", "ZH_CN": "安全责任人", "ZH_TW": "质安分包单位"}。
+         * {"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
          */
-        public static final String CC_SAFE_DUTY_USER_ID = "CC_SAFE_DUTY_USER_ID";
+        public static final String CC_SAFE_DUTY_USER_IDS = "CC_SAFE_DUTY_USER_IDS";
         /**
          * {"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
          */
@@ -1387,36 +1387,36 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "质安分包单位", "ZH_CN": "安全责任人", "ZH_TW": "质安分包单位"}。
+     * {"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
      */
-    private String ccSafeDutyUserId;
+    private String ccSafeDutyUserIds;
 
     /**
-     * 获取：{"EN": "质安分包单位", "ZH_CN": "安全责任人", "ZH_TW": "质安分包单位"}。
+     * 获取：{"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
      */
-    public String getCcSafeDutyUserId() {
-        return this.ccSafeDutyUserId;
+    public String getCcSafeDutyUserIds() {
+        return this.ccSafeDutyUserIds;
     }
 
     /**
-     * 设置：{"EN": "质安分包单位", "ZH_CN": "安全责任人", "ZH_TW": "质安分包单位"}。
+     * 设置：{"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
      */
-    public CcQsInspection setCcSafeDutyUserId(String ccSafeDutyUserId) {
-        if (this.ccSafeDutyUserId == null && ccSafeDutyUserId == null) {
+    public CcQsInspection setCcSafeDutyUserIds(String ccSafeDutyUserIds) {
+        if (this.ccSafeDutyUserIds == null && ccSafeDutyUserIds == null) {
             // 均为null，不做处理。
-        } else if (this.ccSafeDutyUserId != null && ccSafeDutyUserId != null) {
+        } else if (this.ccSafeDutyUserIds != null && ccSafeDutyUserIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccSafeDutyUserId.compareTo(ccSafeDutyUserId) != 0) {
-                this.ccSafeDutyUserId = ccSafeDutyUserId;
-                if (!this.toUpdateCols.contains("CC_SAFE_DUTY_USER_ID")) {
-                    this.toUpdateCols.add("CC_SAFE_DUTY_USER_ID");
+            if (this.ccSafeDutyUserIds.compareTo(ccSafeDutyUserIds) != 0) {
+                this.ccSafeDutyUserIds = ccSafeDutyUserIds;
+                if (!this.toUpdateCols.contains("CC_SAFE_DUTY_USER_IDS")) {
+                    this.toUpdateCols.add("CC_SAFE_DUTY_USER_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccSafeDutyUserId = ccSafeDutyUserId;
-            if (!this.toUpdateCols.contains("CC_SAFE_DUTY_USER_ID")) {
-                this.toUpdateCols.add("CC_SAFE_DUTY_USER_ID");
+            this.ccSafeDutyUserIds = ccSafeDutyUserIds;
+            if (!this.toUpdateCols.contains("CC_SAFE_DUTY_USER_IDS")) {
+                this.toUpdateCols.add("CC_SAFE_DUTY_USER_IDS");
             }
         }
         return this;
