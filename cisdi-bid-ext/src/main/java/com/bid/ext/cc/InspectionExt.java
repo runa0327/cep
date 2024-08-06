@@ -10,6 +10,7 @@ import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.JsonUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -460,4 +461,18 @@ public class InspectionExt {
         }
     }
 
+    /**
+     * 安全责任人名称同步用户名称
+     */
+    public void AdUserNameToSafeDutyUserName() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String id = EntityRecordUtil.getId(entityRecord);
+            CcSafeDutyUser ccSafeDutyUser = CcSafeDutyUser.selectById(id);
+            String adUserId = ccSafeDutyUser.getAdUserId();
+            AdUser adUser = AdUser.selectById(adUserId);
+            String userName = adUser.getName();
+            ccSafeDutyUser.setName(userName);
+            ccSafeDutyUser.updateById();
+        }
+    }
 }
