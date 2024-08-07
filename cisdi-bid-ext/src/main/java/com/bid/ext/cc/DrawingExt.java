@@ -737,6 +737,7 @@ public class DrawingExt {
 
                 FlFile newFile = FlFile.newData();
                 String fileId = newFile.getId();
+                String faPath = flPath.getDir() + year + "/" + month + "/" + day + "/";
                 String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
                 saveWordToFile(fileBytes, path);
                 boolean fileExists = checkFileExists(path);
@@ -745,6 +746,8 @@ public class DrawingExt {
                     long bytes = file0.length();
                     double kilobytes = bytes / 1024.0;
                     String fileName = file.getName();
+
+
 
                     BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
                     String dspSize = String.format("%d KB", Math.round(kilobytes));
@@ -764,6 +767,8 @@ public class DrawingExt {
                     newFile.setOriginFilePhysicalLocation(path);
                     newFile.setIsPublicRead(false);
                     newFile.insertById();
+
+                    addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",newFile.getPhysicalLocation(),faPath);
 
                     CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
                     ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
@@ -833,7 +838,7 @@ public class DrawingExt {
      * @param pdfPath
      * @return
      */
-    private Boolean addWaterMark(String name, String copyPath, String pdfPath) {
+    public Boolean addWaterMark(String name, String copyPath, String pdfPath) {
         boolean res = true;
         try {
             PdfReader reader = new PdfReader(copyPath);
@@ -852,22 +857,22 @@ public class DrawingExt {
                 over = stamper.getOverContent(i);
                 over.saveState();
                 over.setGState(gs1);
-                over.setFontAndSize(BaseFont.createFont("STSong-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED),12);
+                over.setFontAndSize(BaseFont.createFont("STSong-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED),0.02f*x);
 //                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*0.6f, 20);
 //                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*1.5f, 20);
-                over.showTextAligned(Element.ALIGN_CENTER , name, x*0.75f, y*0.05f, 0);
+                over.showTextAligned(Element.ALIGN_CENTER , name, x*0.5f, y*0.5f, 30);
                 over.restoreState();
             }
             stamper.close();
             reader.close();
 
-            File originalFile = new File(copyPath);
-            if (originalFile.delete()) {
-                File tempFile = new File(pdfPath + "tmp.pdf");
-                tempFile.renameTo(originalFile);
-            } else {
-                throw new DocumentException("重命名添加水印后的pdf失败");
-            }
+//            File originalFile = new File(copyPath);
+//            if (originalFile.delete()) {
+//                File tempFile = new File(pdfPath + "tmp.pdf");
+//                tempFile.renameTo(originalFile);
+//            } else {
+//                throw new DocumentException("重命名添加水印后的pdf失败");
+//            }
 
         } catch (DocumentException | IOException e) {
             res = false;
