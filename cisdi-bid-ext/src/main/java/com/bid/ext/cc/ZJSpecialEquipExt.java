@@ -195,9 +195,6 @@ public class ZJSpecialEquipExt {
             throw new BaseException("上传文件失败");
         }
 
-        InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.reFetchData = true;
-        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     //导入填报内容
@@ -413,9 +410,6 @@ public class ZJSpecialEquipExt {
             throw new BaseException("上传文件失败");
         }
 
-        InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.reFetchData = true;
-        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     private String getCellValueAsString(Cell cell) {

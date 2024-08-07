@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.PressurePipelineMapper">
+    <resultMap id="BaseResultMap" type="com.pms.bid.job.domain.zhanJiang.PressurePipeline" >
+        <result column="ID" property="id" />
+        <result column="VER" property="ver" />
+        <result column="TS" property="ts" />
+        <result column="IS_PRESET" property="isPreset" />
+        <result column="CRT_DT" property="crtDt" />
+        <result column="CRT_USER_ID" property="crtUserId" />
+        <result column="LAST_MODI_DT" property="lastModiDt" />
+        <result column="LAST_MODI_USER_ID" property="lastModiUserId" />
+        <result column="STATUS" property="status" />
+        <result column="LK_WF_INST_ID" property="lkWfInstId" />
+        <result column="CODE" property="code" />
+        <result column="NAME" property="name" />
+        <result column="REMARK" property="remark" />
+        <result column="FAST_CODE" property="fastCode" />
+        <result column="ICON_FILE_GROUP_ID" property="iconFileGroupId" />
+        <result column="YJW_PIPING_DESING_NAME" property="yjwPipingDesingName" />
+        <result column="YJW_DRAWING_PIPELINE" property="yjwDrawingPipeline" />
+        <result column="YJW_PIPING_NAME" property="yjwPipingName" />
+        <result column="YJW_DIAMETER" property="yjwDiameter" />
+        <result column="YJW_PIPING_LENGTH" property="yjwPipingLength" />
+        <result column="YJW_DESIGN_PRESSURE" property="yjwDesignPressure" />
+        <result column="YJW_MEDIUM" property="yjwMedium" />
+        <result column="YJW_PIPING_LEVEL" property="yjwPipingLevel" />
+        <result column="YJW_INSTALLATION_UNIT" property="yjwInstallationUnit" />
+        <result column="YJW_CONSTRUCTION_NOTICE_TIME_PLAN" property="yjwConstructionNoticeTimePlan" />
+        <result column="YJW_CONSTRUCTION_NOTICE_TIME_COMPLETE" property="yjwConstructionNoticeTimeComplete" />
+        <result column="YJW_CONSTRUCTION_RECEIPT" property="yjwConstructionReceipt" />
+        <result column="YJW_INSTALLATION_TIME_PLAN" property="yjwInstallationTimePlan" />
+        <result column="YJW_USAGE_TIME_PLAN" property="yjwUsageTimePlan" />
+        <result column="YJW_REPORT_INSURANCE_TIME_PLAN" property="yjwReportInsuranceTimePlan" />
+        <result column="YJW_REPORT_INSURANCE_TIME" property="yjwReportInsuranceTime" />
+        <result column="YJW_REPORT_INSURANCE" property="yjwReportInsurance" />
+        <result column="YJW_QUALIFIED_TIME_PLAN" property="yjwQualifiedTimePlan" />
+        <result column="YJW_INSTITUTION_TIME" property="yjwInstitutionTime" />
+        <result column="YJW_TEST_REPORT" property="yjwTestReport" />
+        <result column="YJW_ACCEPTANCE_TIME_PLAN" property="yjwAcceptanceTimePlan" />
+        <result column="YJW_ACCEPTANCE_TIME" property="yjwAcceptanceTime" />
+        <result column="YJW_REPORT_PROGRESS" property="yjwReportProgress" />
+        <result column="YJW_QUALIFIED_REPORT_TIME" property="yjwQualifiedReportTime" />
+        <result column="YJW_QUALIFIED_REPORT" property="yjwQualifiedReport" />
+        <result column="YJW_REGISTRATION_TIME" property="yjwRegistrationTime" />
+        <result column="YJW_COMPLETE_REGISTRATION_TIME" property="yjwCompleteRegistrationTime" />
+        <result column="YJW_PRESSURE_PIPELINE_ID" property="yjwPressurePipelineId" />
+        <result column="YJW_DESIGN_TIME" property="yjwDesignTime" />
+        <result column="YJW_CONSTRUCTION_MANAGER" property="yjwConstructionManager" />
+        <result column="YJW_ACCEPTANCE_MANAGER" property="yjwAcceptanceManager" />
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+                ID,
+                VER,
+                TS,
+                IS_PRESET,
+                CRT_DT,
+                CRT_USER_ID,
+                LAST_MODI_DT,
+                LAST_MODI_USER_ID,
+                STATUS,
+                LK_WF_INST_ID,
+                CODE,
+                NAME,
+                REMARK,
+                FAST_CODE,
+                ICON_FILE_GROUP_ID,
+                YJW_PIPING_DESING_NAME,
+                YJW_DRAWING_PIPELINE,
+                YJW_PIPING_NAME,
+                YJW_DIAMETER,
+                YJW_PIPING_LENGTH,
+                YJW_DESIGN_PRESSURE,
+                YJW_MEDIUM,
+                YJW_PIPING_LEVEL,
+                YJW_INSTALLATION_UNIT,
+                YJW_CONSTRUCTION_NOTICE_TIME_PLAN,
+                YJW_CONSTRUCTION_NOTICE_TIME_COMPLETE,
+                YJW_CONSTRUCTION_RECEIPT,
+                YJW_INSTALLATION_TIME_PLAN,
+                YJW_USAGE_TIME_PLAN,
+                YJW_REPORT_INSURANCE_TIME_PLAN,
+                YJW_REPORT_INSURANCE_TIME,
+                YJW_REPORT_INSURANCE,
+                YJW_QUALIFIED_TIME_PLAN,
+                YJW_INSTITUTION_TIME,
+                YJW_TEST_REPORT,
+                YJW_ACCEPTANCE_TIME_PLAN,
+                YJW_ACCEPTANCE_TIME,
+                YJW_REPORT_PROGRESS,
+                YJW_QUALIFIED_REPORT_TIME,
+                YJW_QUALIFIED_REPORT,
+                YJW_REGISTRATION_TIME,
+                YJW_COMPLETE_REGISTRATION_TIME,
+                YJW_PRESSURE_PIPELINE_ID,
+                YJW_DESIGN_TIME,
+                YJW_CONSTRUCTION_MANAGER,
+                YJW_ACCEPTANCE_MANAGER
+    </sql>
+    <select id="selectList" resultType="com.pms.bid.job.domain.zhanJiang.PressurePipeline">
+        select
+        <include refid="Base_Column_List" />
+        from yjw_pressure_pipeline where YJW_USAGE_TIME IS NULL
+    </select>
+
+
+</mapper>

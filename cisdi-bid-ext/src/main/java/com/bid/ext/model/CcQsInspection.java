@@ -112,6 +112,10 @@ public class CcQsInspection {
          */
         public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
         /**
+         * {"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+         */
+        public static final String CC_QS_INITIATING_POST_ID = "CC_QS_INITIATING_POST_ID";
+        /**
          * {"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
          */
         public static final String CC_QS_INSPECTION_TIME = "CC_QS_INSPECTION_TIME";
@@ -172,6 +176,22 @@ public class CcQsInspection {
          */
         public static final String CC_QS_DUTY_USER = "CC_QS_DUTY_USER";
         /**
+         * {"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+         */
+        public static final String CC_SAFE_DUTY_USER_IDS = "CC_SAFE_DUTY_USER_IDS";
+        /**
+         * {"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+         */
+        public static final String CC_QS_DUTY_POST_ID = "CC_QS_DUTY_POST_ID";
+        /**
+         * {"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+         */
+        public static final String CC_QS_SUBCONTRACTOR_ID = "CC_QS_SUBCONTRACTOR_ID";
+        /**
+         * {"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+         */
+        public static final String CC_QS_CHECK_USER = "CC_QS_CHECK_USER";
+        /**
          * {"EN": "CC_QS_COPY_USER", "ZH_CN": "质安抄送用户", "ZH_TW": "繁：质安抄送用户"}。
          */
         public static final String CC_QS_COPY_USER = "CC_QS_COPY_USER";
@@ -203,10 +223,6 @@ public class CcQsInspection {
          * {"EN": "CC_QS_CHECK_TIME", "ZH_CN": "质安复核时间", "ZH_TW": "繁：质安复核时间"}。
          */
         public static final String CC_QS_CHECK_TIME = "CC_QS_CHECK_TIME";
-        /**
-         * {"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
-         */
-        public static final String CC_QS_CHECK_USER = "CC_QS_CHECK_USER";
         /**
          * {"EN": "质安通知单", "ZH_CN": "质安通知单", "ZH_TW": "质安通知单"}。
          */
@@ -795,6 +811,42 @@ public class CcQsInspection {
     }
 
     /**
+     * {"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+     */
+    private String ccQsInitiatingPostId;
+
+    /**
+     * 获取：{"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+     */
+    public String getCcQsInitiatingPostId() {
+        return this.ccQsInitiatingPostId;
+    }
+
+    /**
+     * 设置：{"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+     */
+    public CcQsInspection setCcQsInitiatingPostId(String ccQsInitiatingPostId) {
+        if (this.ccQsInitiatingPostId == null && ccQsInitiatingPostId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQsInitiatingPostId != null && ccQsInitiatingPostId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQsInitiatingPostId.compareTo(ccQsInitiatingPostId) != 0) {
+                this.ccQsInitiatingPostId = ccQsInitiatingPostId;
+                if (!this.toUpdateCols.contains("CC_QS_INITIATING_POST_ID")) {
+                    this.toUpdateCols.add("CC_QS_INITIATING_POST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQsInitiatingPostId = ccQsInitiatingPostId;
+            if (!this.toUpdateCols.contains("CC_QS_INITIATING_POST_ID")) {
+                this.toUpdateCols.add("CC_QS_INITIATING_POST_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
      */
     private LocalDate ccQsInspectionTime;
@@ -1335,6 +1387,150 @@ public class CcQsInspection {
     }
 
     /**
+     * {"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+     */
+    private String ccSafeDutyUserIds;
+
+    /**
+     * 获取：{"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+     */
+    public String getCcSafeDutyUserIds() {
+        return this.ccSafeDutyUserIds;
+    }
+
+    /**
+     * 设置：{"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+     */
+    public CcQsInspection setCcSafeDutyUserIds(String ccSafeDutyUserIds) {
+        if (this.ccSafeDutyUserIds == null && ccSafeDutyUserIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccSafeDutyUserIds != null && ccSafeDutyUserIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccSafeDutyUserIds.compareTo(ccSafeDutyUserIds) != 0) {
+                this.ccSafeDutyUserIds = ccSafeDutyUserIds;
+                if (!this.toUpdateCols.contains("CC_SAFE_DUTY_USER_IDS")) {
+                    this.toUpdateCols.add("CC_SAFE_DUTY_USER_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccSafeDutyUserIds = ccSafeDutyUserIds;
+            if (!this.toUpdateCols.contains("CC_SAFE_DUTY_USER_IDS")) {
+                this.toUpdateCols.add("CC_SAFE_DUTY_USER_IDS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+     */
+    private String ccQsDutyPostId;
+
+    /**
+     * 获取：{"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+     */
+    public String getCcQsDutyPostId() {
+        return this.ccQsDutyPostId;
+    }
+
+    /**
+     * 设置：{"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+     */
+    public CcQsInspection setCcQsDutyPostId(String ccQsDutyPostId) {
+        if (this.ccQsDutyPostId == null && ccQsDutyPostId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQsDutyPostId != null && ccQsDutyPostId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQsDutyPostId.compareTo(ccQsDutyPostId) != 0) {
+                this.ccQsDutyPostId = ccQsDutyPostId;
+                if (!this.toUpdateCols.contains("CC_QS_DUTY_POST_ID")) {
+                    this.toUpdateCols.add("CC_QS_DUTY_POST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQsDutyPostId = ccQsDutyPostId;
+            if (!this.toUpdateCols.contains("CC_QS_DUTY_POST_ID")) {
+                this.toUpdateCols.add("CC_QS_DUTY_POST_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+     */
+    private String ccQsSubcontractorId;
+
+    /**
+     * 获取：{"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+     */
+    public String getCcQsSubcontractorId() {
+        return this.ccQsSubcontractorId;
+    }
+
+    /**
+     * 设置：{"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+     */
+    public CcQsInspection setCcQsSubcontractorId(String ccQsSubcontractorId) {
+        if (this.ccQsSubcontractorId == null && ccQsSubcontractorId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQsSubcontractorId != null && ccQsSubcontractorId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQsSubcontractorId.compareTo(ccQsSubcontractorId) != 0) {
+                this.ccQsSubcontractorId = ccQsSubcontractorId;
+                if (!this.toUpdateCols.contains("CC_QS_SUBCONTRACTOR_ID")) {
+                    this.toUpdateCols.add("CC_QS_SUBCONTRACTOR_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQsSubcontractorId = ccQsSubcontractorId;
+            if (!this.toUpdateCols.contains("CC_QS_SUBCONTRACTOR_ID")) {
+                this.toUpdateCols.add("CC_QS_SUBCONTRACTOR_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+     */
+    private String ccQsCheckUser;
+
+    /**
+     * 获取：{"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+     */
+    public String getCcQsCheckUser() {
+        return this.ccQsCheckUser;
+    }
+
+    /**
+     * 设置：{"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+     */
+    public CcQsInspection setCcQsCheckUser(String ccQsCheckUser) {
+        if (this.ccQsCheckUser == null && ccQsCheckUser == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQsCheckUser != null && ccQsCheckUser != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQsCheckUser.compareTo(ccQsCheckUser) != 0) {
+                this.ccQsCheckUser = ccQsCheckUser;
+                if (!this.toUpdateCols.contains("CC_QS_CHECK_USER")) {
+                    this.toUpdateCols.add("CC_QS_CHECK_USER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQsCheckUser = ccQsCheckUser;
+            if (!this.toUpdateCols.contains("CC_QS_CHECK_USER")) {
+                this.toUpdateCols.add("CC_QS_CHECK_USER");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "CC_QS_COPY_USER", "ZH_CN": "质安抄送用户", "ZH_TW": "繁：质安抄送用户"}。
      */
     private String ccQsCopyUser;
@@ -1617,42 +1813,6 @@ public class CcQsInspection {
             this.ccQsCheckTime = ccQsCheckTime;
             if (!this.toUpdateCols.contains("CC_QS_CHECK_TIME")) {
                 this.toUpdateCols.add("CC_QS_CHECK_TIME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
-     */
-    private String ccQsCheckUser;
-
-    /**
-     * 获取：{"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
-     */
-    public String getCcQsCheckUser() {
-        return this.ccQsCheckUser;
-    }
-
-    /**
-     * 设置：{"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
-     */
-    public CcQsInspection setCcQsCheckUser(String ccQsCheckUser) {
-        if (this.ccQsCheckUser == null && ccQsCheckUser == null) {
-            // 均为null，不做处理。
-        } else if (this.ccQsCheckUser != null && ccQsCheckUser != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccQsCheckUser.compareTo(ccQsCheckUser) != 0) {
-                this.ccQsCheckUser = ccQsCheckUser;
-                if (!this.toUpdateCols.contains("CC_QS_CHECK_USER")) {
-                    this.toUpdateCols.add("CC_QS_CHECK_USER");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccQsCheckUser = ccQsCheckUser;
-            if (!this.toUpdateCols.contains("CC_QS_CHECK_USER")) {
-                this.toUpdateCols.add("CC_QS_CHECK_USER");
             }
         }
         return this;
