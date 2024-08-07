@@ -763,6 +763,78 @@ public class StructNodeExt {
     }
 
     /**
+     * 填报进展（湛江施工）
+     */
+    public void reportProgressConstruct() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        String submitUserId = varMap.get("P_SUMBIT_USER_ID").toString();
+        String progTimeStr = varMap.get("P_PROG_TIME").toString(); // 获取日期时间字符串
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime now = LocalDateTime.parse(progTimeStr, formatter);
+
+        String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "P_WBS_PROGRESS_STATUS_ID");
+        String remark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : "";
+        String attachments = varMap.get("P_ATTACHMENTS") != null ? varMap.get("P_ATTACHMENTS").toString() : "";
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String id = IdUtil.getSnowflakeNextIdStr();
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
+            String nodeId = entityRecord.csCommId;
+            List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
+            if (children.isEmpty()) { // 如果是叶子节点
+                String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, PROG_TIME, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CRT_DT, LAST_MODI_DT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                myJdbcTemplate.update(insertSql, id, ccPrjId, nodeId, submitUserId, submitUserId, submitUserId, now, wbsProgressStatusId, remark, attachments, now, now);
+
+                CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(nodeId);
+                ccPrjStructNode.setProgTime(now);
+                ccPrjStructNode.setCcWbsProgressStatusId(wbsProgressStatusId);
+                LocalDate actFr = ccPrjStructNode.getActFr();
+                long actDays;
+
+                // 根据不同的状态更新实际开始和结束日期
+//                switch (wbsStatusId) {
+//                    case "TODO":
+//                        ccPrjStructNode.setActFr(null);
+//                        ccPrjStructNode.setActTo(null);
+//                        ccPrjStructNode.setActDays(BigDecimal.ZERO);
+//                        break;
+//                    case "DOING":
+//                        if (actFr == null) {
+//                            ccPrjStructNode.setActFr(now.toLocalDate());
+//                        }
+//                        ccPrjStructNode.setActTo(null);
+//                        break;
+//                    case "DONE":
+//                        // 实际开始时间为空
+//                        if (actFr == null || actFr.isAfter(now.toLocalDate())) {
+//                            ccPrjStructNode.setActFr(now.toLocalDate());
+//                        }
+//                        ccPrjStructNode.setActTo(now.toLocalDate());
+//                        break;
+//                }
+                //根据不同的状态更新实际开始和结束日期
+
+
+                // 计算实际工作天数
+                if (ccPrjStructNode.getActFr() != null && ccPrjStructNode.getActTo() != null) {
+                    actDays = ChronoUnit.DAYS.between(ccPrjStructNode.getActFr(), ccPrjStructNode.getActTo()) + 1;
+                    ccPrjStructNode.setActDays(BigDecimal.valueOf(actDays));
+                }
+                ccPrjStructNode.updateById();
+            }
+        }
+
+        recalculationPlan();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
      * 节点日期检查计算
      *
      * @throws Exception
