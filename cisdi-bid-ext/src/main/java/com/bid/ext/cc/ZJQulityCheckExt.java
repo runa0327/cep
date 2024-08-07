@@ -42,7 +42,7 @@ public class ZJQulityCheckExt {
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-//        String filePath = "/Users/hejialun/Documents/湛江/导入/检测管理-常规检测信息(1).xlsx";
+//        String filePath = "/Users/hejialun/Documents/湛江/导入/质量检测-模板.xlsx";
 
         //单元工程
         Where queryUnitPrj = new Where();
@@ -103,7 +103,8 @@ public class ZJQulityCheckExt {
                     //单元工程项名称
                     Cell cell1 = row.getCell(1);
                     if (cell1 == null || !StringUtils.hasText(getCellValueAsString(cell1))) {
-                        throw new BaseException("第" + row.getRowNum() + "行，单元格工程项名称为空");
+//                        throw new BaseException("第" + row.getRowNum()+1 + "行，单元工程项名称为空");
+                        continue;
                     }
                     unitPrjName = getCellValueAsString(cell1);
 
@@ -116,8 +117,10 @@ public class ZJQulityCheckExt {
                         }
                     }
                     if (unitPrjNodeId == null) {
-                        throw new BaseException("第" + row.getRowNum() + "单元工程名称填写错误");
+                        throw new BaseException("第" + row.getRowNum()+1 + "单元工程名称填写错误");
+
                     }
+
 
 
                     String mainBody = "";
@@ -137,14 +140,14 @@ public class ZJQulityCheckExt {
                     }
 
                     if (mainBodyId == null) {
-                        throw new BaseException("第" + row.getRowNum() + "检测主体填写错误");
+                        throw new BaseException("第" + row.getRowNum()+1 + "检测主体填写错误");
                     }
 
 
                     //检测时期
                     Cell cell3 = row.getCell(3);
                     if (cell3 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，检测时期为空");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，检测时期为空");
                     }
                     LocalDate checkDate = null;
                     try {
@@ -154,7 +157,7 @@ public class ZJQulityCheckExt {
                             String date = getCellValueAsString(cell2);
                             checkDate = LocalDate.parse(date, formatter);
                         } catch (Exception ex) {
-                            throw new BaseException("第" + row.getRowNum() + "行，检测时期列格式错误");
+                            throw new BaseException("第" + row.getRowNum()+1 + "行，检测时期列格式错误");
                         }
                     }
 
@@ -175,14 +178,14 @@ public class ZJQulityCheckExt {
                     }
 
                     if (yearId == null || monthId == null) {
-                        throw new BaseException("日期格式错误");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行日期格式错误");
                     }
 
                     //检测分类
                     String checkType = null;
                     Cell cell4 = row.getCell(4);
                     if (cell4 == null || !StringUtils.hasText(getCellValueAsString(cell4))) {
-                        throw new BaseException("第" + row.getRowNum() + "行，检测分类为空");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，检测分类为空");
                     }
                     checkType = getCellValueAsString(cell4);
 
@@ -194,14 +197,14 @@ public class ZJQulityCheckExt {
                         }
                     }
                     if (checkTypeId == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，检测分类填写错误");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，检测分类填写错误");
                     }
 
                     //检测分类内容
                     String checkContent = null;
                     Cell cell5 = row.getCell(5);
                     if (cell5 == null || !StringUtils.hasText(getCellValueAsString(cell5))) {
-                        throw new BaseException("第" + row.getRowNum() + "行，检测内容为空");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，检测内容为空");
                     }
                     checkContent = getCellValueAsString(cell5);
                     //检查检测主体填写是否错误
@@ -222,7 +225,7 @@ public class ZJQulityCheckExt {
 
                     }
                     if (checkContentId == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，检测主体填写错误");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，检测主体填写错误");
                     }
 
                     //查询是否存在相同时期检测数据
@@ -231,14 +234,14 @@ public class ZJQulityCheckExt {
                     CcQualityCheckRecord ccQualityCheckRecord = CcQualityCheckRecord.selectOneByWhere(queryRecord);
 
                     if (ccQualityCheckRecord != null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，存在相同检测日期数据");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，存在相同检测日期数据");
                     }
 
                     //送检批次
                     String checkBatch = "";
                     Cell cell6 = row.getCell(6);
                     if (cell6 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，送检批次容为空");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，送检批次容为空");
                     }
                     checkBatch = getCellValueAsString(cell6);
                     checkBatch = checkBatch.substring(0, checkBatch.indexOf("."));
@@ -247,7 +250,7 @@ public class ZJQulityCheckExt {
                     String qualifiedBatch = "";
                     Cell cell7 = row.getCell(7);
                     if (cell7 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，合格批次为空");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，合格批次为空");
                     }
                     qualifiedBatch = getCellValueAsString(cell7);
                     qualifiedBatch = qualifiedBatch.substring(0, qualifiedBatch.indexOf("."));
@@ -260,7 +263,7 @@ public class ZJQulityCheckExt {
                     }
 
                     if (Integer.parseInt(checkBatch) < Integer.parseInt(qualifiedBatch)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，合格批次大于送检批次");
+                        throw new BaseException("第" + row.getRowNum()+1 + "行，合格批次大于送检批次");
                     }
 
                     //备注
