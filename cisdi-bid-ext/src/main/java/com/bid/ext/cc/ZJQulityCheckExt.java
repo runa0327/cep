@@ -90,32 +90,33 @@ public class ZJQulityCheckExt {
                 //获取指定列的下标
                 if (row.getRowNum() > 0) {
 
-                    String unitPrjCode = "";
+//                    String unitPrjCode = "";
                     //单元工程项目号
-                    Cell cell0 = row.getCell(0);
-                    if (cell0 == null || !StringUtils.hasText(getCellValueAsString(cell0))) {
-                        throw new BaseException("第" + row.getRowNum() + "行，单元格工程项目号为空");
-                    }
-                    unitPrjCode = getCellValueAsString(cell0);
-                    unitPrjCode = unitPrjCode.substring(0, unitPrjCode.lastIndexOf("."));
+//                    Cell cell0 = row.getCell(0);
+//                    if (cell0 == null || !StringUtils.hasText(getCellValueAsString(cell0))) {
+//                        throw new BaseException("第" + row.getRowNum() + "行，单元格工程项目号为空");
+//                    }
+//                    unitPrjCode = getCellValueAsString(cell0);
+//                    unitPrjCode = unitPrjCode.substring(0, unitPrjCode.lastIndexOf("."));
 
                     String unitPrjName = "";
                     //单元工程项名称
                     Cell cell1 = row.getCell(1);
                     if (cell1 == null || !StringUtils.hasText(getCellValueAsString(cell1))) {
-                        throw new BaseException("第" + row.getRowNum() + "行，单元格工程项目号为空");
+                        throw new BaseException("第" + row.getRowNum() + "行，单元格工程项名称为空");
                     }
                     unitPrjName = getCellValueAsString(cell1);
+
 
                     //检查单元工程信息是否填写错误
                     String unitPrjNodeId = null;
                     for (CcPrjStructNode prjStructNode : ccPrjStructNodes) {
-                        if (prjStructNode.getCode().equals(unitPrjCode) && prjStructNode.getName().equals(unitPrjName)) {
+                        if (prjStructNode.getName().equals(unitPrjName)) {
                             unitPrjNodeId = prjStructNode.getId();
                         }
                     }
                     if (unitPrjNodeId == null) {
-                        throw new BaseException("第" + row.getRowNum() + "单元工程项目号或单元工程名称填写错误");
+                        throw new BaseException("第" + row.getRowNum() + "单元工程名称填写错误");
                     }
 
 
