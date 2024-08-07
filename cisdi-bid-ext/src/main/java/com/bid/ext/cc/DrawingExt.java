@@ -209,6 +209,21 @@ public class DrawingExt {
             List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
             for (String attachmentId : ccAttachmentList) {
                 FlFile flFile = FlFile.selectById(attachmentId);
+
+                // 加水印开始
+                String flPathId = flFile.getFlPathId();
+                Where pathWhere = new Where();
+                pathWhere.eq(FlPath.Cols.ID, flPathId);
+                FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+                LocalDate now = LocalDate.now();
+                int year = now.getYear();
+                String month = String.format("%02d", now.getMonthValue());
+                String day = String.format("%02d", now.getDayOfMonth());
+                String fullPath = flPath.getDir() + year + "/" + month + "/" + day + "/";
+//                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
+                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
+                // 加水印结束
+
                 String dspName = flFile.getDspName();
                 String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
                 CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
@@ -768,7 +783,7 @@ public class DrawingExt {
                     newFile.setIsPublicRead(false);
                     newFile.insertById();
 
-                    addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",newFile.getPhysicalLocation(),faPath);
+                    addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",path,faPath);
 
                     CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
                     ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
@@ -866,13 +881,13 @@ public class DrawingExt {
             stamper.close();
             reader.close();
 
-//            File originalFile = new File(copyPath);
-//            if (originalFile.delete()) {
-//                File tempFile = new File(pdfPath + "tmp.pdf");
-//                tempFile.renameTo(originalFile);
-//            } else {
-//                throw new DocumentException("重命名添加水印后的pdf失败");
-//            }
+            File originalFile = new File(copyPath);
+            if (originalFile.delete()) {
+                File tempFile = new File(pdfPath + "tmp.pdf");
+                tempFile.renameTo(originalFile);
+            } else {
+                throw new DocumentException("重命名添加水印后的pdf失败");
+            }
 
         } catch (DocumentException | IOException e) {
             res = false;
