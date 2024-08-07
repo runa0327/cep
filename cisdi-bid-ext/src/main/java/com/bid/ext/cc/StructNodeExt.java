@@ -788,7 +788,7 @@ public class StructNodeExt {
             String nodeId = entityRecord.csCommId;
             List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
             if (children.isEmpty()) { // 如果是叶子节点
-                String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, ACT_FR, PROG_TIME, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CRT_DT, LAST_MODI_DT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, ACT_FR, PROG_TIME, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CRT_DT, LAST_MODI_DT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 myJdbcTemplate.update(insertSql, id, ccPrjId, nodeId, submitUserId, submitUserId, submitUserId, pActFr, now, wbsProgressStatusId, remark, attachments, now, now);
 
                 CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(nodeId);
