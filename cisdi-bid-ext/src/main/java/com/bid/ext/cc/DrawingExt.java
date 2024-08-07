@@ -4,6 +4,10 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.bid.ext.model.*;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -16,6 +20,8 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import com.tencentcloudapi.trp.v20210515.models.Ext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -32,6 +38,7 @@ import static com.bid.ext.cc.GenExt.checkFileExists;
 import static com.bid.ext.cc.GenExt.saveWordToFile;
 import static com.bid.ext.utils.ImportValueUtils.*;
 
+@Slf4j
 public class DrawingExt {
 
     /**
@@ -822,4 +829,148 @@ public class DrawingExt {
 
         }
     }
+
+    /**
+     *
+     * @param name
+     * @param copyPath
+     * @param pdfPath
+     * @return
+     */
+    private Boolean addWaterMark(String name, String copyPath, String pdfPath) {
+        boolean res = true;
+        try {
+            PdfReader reader = new PdfReader(copyPath);
+            int n = reader.getNumberOfPages();
+            PdfStamper stamper;
+            stamper = new PdfStamper(reader, new FileOutputStream(pdfPath + "tmp.pdf"));
+            PdfGState gs1 = new PdfGState();
+            gs1.setFillOpacity(0.2f);
+            PdfContentByte over;
+            Rectangle pagesize;
+            float x, y;
+            for (int i = 1; i <= n; i++) {
+                pagesize = reader.getPageSizeWithRotation(i);
+                x = pagesize.getWidth();
+                y = pagesize.getHeight();
+                over = stamper.getOverContent(i);
+                over.saveState();
+                over.setGState(gs1);
+                over.setFontAndSize(BaseFont.createFont("STSong-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED),12);
+//                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*0.6f, 20);
+//                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*1.5f, 20);
+                over.showTextAligned(Element.ALIGN_CENTER , name, x*0.75f, y*0.05f, 0);
+                over.restoreState();
+            }
+            stamper.close();
+            reader.close();
+
+            File originalFile = new File(copyPath);
+            if (originalFile.delete()) {
+                File tempFile = new File(pdfPath + "tmp.pdf");
+                tempFile.renameTo(originalFile);
+            } else {
+                throw new DocumentException("重命名添加水印后的pdf失败");
+            }
+
+        } catch (DocumentException | IOException e) {
+            res = false;
+//            errorBuilder.append("添加水印失败\n ");
+            log.error("添加水印失败，详情： ",e);
+        }
+        return res;
+    }
+
+    /**
+     * 升级图纸
+     */
+    public void upgradeDrawingWithWaterMark() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+            String pActDate = JdbcMapUtil.getString(varMap, "P_ACT_DATE");
+
+            Boolean isDefault = (Boolean) varMap.get("P_IS_DEFAULT");
+
+            if (isDefault) {
+                List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
+                if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
+                    for (CcStructDrawingVersion ccStructDrawingVersion1 : ccStructDrawingVersions) {
+                        ccStructDrawingVersion1.setIsDefault(false);
+                        ccStructDrawingVersion1.updateById();
+                    }
+                }
+            }
+
+            String[] versionOrder = {"A", "B", "C", "D", "E", "F", "G"};
+            String ccDrawingVersionId = null;
+
+            // 依次判断版本的存在性
+            for (String version : versionOrder) {
+                List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(
+                        new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_VERSION_ID, version)
+                                .eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId)
+                );
+                if (SharedUtil.isEmpty(ccStructDrawingVersions)) {
+                    ccDrawingVersionId = version;
+                    break;
+                }
+            }
+
+            // 套图信息
+            CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
+            String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
+            String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
+
+            // 套图版本
+            CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
+            ccStructDrawingVersion.setCcDrawingVersionId(ccDrawingVersionId);
+            CcDrawingVersion ccDrawingVersion = CcDrawingVersion.selectById(ccDrawingVersionId);
+            String ccDrawingVersionName = ccDrawingVersion.getName();
+            ccStructDrawingVersion.setName(ccDrawingVersionName);
+            ccStructDrawingVersion.setCcDrawingManagementId(csCommId);
+            ccStructDrawingVersion.setCcPrjStructNodeId(ccPrjStructNodeId);
+            ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+            ccStructDrawingVersion.setIsDefault(isDefault);
+            ccStructDrawingVersion.insertById();
+
+            List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+            for (String attachmentId : ccAttachmentList) {
+                FlFile flFile = FlFile.selectById(attachmentId);
+                String flPathId = flFile.getFlPathId();
+                Where pathWhere = new Where();
+                pathWhere.eq(FlPath.Cols.ID, flPathId);
+                FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+
+                LocalDate now = LocalDate.now();
+                int year = now.getYear();
+                String month = String.format("%02d", now.getMonthValue());
+                String day = String.format("%02d", now.getDayOfMonth());
+                String fullPath = flPath.getDir() + year + "/" + month + "/" + day + "/";
+
+//                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
+                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
+
+                String dspName = flFile.getDspName();
+                String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
+                CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+                ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
+                ccDrawingUpload.setCcAttachment(attachmentId);
+                ccDrawingUpload.setCcDrawingVersionId(ccDrawingVersionId);
+                ccDrawingUpload.setRemark(pRemark);
+                ccDrawingUpload.setCcDrawingManagementId(csCommId);
+                ccDrawingUpload.setName(dspName);
+                ccDrawingUpload.insertById();
+            }
+            // 若没有实际发图日期则更新套图实际发图日期
+            if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
+                ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
+                ccDrawingManagement.setCcDrawingStatusId("DONE");
+                ccDrawingManagement.updateById();
+            }
+        }
+    }
+
 }
