@@ -258,7 +258,7 @@ public class ZJConstructionPlanImportExt {
         //获取上传的excel文件
 //        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
 //        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/导入/副本湛江标点(2).xlsx";
+        String filePath = "/Users/hejialun/Documents/湛江/导入/副本湛江标点(3).xlsx";
 
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
@@ -301,7 +301,7 @@ public class ZJConstructionPlanImportExt {
                     CcEquipIot equip = CcEquipIot.selectOneByWhere(queryPoint);
 
                     if (equip==null){
-                        throw new BaseException("设备id错误");
+                        throw new BaseException(pointName+"设备id错误");
                     }else{
                         equip.setLongitude(new BigDecimal(x));
                         equip.setLatitude(new BigDecimal(y));

@@ -15,6 +15,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -147,11 +148,18 @@ public class ImgExt {
         SimpleDateFormat format = new SimpleDateFormat("YYYYMMDDHHSSmm");
         String now = format.format(new Date());
         // 解压输出路径
-        String outputDir = flPath.getDir() + year + "/" + month + "/" + day + "/" + id+".png";
+        String outputDir = flPath.getDir() + year + "/" + month + "/" + day;
+        File baseDir = new File(outputDir);
+        if (!baseDir.exists()){
+            baseDir.mkdirs();
+        }
+
+        String outputFile = outputDir+ "/" + id+".png";
+
         // 将Base64字符串解码为字节数组
         byte[] imageBytes = Base64.getDecoder().decode(base64Str);
         // 图片文件保存路径
-        String imagePath = outputDir;
+        String imagePath = outputFile;
         try (FileOutputStream fos = new FileOutputStream(imagePath)) {
             fos.write(imageBytes);
             Path path = Paths.get(imagePath);
@@ -174,8 +182,10 @@ public class ImgExt {
                     .set("TS",nowDate)
                     .set("UPLOAD_DTTM",nowDate)
                     .set("IS_PUBLIC_READ",1 )
-                    .set("ORIGIN_FILE_PHYSICAL_LOCATION","/data/qygly/file3/prod/FileStore/"+DateUtil.year(new Date())+"/"+month+"/"+day+"/"+id+".png" )
-                    .set("PHYSICAL_LOCATION","/data/qygly/file3/prod/FileStore/"+DateUtil.year(new Date())+"/"+month+"/"+day+"/"+id+".png" )
+//                    .set("ORIGIN_FILE_PHYSICAL_LOCATION","/data/qygly/file3/prod/FileStore/"+DateUtil.year(new Date())+"/"+month+"/"+day+"/"+id+".png" )
+//                    .set("PHYSICAL_LOCATION","/data/qygly/file3/prod/FileStore/"+DateUtil.year(new Date())+"/"+month+"/"+day+"/"+id+".png" )
+                    .set("ORIGIN_FILE_PHYSICAL_LOCATION",outputFile )
+                    .set("PHYSICAL_LOCATION",outputFile )
                     .set("REMARK","1" )
                     .set("SIZE_KB",size)
                     .set("DSP_NAME",now+userName+".png" )
