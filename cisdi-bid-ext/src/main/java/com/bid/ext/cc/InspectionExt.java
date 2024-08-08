@@ -189,16 +189,15 @@ public class InspectionExt {
                 String adUserId = ccPrjMember.getAdUserId();
                 dutyUserList.add(adUserId);
             }
-            List<String> checkMembers = Arrays.asList(ccQsCheckUser.split(","));
-            ArrayList<String> checkUserList = new ArrayList<>(); //复核人列表
-            for (String checkMember : checkMembers) {
-                CcPrjMember ccPrjMember = CcPrjMember.selectById(checkMember);
-                String adUserId = ccPrjMember.getAdUserId();
-                checkUserList.add(adUserId);
-            }
-
             //复核人不为空
             if (ccQsCheckUser != null && !ccQsCheckUser.isEmpty()) {
+                List<String> checkMembers = Arrays.asList(ccQsCheckUser.split(","));
+                ArrayList<String> checkUserList = new ArrayList<>(); //复核人列表
+                for (String checkMember : checkMembers) {
+                    CcPrjMember ccPrjMember = CcPrjMember.selectById(checkMember);
+                    String adUserId = ccPrjMember.getAdUserId();
+                    checkUserList.add(adUserId);
+                }
                 // 检查复核人列表是否包含发起人
                 if (checkUserList.contains(crtUserId)) {
                     //复核人里包含发起人，则通知人里只包含责任人
