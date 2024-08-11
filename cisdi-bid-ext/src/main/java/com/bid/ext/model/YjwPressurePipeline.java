@@ -109,6 +109,10 @@ public class YjwPressurePipeline {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+         */
+        public static final String SLIPPAGE_WARNING_DAYS = "SLIPPAGE_WARNING_DAYS";
+        /**
          * {"EN": "管道设计元名称", "ZH_CN": "管道设计元名称", "ZH_TW": "管道设计元名称"}。
          */
         public static final String YJW_PIPING_DESING_NAME = "YJW_PIPING_DESING_NAME";
@@ -312,6 +316,14 @@ public class YjwPressurePipeline {
          * {"EN": "报审进展时间点", "ZH_CN": "报审进展时间点", "ZH_TW": "报审进展时间点"}。
          */
         public static final String YJW_TASK_19 = "YJW_TASK_19";
+        /**
+         * {"EN": "报审进展填报周期", "ZH_CN": "报审进展填报周期", "ZH_TW": "报审进展填报周期"}。
+         */
+        public static final String YJW_FILLING_CYCLE = "YJW_FILLING_CYCLE";
+        /**
+         * {"EN": "督办人", "ZH_CN": "督办人", "ZH_TW": "督办人"}。
+         */
+        public static final String SUPERVISE_USER_ID = "SUPERVISE_USER_ID";
     }
 
     // </editor-fold>
@@ -854,6 +866,42 @@ public class YjwPressurePipeline {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+     */
+    private Integer slippageWarningDays;
+
+    /**
+     * 获取：{"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+     */
+    public Integer getSlippageWarningDays() {
+        return this.slippageWarningDays;
+    }
+
+    /**
+     * 设置：{"EN": "逾期提醒天数", "ZH_CN": "逾期提醒天数", "ZH_TW": "逾期提醒天数"}。
+     */
+    public YjwPressurePipeline setSlippageWarningDays(Integer slippageWarningDays) {
+        if (this.slippageWarningDays == null && slippageWarningDays == null) {
+            // 均为null，不做处理。
+        } else if (this.slippageWarningDays != null && slippageWarningDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.slippageWarningDays.compareTo(slippageWarningDays) != 0) {
+                this.slippageWarningDays = slippageWarningDays;
+                if (!this.toUpdateCols.contains("SLIPPAGE_WARNING_DAYS")) {
+                    this.toUpdateCols.add("SLIPPAGE_WARNING_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.slippageWarningDays = slippageWarningDays;
+            if (!this.toUpdateCols.contains("SLIPPAGE_WARNING_DAYS")) {
+                this.toUpdateCols.add("SLIPPAGE_WARNING_DAYS");
             }
         }
         return this;
@@ -2690,6 +2738,78 @@ public class YjwPressurePipeline {
             this.yjwTask19 = yjwTask19;
             if (!this.toUpdateCols.contains("YJW_TASK_19")) {
                 this.toUpdateCols.add("YJW_TASK_19");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "报审进展填报周期", "ZH_CN": "报审进展填报周期", "ZH_TW": "报审进展填报周期"}。
+     */
+    private String yjwFillingCycle;
+
+    /**
+     * 获取：{"EN": "报审进展填报周期", "ZH_CN": "报审进展填报周期", "ZH_TW": "报审进展填报周期"}。
+     */
+    public String getYjwFillingCycle() {
+        return this.yjwFillingCycle;
+    }
+
+    /**
+     * 设置：{"EN": "报审进展填报周期", "ZH_CN": "报审进展填报周期", "ZH_TW": "报审进展填报周期"}。
+     */
+    public YjwPressurePipeline setYjwFillingCycle(String yjwFillingCycle) {
+        if (this.yjwFillingCycle == null && yjwFillingCycle == null) {
+            // 均为null，不做处理。
+        } else if (this.yjwFillingCycle != null && yjwFillingCycle != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.yjwFillingCycle.compareTo(yjwFillingCycle) != 0) {
+                this.yjwFillingCycle = yjwFillingCycle;
+                if (!this.toUpdateCols.contains("YJW_FILLING_CYCLE")) {
+                    this.toUpdateCols.add("YJW_FILLING_CYCLE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.yjwFillingCycle = yjwFillingCycle;
+            if (!this.toUpdateCols.contains("YJW_FILLING_CYCLE")) {
+                this.toUpdateCols.add("YJW_FILLING_CYCLE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "督办人", "ZH_CN": "督办人", "ZH_TW": "督办人"}。
+     */
+    private String superviseUserId;
+
+    /**
+     * 获取：{"EN": "督办人", "ZH_CN": "督办人", "ZH_TW": "督办人"}。
+     */
+    public String getSuperviseUserId() {
+        return this.superviseUserId;
+    }
+
+    /**
+     * 设置：{"EN": "督办人", "ZH_CN": "督办人", "ZH_TW": "督办人"}。
+     */
+    public YjwPressurePipeline setSuperviseUserId(String superviseUserId) {
+        if (this.superviseUserId == null && superviseUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.superviseUserId != null && superviseUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.superviseUserId.compareTo(superviseUserId) != 0) {
+                this.superviseUserId = superviseUserId;
+                if (!this.toUpdateCols.contains("SUPERVISE_USER_ID")) {
+                    this.toUpdateCols.add("SUPERVISE_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.superviseUserId = superviseUserId;
+            if (!this.toUpdateCols.contains("SUPERVISE_USER_ID")) {
+                this.toUpdateCols.add("SUPERVISE_USER_ID");
             }
         }
         return this;

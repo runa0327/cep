@@ -71,6 +71,8 @@
         <result column="YJW_TASK_17" property="yjwTask17" />
         <result column="YJW_TASK_18" property="yjwTask18" />
         <result column="YJW_TASK_19" property="yjwTask19" />
+        <result column="SUPERVISE_USER_ID" property="superviseUserId"/>
+        <result column="SLIPPAGE_WARNING_DAYS" property="warningDays"/>
     </resultMap>
 
 
@@ -139,8 +141,9 @@
                 YJW_TASK_16,
                 YJW_TASK_17,
                 YJW_TASK_18,
-                YJW_TASK_19
-
+                YJW_TASK_19,
+                SLIPPAGE_WARNING_DAYS,
+                SUPERVISE_USER_ID
     </sql>
     <update id="updateInstIdById">
         update yjw_pressure_pipeline

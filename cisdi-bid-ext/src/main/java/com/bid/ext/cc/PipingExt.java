@@ -1,9 +1,6 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.FlFile;
-import com.bid.ext.model.StringUtil;
-import com.bid.ext.model.WfTask;
-import com.bid.ext.model.YjwPressurePipeline;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -363,6 +360,21 @@ public class PipingExt {
         if (yConstructionManager == null){
             throw new BaseException("负责人不能为空");
         }
+
+        //督办人
+        Object supervisorIdObj = varMap.get("Y_SUPERVISOR_ID");
+        //逾期天数
+        Object warningDaysObj = varMap.get("Y_SLIPPAGE_WARNING_DAYS");
+        String supervisorId = null;
+        Integer warningDays = null;
+        if(supervisorIdObj !=null &&  warningDaysObj!=null){
+            CcPrjMember member = CcPrjMember.selectById(supervisorIdObj.toString());
+            if (member!=null){
+                supervisorId = member.getAdUserId();
+                warningDays = Integer.parseInt(warningDaysObj.toString());
+            }
+        }
+
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("Y_IMPORT_PIPING").toString());
         String filePath = flFile.getPhysicalLocation();
@@ -486,6 +498,7 @@ public class PipingExt {
                         throw new BaseException("第"+cells.getRowNum()+"行‘设计发图时间’不能为空！");
                     }
                     String id = Crud.from("yjw_pressure_pipeline").insertData();
+
                     Crud.from("yjw_pressure_pipeline").where().eq("ID",id).update()
                             .set("YJW_PIPING_DESING_NAME",YJW_PIPING_DESING_NAME)
                             .set("YJW_DRAWING_PIPELINE",YJW_DRAWING_PIPELINE)
@@ -498,6 +511,8 @@ public class PipingExt {
                             .set("YJW_INSTALLATION_UNIT",YJW_INSTALLATION_UNIT)
                             .set("YJW_DESIGN_TIME",YJW_DESIGN_TIME)
                             .set("YJW_CONSTRUCTION_MANAGER",yConstructionManager.toString())
+                            .set("SUPERVISE_USER_ID",supervisorId)
+                            .set("SLIPPAGE_WARNING_DAYS",warningDays)
                             .set("YJW_ACCEPTANCE_MANAGER",yAcceptanceManager.toString()).exec();
                 }
             }

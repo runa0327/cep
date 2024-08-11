@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcEarlyWarningMapper">
+
+    <insert id="insert">
+        insert into CC_EARLY_WARNING (ID,
+                                      VER,
+                                      TS,
+                                      CRT_DT,
+                                      CRT_USER_ID,
+                                      LAST_MODI_DT,
+                                      LAST_MODI_USER_ID,
+                                      STATUS,
+                                      LK_WF_INST_ID,
+                                      CODE,
+                                      `NAME`,
+                                      REMARK,
+                                      FAST_CODE,
+                                      AD_USER_IDS)
+        values (#{id},
+                #{ver},
+                #{ts},
+                #{crtDt},
+                #{crtUserId},
+                #{lastModiDt},
+                #{lastModiUserId},
+                #{status},
+                #{lkWfInstId},
+                #{code},
+                #{name},
+                #{remark},
+                #{fastCode},
+                #{adUserIds})
+    </insert>
+
+
+</mapper>

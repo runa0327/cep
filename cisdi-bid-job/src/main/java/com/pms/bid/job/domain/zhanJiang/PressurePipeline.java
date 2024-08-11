@@ -272,4 +272,15 @@ public class PressurePipeline {
     private String yjwTask17;
     private String yjwTask18;
     private String yjwTask19;
+
+
+    /**
+     * 督办人
+     */
+    private String superviseUserId;
+
+    /**
+     * 逾期提醒天数
+     */
+    private Integer  warningDays;
 }

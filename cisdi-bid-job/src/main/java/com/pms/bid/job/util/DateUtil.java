@@ -1,5 +1,6 @@
 package com.pms.bid.job.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -29,5 +30,12 @@ public class DateUtil {
         Date date = new Date(timestamp);
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         return sdf.format(date);
+    }
+
+    public static Date  convertStringToDate(String dateString,String  formatStr) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat(formatStr);
+        Date date = null;
+        date = formatter.parse(dateString);
+        return date;
     }
 }
