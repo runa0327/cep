@@ -148,11 +148,20 @@ public class PressurePipeline {
      * 计划安装时间（安装单位）
      */
     private Date yjwInstallationTimePlan;
+    /**
+     * 实际安装完成时间
+     */
+    private Date yjwInstallationTime;
 
     /**
      * 计划投用（带介质）时间
      */
     private Date yjwUsageTimePlan;
+
+    /**
+     * 实际投用（带介质）时间
+     */
+    private Date yjwUsageTime;
 
     /**
      * 监督检验计划报检时间
@@ -238,4 +247,40 @@ public class PressurePipeline {
      * 验收负责人
      */
     private String yjwAcceptanceManager;
+
+    /**
+     * 报审进展
+     */
+    private String yjwFillingCycle;
+
+    private String yjwTask1;
+    private String yjwTask2;
+    private String yjwTask3;
+    private String yjwTask4;
+    private String yjwTask5;
+    private String yjwTask6;
+    private String yjwTask7;
+    private String yjwTask8;
+    private String yjwTask9;
+    private String yjwTask10;
+    private String yjwTask11;
+    private String yjwTask12;
+    private String yjwTask13;
+    private String yjwTask14;
+    private String yjwTask15;
+    private String yjwTask16;
+    private String yjwTask17;
+    private String yjwTask18;
+    private String yjwTask19;
+
+
+    /**
+     * 督办人
+     */
+    private String superviseUserId;
+
+    /**
+     * 逾期提醒天数
+     */
+    private Integer  warningDays;
 }

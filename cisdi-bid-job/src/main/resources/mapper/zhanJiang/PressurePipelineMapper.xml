@@ -47,9 +47,32 @@
         <result column="YJW_REGISTRATION_TIME" property="yjwRegistrationTime" />
         <result column="YJW_COMPLETE_REGISTRATION_TIME" property="yjwCompleteRegistrationTime" />
         <result column="YJW_PRESSURE_PIPELINE_ID" property="yjwPressurePipelineId" />
-        <result column="YJW_DESIGN_TIME" property="yjwDesignTime" />
+        <result column="YJW_DESIGN_TIME" property="yjwDesignTime" jdbcType="DATE" />
         <result column="YJW_CONSTRUCTION_MANAGER" property="yjwConstructionManager" />
         <result column="YJW_ACCEPTANCE_MANAGER" property="yjwAcceptanceManager" />
+        <result column="YJW_FILLING_CYCLE" property="yjwFillingCycle" />
+        <result column="YJW_TASK_1" property="yjwTask1" />
+        <result column="YJW_TASK_1" property="yjwTask1" />
+        <result column="YJW_TASK_2" property="yjwTask2" />
+        <result column="YJW_TASK_3" property="yjwTask3" />
+        <result column="YJW_TASK_4" property="yjwTask4" />
+        <result column="YJW_TASK_5" property="yjwTask5" />
+        <result column="YJW_TASK_6" property="yjwTask6" />
+        <result column="YJW_TASK_7" property="yjwTask7" />
+        <result column="YJW_TASK_8" property="yjwTask8" />
+        <result column="YJW_TASK_9" property="yjwTask9" />
+        <result column="YJW_TASK_10" property="yjwTask10" />
+        <result column="YJW_TASK_11" property="yjwTask11" />
+        <result column="YJW_TASK_12" property="yjwTask12" />
+        <result column="YJW_TASK_13" property="yjwTask13" />
+        <result column="YJW_TASK_14" property="yjwTask14" />
+        <result column="YJW_TASK_15" property="yjwTask15" />
+        <result column="YJW_TASK_16" property="yjwTask16" />
+        <result column="YJW_TASK_17" property="yjwTask17" />
+        <result column="YJW_TASK_18" property="yjwTask18" />
+        <result column="YJW_TASK_19" property="yjwTask19" />
+        <result column="SUPERVISE_USER_ID" property="superviseUserId"/>
+        <result column="SLIPPAGE_WARNING_DAYS" property="warningDays"/>
     </resultMap>
 
 
@@ -71,6 +94,7 @@
                 ICON_FILE_GROUP_ID,
                 YJW_PIPING_DESING_NAME,
                 YJW_DRAWING_PIPELINE,
+                YJW_CONSTRUCTION_NOTICE_TIME_PLAN,
                 YJW_PIPING_NAME,
                 YJW_DIAMETER,
                 YJW_PIPING_LENGTH,
@@ -96,15 +120,118 @@
                 YJW_QUALIFIED_REPORT,
                 YJW_REGISTRATION_TIME,
                 YJW_COMPLETE_REGISTRATION_TIME,
-                YJW_PRESSURE_PIPELINE_ID,
                 YJW_DESIGN_TIME,
                 YJW_CONSTRUCTION_MANAGER,
-                YJW_ACCEPTANCE_MANAGER
+                YJW_ACCEPTANCE_MANAGER,
+                YJW_TASK_1,
+                YJW_TASK_2,
+                YJW_TASK_3,
+                YJW_TASK_4,
+                YJW_TASK_5,
+                YJW_TASK_6,
+                YJW_TASK_7,
+                YJW_TASK_8,
+                YJW_TASK_9,
+                YJW_TASK_10,
+                YJW_TASK_11,
+                YJW_TASK_12,
+                YJW_TASK_13,
+                YJW_TASK_14,
+                YJW_TASK_15,
+                YJW_TASK_16,
+                YJW_TASK_17,
+                YJW_TASK_18,
+                YJW_TASK_19,
+                SLIPPAGE_WARNING_DAYS,
+                SUPERVISE_USER_ID
     </sql>
-    <select id="selectList" resultType="com.pms.bid.job.domain.zhanJiang.PressurePipeline">
+    <update id="updateInstIdById">
+        update yjw_pressure_pipeline
+        set LK_WF_INST_ID = #{wfProcessInstanceId}
+        where id = #{id}
+    </update>
+    <update id="updateTaskById">
+        update yjw_pressure_pipeline
+        <if test="number == 1">
+           set  YJW_TASK_1 = #{taskId}
+        </if>
+        <if test="number == 2">
+           set  YJW_TASK_2 = #{taskId}
+        </if>
+        <if test="number == 3">
+           set  YJW_TASK_3= #{taskId}
+        </if>
+        <if test="number == 4">
+           set  YJW_TASK_4 = #{taskId}
+        </if>
+        <if test="number == 5">
+            set  YJW_TASK_5 = #{taskId}
+        </if>
+        <if test="number == 6">
+            set  YJW_TASK_6= #{taskId}
+        </if>
+        <if test="number == 7">
+            set  YJW_TASK_7 = #{taskId}
+        </if>
+        <if test="number == 8">
+            set  YJW_TASK_8 = #{taskId}
+        </if>
+        <if test="number == 9">
+            set  YJW_TASK_9 = #{taskId}
+        </if>
+        <if test="number == 10">
+            set  YJW_TASK_10 = #{taskId}
+        </if>
+        <if test="number == 11">
+            set  YJW_TASK_11 = #{taskId}
+        </if>
+        <if test="number == 12">
+            set  YJW_TASK_12 = #{taskId}
+        </if>
+        <if test="number == 13">
+            set  YJW_TASK_13 = #{taskId}
+        </if>
+        <if test="number == 14">
+            set  YJW_TASK_14 = #{taskId}
+        </if>
+        <if test="number == 15">
+            set  YJW_TASK_15 = #{taskId}
+        </if>
+        <if test="number == 16">
+            set  YJW_TASK_16 = #{taskId}
+        </if>
+        <if test="number == 17">
+            set  YJW_TASK_17 = #{taskId}
+        </if>
+        <if test="number == 18">
+            set  YJW_TASK_18 = #{taskId}
+        </if>
+        <if test="number == 19">
+            set  YJW_TASK_19 = #{taskId}
+        </if>
+        where Id = #{id}
+    </update>
+    <update id="updateFilling">
+        update yjw_pressure_pipeline set YJW_FILLING_CYCLE = #{filling} where ID = #{id}
+    </update>
+    <select id="selectList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from yjw_pressure_pipeline where YJW_USAGE_TIME IS NULL
+        from yjw_pressure_pipeline
+    </select>
+    <select id="selectUserByPrjId" resultType="java.lang.String">
+        select
+            AD_USER_ID
+        from cc_prj_member where ID = #{id}
+    </select>
+    <select id="selectWfId" resultType="java.lang.String">
+        select LK_WF_INST_ID from yjw_pressure_pipeline where ID = #{id}
+    </select>
+    <select id="selectDateByPipingId" resultType="java.util.Date">
+        select YJW_FILL_DATE from yjw_review_progress order by YJW_FILL_DATE desc limit 1
+    </select>
+    <select id="selectContentByTime" resultType="java.lang.String">
+        select YJW_CONTENT from yjw_review_progress where YJW_FILL_DATE between #{start} and #{end} and YJW_PRESSURE_PIPELINE_ID = #{id}
     </select>
 
 

@@ -47,6 +47,4 @@ public class CronTask {
             log.error("特种设备提醒失败:"+e.getMessage());
         }
     }
-
-
 }
