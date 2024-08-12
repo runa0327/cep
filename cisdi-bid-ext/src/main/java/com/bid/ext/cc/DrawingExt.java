@@ -20,7 +20,6 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
-import com.tencentcloudapi.trp.v20210515.models.Ext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -221,7 +220,7 @@ public class DrawingExt {
                 String day = String.format("%02d", now.getDayOfMonth());
                 String fullPath = flPath.getDir() + year + "/" + month + "/" + day + "/";
 //                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
-                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
+                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)", flFile.getPhysicalLocation(), fullPath);
                 // 加水印结束
 
                 String dspName = flFile.getDspName();
@@ -456,38 +455,63 @@ public class DrawingExt {
      */
     public void drawingAuth() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcPrjStructNodeId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_STRUCT_NODE_ID");
         String pCcDrawingMemberIds = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_MEMBER_IDS");
         Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
         Boolean isUpload = (Boolean) varMap.get("P_IS_UPLOAD");
 
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            String csCommId = entityRecord.csCommId;
-            if (pCcDrawingMemberIds != null && !pCcDrawingMemberIds.isEmpty()) {
+        if (SharedUtil.isEmpty(pCcPrjStructNodeId)) {
+            for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+                String csCommId = entityRecord.csCommId;
+                if (pCcDrawingMemberIds != null && !pCcDrawingMemberIds.isEmpty()) {
 
-                List<String> memberIdList = Arrays.asList(pCcDrawingMemberIds.split(","));
+                    List<String> memberIdList = Arrays.asList(pCcDrawingMemberIds.split(","));
 
-                for (String memberId : memberIdList) {
-                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
-                    String adUserId = ccPrjMember.getAdUserId();
+                    for (String memberId : memberIdList) {
+                        CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                        String adUserId = ccPrjMember.getAdUserId();
 
-                    List<CcDrawingAuth> ccDrawingAuths = CcDrawingAuth.selectByWhere(new Where().eq(CcDrawingAuth.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId).eq(CcDrawingAuth.Cols.AD_USER_ID, adUserId));
-                    if (SharedUtil.isEmpty(ccDrawingAuths)) {
-                        CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
-                        ccDrawingAuth.setCcDrawingManagementId(csCommId);
-                        ccDrawingAuth.setAdUserId(adUserId);
-                        ccDrawingAuth.setIsUpload(isUpload);
-                        ccDrawingAuth.setIsView(isView);
-                        ccDrawingAuth.insertById();
-                    } else {
-                        for (CcDrawingAuth ccDrawingAuth : ccDrawingAuths) {
+                        List<CcDrawingAuth> ccDrawingAuths = CcDrawingAuth.selectByWhere(new Where().eq(CcDrawingAuth.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId).eq(CcDrawingAuth.Cols.AD_USER_ID, adUserId));
+                        if (SharedUtil.isEmpty(ccDrawingAuths)) {
+                            CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                            ccDrawingAuth.setCcDrawingManagementId(csCommId);
+                            ccDrawingAuth.setAdUserId(adUserId);
                             ccDrawingAuth.setIsUpload(isUpload);
                             ccDrawingAuth.setIsView(isView);
-                            ccDrawingAuth.updateById();
+                            ccDrawingAuth.insertById();
+                        } else {
+                            for (CcDrawingAuth ccDrawingAuth : ccDrawingAuths) {
+                                ccDrawingAuth.setIsUpload(isUpload);
+                                ccDrawingAuth.setIsView(isView);
+                                ccDrawingAuth.updateById();
+                            }
                         }
                     }
                 }
             }
+        } else {
+            List<String> memberIdList = Arrays.asList(pCcDrawingMemberIds.split(","));
 
+            for (String memberId : memberIdList) {
+                CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                String adUserId = ccPrjMember.getAdUserId();
+
+                List<CcDrawingAuth> ccDrawingAuths = CcDrawingAuth.selectByWhere(new Where().eq(CcDrawingAuth.Cols.CC_PRJ_STRUCT_NODE_ID, pCcPrjStructNodeId).eq(CcDrawingAuth.Cols.AD_USER_ID, adUserId));
+                if (SharedUtil.isEmpty(ccDrawingAuths)) {
+                    CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                    ccDrawingAuth.setCcPrjStructNodeId(pCcPrjStructNodeId);
+                    ccDrawingAuth.setAdUserId(adUserId);
+                    ccDrawingAuth.setIsUpload(isUpload);
+                    ccDrawingAuth.setIsView(isView);
+                    ccDrawingAuth.insertById();
+                } else {
+                    for (CcDrawingAuth ccDrawingAuth : ccDrawingAuths) {
+                        ccDrawingAuth.setIsUpload(isUpload);
+                        ccDrawingAuth.setIsView(isView);
+                        ccDrawingAuth.updateById();
+                    }
+                }
+            }
         }
     }
 
@@ -804,7 +828,7 @@ public class DrawingExt {
             }
 
             // 加水印
-            addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",path,faPath);
+            addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)", path, faPath);
         }
     }
 
@@ -847,7 +871,6 @@ public class DrawingExt {
     }
 
     /**
-     *
      * @param name
      * @param copyPath
      * @param pdfPath
@@ -872,10 +895,10 @@ public class DrawingExt {
                 over = stamper.getOverContent(i);
                 over.saveState();
                 over.setGState(gs1);
-                over.setFontAndSize(BaseFont.createFont("STSong-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED),0.02f*x);
+                over.setFontAndSize(BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED), 0.02f * x);
 //                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*0.6f, 20);
 //                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*1.5f, 20);
-                over.showTextAligned(Element.ALIGN_CENTER , name, x*0.5f, y*0.5f, 30);
+                over.showTextAligned(Element.ALIGN_CENTER, name, x * 0.5f, y * 0.5f, 30);
                 over.restoreState();
             }
             stamper.close();
@@ -892,7 +915,7 @@ public class DrawingExt {
         } catch (DocumentException | IOException e) {
             res = false;
 //            errorBuilder.append("添加水印失败\n ");
-            log.error("添加水印失败，详情： ",e);
+            log.error("添加水印失败，详情： ", e);
         }
         return res;
     }
@@ -967,7 +990,7 @@ public class DrawingExt {
                 String fullPath = flPath.getDir() + year + "/" + month + "/" + day + "/";
 
 //                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
-                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)",flFile.getPhysicalLocation(),fullPath);
+                addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)", flFile.getPhysicalLocation(), fullPath);
 
                 String dspName = flFile.getDspName();
                 String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
@@ -988,7 +1011,6 @@ public class DrawingExt {
             }
         }
     }
-
 
 
 }
