@@ -148,7 +148,7 @@ public class VrExt {
 
         for (Map<String, Object> mapPanoMonth : ccPanoMonths) {
             String panoMonth = JdbcMapUtil.getString(mapPanoMonth, "CC_PANO_MONTH");
-            String sqlPanoLst = "SELECT `NAME`, CC_DOC_DATE,  CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_YEAR_MONTH, CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT FROM CC_DOC_FILE WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? AND (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_DOC_DATE DESC";
+            String sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE,  CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_YEAR_MONTH, CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT FROM CC_DOC_FILE WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? AND (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_DOC_DATE DESC";
             List<Map<String, Object>> ccVrs = ExtJarHelper.getMyJdbcTemplate().queryForList(sqlPanoLst, panoMonth);
             List<Map<String, String>> panoLst = new ArrayList<>();
 
@@ -158,6 +158,7 @@ public class VrExt {
                 String ccVrYearMonth = JdbcMapUtil.getString(ccVr, "CC_YEAR_MONTH");
                 String ccVrAttachment = JdbcMapUtil.getString(ccVr, "CC_ATTACHMENT");
                 String ccVrAttachmentPreview = JdbcMapUtil.getString(ccVr, "CC_PREVIEW_ATTACHMENT");
+                String ccDocFileId = JdbcMapUtil.getString(ccVr, "ID");
 
                 if (null == ccVrAttachment || null == ccVrAttachmentPreview) {
                     continue;
@@ -176,6 +177,7 @@ public class VrExt {
                 ccVrItem.put("CC_YEAR_MONTH", ccVrYearMonth);
                 ccVrItem.put("CC_VR_ATTACHMENT", ccVrAttachmentFlFile.getFileInlineUrl());
                 ccVrItem.put("CC_VR_ATTACHMENT_PREVIEW", ccVrAttachmentPreviewFlFile.getFileInlineUrl());
+                ccVrItem.put("CC_DOC_FILE_ID", ccDocFileId);
                 panoLst.add(ccVrItem);
             }
 
