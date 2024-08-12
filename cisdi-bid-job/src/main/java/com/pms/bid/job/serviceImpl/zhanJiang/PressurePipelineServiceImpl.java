@@ -1,6 +1,7 @@
 package com.pms.bid.job.serviceImpl.zhanJiang;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.http.useragent.UserAgentUtil;
 import com.pms.bid.job.domain.json.Internationalization;
 import com.pms.bid.job.domain.process.SpecialEquipPreVe;
 import com.pms.bid.job.domain.processInstance.*;
@@ -213,9 +214,11 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 fillingCycles.forEach(fillingCycle -> {
                     List<Date> contents = pressurePipelineMapper.selectContentByTime(fillingCycle.getStart(), fillingCycle.getEnd(),item.getId());
                     if (contents.isEmpty()){
+
 //                        pressurePipelineMapper.updateFilling(item.getId(),fillingCycle.getStart()+"————"+fillingCycle.getEnd());
                         String snowflakeNextIdStr = IdUtil.getSnowflakeNextIdStr();
-                        pressurePipelineMapper.insert(item.getId(),getDate(fillingCycle.getStart()),getDate(fillingCycle.getEnd()),"0",snowflakeNextIdStr);
+                        pressurePipelineMapper.insert(item.getId(),getDate(fillingCycle.getStart()),getDate(fillingCycle.getEnd()),"0",snowflakeNextIdStr,
+                        new Date(),new Date(),System.currentTimeMillis(),"0099250247095871681","AP");
                         remind("19",item);
                         try {
                             checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),DateUtil.convertStringToDate(fillingCycle.getEnd(),"yyyy-MM-dd"),"压力管道："+item.getYjwPipingName()+"'"+fillingCycle.getStart()+"————"+fillingCycle.getEnd()+"'竣工资料未填报",0);

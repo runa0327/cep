@@ -146,7 +146,9 @@
                 SUPERVISE_USER_ID
     </sql>
     <insert id="insert">
-        insert into yjw_review_progress (ID,YJW_PRESSURE_PIPELINE_ID,REVIEW_FILL_DATE_FR,REVIEW_FILL_DATE_TO,REVIEW_IS_FILLED) values (#{id},#{YJW_PRESSURE_PIPELINE_ID},#{start},#{end},#{status})
+        insert into yjw_review_progress (ID,YJW_PRESSURE_PIPELINE_ID,REVIEW_FILL_DATE_FR,REVIEW_FILL_DATE_TO,REVIEW_IS_FILLED,
+                                         CRT_DT,LAST_MODI_DT,CRT_USER_ID,LAST_MODI_USER_ID,STATUS)
+        values (#{id},#{YJW_PRESSURE_PIPELINE_ID},#{start},#{end},#{review},#{createTime},#{lastModiDt},#{createBy},#{createBy},#{status})
 
     </insert>
     <update id="updateInstIdById">

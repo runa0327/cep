@@ -46,5 +46,6 @@ public interface PressurePipelineMapper {
     int updateFilling(@Param("id") String id,@Param("filling") String filling);
 
 
-    int insert(@Param("YJW_PRESSURE_PIPELINE_ID") String pip,@Param("start") Date date, @Param("end") Date date1, @Param("status") String number,@Param("id") String id);
+    int insert(@Param("YJW_PRESSURE_PIPELINE_ID") String pip,@Param("start") Date date, @Param("end") Date date1, @Param("review") String number,@Param("id") String id,
+               @Param("createTime") Date creteTime,@Param("lastModiDt") Date lastModiDt,@Param("ts") Long ts,@Param("createBy") String createBy,@Param("status") String status);
 }
