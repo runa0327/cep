@@ -14,6 +14,7 @@ public interface CcEarlyWarningMapper {
      * 新增警告
      * @param ccEarlyWarning
      */
-    int insert(CcEarlyWarning ccEarlyWarning);
+    int insertRecord(@Param("ccEarlyWarning") CcEarlyWarning ccEarlyWarning);
 
+    String selectByName(@Param("message") String  message);
 }

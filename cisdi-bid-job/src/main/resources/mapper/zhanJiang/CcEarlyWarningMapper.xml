@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcEarlyWarningMapper">
 
-    <insert id="insert">
+    <insert id="insertRecord" parameterType="com.pms.bid.job.domain.zhanJiang.CcEarlyWarning">
         insert into CC_EARLY_WARNING (ID,
                                       VER,
                                       TS,
@@ -16,24 +16,26 @@
                                       LK_WF_INST_ID,
                                       CODE,
                                       `NAME`,
-                                      REMARK,
                                       FAST_CODE,
                                       AD_USER_IDS)
-        values (#{id},
-                #{ver},
-                #{ts},
-                #{crtDt},
-                #{crtUserId},
-                #{lastModiDt},
-                #{lastModiUserId},
-                #{status},
-                #{lkWfInstId},
-                #{code},
-                #{name},
-                #{remark},
-                #{fastCode},
-                #{adUserIds})
+        values (#{ccEarlyWarning.id},
+                #{ccEarlyWarning.ver},
+                #{ccEarlyWarning.ts},
+                #{ccEarlyWarning.crtDt},
+                #{ccEarlyWarning.crtUserId},
+                #{ccEarlyWarning.lastModiDt},
+                #{ccEarlyWarning.lastModiUserId},
+                #{ccEarlyWarning.status},
+                #{ccEarlyWarning.lkWfInstId},
+                #{ccEarlyWarning.code},
+                #{ccEarlyWarning.name},
+                #{ccEarlyWarning.fastCode},
+                #{ccEarlyWarning.adUserIds})
     </insert>
+
+    <select id="selectByName" resultType="string">
+        select id  from CC_EARLY_WARNING where `name` = #{message}
+    </select>
 
 
 </mapper>

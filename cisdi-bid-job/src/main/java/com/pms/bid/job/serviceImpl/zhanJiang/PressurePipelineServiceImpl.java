@@ -69,7 +69,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 if (isMoreThan30DaysOld(item.getYjwDesignTime())){
                     remind("1",item);
                 }
-                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道"+item.getYjwPipingName()+"施工告知计划时间未填写",30);
+                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道："+item.getYjwPipingName()+"施工告知计划时间未填写",30);
             }else {
                 //完成施工告知时间，施工告知回执
                 if (null == item.getYjwConstructionNoticeTimeComplete() || null == item.getYjwConstructionReceipt()){
@@ -78,7 +78,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                         remind("8",item);
                     }
 
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道"+item.getYjwPipingName()+"施工告知未完成",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道："+item.getYjwPipingName()+"施工告知未完成",0);
                 }
             }
             //计划安装时间
@@ -86,7 +86,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 if (isMoreThan30DaysOld(item.getYjwDesignTime())){
                     remind("2",item);
                 }
-                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道"+item.getYjwPipingName()+"计划安装时间未填写",30);
+                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道："+item.getYjwPipingName()+"计划安装时间未填写",30);
             }else {
                 //实际安装时间
                 if (null == item.getYjwInstallationTime()){
@@ -94,7 +94,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     if (new Date().after(timePlan)){
                         remind("9",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道"+item.getYjwPipingName()+"实际安装时间未填写",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道："+item.getYjwPipingName()+"实际安装时间未填写",0);
                 }
             }
             //监督检验计划报检时间
@@ -102,7 +102,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 if (isMoreThan30DaysOld(item.getYjwDesignTime())){
                     remind("3",item);
                 }
-                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道"+item.getYjwPipingName()+"监督检验计划时间未填写",30);
+                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道："+item.getYjwPipingName()+"监督检验计划时间未填写",30);
             }else {
                 //完成报检时间，上传报检单
                 if (null == item.getYjwReportInsuranceTime() || null == item.getYjwReportInsurance()){
@@ -110,7 +110,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     if (new Date().after(timePlan)){
                         remind("10",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道"+item.getYjwPipingName()+"监督检验报告未上传",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道："+item.getYjwPipingName()+"监督检验报告未上传",0);
                 }
 
             }
@@ -119,7 +119,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 if (isMoreThan30DaysOld(item.getYjwDesignTime())){
                     remind("4",item);
                 }
-                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道"+item.getYjwPipingName()+"竣工资料提交特检院时间未填写",30);
+                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道："+item.getYjwPipingName()+"竣工资料提交特检院时间未填写",30);
             }else {
                 //竣工资料提交特检院受理时间
                 if (null == item.getYjwAcceptanceTime()){
@@ -127,7 +127,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     if (new Date().after(timePlan)){
                         remind("12",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道"+item.getYjwPipingName()+"竣工资料提交特检院受理时间填写",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道："+item.getYjwPipingName()+"竣工资料提交特检院受理时间填写",0);
                 }
             }
             //具备现场试压条件的计划时间
@@ -135,7 +135,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 if (isMoreThan30DaysOld(item.getYjwDesignTime())){
                     remind("11",item);
                 }
-                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道"+item.getYjwPipingName()+"现场试压时间未填写",30);
+                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道："+item.getYjwPipingName()+"现场试压时间未填写",30);
             }
             //计划投用带介质时间
             if (null != item.getYjwUsageTimePlan()){
@@ -145,7 +145,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     if (new Date().after(yjwUsageTimePlan)){
                         remind("5",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道"+item.getYjwPipingName()+"实际安装时间未填写",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道："+item.getYjwPipingName()+"实际安装时间未填写",0);
                 }else {
                     //填报竣工资料
                     /*if (new Date().after(item.getYjwUsageTimePlan()) && (null == item.getYjwQualifiedReportTime() || new Date().before(item.getYjwQualifiedReportTime()))){
@@ -162,48 +162,48 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     if (new Date().after(yjwUsageTimePlan)){
                         remind("6",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道"+item.getYjwPipingName()+"上传耐压试验报告",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道："+item.getYjwPipingName()+"上传耐压试验报告",0);
                 }
                 //上传监督检验合格报告
                 if (null == item.getYjwQualifiedReport()){
                     if (new Date().after(yjwUsageTimePlan)){
                         remind("14",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道"+item.getYjwPipingName()+"监督检验合格报告",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道："+item.getYjwPipingName()+"监督检验合格报告",0);
                 }
                 //实际投用时间
                 if (null == item.getYjwUsageTime()){
                     if (new Date().after(yjwUsageTimePlan)){
                         remind("15",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道"+item.getYjwPipingName()+"实际投用时间未填写",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道："+item.getYjwPipingName()+"实际投用时间未填写",0);
                 }
                 //项目单位计划办理使用登记的时间****
                 if (null == item.getYjwRegistrationTime()){
                     if (before30DaysLater(new Date(), item.getYjwUsageTimePlan())){
                         remind("16",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道"+item.getYjwPipingName()+"计划办理登记使用时间未填写",-30);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道："+item.getYjwPipingName()+"计划办理登记使用时间未填写",-30);
                 }
                 //取得监督检验报告时间
                 if (null == item.getYjwQualifiedReportTime()){
                     if (before30DaysLater(new Date(), item.getYjwUsageTimePlan())){
                         remind("17",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道"+item.getYjwPipingName()+"取得监督检验报告时间未填写",-30);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道："+item.getYjwPipingName()+"取得监督检验报告时间未填写",-30);
                 }else {
                     //项目单位办结使用登记的时间****
                     if (null == item.getYjwCompleteRegistrationTime()){
                         remind("18",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwCompleteRegistrationTime(),"压力管道"+item.getYjwPipingName()+"办结登记时间未填写",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwCompleteRegistrationTime(),"压力管道："+item.getYjwPipingName()+"办结登记时间未填写",0);
                 }
             }else {
                 //
                 if (isMoreThan30DaysOld(item.getYjwDesignTime())){
                     remind("13",item);
                 }
-                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道"+item.getYjwPipingName()+"计划投用带介质时间未填写",30);
+                checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwDesignTime(),"压力管道："+item.getYjwPipingName()+"计划投用带介质时间未填写",30);
             }
 
             //填报竣工资料
@@ -215,7 +215,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                         pressurePipelineMapper.updateFilling(item.getId(),fillingCycle.getStart()+"————"+fillingCycle.getEnd());
                         remind("19",item);
                         try {
-                            checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),DateUtil.convertStringToDate(fillingCycle.getEnd(),"yyyy-MM-dd"),"压力管道"+item.getYjwPipingName()+"计划投用带介质时间未填写",0);
+                            checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),DateUtil.convertStringToDate(fillingCycle.getEnd(),"yyyy-MM-dd"),"压力管道："+item.getYjwPipingName()+"'"+fillingCycle.getStart()+"————"+fillingCycle.getEnd()+"'竣工资料未填报",0);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -228,7 +228,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     if (new Date().after(item.getYjwInstitutionTime())){
                         remind("7",item);
                     }
-                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwInstitutionTime(),"压力管道"+item.getYjwPipingName()+"竣工资料提交特检院受理时间未填写",0);
+                    checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwInstitutionTime(),"压力管道："+item.getYjwPipingName()+"竣工资料提交特检院受理时间未填写",0);
                 }
             }
         });
@@ -720,11 +720,15 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
 
 
     private void checkWarningDay(Integer warningDay,String userIds, Date planDate , String message,int moreThanDay){
-        if (warningDay !=null && userIds != null){
+        if (warningDay !=null && userIds != null &&  !StringUtils.isEmpty(message)){
+
+            String s = earlyWarningMapper.selectByName(message);
+            if (s!=null){ //存在消息不提醒
+                return;
+            }
             warningDay+=moreThanDay;
             String nowStr = DateUtil.getNormalTimeStr(new Date());
             String createBy = "0099250247095871681";
-            LocalDate now = LocalDate.now();
             if (isSlippage(planDate,warningDay)){
                 CcEarlyWarning ccEarlyWarning = new CcEarlyWarning();
                 ccEarlyWarning.setId(IdUtil.getSnowflakeNextIdStr());
@@ -740,7 +744,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 ccEarlyWarning.setName(message);
                 ccEarlyWarning.setLkWfInstId(null);
                 ccEarlyWarning.setTs(nowStr);
-                earlyWarningMapper.insert(ccEarlyWarning);
+                earlyWarningMapper.insertRecord(ccEarlyWarning);
             }
         }
     }
