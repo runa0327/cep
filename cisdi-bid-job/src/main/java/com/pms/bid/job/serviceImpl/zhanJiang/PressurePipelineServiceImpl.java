@@ -80,6 +80,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
 
                     checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),timePlan,"压力管道："+item.getYjwPipingName()+"施工告知未完成",0);
                 }
+                //[YJW_CONSTRUCTION_RECEIPT, YJW_INSTALLATION_TIME, YJW_REPORT_INSURANCE_TIME, YJW_REPORT_INSURANCE, YJW_QUALIFIED_REPORT_TIME, YJW_REGISTRATION_TIME
             }
             //计划安装时间
             if (null == item.getYjwInstallationTimePlan()){
@@ -193,7 +194,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),yjwUsageTimePlan,"压力管道："+item.getYjwPipingName()+"取得监督检验报告时间未填写",-30);
                 }else {
                     //项目单位办结使用登记的时间****
-                    if (null == item.getYjwCompleteRegistrationTime()){
+                    if (null == item.getYjwCompleteRegistrationTime() && before30DaysLater(new Date(), item.getYjwQualifiedReportTime())  ){
                         remind("18",item);
                     }
                     checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),item.getYjwCompleteRegistrationTime(),"压力管道："+item.getYjwPipingName()+"办结登记时间未填写",0);
@@ -210,9 +211,11 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
             if (null != item.getYjwInstitutionTime()&& (null == item.getYjwQualifiedReportTime() || new Date().before(item.getYjwQualifiedReportTime()))){
                 List<FillingCycle> fillingCycles = generateDateRanges(item.getYjwInstitutionTime(), new Date());
                 fillingCycles.forEach(fillingCycle -> {
-                    List<String> contents = pressurePipelineMapper.selectContentByTime(fillingCycle.getStart(), fillingCycle.getEnd(),item.getId());
-                    if (contents.isEmpty() && new Date().after(getDate(fillingCycle.getEnd()))){
-                        pressurePipelineMapper.updateFilling(item.getId(),fillingCycle.getStart()+"————"+fillingCycle.getEnd());
+                    List<Date> contents = pressurePipelineMapper.selectContentByTime(fillingCycle.getStart(), fillingCycle.getEnd(),item.getId());
+                    if (contents.isEmpty()){
+//                        pressurePipelineMapper.updateFilling(item.getId(),fillingCycle.getStart()+"————"+fillingCycle.getEnd());
+                        String snowflakeNextIdStr = IdUtil.getSnowflakeNextIdStr();
+                        pressurePipelineMapper.insert(item.getId(),getDate(fillingCycle.getStart()),getDate(fillingCycle.getEnd()),"0",snowflakeNextIdStr);
                         remind("19",item);
                         try {
                             checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),DateUtil.convertStringToDate(fillingCycle.getEnd(),"yyyy-MM-dd"),"压力管道："+item.getYjwPipingName()+"'"+fillingCycle.getStart()+"————"+fillingCycle.getEnd()+"'竣工资料未填报",0);
@@ -259,16 +262,23 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
 
         while (currentStart.isBefore(endDate) || currentStart.isEqual(endDate)) {
             LocalDate currentEnd = currentStart.plusDays(6); // 加上六天
-            if (currentEnd.isAfter(endDate)) {
+            /*if (currentEnd.isAfter(endDate)) {
                 currentEnd = endDate;
-            }
+            }*/
             FillingCycle cycle = new FillingCycle();
             cycle.setStart(currentStart.format(formatter));
             cycle.setEnd(currentEnd.format(formatter));
             dateRanges.add(cycle);
             currentStart = currentEnd.plusDays(1); // 开始下一周
         }
-
+        FillingCycle cycle = dateRanges.get(dateRanges.size() - 1);
+        String end1 = cycle.getEnd();
+        DateTimeFormatter matter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate parse = LocalDate.parse(end1, matter);
+        FillingCycle cycle1 = new FillingCycle();
+        cycle1.setStart(parse.plusDays(1).format(matter));
+        cycle1.setEnd(parse.plusDays(8).format(matter));
+        dateRanges.add(cycle1);
         return dateRanges;
     }
 
@@ -396,11 +406,10 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("19".equals(number)){
-                if (!org.springframework.util.StringUtils.hasText(item.getYjwTask19())){
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
-                }
+
             }
 
 

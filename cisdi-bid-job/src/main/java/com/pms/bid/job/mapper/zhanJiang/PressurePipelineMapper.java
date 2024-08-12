@@ -41,7 +41,10 @@ public interface PressurePipelineMapper {
      * @param end
      * @return
      */
-    List<String> selectContentByTime(@Param("start") String start, @Param("end") String end,@Param("id") String id);
+    List<Date> selectContentByTime(@Param("start") String start, @Param("end") String end,@Param("id") String id);
 
     int updateFilling(@Param("id") String id,@Param("filling") String filling);
+
+
+    int insert(@Param("YJW_PRESSURE_PIPELINE_ID") String pip,@Param("start") Date date, @Param("end") Date date1, @Param("status") String number,@Param("id") String id);
 }
