@@ -686,6 +686,10 @@ public class StructNodeExt {
         if (actWbsPct > 100 || actWbsPct < 0) {
             throw new BaseException("“实际进度比例”超出数据范围!");
         }
+        int curWbsPct = JdbcMapUtil.getInt(varMap, "P_CUR_WBS_PCT");
+        if (actWbsPct < curWbsPct) {
+            throw new BaseException("“实际进度比例”应不小于最新进展比例!");
+        }
         String wbsStatusId = JdbcMapUtil.getString(varMap, "P_WBS_STATUS_ID");
         String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "P_WBS_PROGRESS_STATUS_ID");
         String remark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : "";
@@ -697,6 +701,7 @@ public class StructNodeExt {
             String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
             String nodeId = entityRecord.csCommId;
             List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
+
             if (children.isEmpty()) { // 如果是叶子节点
                 String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, ACT_FR, PROG_TIME, ACT_WBS_PCT, CC_WBS_STATUS_ID, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CRT_DT, LAST_MODI_DT,VER) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 myJdbcTemplate.update(insertSql, id, ccPrjId, nodeId, submitUserId, submitUserId, submitUserId, pActFr, now, actWbsPct, wbsStatusId, wbsProgressStatusId, remark, attachments, now, now, 1);
