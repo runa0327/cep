@@ -342,6 +342,31 @@ public class PipingExt {
     }
 
 
+    /**
+     * 设置责任人
+     */
+    public void setUpTheOwner(){
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        //设备登记办理责任人
+        Object yAcceptanceManager = varMap.get("Y_ACCEPTANCE_MANAGER");
+        Object yConstructionManager = varMap.get("Y_CONSTRUCTION_MANAGER");
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+//        List<Map<String, Object>> valueMapList = ExtJarHelper.getValueMapList();
+        for (EntityRecord map : entityRecordList) {
+            Map<String, Object> en = map.valueMap;
+            YjwPressurePipeline yjwPressurePipeline = new YjwPressurePipeline();
+            yjwPressurePipeline.setId(en.get("ID").toString());
+            if (null != yAcceptanceManager){
+                yjwPressurePipeline.setYjwAcceptanceManager(yAcceptanceManager.toString());
+            }
+            if (null != yConstructionManager){
+                yjwPressurePipeline.setYjwConstructionManager(yConstructionManager.toString());
+            }
+            yjwPressurePipeline.updateById();
+        }
+    }
+
+
 
     /**
      * 导入压力管道数据
