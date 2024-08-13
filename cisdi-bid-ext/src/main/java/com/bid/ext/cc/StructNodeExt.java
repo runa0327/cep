@@ -1927,10 +1927,63 @@ public class StructNodeExt {
     }
 
     /**
-     * 同步支付记录数据到成本总览
+     * 同步支付记录数据到成本总览(安徽)
      *
      * @throws Exception
      */
+    public void payRecordToCostOverviewAnhui() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+
+            CcPay ccPay = CcPay.selectById(csCommId);
+            String ccPrjId = ccPay.getCcPrjId();
+            BigDecimal trxAmt = ccPay.getTrxAmt();
+
+            String ccPayReqId = ccPay.getCcPayReqId();
+            String ccPoId = ccPay.getCcPoId();
+            String ccPrjCbsTempalteNodeId = null;
+            if (ccPayReqId == null) {
+                CcPo ccPo = CcPo.selectById(ccPoId);
+                ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
+            } else {
+                CcPayReq ccPayReq = CcPayReq.selectById(ccPayReqId);
+                ccPrjCbsTempalteNodeId = ccPayReq.getCcPrjCbsTempalteNodeId();
+            }
+
+
+
+            BigDecimal payAmtInReqSum = trxAmt;
+            // 1.查询项目此成本科目已支付金额
+            CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjCbsTempalteNodeId)).get(0);
+            BigDecimal payAmtInReq = ccPrjCostOverview.getPayAmt() != null ? ccPrjCostOverview.getPayAmt() : BigDecimal.ZERO;
+            payAmtInReqSum = payAmtInReqSum.add(payAmtInReq);
+
+            // 2.查询项目已申请支付金额
+            BigDecimal reqPayAmtInPo = ccPrjCostOverview.getReqPayAmt() != null ? ccPrjCostOverview.getReqPayAmt() : BigDecimal.ZERO;
+
+            // 3.对比已支付金额和已申请支付金额，若已支付金额大于已申请支付金额则提示
+            if (payAmtInReqSum.compareTo(reqPayAmtInPo) > 0) {
+                throw new BaseException("已支付金额大于已申请支付金额！");
+            }
+
+            // 4.存储成本统览关联明细
+            CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
+            ccPrjCostOverviewToDtl.setCcPrjCostOverviewId(ccPrjCostOverview.getId());
+            ccPrjCostOverviewToDtl.setTrxAmt(trxAmt);
+            ccPrjCostOverviewToDtl.setEntCode("CC_PAY");
+            ccPrjCostOverviewToDtl.setEntityRecordId(csCommId);
+            ccPrjCostOverviewToDtl.updateById();
+
+            // 5.更新成本统览已支付金额
+            ccPrjCostOverview.setPayAmt(payAmtInReqSum);
+            ccPrjCostOverview.updateById();
+
+            String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT");
+        }
+    }
+
+
     /**
      * 同步支付记录数据到成本总览
      *

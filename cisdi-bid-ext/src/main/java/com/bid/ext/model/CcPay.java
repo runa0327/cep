@@ -113,6 +113,14 @@ public class CcPay {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+         */
+        public static final String CC_PO_ID = "CC_PO_ID";
+        /**
+         * {"EN": "支付申请", "ZH_CN": "支付申请", "ZH_TW": "支付申请"}。
+         */
+        public static final String CC_PAY_REQ_ID = "CC_PAY_REQ_ID";
+        /**
          * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
          */
         public static final String CC_PRJ_CBS_TEMPALTE_NODE_ID = "CC_PRJ_CBS_TEMPALTE_NODE_ID";
@@ -706,6 +714,78 @@ public class CcPay {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     */
+    private String ccPoId;
+
+    /**
+     * 获取：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     */
+    public String getCcPoId() {
+        return this.ccPoId;
+    }
+
+    /**
+     * 设置：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     */
+    public CcPay setCcPoId(String ccPoId) {
+        if (this.ccPoId == null && ccPoId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPoId != null && ccPoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPoId.compareTo(ccPoId) != 0) {
+                this.ccPoId = ccPoId;
+                if (!this.toUpdateCols.contains("CC_PO_ID")) {
+                    this.toUpdateCols.add("CC_PO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPoId = ccPoId;
+            if (!this.toUpdateCols.contains("CC_PO_ID")) {
+                this.toUpdateCols.add("CC_PO_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "支付申请", "ZH_CN": "支付申请", "ZH_TW": "支付申请"}。
+     */
+    private String ccPayReqId;
+
+    /**
+     * 获取：{"EN": "支付申请", "ZH_CN": "支付申请", "ZH_TW": "支付申请"}。
+     */
+    public String getCcPayReqId() {
+        return this.ccPayReqId;
+    }
+
+    /**
+     * 设置：{"EN": "支付申请", "ZH_CN": "支付申请", "ZH_TW": "支付申请"}。
+     */
+    public CcPay setCcPayReqId(String ccPayReqId) {
+        if (this.ccPayReqId == null && ccPayReqId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPayReqId != null && ccPayReqId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPayReqId.compareTo(ccPayReqId) != 0) {
+                this.ccPayReqId = ccPayReqId;
+                if (!this.toUpdateCols.contains("CC_PAY_REQ_ID")) {
+                    this.toUpdateCols.add("CC_PAY_REQ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPayReqId = ccPayReqId;
+            if (!this.toUpdateCols.contains("CC_PAY_REQ_ID")) {
+                this.toUpdateCols.add("CC_PAY_REQ_ID");
             }
         }
         return this;
