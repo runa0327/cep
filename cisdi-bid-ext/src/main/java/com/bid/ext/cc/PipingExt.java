@@ -402,8 +402,10 @@ public class PipingExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("Y_IMPORT_PIPING").toString());
-        String filePath = flFile.getPhysicalLocation();
+//        String filePath = flFile.getPhysicalLocation();
 //        String filePath = "D:\\googledownload\\导入模板 (2).xlsx";
+
+        String filePath = "/Users/hejialun/Documents/湛江/导入/压力管道-导入模板 (1).xlsx";
         FileInputStream file = null;
         Workbook workbook = null;
         try {
@@ -431,17 +433,17 @@ public class PipingExt {
                     Cell cell2 = cells.getCell(2);
                     if (cell2!=null){
                         YJW_DRAWING_PIPELINE = getCellValueAsString(cell2);
-                        String name;
-                        try {
-                            Map<String, Object> queryForMap
-                                    = myJdbcTemplate.queryForMap("SELECT `YJW_DRAWING_PIPELINE` FROM yjw_pressure_pipeline WHERE YJW_DRAWING_PIPELINE = ? limit 1", YJW_DRAWING_PIPELINE);
-                            name = JdbcMapUtil.getString(queryForMap, "YJW_DRAWING_PIPELINE");
-                        }catch (EmptyResultDataAccessException e){
-                            name = "";
-                        }
-                        if (!StringUtils.isEmpty(name)){
-                            throw new BaseException("第"+cells.getRowNum()+"行‘设计图的管线号’重复！");
-                        }
+//                        String name;
+//                        try {
+//                            Map<String, Object> queryForMap
+//                                    = myJdbcTemplate.queryForMap("SELECT `YJW_DRAWING_PIPELINE` FROM yjw_pressure_pipeline WHERE YJW_DRAWING_PIPELINE = ? limit 1", YJW_DRAWING_PIPELINE);
+//                            name = JdbcMapUtil.getString(queryForMap, "YJW_DRAWING_PIPELINE");
+//                        }catch (EmptyResultDataAccessException e){
+//                            name = "";
+//                        }
+//                        if (!StringUtils.isEmpty(name)){
+//                            throw new BaseException("第"+cells.getRowNum()+"行‘设计图的管线号’重复！");
+//                        }
                     }else {
                         throw new BaseException("第"+cells.getRowNum()+"行‘设计图的管线号’不能为空！");
                     }
@@ -453,14 +455,14 @@ public class PipingExt {
                         String name;
                         try {
                             Map<String, Object> queryForMap
-                                    = myJdbcTemplate.queryForMap("SELECT `YJW_PIPING_NAME` FROM yjw_pressure_pipeline WHERE YJW_PIPING_NAME = ? limit 1", YJW_PIPING_NAME);
+                                    = myJdbcTemplate.queryForMap("SELECT `YJW_PIPING_NAME` FROM yjw_pressure_pipeline WHERE YJW_PIPING_NAME = ? AND  YJW_DRAWING_PIPELINE = ? limit 1", YJW_PIPING_NAME,YJW_DRAWING_PIPELINE);
                             name = JdbcMapUtil.getString(queryForMap, "YJW_PIPING_NAME");
                         }catch (EmptyResultDataAccessException e){
                             name = "";
                         }
 
                         if (!StringUtils.isEmpty(name)){
-                            throw new BaseException("第"+cells.getRowNum()+"行‘管道名称’重复！");
+                            throw new BaseException("第"+cells.getRowNum()+"行‘设计图的管线号’+‘管道名称’重复！");
                         }
                     }else {
                         throw new BaseException("第"+cells.getRowNum()+"行‘管道名称’不能为空！");

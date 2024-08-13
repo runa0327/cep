@@ -236,7 +236,7 @@
     <select id="selectDateByPipingId" resultType="java.util.Date">
         select YJW_FILL_DATE from yjw_review_progress order by YJW_FILL_DATE desc limit 1
     </select>
-    <select id="selectContentByTime" resultType="java.lang.String">
+    <select id="selectContentByTime" resultType="java.util.Date">
         select REVIEW_FILL_DATE_TO from yjw_review_progress where REVIEW_FILL_DATE_FR = #{start} and REVIEW_FILL_DATE_TO = #{end} and YJW_PRESSURE_PIPELINE_ID = #{id}
     </select>
 

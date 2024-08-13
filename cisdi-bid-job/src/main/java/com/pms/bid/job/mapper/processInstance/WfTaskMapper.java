@@ -1,6 +1,7 @@
 package com.pms.bid.job.mapper.processInstance;
 
 import com.pms.bid.job.domain.processInstance.WfTask;
+import org.apache.ibatis.annotations.Param;
 
 public interface WfTaskMapper {
 
@@ -9,4 +10,6 @@ public interface WfTaskMapper {
      * @param wfTask 任务实体
      */
     void create(WfTask wfTask);
+
+    int  closeTask(@Param("id")String id);
 }

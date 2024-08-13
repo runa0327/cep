@@ -17,4 +17,13 @@ public interface WfTaskService {
      * @param wfTask 任务实体
      */
     void create(WfTask wfTask);
+
+
+    /**
+     * 关闭流程实例任务
+     * @param taskId 任务id
+     */
+    void closeTask(String  taskId);
+
+
 }

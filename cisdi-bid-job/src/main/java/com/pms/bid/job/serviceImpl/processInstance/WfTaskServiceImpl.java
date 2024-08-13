@@ -61,4 +61,9 @@ public class WfTaskServiceImpl implements WfTaskService {
     public void create(WfTask wfTask) {
         wfTaskMapper.create(wfTask);
     }
+
+    @Override
+    public void closeTask(String taskId) {
+        wfTaskMapper.closeTask(taskId);
+    }
 }

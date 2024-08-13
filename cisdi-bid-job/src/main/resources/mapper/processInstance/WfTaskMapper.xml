@@ -55,4 +55,8 @@
             #{ver}
         )
     </insert>
+
+    <update id="closeTask">
+        update  wf_task set is_close = 1 where  id = #{id}
+    </update>
 </mapper>

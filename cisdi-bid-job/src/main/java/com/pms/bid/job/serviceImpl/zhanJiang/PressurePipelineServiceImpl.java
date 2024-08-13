@@ -214,14 +214,15 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 fillingCycles.forEach(fillingCycle -> {
                     List<Date> contents = pressurePipelineMapper.selectContentByTime(fillingCycle.getStart(), fillingCycle.getEnd(),item.getId());
                     if (contents.isEmpty()){
-
 //                        pressurePipelineMapper.updateFilling(item.getId(),fillingCycle.getStart()+"————"+fillingCycle.getEnd());
                         String snowflakeNextIdStr = IdUtil.getSnowflakeNextIdStr();
                         pressurePipelineMapper.insert(item.getId(),getDate(fillingCycle.getStart()),getDate(fillingCycle.getEnd()),"0",snowflakeNextIdStr,
                         new Date(),new Date(),System.currentTimeMillis(),"0099250247095871681","AP");
-                        remind("19",item);
+
+                            remind("19",item);
+
                         try {
-                            checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),DateUtil.convertStringToDate(fillingCycle.getEnd(),"yyyy-MM-dd"),"压力管道："+item.getYjwPipingName()+"'"+fillingCycle.getStart()+"————"+fillingCycle.getEnd()+"'竣工资料未填报",0);
+                            checkWarningDay(item.getWarningDays(),item.getSuperviseUserId(),DateUtil.convertStringToDate(fillingCycle.getEnd(),"yyyy-MM-dd"),"压力管道："+item.getYjwPipingName()+"'"+fillingCycle.getStart()+"—"+fillingCycle.getEnd()+"'竣工资料未填报",0);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -302,113 +303,142 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
             //  发起新的通知
             if ("1".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask1())){
+                    wfTaskService.closeTask(item.getYjwTask1());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("2".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask2())){
-                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
+//                    wfTaskService.closeTask(item.getYjwTask2());
+//                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
-                    pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
+                    if(org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
+                        pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
+                    }
                 }
             }else if ("3".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask3())){
-                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
+//                    wfTaskService.closeTask(item.getYjwTask3());
+//                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
-                    pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
+                    if(org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
+                        pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
+                    }
                 }
             }else if ("4".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask4())){
-                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
+//                    wfTaskService.closeTask(item.getYjwTask4());
+//                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
-                    pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
+                    if(org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
+                        pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
+                    }
                 }
             }else if ("5".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask5())){
+                    wfTaskService.closeTask(item.getYjwTask5());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("6".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask6())){
+                    wfTaskService.closeTask(item.getYjwTask6());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("7".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask7())){
+                    wfTaskService.closeTask(item.getYjwTask7());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("8".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask8())){
+                    wfTaskService.closeTask(item.getYjwTask8());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("9".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask9())){
+                    wfTaskService.closeTask(item.getYjwTask9());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("10".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask10())){
+                    wfTaskService.closeTask(item.getYjwTask10());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("11".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask11())){
-                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
+//                    wfTaskService.closeTask(item.getYjwTask11());
+//                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
-                    pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
+                    if(org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
+                        pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
+                    }
                 }
             }else if ("12".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask12())){
+                    wfTaskService.closeTask(item.getYjwTask12());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("13".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask13())){
-                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
+//                    wfTaskService.closeTask(item.getYjwTask13());
+//                    String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
-                    pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
+                    if(org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
+                        pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
+                    }
                 }
             }else if ("14".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask14())){
+                    wfTaskService.closeTask(item.getYjwTask14());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("15".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask15())){
+                    wfTaskService.closeTask(item.getYjwTask15());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("16".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask16())){
+                    wfTaskService.closeTask(item.getYjwTask16());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("17".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask17())){
+                    wfTaskService.closeTask(item.getYjwTask17());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("18".equals(number)){
                 if (!org.springframework.util.StringUtils.hasText(item.getYjwTask18())){
+                    wfTaskService.closeTask(item.getYjwTask18());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
                 }
             }else if ("19".equals(number)){
+                    wfTaskService.closeTask(item.getYjwTask19());
                     String taskId = createUserTaskMsg(wfId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
                     //修改时间节点状态
                     pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
