@@ -12,4 +12,6 @@ public interface WfTaskMapper {
     void create(WfTask wfTask);
 
     int  closeTask(@Param("id")String id);
+
+    int  getTaskStatus(@Param("id")String id);
 }

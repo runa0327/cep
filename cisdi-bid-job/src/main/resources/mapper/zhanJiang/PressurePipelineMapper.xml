@@ -32,7 +32,9 @@
         <result column="YJW_CONSTRUCTION_NOTICE_TIME_COMPLETE" property="yjwConstructionNoticeTimeComplete" />
         <result column="YJW_CONSTRUCTION_RECEIPT" property="yjwConstructionReceipt" />
         <result column="YJW_INSTALLATION_TIME_PLAN" property="yjwInstallationTimePlan" />
+        <result column="YJW_INSTALLATION_TIME" property="yjwInstallationTime" />
         <result column="YJW_USAGE_TIME_PLAN" property="yjwUsageTimePlan" />
+        <result column="YJW_USAGE_TIME" property="yjwUsageTime"/>
         <result column="YJW_REPORT_INSURANCE_TIME_PLAN" property="yjwReportInsuranceTimePlan" />
         <result column="YJW_REPORT_INSURANCE_TIME" property="yjwReportInsuranceTime" />
         <result column="YJW_REPORT_INSURANCE" property="yjwReportInsurance" />
@@ -106,7 +108,9 @@
                 YJW_CONSTRUCTION_NOTICE_TIME_COMPLETE,
                 YJW_CONSTRUCTION_RECEIPT,
                 YJW_INSTALLATION_TIME_PLAN,
+                YJW_INSTALLATION_TIME,
                 YJW_USAGE_TIME_PLAN,
+                YJW_USAGE_TIME,
                 YJW_REPORT_INSURANCE_TIME_PLAN,
                 YJW_REPORT_INSURANCE_TIME,
                 YJW_REPORT_INSURANCE,

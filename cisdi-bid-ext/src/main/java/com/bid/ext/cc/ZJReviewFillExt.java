@@ -42,26 +42,41 @@ public class ZJReviewFillExt {
             } catch (Exception e) {
                 log.error(new Date() + "压力管道竣工资料填报" + id + "查询失败:" + e.getMessage());
             }
+            if (reviewProgress==null){
+                return;
+            }
 
            pipelineId =  reviewProgress.getYjwPressurePipelineId();
             if (!StringUtils.isEmpty(reviewProgress.getYjwContent())) {
                 reviewProgress.setReviewIsFilled(true);
                 reviewProgress.updateById();
 
-            }else{
-                if (reviewProgress.getReviewFillDateFr().isBefore(LocalDate.now())){
-                    isComplete = false;
+            }
+
+            Where  queryReviewFill = new Where();
+            queryReviewFill.eq("YJW_PRESSURE_PIPELINE_ID",reviewProgress.getYjwPressurePipelineId());
+            List<YjwReviewProgress> yjwReviewProgresses = YjwReviewProgress.selectByWhere(queryReviewFill);
+            for (YjwReviewProgress reviewFill:yjwReviewProgresses){
+                if ( !reviewFill.getReviewIsFilled()){//状态为未填报
+                    if(reviewFill.getReviewFillDateFr().isBefore(LocalDate.now())){//且填报开始时间小于今天
+                        isComplete =false;
+                        break;//终止
+                    }
                 }
             }
         }
 
+
+
         if (isComplete) {
             YjwPressurePipeline yjwPressurePipeline = YjwPressurePipeline.selectById(pipelineId);
-            //验证是否完成
-            WfTask wfTask = new WfTask();
-            wfTask.setId(yjwPressurePipeline.getYjwTask19());
-            wfTask.setIsClosed(true);
-            wfTask.updateById();
+            if(yjwPressurePipeline.getYjwTask19()!=null) {
+                //验证是否完成
+                WfTask wfTask = new WfTask();
+                wfTask.setId(yjwPressurePipeline.getYjwTask19());
+                wfTask.setIsClosed(true);
+                wfTask.updateById();
+            }
         }
 
     }

@@ -25,5 +25,9 @@ public interface WfTaskService {
      */
     void closeTask(String  taskId);
 
-
+    /**
+     * 获取流程实例任务关闭状态
+     * @param taskId 任务id
+     */
+    int getTaskStatus(String  taskId);
 }

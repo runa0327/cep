@@ -57,6 +57,10 @@
     </insert>
 
     <update id="closeTask">
-        update  wf_task set is_close = 1 where  id = #{id}
+        update  wf_task set is_closed = 1 where  id = #{id}
     </update>
+
+    <select id="getTaskStatus" resultType="int">
+       select is_closed from  wf_task where id = #{id}
+    </select>
 </mapper>
