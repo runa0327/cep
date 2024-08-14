@@ -455,12 +455,12 @@ public class DrawingExt {
      */
     public void drawingAuth() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
-        String pCcPrjStructNodeId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_STRUCT_NODE_ID");
+        String pCcPrjStructNodeIds = JdbcMapUtil.getString(varMap, "P_CC_PRJ_STRUCT_NODE_ID");
         String pCcDrawingMemberIds = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_MEMBER_IDS");
         Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
         Boolean isUpload = (Boolean) varMap.get("P_IS_UPLOAD");
 
-        if (SharedUtil.isEmpty(pCcPrjStructNodeId)) {
+        if (SharedUtil.isEmpty(pCcPrjStructNodeIds)) {
             for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
                 String csCommId = entityRecord.csCommId;
                 if (pCcDrawingMemberIds != null && !pCcDrawingMemberIds.isEmpty()) {
@@ -495,20 +495,22 @@ public class DrawingExt {
             for (String memberId : memberIdList) {
                 CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
                 String adUserId = ccPrjMember.getAdUserId();
-
-                List<CcDrawingAuth> ccDrawingAuths = CcDrawingAuth.selectByWhere(new Where().eq(CcDrawingAuth.Cols.CC_PRJ_STRUCT_NODE_ID, pCcPrjStructNodeId).eq(CcDrawingAuth.Cols.AD_USER_ID, adUserId));
-                if (SharedUtil.isEmpty(ccDrawingAuths)) {
-                    CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
-                    ccDrawingAuth.setCcPrjStructNodeId(pCcPrjStructNodeId);
-                    ccDrawingAuth.setAdUserId(adUserId);
-                    ccDrawingAuth.setIsUpload(isUpload);
-                    ccDrawingAuth.setIsView(isView);
-                    ccDrawingAuth.insertById();
-                } else {
-                    for (CcDrawingAuth ccDrawingAuth : ccDrawingAuths) {
+                List<String> pCcPrjStructNodeIdList = Arrays.asList(pCcPrjStructNodeIds.split(","));
+                for (String pCcPrjStructNodeId : pCcPrjStructNodeIdList) {
+                    List<CcDrawingAuth> ccDrawingAuths = CcDrawingAuth.selectByWhere(new Where().eq(CcDrawingAuth.Cols.CC_PRJ_STRUCT_NODE_ID, pCcPrjStructNodeId).eq(CcDrawingAuth.Cols.AD_USER_ID, adUserId));
+                    if (SharedUtil.isEmpty(ccDrawingAuths)) {
+                        CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                        ccDrawingAuth.setCcPrjStructNodeId(pCcPrjStructNodeId);
+                        ccDrawingAuth.setAdUserId(adUserId);
                         ccDrawingAuth.setIsUpload(isUpload);
                         ccDrawingAuth.setIsView(isView);
-                        ccDrawingAuth.updateById();
+                        ccDrawingAuth.insertById();
+                    } else {
+                        for (CcDrawingAuth ccDrawingAuth : ccDrawingAuths) {
+                            ccDrawingAuth.setIsUpload(isUpload);
+                            ccDrawingAuth.setIsView(isView);
+                            ccDrawingAuth.updateById();
+                        }
                     }
                 }
             }
