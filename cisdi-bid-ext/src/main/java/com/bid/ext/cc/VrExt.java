@@ -145,6 +145,7 @@ public class VrExt {
         List<Map<String, Object>> ccPanoMonths = ExtJarHelper.getMyJdbcTemplate().queryForList(sqlPanoMonth);
 
         List<Map<String, Object>> vrLst = new ArrayList<>();
+        List<String> fileIdList = new ArrayList<>();
 
         for (Map<String, Object> mapPanoMonth : ccPanoMonths) {
             String panoMonth = JdbcMapUtil.getString(mapPanoMonth, "CC_PANO_MONTH");
@@ -176,9 +177,13 @@ public class VrExt {
                 ccVrItem.put("VR_DATE", vrDate);
                 ccVrItem.put("CC_YEAR_MONTH", ccVrYearMonth);
                 ccVrItem.put("CC_VR_ATTACHMENT", ccVrAttachmentFlFile.getFileInlineUrl());
+                ccVrItem.put("CC_VR_ATTACHMENT_ID", ccVrAttachmentFlFile.getId());
                 ccVrItem.put("CC_VR_ATTACHMENT_PREVIEW", ccVrAttachmentPreviewFlFile.getFileInlineUrl());
+                ccVrItem.put("CC_VR_ATTACHMENT_PREVIEW_ID", ccVrAttachmentPreviewFlFile.getId());
                 ccVrItem.put("CC_DOC_FILE_ID", ccDocFileId);
                 panoLst.add(ccVrItem);
+                fileIdList.add(ccVrAttachmentFlFile.getId());
+                fileIdList.add(ccVrAttachmentPreviewFlFile.getId());
             }
 
             if (!panoLst.isEmpty()) {
@@ -188,8 +193,11 @@ public class VrExt {
                 vrLst.add(ccPano);
             }
         }
+
         Map<String,Object> result = new HashMap<>();
         result.put("data",vrLst);
+        result.put("fileIdList", fileIdList);
+//        result.put("filePreviewIdList", filePreviewIdLst);
         ExtJarHelper.setReturnValue(result);
 //        String sql = "SELECT `NAME`, VR_DATE,  CONCAT( YEAR ( VR_DATE ), '年', MONTH ( VR_DATE ), '月' ) CC_YEAR_MONTH, CC_VR_ATTACHMENT_PREVIEW, CC_VR_ATTACHMENT FROM CC_VR WHERE (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY VR_DATE DESC";
 //        List<Map<String, Object>> ccVrs = ExtJarHelper.getMyJdbcTemplate().queryForList(sql);
