@@ -168,9 +168,9 @@ public class VrExt {
                 FlFile ccVrAttachmentFlFile = FlFile.selectById(ccVrAttachment);
                 FlFile ccVrAttachmentPreviewFlFile = FlFile.selectById(ccVrAttachmentPreview);
 
-//                if (!checkFileExists(ccVrAttachmentFlFile.getPhysicalLocation()) || !checkFileExists(ccVrAttachmentPreviewFlFile.getPhysicalLocation())) {
-//                    continue;
-//                }
+                if (!checkFileExists(ccVrAttachmentFlFile.getPhysicalLocation()) || !checkFileExists(ccVrAttachmentPreviewFlFile.getPhysicalLocation())) {
+                    continue;
+                }
 
                 Map<String, String> ccVrItem = new HashMap<>();
                 ccVrItem.put("NAME", name);
