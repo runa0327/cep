@@ -922,6 +922,12 @@ public class PipingExt {
                 wfTask.updateById();
             }
         }
+
+        //竣工资料填写待办
+        if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask19())) {
+            list.add(yjwPressurePipeline.getYjwTask19());
+        }
+
 //                yjwPressurePipeline.updateById();
         String id1 = yjwPressurePipeline.getLkWfInstId();
         Where where = new Where();
