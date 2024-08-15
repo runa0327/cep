@@ -92,14 +92,6 @@ public class CcDocFile {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
-         */
-        public static final String CC_PREVIEW_ATTACHMENT = "CC_PREVIEW_ATTACHMENT";
-        /**
-         * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
-         */
-        public static final String CC_DOC_DATE = "CC_DOC_DATE";
-        /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
@@ -107,6 +99,10 @@ public class CcDocFile {
          * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
          */
         public static final String NAME = "NAME";
+        /**
+         * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+         */
+        public static final String CC_DOC_DATE = "CC_DOC_DATE";
         /**
          * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
          */
@@ -127,6 +123,10 @@ public class CcDocFile {
          * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
          */
         public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
+        /**
+         * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+         */
+        public static final String CC_PREVIEW_ATTACHMENT = "CC_PREVIEW_ATTACHMENT";
         /**
          * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
          */
@@ -167,6 +167,10 @@ public class CcDocFile {
          * {"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
          */
         public static final String CC_DOC_DIR_ID = "CC_DOC_DIR_ID";
+        /**
+         * {"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+         */
+        public static final String CC_DOC_FILE_FROM = "CC_DOC_FILE_FROM";
     }
 
     // </editor-fold>
@@ -571,78 +575,6 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
-     */
-    private String ccPreviewAttachment;
-
-    /**
-     * 获取：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
-     */
-    public String getCcPreviewAttachment() {
-        return this.ccPreviewAttachment;
-    }
-
-    /**
-     * 设置：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
-     */
-    public CcDocFile setCcPreviewAttachment(String ccPreviewAttachment) {
-        if (this.ccPreviewAttachment == null && ccPreviewAttachment == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPreviewAttachment != null && ccPreviewAttachment != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPreviewAttachment.compareTo(ccPreviewAttachment) != 0) {
-                this.ccPreviewAttachment = ccPreviewAttachment;
-                if (!this.toUpdateCols.contains("CC_PREVIEW_ATTACHMENT")) {
-                    this.toUpdateCols.add("CC_PREVIEW_ATTACHMENT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPreviewAttachment = ccPreviewAttachment;
-            if (!this.toUpdateCols.contains("CC_PREVIEW_ATTACHMENT")) {
-                this.toUpdateCols.add("CC_PREVIEW_ATTACHMENT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
-     */
-    private LocalDate ccDocDate;
-
-    /**
-     * 获取：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
-     */
-    public LocalDate getCcDocDate() {
-        return this.ccDocDate;
-    }
-
-    /**
-     * 设置：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
-     */
-    public CcDocFile setCcDocDate(LocalDate ccDocDate) {
-        if (this.ccDocDate == null && ccDocDate == null) {
-            // 均为null，不做处理。
-        } else if (this.ccDocDate != null && ccDocDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccDocDate.compareTo(ccDocDate) != 0) {
-                this.ccDocDate = ccDocDate;
-                if (!this.toUpdateCols.contains("CC_DOC_DATE")) {
-                    this.toUpdateCols.add("CC_DOC_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccDocDate = ccDocDate;
-            if (!this.toUpdateCols.contains("CC_DOC_DATE")) {
-                this.toUpdateCols.add("CC_DOC_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
     private String ccPrjId;
@@ -709,6 +641,42 @@ public class CcDocFile {
             this.name = name;
             if (!this.toUpdateCols.contains("NAME")) {
                 this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     */
+    private LocalDate ccDocDate;
+
+    /**
+     * 获取：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     */
+    public LocalDate getCcDocDate() {
+        return this.ccDocDate;
+    }
+
+    /**
+     * 设置：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     */
+    public CcDocFile setCcDocDate(LocalDate ccDocDate) {
+        if (this.ccDocDate == null && ccDocDate == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDocDate != null && ccDocDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDocDate.compareTo(ccDocDate) != 0) {
+                this.ccDocDate = ccDocDate;
+                if (!this.toUpdateCols.contains("CC_DOC_DATE")) {
+                    this.toUpdateCols.add("CC_DOC_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDocDate = ccDocDate;
+            if (!this.toUpdateCols.contains("CC_DOC_DATE")) {
+                this.toUpdateCols.add("CC_DOC_DATE");
             }
         }
         return this;
@@ -889,6 +857,42 @@ public class CcDocFile {
             this.ccAttachment = ccAttachment;
             if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
                 this.toUpdateCols.add("CC_ATTACHMENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     */
+    private String ccPreviewAttachment;
+
+    /**
+     * 获取：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     */
+    public String getCcPreviewAttachment() {
+        return this.ccPreviewAttachment;
+    }
+
+    /**
+     * 设置：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     */
+    public CcDocFile setCcPreviewAttachment(String ccPreviewAttachment) {
+        if (this.ccPreviewAttachment == null && ccPreviewAttachment == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPreviewAttachment != null && ccPreviewAttachment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPreviewAttachment.compareTo(ccPreviewAttachment) != 0) {
+                this.ccPreviewAttachment = ccPreviewAttachment;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_ATTACHMENT")) {
+                    this.toUpdateCols.add("CC_PREVIEW_ATTACHMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPreviewAttachment = ccPreviewAttachment;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_ATTACHMENT")) {
+                this.toUpdateCols.add("CC_PREVIEW_ATTACHMENT");
             }
         }
         return this;
@@ -1249,6 +1253,42 @@ public class CcDocFile {
             this.ccDocDirId = ccDocDirId;
             if (!this.toUpdateCols.contains("CC_DOC_DIR_ID")) {
                 this.toUpdateCols.add("CC_DOC_DIR_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+     */
+    private Integer ccDocFileFrom;
+
+    /**
+     * 获取：{"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+     */
+    public Integer getCcDocFileFrom() {
+        return this.ccDocFileFrom;
+    }
+
+    /**
+     * 设置：{"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+     */
+    public CcDocFile setCcDocFileFrom(Integer ccDocFileFrom) {
+        if (this.ccDocFileFrom == null && ccDocFileFrom == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDocFileFrom != null && ccDocFileFrom != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDocFileFrom.compareTo(ccDocFileFrom) != 0) {
+                this.ccDocFileFrom = ccDocFileFrom;
+                if (!this.toUpdateCols.contains("CC_DOC_FILE_FROM")) {
+                    this.toUpdateCols.add("CC_DOC_FILE_FROM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDocFileFrom = ccDocFileFrom;
+            if (!this.toUpdateCols.contains("CC_DOC_FILE_FROM")) {
+                this.toUpdateCols.add("CC_DOC_FILE_FROM");
             }
         }
         return this;

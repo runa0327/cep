@@ -402,6 +402,7 @@ public class DocExt {
                 ccDocFile.setCcDocFileTypeId(fileType);
                 ccDocFile.setCcDocDirId(ccDocDirId);
                 ccDocFile.setCcAttachment(attachmentId);
+                ccDocFile.setCcDocFileFrom(1);
                 ccDocFile.insertById();
             }
         }
@@ -411,7 +412,7 @@ public class DocExt {
     }
 
     /**
-     * 批量上传CAD图纸或VR全景，CAD图纸格式要求dwg，VR全景格式要求jpg和png
+     * 批量上传CAD图纸
      */
     public void uploadVrOrCadFileBatch() throws IOException {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
@@ -511,6 +512,7 @@ public class DocExt {
             ccDocFile.setCcDocFileTypeId(fileType);
             ccDocFile.setCcDocDirId(ccDocDirId);
             ccDocFile.setCcAttachment(attachmentId);
+            ccDocFile.setCcDocFileFrom(2);
             ccDocFile.insertById();
         }
         InvokeActResult invokeActResult = new InvokeActResult();
