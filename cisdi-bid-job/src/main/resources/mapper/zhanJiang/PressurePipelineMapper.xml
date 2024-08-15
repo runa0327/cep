@@ -77,6 +77,14 @@
         <result column="SLIPPAGE_WARNING_DAYS" property="warningDays"/>
     </resultMap>
 
+    <resultMap id="reviewProgressMap" type="com.pms.bid.job.domain.zhanJiang.CcReviewProgress">
+        <result column="ID" property="id"></result>
+        <result column="YJW_CONTENT" property="content"></result>
+        <result column="REVIEW_FILL_DATE_FR" property="fillDateFor"></result>
+        <result column="REVIEW_FILL_DATE_TO" property="fillDateTo"></result>
+        <result column="YJW_PRESSURE_PIPELINE_ID" property="pipelineId"></result>
+        <result column="REVIEW_IS_FILLED" property="isFilled"></result>
+    </resultMap>
 
     <sql id="Base_Column_List">
                 ID,
@@ -224,6 +232,7 @@
     <update id="updateFilling">
         update yjw_pressure_pipeline set YJW_FILLING_CYCLE = #{filling} where ID = #{id}
     </update>
+
     <select id="selectList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
@@ -240,9 +249,17 @@
     <select id="selectDateByPipingId" resultType="java.util.Date">
         select YJW_FILL_DATE from yjw_review_progress order by YJW_FILL_DATE desc limit 1
     </select>
+
     <select id="selectContentByTime" resultType="java.util.Date">
-        select REVIEW_FILL_DATE_TO from yjw_review_progress where REVIEW_FILL_DATE_FR = #{start} and REVIEW_FILL_DATE_TO = #{end} and YJW_PRESSURE_PIPELINE_ID = #{id}
+        select  REVIEW_FILL_DATE_TO from yjw_review_progress where REVIEW_FILL_DATE_FR = #{start} and REVIEW_FILL_DATE_TO = #{end} and YJW_PRESSURE_PIPELINE_ID = #{id}
+    </select>
+
+    <select id="selectByPipelineId" resultMap="reviewProgressMap">
+        select ID,REVIEW_IS_FILLED,REVIEW_FILL_DATE_TO,REVIEW_FILL_DATE_FR,YJW_CONTENT,YJW_PRESSURE_PIPELINE_ID  from yjw_review_progress where  YJW_PRESSURE_PIPELINE_ID = #{id}
     </select>
 
 
+    <update id="updateReviewProgressFillDateTo">
+        update yjw_review_progress set REVIEW_FILL_DATE_TO = #{fillDateTo} where id  = #{id}
+    </update>
 </mapper>

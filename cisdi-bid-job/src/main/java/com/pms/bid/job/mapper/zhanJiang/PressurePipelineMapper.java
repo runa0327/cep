@@ -1,5 +1,6 @@
 package com.pms.bid.job.mapper.zhanJiang;
 
+import com.pms.bid.job.domain.zhanJiang.CcReviewProgress;
 import com.pms.bid.job.domain.zhanJiang.PressurePipeline;
 import org.apache.ibatis.annotations.Param;
 
@@ -41,11 +42,26 @@ public interface PressurePipelineMapper {
      * @param end
      * @return
      */
-    List<Date> selectContentByTime(@Param("start") String start, @Param("end") String end,@Param("id") String id);
+    List<Date> selectContentByTime(@Param("start") String start, @Param("end") String end, @Param("id") String id);
 
     int updateFilling(@Param("id") String id,@Param("filling") String filling);
 
 
     int insert(@Param("YJW_PRESSURE_PIPELINE_ID") String pip,@Param("start") Date date, @Param("end") Date date1, @Param("review") String number,@Param("id") String id,
                @Param("createTime") Date creteTime,@Param("lastModiDt") Date lastModiDt,@Param("ts") Long ts,@Param("createBy") String createBy,@Param("status") String status);
+
+    /**
+     * 查询压力管道的所有竣工填报进度数据
+     * @param id
+     * @return
+     */
+    List<CcReviewProgress> selectByPipelineId(@Param("id") String id);
+
+    /**
+     * 更新填报结束时间
+     * @param fillDateTo
+     * @param id
+     * @return
+     */
+    int updateReviewProgressFillDateTo(@Param("fillDateTo") String fillDateTo,@Param("id") String id);
 }
