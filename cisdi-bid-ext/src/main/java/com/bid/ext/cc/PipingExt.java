@@ -263,10 +263,10 @@ public class PipingExt {
             }
             //获取上传的excel文件
             FlFile flFile = FlFile.selectById(varMap.get("Y_IMPORT_PIPING").toString());
-//            String filePath = flFile.getPhysicalLocation();
+            String filePath = flFile.getPhysicalLocation();
 //            String filePath = "D:\\googledownload\\导入模板 (2).xlsx";
 
-            String filePath = "/Users/hejialun/Documents/湛江/导入/压力管道-导入模板 (1).xlsx";
+//            String filePath = "/Users/hejialun/Documents/湛江/导入/压力管道-导入模板 (1).xlsx";
             FileInputStream file = new FileInputStream(filePath);
             Workbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(0);
