@@ -410,4 +410,76 @@ public class PrjExt {
         }
     }
 
+    /**
+     * 创建项目初始化成本指标
+     */
+    public void initPrjCostIndicator() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String ccPrjId = entityRecord.csCommId;
+            CcCostIndicator ccCostIndicator01 = CcCostIndicator.newData();
+            ccCostIndicator01.setCcPrjId(ccPrjId);
+            ccCostIndicator01.setName("（概算-合同额）/概算");
+            ccCostIndicator01.setCode("001");
+            ccCostIndicator01.setIsPositiveIndicator(true);
+            ccCostIndicator01.setEnableWarning(true);
+            ccCostIndicator01.insertById();
+
+            CcCostIndicator ccCostIndicator02 = CcCostIndicator.newData();
+            ccCostIndicator02.setCcPrjId(ccPrjId);
+            ccCostIndicator02.setName("（概算-结算）/概算");
+            ccCostIndicator02.setCode("002");
+            ccCostIndicator02.setIsPositiveIndicator(true);
+            ccCostIndicator02.setEnableWarning(true);
+            ccCostIndicator02.insertById();
+
+            CcCostIndicator ccCostIndicator03 = CcCostIndicator.newData();
+            ccCostIndicator03.setCcPrjId(ccPrjId);
+            ccCostIndicator03.setName("结算/概算");
+            ccCostIndicator03.setCode("003");
+            ccCostIndicator03.setIsPositiveIndicator(false);
+            ccCostIndicator03.setEnableWarning(false);
+            ccCostIndicator03.insertById();
+
+            CcCostIndicator ccCostIndicator04 = CcCostIndicator.newData();
+            ccCostIndicator04.setCcPrjId(ccPrjId);
+            ccCostIndicator04.setName("已完成产值/合同额");
+            ccCostIndicator04.setCode("004");
+            ccCostIndicator04.setIsPositiveIndicator(true);
+            ccCostIndicator04.setEnableWarning(false);
+            ccCostIndicator04.insertById();
+
+            CcCostIndicator ccCostIndicator05 = CcCostIndicator.newData();
+            ccCostIndicator05.setCcPrjId(ccPrjId);
+            ccCostIndicator05.setName("已付款/合同额");
+            ccCostIndicator05.setCode("005");
+            ccCostIndicator05.setIsPositiveIndicator(false);
+            ccCostIndicator05.setEnableWarning(false);
+            ccCostIndicator05.insertById();
+
+            CcCostIndicator ccCostIndicator06 = CcCostIndicator.newData();
+            ccCostIndicator06.setCcPrjId(ccPrjId);
+            ccCostIndicator06.setName("概算-预算");
+            ccCostIndicator06.setCode("006");
+            ccCostIndicator06.setIsPositiveIndicator(true);
+            ccCostIndicator06.setEnableWarning(false);
+            ccCostIndicator06.insertById();
+
+            CcCostIndicator ccCostIndicator07 = CcCostIndicator.newData();
+            ccCostIndicator07.setCcPrjId(ccPrjId);
+            ccCostIndicator07.setName("（概算-结算）");
+            ccCostIndicator07.setCode("007");
+            ccCostIndicator07.setIsPositiveIndicator(true);
+            ccCostIndicator07.setEnableWarning(false);
+            ccCostIndicator07.insertById();
+
+            CcCostIndicator ccCostIndicator08 = CcCostIndicator.newData();
+            ccCostIndicator08.setCcPrjId(ccPrjId);
+            ccCostIndicator08.setName("概算-合同额");
+            ccCostIndicator08.setCode("008");
+            ccCostIndicator08.setIsPositiveIndicator(true);
+            ccCostIndicator08.setEnableWarning(true);
+            ccCostIndicator08.insertById();
+        }
+    }
+
 }
