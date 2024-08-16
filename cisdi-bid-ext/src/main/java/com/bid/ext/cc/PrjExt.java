@@ -466,7 +466,7 @@ public class PrjExt {
 
             CcCostIndicator ccCostIndicator07 = CcCostIndicator.newData();
             ccCostIndicator07.setCcPrjId(ccPrjId);
-            ccCostIndicator07.setName("（概算-结算");
+            ccCostIndicator07.setName("（概算-结算）");
             ccCostIndicator07.setCode("007");
             ccCostIndicator07.setIsPositiveIndicator(true);
             ccCostIndicator07.setEnableWarning(false);
