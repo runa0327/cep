@@ -262,4 +262,8 @@
     <update id="updateReviewProgressFillDateTo">
         update yjw_review_progress set REVIEW_FILL_DATE_TO = #{fillDateTo} where id  = #{id}
     </update>
+
+    <delete id="deleteReviewProgressFill">
+        delete from yjw_review_progress  where id = #{id}
+    </delete>
 </mapper>

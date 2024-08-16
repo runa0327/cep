@@ -67,7 +67,6 @@ public class ZJReviewFillExt {
         }
 
 
-
         if (isComplete) {
             YjwPressurePipeline yjwPressurePipeline = YjwPressurePipeline.selectById(pipelineId);
             if(yjwPressurePipeline.getYjwTask19()!=null) {

@@ -53,6 +53,15 @@ public class PipingExt {
                         AdUser adUser = AdUser.selectById(yjwPressurePipeline.getCrtUserId());
                         throw new BaseException("'填写竣工资料编制及报审进展'存在填报数据，请联系数据创建人：" + JsonUtil.getCN(adUser.getName()));
                     } else {
+                        //删除存在的填报数据
+                        Where delProgress = new Where();
+                        delProgress.eq("YJW_PRESSURE_PIPELINE_ID", yjwPressurePipeline.getId());
+                        try{
+                            YjwReviewProgress.deleteByWhere(delProgress);
+                        }catch (Exception e){
+                            throw new BaseException("竣工资料填报数据跟新失败");
+                        }
+
                         //关闭待办
                         if (yjwPressurePipeline.getYjwTask19() != null) {
                             WfTask wfTask = new WfTask();
@@ -60,10 +69,7 @@ public class PipingExt {
                             wfTask.setIsClosed(true);
                             wfTask.updateById();
                         }
-                        //删除存在的填报数据
-                        Where delProgress = new Where();
-                        delProgress.eq("YJW_PRESSURE_PIPELINE_ID", yjwPressurePipeline.getId());
-                        YjwReviewProgress.deleteByWhere(delProgress);
+
                     }
                 }
             }
@@ -82,166 +88,7 @@ public class PipingExt {
         for (EntityRecord entityRecord : entityRecordList) {
             Object id = entityRecord.valueMap.get("ID");
             if (null != id) {
-//                List<String> list = new ArrayList<>();
                 YjwPressurePipeline yjwPressurePipeline = YjwPressurePipeline.selectById(id.toString());
-
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask1())){
-//                    list.add(yjwPressurePipeline.getYjwTask1());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask1());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask1(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask2())){
-//                    list.add(yjwPressurePipeline.getYjwTask2());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask2());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask2(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask3())){
-//                    list.add(yjwPressurePipeline.getYjwTask3());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask3());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask3(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask4())){
-//                    list.add(yjwPressurePipeline.getYjwTask4());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask4());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask4(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask5())){
-//                    list.add(yjwPressurePipeline.getYjwTask5());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask5());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask5(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask6())){
-//                    list.add(yjwPressurePipeline.getYjwTask6());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask6());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask6(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask7())){
-//                    list.add(yjwPressurePipeline.getYjwTask7());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask7());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask7(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask8())){
-//                    list.add(yjwPressurePipeline.getYjwTask8());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask8());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask8(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask9())){
-//                    list.add(yjwPressurePipeline.getYjwTask9());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask9());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask9(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask10())){
-//                    list.add(yjwPressurePipeline.getYjwTask10());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask10());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask10(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask11())){
-//                    list.add(yjwPressurePipeline.getYjwTask11());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask11());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask11(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask12())){
-//                    list.add(yjwPressurePipeline.getYjwTask12());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask12());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask12(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask13())){
-//                    list.add(yjwPressurePipeline.getYjwTask13());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask13());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask13(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask14())){
-//                    list.add(yjwPressurePipeline.getYjwTask14());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask14());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask14(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask15())){
-//                    list.add(yjwPressurePipeline.getYjwTask15());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask15());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask15(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask16())){
-//                    list.add(yjwPressurePipeline.getYjwTask16());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask16());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask16(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask17())){
-//                    list.add(yjwPressurePipeline.getYjwTask17());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask17());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask17(null);
-//                }
-//                if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask18())){
-//                    list.add(yjwPressurePipeline.getYjwTask18());
-//                    WfTask wfTask = new WfTask();
-//                    wfTask.setId(yjwPressurePipeline.getYjwTask18());
-//                    wfTask.setIsClosed(true);
-//                    wfTask.updateById();
-//                    yjwPressurePipeline.setYjwTask18(null);
-//                }
-////                yjwPressurePipeline.updateById();
-//                String id1 = yjwPressurePipeline.getLkWfInstId();
-//                Where where = new Where();
-//                where.eq("LK_WF_INST_ID",id1);
-//                List<WfTask> wfTasks = WfTask.selectByWhere(where);
-//                if (!list.isEmpty()){
-//                    List<WfTask> collect = wfTasks.stream().filter(wfTask -> !list.contains(wfTask.getId())).collect(Collectors.toList());
-//                    for (WfTask wfTask : collect) {
-//                        wfTask.setIsClosed(true);
-//                        wfTask.updateById();
-//                    }
-//                }
-
                 closeTask(yjwPressurePipeline);
             }
         }
@@ -253,7 +100,6 @@ public class PipingExt {
      */
     @Transactional
     public void processImport() {
-//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String userId = ExtJarHelper.getLoginInfo().userInfo.id;
 
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
@@ -480,22 +326,66 @@ public class PipingExt {
         //设备登记办理责任人
         Object yAcceptanceManager = varMap.get("Y_ACCEPTANCE_MANAGER");
         Object yConstructionManager = varMap.get("Y_CONSTRUCTION_MANAGER");
+
+        Object  supervisorId= varMap.get("Y_SUPERVISOR_ID");
+        Object slippageWarningDays= varMap.get("Y_SLIPPAGE_WARNING_DAYS");
+
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
-//        List<Map<String, Object>> valueMapList = ExtJarHelper.getValueMapList();
+
         for (EntityRecord map : entityRecordList) {
             Map<String, Object> en = map.valueMap;
-            YjwPressurePipeline yjwPressurePipeline = new YjwPressurePipeline();
-            yjwPressurePipeline.setId(en.get("ID").toString());
+
+            YjwPressurePipeline pipeline = YjwPressurePipeline.selectById(en.get("ID").toString());
+
+            //施工责任人
             if (null != yAcceptanceManager) {
-                yjwPressurePipeline.setYjwAcceptanceManager(yAcceptanceManager.toString());
+                if (!yAcceptanceManager.toString().equals(pipeline.getYjwAcceptanceManager())) {
+                    pipeline.setYjwAcceptanceManager(yAcceptanceManager.toString());
+
+                    //取消以前的待办
+                    pipeline.setYjwTask1(null);
+                    pipeline.setYjwTask2(null);
+                    pipeline.setYjwTask3(null);
+                    pipeline.setYjwTask4(null);
+                    pipeline.setYjwTask5(null);
+                    pipeline.setYjwTask6(null);
+                    pipeline.setYjwTask7(null);
+                    pipeline.setYjwTask8(null);
+                    pipeline.setYjwTask9(null);
+                    pipeline.setYjwTask10(null);
+                    pipeline.setYjwTask11(null);
+                    pipeline.setYjwTask12(null);
+                    pipeline.setYjwTask13(null);
+                    pipeline.setYjwTask14(null);
+                    pipeline.setYjwTask15(null);
+                    pipeline.setYjwTask17(null);
+                    pipeline.setYjwTask19(null);
+                }
             }
+            //登记责任人
             if (null != yConstructionManager) {
-                yjwPressurePipeline.setYjwConstructionManager(yConstructionManager.toString());
+                if (!yConstructionManager.toString().equals(pipeline.getYjwConstructionManager())) {
+                    pipeline.setYjwConstructionManager(yConstructionManager.toString());
+
+                    //取消以前的待办
+                    pipeline.setYjwTask16(null);
+                    pipeline.setYjwTask18(null);
+                }
             }
-            yjwPressurePipeline.updateById();
+            //督办人
+            if (null != supervisorId) {
+                CcPrjMember member = CcPrjMember.selectById(supervisorId.toString());
+                pipeline.setSuperviseUserId(member.getAdUserId());
+            }
+            //逾期天数
+            if (null != slippageWarningDays) {
+                pipeline.setSlippageWarningDays(Integer.parseInt(slippageWarningDays.toString()));
+            }
+
+            pipeline.updateById();
+            closeTask(pipeline);
         }
     }
-
 
     /**
      * 导入压力管道数据
@@ -781,8 +671,6 @@ public class PipingExt {
         }
         if (!StringUtils.isEmpty(yjwPressurePipeline.getYjwQualifiedReport())) {
             if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask6())) {
-                list.add(yjwPressurePipeline.getYjwTask6());
-
                 WfTask wfTask = new WfTask();
                 wfTask.setId(yjwPressurePipeline.getYjwTask6());
                 wfTask.setIsClosed(true);
@@ -795,8 +683,6 @@ public class PipingExt {
         }
         if (yjwPressurePipeline.getYjwAcceptanceTime() != null) {
             if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask7())) {
-                list.add(yjwPressurePipeline.getYjwTask7());
-
                 WfTask wfTask = new WfTask();
                 wfTask.setId(yjwPressurePipeline.getYjwTask7());
                 wfTask.setIsClosed(true);
@@ -856,20 +742,6 @@ public class PipingExt {
             }
         }
 
-        //取得监督检验报告时间
-        if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask14())) {
-            list.add(yjwPressurePipeline.getYjwTask14());
-        }
-        if (yjwPressurePipeline.getYjwQualifiedReportTime() != null) {
-            if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask14())) {
-                list.add(yjwPressurePipeline.getYjwTask14());
-                WfTask wfTask = new WfTask();
-                wfTask.setId(yjwPressurePipeline.getYjwTask14());
-                wfTask.setIsClosed(true);
-                wfTask.updateById();
-            }
-        }
-
         //实际投用时间（带介质）
         if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask15())) {
             list.add(yjwPressurePipeline.getYjwTask15());
@@ -897,14 +769,27 @@ public class PipingExt {
                 wfTask.updateById();
             }
         }
-        //上传监督检验合格报告
+
+        //取得监督检验报告时间
         if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask17())) {
-            list.add(yjwPressurePipeline.getYjwTask1());
+            list.add(yjwPressurePipeline.getYjwTask17());
         }
-        if (!StringUtils.isEmpty(yjwPressurePipeline.getYjwQualifiedReport())) {
+        if (yjwPressurePipeline.getYjwQualifiedReportTime() != null) {
             if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask17())) {
                 WfTask wfTask = new WfTask();
                 wfTask.setId(yjwPressurePipeline.getYjwTask17());
+                wfTask.setIsClosed(true);
+                wfTask.updateById();
+            }
+        }
+        //上传监督检验合格报告
+        if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask14())) {
+            list.add(yjwPressurePipeline.getYjwTask14());
+        }
+        if (!StringUtils.isEmpty(yjwPressurePipeline.getYjwQualifiedReport())) {
+            if (org.springframework.util.StringUtils.hasText(yjwPressurePipeline.getYjwTask14())) {
+                WfTask wfTask = new WfTask();
+                wfTask.setId(yjwPressurePipeline.getYjwTask14());
                 wfTask.setIsClosed(true);
                 wfTask.updateById();
             }

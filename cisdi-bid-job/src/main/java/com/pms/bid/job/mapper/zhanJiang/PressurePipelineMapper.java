@@ -64,4 +64,12 @@ public interface PressurePipelineMapper {
      * @return
      */
     int updateReviewProgressFillDateTo(@Param("fillDateTo") String fillDateTo,@Param("id") String id);
+
+    /**
+     * 更新填报结束时间
+     * @param
+     * @param id
+     * @return
+     */
+    int deleteReviewProgressFill(@Param("id") String id);
 }

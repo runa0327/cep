@@ -84,7 +84,6 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
 
                     checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), timePlan, "压力管道：" + item.getYjwPipingName() + "施工告知未完成", 0);
                 }
-                //[YJW_CONSTRUCTION_RECEIPT, YJW_INSTALLATION_TIME, YJW_REPORT_INSURANCE_TIME, YJW_REPORT_INSURANCE, YJW_QUALIFIED_REPORT_TIME, YJW_REGISTRATION_TIME
             }
             //计划安装时间
             if (null == item.getYjwInstallationTimePlan()) {
@@ -126,16 +125,6 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 }
                 checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), item.getYjwDesignTime(), "压力管道：" + item.getYjwPipingName() + "竣工资料提交特检院时间未填写", 30);
             }
-//            else {
-//                //竣工资料提交特检院受理时间
-//                if (null == item.getYjwAcceptanceTime()) {
-//                    Date timePlan = item.getYjwAcceptanceTimePlan();
-//                    if (new Date().after(timePlan)) {
-//                        remind("12", item);
-//                    }
-//                    checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), timePlan, "压力管道：" + item.getYjwPipingName() + "竣工资料提交特检院受理时间填写", 0);
-//                }
-//            }
             //具备现场试压条件的计划时间
             if (null == item.getYjwQualifiedTimePlan()) {
                 if (isMoreThan30DaysOld(item.getYjwDesignTime())) {
@@ -152,16 +141,6 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                         remind("5", item);
                     }
                     checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), yjwUsageTimePlan, "压力管道：" + item.getYjwPipingName() + "实际安装时间未填写", 0);
-                } else {
-                    //填报竣工资料
-                    /*if (new Date().after(item.getYjwUsageTimePlan()) && (null == item.getYjwQualifiedReportTime() || new Date().before(item.getYjwQualifiedReportTime()))){
-                        Date date = pressurePipelineMapper.selectDateByPipingId(item.getId());
-                        //七天为一周期，一周期可多次填写
-                        if (before30DaysLater(date)){
-                            remind("19",item);
-                        }
-
-                    }*/
                 }
                 //上传耐压试验报告
                 if (StringUtils.isEmpty(item.getYjwTestReport())) {
@@ -172,7 +151,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 }
                 //上传监督检验合格报告
                 if (null == item.getYjwQualifiedReport()) {
-                    if (new Date().after(yjwUsageTimePlan)) {
+                    if (before30DaysLater(new Date(), item.getYjwUsageTimePlan())) {
                         remind("14", item);
                     }
                     checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), yjwUsageTimePlan, "压力管道：" + item.getYjwPipingName() + "监督检验合格报告", 0);
@@ -186,7 +165,6 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                 }
                 //项目单位计划办理使用登记的时间****
                 if (null == item.getYjwRegistrationTime()) {
-
                     if (before30DaysLater(new Date(), item.getYjwUsageTimePlan())) {
                         remind("16", item);
                     }
@@ -216,16 +194,19 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
 
             //填报竣工资料
             if (null != item.getYjwInstitutionTime()) {
+                LocalDate now = LocalDate.now();
                 List<FillingCycle> fillingCycles;
+                LocalDate fillEndDate = now;
                 if (null == item.getYjwQualifiedReportTime()) {
-                    fillingCycles = generateDateRanges(item.getYjwInstitutionTime(), new Date());
+                    fillingCycles = generateDateRanges(item.getYjwInstitutionTime(), new Date(), 1);
                 } else {
-                    fillingCycles = generateDateRanges(item.getYjwInstitutionTime(), item.getYjwQualifiedReportTime());
+                    fillingCycles = generateDateRanges(item.getYjwInstitutionTime(), item.getYjwQualifiedReportTime(), 2);
+                    fillEndDate = item.getYjwQualifiedReportTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
+                List<CcReviewProgress> progresses = pressurePipelineMapper.selectByPipelineId(item.getId());
 
+                //时间范围更新
                 fillingCycles.forEach(fillingCycle -> {
-
-                    List<CcReviewProgress> progresses = pressurePipelineMapper.selectByPipelineId(item.getId());
 
                     String start = fillingCycle.getStart();
                     String end = fillingCycle.getEnd();
@@ -236,13 +217,16 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                     //对比是否存在,已有数据更新
                     //相同记录记录相同记录
                     boolean isExist = false;
+                    boolean isComplete = true;
+                    if (progresses == null && progresses.size() < 1) {//没有历史数据，发送待办
+                        isComplete = false;
+                    }
                     for (CcReviewProgress progress : progresses) {
-
-                        if (progress.getFillDateFor() == null ||  progress.getFillDateTo() == null) {
+                        if (progress.getFillDateFor() == null || progress.getFillDateTo() == null) {
                             //错误数据删除
+                            pressurePipelineMapper.deleteReviewProgressFill(progress.getId());
                             continue;
                         }
-
                         LocalDate fillDateFor = progress.getFillDateFor().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                         LocalDate fillDateTo = progress.getFillDateTo().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
@@ -250,36 +234,46 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
                             isExist = true;
                             if (!endDate.isEqual(fillDateTo)) {
                                 //更新存在结束时间
-                                pressurePipelineMapper.updateReviewProgressFillDateTo(end,progress.getId());
+                                pressurePipelineMapper.updateReviewProgressFillDateTo(end, progress.getId());
                             }
                         }
+                        if (progress.getIsFilled() == 0 && fillDateFor.isBefore(now)) {
+                            isComplete = false;
+                        }
                     }
-
                     if (!isExist) {
                         //不存在，创建
                         String snowflakeNextIdStr = IdUtil.getSnowflakeNextIdStr();
                         pressurePipelineMapper.insert(item.getId(), getDate(fillingCycle.getStart()), getDate(fillingCycle.getEnd()), "0", snowflakeNextIdStr,
                                 new Date(), new Date(), System.currentTimeMillis(), "0099250247095871681", "AP");
-                        try {
-                            checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), DateUtil.convertStringToDate(fillingCycle.getEnd(), "yyyy-MM-dd"), "压力管道：" + item.getYjwPipingName() + "'" + fillingCycle.getStart() + "—" + fillingCycle.getEnd() + "'竣工资料未填报", 0);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                    }
+                    if (!isComplete || !isExist) {
                         remind("19", item);
                     }
-
+                    //预警发送
+                    try {
+                        checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), DateUtil.convertStringToDate(fillingCycle.getEnd(), "yyyy-MM-dd"), "压力管道：" + item.getYjwPipingName() + "'" + fillingCycle.getStart() + "—" + fillingCycle.getEnd() + "'竣工资料未填报", 0);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 });
+                //删除超过结束时间的历史数据
+                for (CcReviewProgress progress : progresses) {
+                    LocalDate fillDateFor = progress.getFillDateFor().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                    if (fillDateFor.isAfter(fillEndDate)) {
+                        pressurePipelineMapper.deleteReviewProgressFill(progress.getId());
+                    }
+                }
             }
             //竣工资料提交特检院受理时间
             if (null != item.getYjwInstitutionTime()) {
                 if (null == item.getYjwAcceptanceTime()) {
-//                    if (   new Date().after(item.getYjwInstitutionTime())  ){
                     if (isMoreThan30DaysOld(item.getYjwInstitutionTime())) {
-                        log.info(item.getYjwPipingName()+"----777-----"+item.getYjwInstitutionTime());
                         remind("7", item);
                     }
 
-//                    checkWarningDay(item.getWarningDays() + 30, item.getSuperviseUserId(), item.getYjwInstitutionTime(), "压力管道：" + item.getYjwPipingName() + "竣工资料提交特检院受理时间未填写", 0);
+                    checkWarningDay(item.getWarningDays(), item.getSuperviseUserId(), item.getYjwInstitutionTime(), "压力管道：" + item.getYjwPipingName() + "竣工资料提交特检院受理时间未填写", 30);
 
                 }
             }
@@ -303,7 +297,7 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
      * @param end   结束时间
      * @return List<FillingCycle>
      */
-    public static List<FillingCycle> generateDateRanges(Date start, Date end) {
+    public static List<FillingCycle> generateDateRanges(Date start, Date end, int type) {
 
         List<FillingCycle> dateRanges = new ArrayList<>();
         LocalDate currentStart = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -313,8 +307,10 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
         while (currentStart.isBefore(endDate) || currentStart.isEqual(endDate)) {
             LocalDate currentEnd = currentStart.plusDays(6); // 加上六天
 
-            if (currentEnd.isAfter(endDate)) {
-                currentEnd = endDate;
+            if (type == 2) {//按填写取得监督检验合格报告时间
+                if (currentEnd.isAfter(endDate)) {
+                    currentEnd = endDate;
+                }
             }
             FillingCycle cycle = new FillingCycle();
             cycle.setStart(currentStart.format(formatter));
@@ -322,14 +318,6 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
             dateRanges.add(cycle);
             currentStart = currentEnd.plusDays(1); // 开始下一周
         }
-//        FillingCycle cycle = dateRanges.get(dateRanges.size() - 1);
-//        String end1 = cycle.getEnd();
-//        DateTimeFormatter matter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//        LocalDate parse = LocalDate.parse(end1, matter);
-//        FillingCycle cycle1 = new FillingCycle();
-//        cycle1.setStart(parse.plusDays(1).format(matter));
-//        cycle1.setEnd(parse.plusDays(8).format(matter));
-//        dateRanges.add(cycle1);
         return dateRanges;
     }
 
@@ -340,11 +328,11 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
      */
     private void remind(String number, PressurePipeline item) {
 
-        String  toUserId = null;
+        String toUserId = null;
         if (number.equals("18") || number.equals("16")) {
-            toUserId= pressurePipelineMapper.selectUserByPrjId(item.getYjwConstructionManager());
+            toUserId = pressurePipelineMapper.selectUserByPrjId(item.getYjwConstructionManager());
 //            item.setYjwAcceptanceManager(userId);
-        }else{
+        } else {
             toUserId = pressurePipelineMapper.selectUserByPrjId(item.getYjwAcceptanceManager());
         }
         //  校验是否已发起流程
@@ -363,164 +351,110 @@ public class PressurePipelineServiceImpl implements PressurePipelineService {
         }
 
         //  发起新的通知
-        if ("1".equals(number)) {
+        if ("1".equals(number) || "2".equals(number) || "3".equals(number) || "4".equals(number) || "11".equals(number) || "13".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask1()) || wfTaskService.getTaskStatus(item.getYjwTask1()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
-                pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "1");
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "2");
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "3");
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "4");
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "11");
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "13");
                 item.setYjwTask1(taskId);
-            }
-        } else if ("2".equals(number)) {
-            if (!org.springframework.util.StringUtils.hasText(item.getYjwTask2()) || wfTaskService.getTaskStatus(item.getYjwTask2()) == 1) {
-//                    wfTaskService.closeTask(item.getYjwTask2());
-//                    String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
-                //修改时间节点状态
-                if (org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
-                    pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
-                }
-            }
-        } else if ("3".equals(number)) {
-            if (!org.springframework.util.StringUtils.hasText(item.getYjwTask3()) || wfTaskService.getTaskStatus(item.getYjwTask3()) == 1) {
-//                    wfTaskService.closeTask(item.getYjwTask3());
-//                    String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
-                //修改时间节点状态
-                if (org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
-                    pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
-                }
-            }
-        } else if ("4".equals(number)) {
-            if (!org.springframework.util.StringUtils.hasText(item.getYjwTask4()) || wfTaskService.getTaskStatus(item.getYjwTask4()) == 1) {
-//                    wfTaskService.closeTask(item.getYjwTask4());
-//                    String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
-                //修改时间节点状态
-                if (org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
-                    pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
-                }
+                item.setYjwTask2(taskId);
+                item.setYjwTask3(taskId);
+                item.setYjwTask4(taskId);
+                item.setYjwTask11(taskId);
+                item.setYjwTask13(taskId);
             }
         } else if ("5".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask5()) || wfTaskService.getTaskStatus(item.getYjwTask5()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask5(taskId);
             }
         } else if ("6".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask6()) || wfTaskService.getTaskStatus(item.getYjwTask6()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask6(taskId);
             }
         } else if ("7".equals(number)) {
-            log.info(toUserId+"----"+number);
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask7()) || wfTaskService.getTaskStatus(item.getYjwTask7()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask7(taskId);
             }
         } else if ("8".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask8()) || wfTaskService.getTaskStatus(item.getYjwTask8()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask8(taskId);
             }
         } else if ("9".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask9()) || wfTaskService.getTaskStatus(item.getYjwTask9()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask9(taskId);
             }
         } else if ("10".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask10()) || wfTaskService.getTaskStatus(item.getYjwTask10()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask10(taskId);
             }
-        } else if ("11".equals(number)) {
-            if (!org.springframework.util.StringUtils.hasText(item.getYjwTask11()) || wfTaskService.getTaskStatus(item.getYjwTask11()) == 1) {
-//                    wfTaskService.closeTask(item.getYjwTask11());
-//                    String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
-                //修改时间节点状态
-                if (org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
-                    pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
-                }
-            }
         } else if ("12".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask12()) || wfTaskService.getTaskStatus(item.getYjwTask12()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask12(taskId);
             }
-        } else if ("13".equals(number)) {
-            if (!org.springframework.util.StringUtils.hasText(item.getYjwTask13())|| wfTaskService.getTaskStatus(item.getYjwTask13()) == 1) {
-//                    wfTaskService.closeTask(item.getYjwTask13());
-//                    String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
-                //修改时间节点状态
-                if (org.springframework.util.StringUtils.hasText(item.getYjwTask1())) {
-                    pressurePipelineMapper.updateTaskById(item.getId(), item.getYjwTask1(), number);
-                }
-            }
-        } else if ("14".equals(number)) {
+        } else if ("14".equals(number) || "17".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask14()) || wfTaskService.getTaskStatus(item.getYjwTask14()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
-                pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "14");
+                pressurePipelineMapper.updateTaskById(item.getId(), taskId, "17");
                 item.setYjwTask14(taskId);
+                item.setYjwTask17(taskId);
             }
         } else if ("15".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask15()) || wfTaskService.getTaskStatus(item.getYjwTask15()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask15(taskId);
             }
         } else if ("16".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask16()) || wfTaskService.getTaskStatus(item.getYjwTask16()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask16(taskId);
             }
-        } else if ("17".equals(number)) {
-            if (!org.springframework.util.StringUtils.hasText(item.getYjwTask17()) || wfTaskService.getTaskStatus(item.getYjwTask17()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
-                //修改时间节点状态
-                pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
-                item.setYjwTask17(taskId);
-            }
         } else if ("18".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask18()) || wfTaskService.getTaskStatus(item.getYjwTask18()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask18(taskId);
             }
         } else if ("19".equals(number)) {
             if (!org.springframework.util.StringUtils.hasText(item.getYjwTask19()) || wfTaskService.getTaskStatus(item.getYjwTask19()) == 1) {
-                String taskId = createUserTaskMsg(wfId,toUserId, 1, now, "0099250247095871681");
+                String taskId = createUserTaskMsg(wfId, toUserId, 1, now, "0099250247095871681");
                 //修改时间节点状态
                 pressurePipelineMapper.updateTaskById(item.getId(), taskId, number);
                 item.setYjwTask19(taskId);
             }
         }
-
-
-//        }else {
-//            // 发起流程
-//            Map<String, String> result =
-//                    createWfProcessToSendNode(item, "1820723379691139072", "1816043591190458368", "1819203639730610176", "YJW_PRESSURE_PIPELINE", item.getYjwAcceptanceManager());
-//            String wfProcessInstanceId = result.get("wfProcessInstanceId");
-//            pressurePipelineMapper.updateInstIdById(item.getId(),wfProcessInstanceId); //设置流程实例id
-//            //发任务提醒
-//            String taskId = createUserTaskMsg(wfProcessInstanceId, item.getYjwAcceptanceManager(), 1, now, "0099250247095871681");
-//            //修改时间节点状态
-//            pressurePipelineMapper.updateTaskById(item.getId(),taskId,number);
-//        }
 
     }
 
