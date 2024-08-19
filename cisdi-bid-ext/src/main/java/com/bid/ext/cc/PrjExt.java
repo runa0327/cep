@@ -116,9 +116,8 @@ public class PrjExt {
     private List<CcPrjStructNode> replaceIdsAndInsert(List<CcPrjStructNode> ccPrjStructNodes, String ccPrjId, String ccPrjStructUsageId) {
         List<CcPrjStructNode> ccPrjStructNodes0 = new ArrayList<>();
         Map<String, String> idMapping = new HashMap<>();
-        BigDecimal seqNo = BigDecimal.ZERO;
+//        BigDecimal seqNo = BigDecimal.ZERO;
 
-        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         // 为每个节点生成新的 ID 并更新映射表
         for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
 
@@ -128,10 +127,10 @@ public class PrjExt {
             CcPrjStructNode ccPrjStructNode0 = CcPrjStructNode.newData();
 
             String oldId = ccPrjStructNode.getId();
-            String newId = IdUtil.getSnowflakeNextIdStr();
+//            String newId = IdUtil.getSnowflakeNextIdStr();
+            String newId = ccPrjStructNode0.getId();
             // 新ID与旧ID映射表
             idMapping.put(oldId, newId);
-            ccPrjStructNode0.setId(newId);
             ccPrjStructNode0.setCcPrjStructNodePid(ccPrjStructNode.getCcPrjStructNodePid());
             ccPrjStructNode0.setCopyFromPrjStructNodeId(oldId);
             ccPrjStructNode0.setCcPrjStructUsageId(ccPrjStructUsageId);
@@ -139,12 +138,10 @@ public class PrjExt {
             ccPrjStructNode0.setName(ccPrjStructNode.getName());
             ccPrjStructNode0.setIsTemplate(false);
             ccPrjStructNode0.setIsCbs(true);
-            ccPrjStructNode0.setCrtUserId(loginInfo.userInfo.id);
-            ccPrjStructNode0.setCrtDt(LocalDateTime.now());
-            ccPrjStructNode0.setStatus("AP");
-            ccPrjStructNode0.setSeqNo(seqNo);
+//            ccPrjStructNode0.setSeqNo(seqNo);
+            ccPrjStructNode0.setSeqNo(ccPrjStructNode.getSeqNo());
             ccPrjStructNodes0.add(ccPrjStructNode0);
-            seqNo = seqNo.add(BigDecimal.ONE);
+//            seqNo = seqNo.add(BigDecimal.ONE);
         }
 
         // 更新每个节点的父节点ID
