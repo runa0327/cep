@@ -226,4 +226,117 @@ public class ZJCameraExt {
         return map;
     }
 
+    //摄像头控制
+    public void   startCtl(){
+        Map<String, Object> paramMap = ExtJarHelper.getExtApiParamMap();
+        Object accessToken = paramMap.get("accessToken");//所属单位
+        Object deviceSerial = paramMap.get("deviceSerial");//设备序列号
+        Object channelNo = paramMap.get("channelNo");//通道号
+        Object direction = paramMap.get("direction");//操作命令
+//        Object speed = paramMap.get("speed");//移动速度
+
+        if (accessToken == null ){
+            throw new BaseException("accessToken不能为空");
+        }
+        if (deviceSerial == null ){
+            throw new BaseException("设备序号不能为空");
+        }
+        if (channelNo == null ){
+            throw new BaseException("通道号不能为空");
+        }
+        if (direction == null ){
+            throw new BaseException("控制命令不能为空");
+        }
+//        if (speed == null ){
+//            throw new BaseException("云台速度不能为空");
+//        }
+
+            RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/x-www-form-urlencoded");
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
+            body.add("accessToken", accessToken);
+            body.add("channelNo",Integer.parseInt(channelNo.toString()));
+            body.add("speed",1);
+            body.add("deviceSerial", deviceSerial);
+            body.add("direction",direction);
+
+            HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL + "/lapp/device/ptz/start", HttpMethod.POST, entity, String.class);
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                String message = "控制摄像头失败！";
+                log.error(message + response);
+                throw new BaseException(message);
+            }
+            log.info(response.getBody());
+
+        String res = response.getBody();
+        Map<String,Object> map = JsonUtil.fromJson(res, Map.class);
+
+        ExtJarHelper.setReturnValue(map);
+    }
+
+
+    //停止摄像头控制
+    public void  stopCtl(){
+
+        Map<String, Object> paramMap = ExtJarHelper.getExtApiParamMap();
+        Object accessToken = paramMap.get("accessToken");//所属单位
+        Object deviceSerial = paramMap.get("deviceSerial");//设备序列号
+        Object channelNo = paramMap.get("channelNo");//通道号
+        Object direction = paramMap.get("direction");//操作命令
+
+        if (accessToken == null ){
+            throw new BaseException("accessToken不能为空");
+        }
+        if (deviceSerial == null ){
+            throw new BaseException("设备序号不能为空");
+        }
+        if (channelNo == null ){
+            throw new BaseException("通道号不能为空");
+        }
+        if (direction == null ){
+            throw new BaseException("控制命令不能为空");
+        }
+
+        Map<String,Object>   result =  stop(accessToken.toString(),deviceSerial.toString(),Integer.parseInt(channelNo.toString()),Integer.parseInt(direction.toString()));
+
+        ExtJarHelper.setReturnValue(result);
+    }
+
+
+    //停止控制摄像头
+    private Map<String,Object> stop(String accessToken,String deviceSerial,Integer channelNo,Integer direction ){
+
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("accessToken", accessToken);
+        body.add("channelNo",channelNo);
+        body.add("direction",direction);
+        body.add("deviceSerial",deviceSerial);
+
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL + "/lapp/device/ptz/stop", HttpMethod.POST, entity, String.class);
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            String message = "控制停止失败！";
+            log.error(message + response);
+            throw new BaseException(message);
+        }
+
+        String res = response.getBody();
+        Map<String,Object> map = JsonUtil.fromJson(res, Map.class);
+        return map;
+
+    }
 }
