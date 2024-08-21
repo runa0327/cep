@@ -2221,8 +2221,8 @@ public class StructNodeExt {
             } else {
                 //获取项目编制中是否有对应类型计划
 //                List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null).in(CcPrjStructNode.Cols.STATUS, "DR", "APING", "DN").eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjWbsTypeId).neq(CcPrjStructNode.Cols.ID, csCommId));
-                String checkSql = "select * from cc_prj_struct_node t where t.is_template = 0 AND t.is_wbs = 1 AND t.status IN ('DR', 'APING', 'DN') AND t.CC_PRJ_WBS_TYPE_ID = ? AND t.CC_PRJ_ID = ? AND (t.cc_prj_struct_node_pid IS NULL OR t.cc_prj_struct_node_pid IN (SELECT id FROM cc_prj_struct_node WHERE cc_prj_struct_node_pid IS NULL))";
-                Map<String, Object> checkMap = myJdbcTemplate.queryForMap(checkSql, ccPrjWbsTypeId, ccPrjId);
+                String checkSql = "select * from cc_prj_struct_node t where t.is_template = 0 AND t.is_wbs = 1 AND t.status IN ('DR', 'APING', 'DN') AND t.CC_PRJ_WBS_TYPE_ID = ? AND t.CC_PRJ_ID = ? AND (t.cc_prj_struct_node_pid IS NULL OR t.cc_prj_struct_node_pid IN (SELECT id FROM cc_prj_struct_node WHERE cc_prj_struct_node_pid IS NULL)) AND t.id != ?";
+                Map<String, Object> checkMap = myJdbcTemplate.queryForMap(checkSql, ccPrjWbsTypeId, ccPrjId, csCommId);
                 if (!SharedUtil.isEmpty(checkMap)) {
                     throw new BaseException("已存在" + typeName + "编制中计划");
                 }
