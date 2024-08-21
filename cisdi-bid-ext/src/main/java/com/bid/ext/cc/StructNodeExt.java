@@ -2222,24 +2222,28 @@ public class StructNodeExt {
                 //获取项目编制中是否有对应类型计划
 //                List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null).in(CcPrjStructNode.Cols.STATUS, "DR", "APING", "DN").eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjWbsTypeId).neq(CcPrjStructNode.Cols.ID, csCommId));
                 String checkSql = "select * from cc_prj_struct_node t where t.is_template = 0 AND t.is_wbs = 1 AND t.status IN ('DR', 'APING', 'DN') AND t.CC_PRJ_WBS_TYPE_ID = ? AND t.CC_PRJ_ID = ? AND (t.cc_prj_struct_node_pid IS NULL OR t.cc_prj_struct_node_pid IN (SELECT id FROM cc_prj_struct_node WHERE cc_prj_struct_node_pid IS NULL)) AND t.id != ?";
-                Map<String, Object> checkMap = myJdbcTemplate.queryForMap(checkSql, ccPrjWbsTypeId, ccPrjId, csCommId);
+                List<Map<String, Object>> checkMap = myJdbcTemplate.queryForList(checkSql, ccPrjWbsTypeId, ccPrjId, csCommId);
                 if (!SharedUtil.isEmpty(checkMap)) {
                     throw new BaseException("已存在" + typeName + "编制中计划");
                 }
                 //获取项目已发布对应类型计划
                 String sql = "select * from cc_prj_struct_node n where n.cc_prj_struct_node_pid in (select id from cc_prj_struct_node n1 where n1.CC_PRJ_STRUCT_NODE_PID is null) and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS = 'AP' and n.CC_PRJ_ID = ? and n.CC_PRJ_WBS_TYPE_ID = ?";
-                Map<String, Object> queryForMap = myJdbcTemplate.queryForMap(sql, ccPrjId, ccPrjWbsTypeId);
-                //第二层根节点
-                String rootNodeId = JdbcMapUtil.getString(queryForMap, "ID");
-                // 获取项目已发布类型计划树
-                List<Map<String, Object>> prjPlanTree = getTemplateStruct(rootNodeId, false);
-                // 替换ID
-                List<Map<String, Object>> list = replaceIdsAndInsert(prjPlanTree);
-                // 序号
-                BigDecimal seqNo = BigDecimal.ZERO;
-                // 对于每一个模板结构节点，将其作为子节点插入
-                for (Map<String, Object> node : prjPlanTree) {
-                    insertWbsNodeUnapproved(node, entityRecord, seqNo);
+                List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, ccPrjId, ccPrjWbsTypeId);
+                if (!SharedUtil.isEmpty(queryForList)) {
+                    for (Map<String, Object> queryForMap : queryForList) {
+                        //第二层根节点
+                        String rootNodeId = JdbcMapUtil.getString(queryForMap, "ID");
+                        // 获取项目已发布类型计划树
+                        List<Map<String, Object>> prjPlanTree = getTemplateStruct(rootNodeId, false);
+                        // 替换ID
+                        List<Map<String, Object>> list = replaceIdsAndInsert(prjPlanTree);
+                        // 序号
+                        BigDecimal seqNo = BigDecimal.ZERO;
+                        // 对于每一个模板结构节点，将其作为子节点插入
+                        for (Map<String, Object> node : prjPlanTree) {
+                            insertWbsNodeUnapproved(node, entityRecord, seqNo);
+                        }
+                    }
                 }
             }
 
