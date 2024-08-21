@@ -2151,8 +2151,8 @@ public class StructNodeExt {
                 }
 
                 //获取项目编制中类型计划
-                String sql = "select * from cc_prj_struct_node n where n.cc_prj_struct_node_pid is null and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS in ('APING','DR','DN') and n.CC_PRJ_ID = ?";
-                List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, ccPrjId);
+                String sql = "select * from cc_prj_struct_node n where n.cc_prj_struct_node_pid is null and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS in ('APING','DR','DN') and n.CC_PRJ_ID = ? and n.id != ?";
+                List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, ccPrjId, csCommId);
                 ArrayList<String> typeList = new ArrayList<>();
                 for (Map<String, Object> map : queryForList) {
                     String ccPrjWbsTypeId1 = map.get("CC_PRJ_WBS_TYPE_ID").toString();
@@ -2220,7 +2220,7 @@ public class StructNodeExt {
 
             } else {
                 //获取项目编制中是否有对应类型计划
-                List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null).in(CcPrjStructNode.Cols.STATUS, "DR", "APING", "DN").eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjWbsTypeId));
+                List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null).in(CcPrjStructNode.Cols.STATUS, "DR", "APING", "DN").eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjWbsTypeId).neq(CcPrjStructNode.Cols.ID, csCommId));
                 if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
                     throw new BaseException("已存在" + typeName + "编制中计划");
                 }
@@ -2242,6 +2242,9 @@ public class StructNodeExt {
             }
 
         }
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**
