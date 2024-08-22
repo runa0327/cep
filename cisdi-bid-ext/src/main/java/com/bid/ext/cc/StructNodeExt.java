@@ -2387,7 +2387,11 @@ public class StructNodeExt {
             } else {
                 //查询现行计划的全景计划根节点
                 CcPrjStructNode ccPrjStructNodeRoot = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.IS_WBS, 1).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
-                String ccPrjStructNodeRootId = ccPrjStructNodeRoot.getId();
+                if (!SharedUtil.isEmpty(ccPrjStructNodeRoot)) {
+                    String ccPrjStructNodeRootId = ccPrjStructNodeRoot.getId();
+                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodeRootId);
+                    ccPrjStructNode.updateById();
+                }
 
                 // 当 ccPrjWbsTypeId 不为 "ALL" 时,将此类型的计划状态改为VD
                 //先前的现行计划 改为VD
@@ -2415,8 +2419,7 @@ public class StructNodeExt {
 
                     }
                 }
-                ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodeRootId);
-                ccPrjStructNode.updateById();
+
             }
 
             // 重算计划
