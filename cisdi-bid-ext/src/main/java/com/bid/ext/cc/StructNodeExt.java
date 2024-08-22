@@ -13,6 +13,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.bid.ext.cc.PrjExt.checkDates;
 
+@Slf4j
 public class StructNodeExt {
 
     /**
@@ -2402,6 +2404,86 @@ public class StructNodeExt {
             CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
             ccPrjStructNode.setIsFavorites(false);
             ccPrjStructNode.updateById();
+        }
+    }
+
+
+    public void newEdittingNode() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+//        // 获取模板结构
+//        String pWbsTempateId = varMap.get("P_WBS_TEMPATE_ID").toString();
+//        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.newData();
+//            ccPrjStructNode.setCrtUserId("");
+            ccPrjStructNode.setCrtDt(LocalDateTime.now());
+            ccPrjStructNode.setStatus("DR");
+            ccPrjStructNode.setName(JdbcMapUtil.getString(varMap, "P_NAME"));
+            ccPrjStructNode.setRemark(JdbcMapUtil.getString(varMap, "P_REMARK"));
+            ccPrjStructNode.setCcPrjId(JdbcMapUtil.getString(valueMap, "CC_PRJ_ID"));
+            ccPrjStructNode.setCcPrjStructNodePid(JdbcMapUtil.getString(valueMap, "ID"));
+
+            ccPrjStructNode.setIsWbs(true);
+            ccPrjStructNode.setIsPbs(false);
+            ccPrjStructNode.setIsCbs(false);
+            ccPrjStructNode.setWbsChiefUserId(JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID"));
+            ccPrjStructNode.setPbsChiefUserId(JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID"));
+            ccPrjStructNode.setCbsChiefUserId(JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID"));
+
+            LocalDate pPlanFr = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_FR");
+            LocalDate pPlanTo = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_TO");
+
+            checkDates(JdbcMapUtil.getString(varMap, "P_PLAN_FR"), JdbcMapUtil.getString(varMap, "P_PLAN_TO"));
+
+            ccPrjStructNode.setPlanFr(pPlanFr);
+            ccPrjStructNode.setPlanTo(pPlanTo);
+            log.info(pPlanFr.toString());
+            log.info(pPlanTo.toString());
+
+            ccPrjStructNode.setPlanDays(BigDecimal.valueOf(pPlanFr.until(pPlanTo).getDays()));
+
+            log.info(JdbcMapUtil.getString(varMap, "P_IS_STONE"));
+
+            ccPrjStructNode.setIsMileStone(Boolean.valueOf(JdbcMapUtil.getString(varMap, "P_IS_STONE")));
+            ccPrjStructNode.setIsTemplate(false);
+            ccPrjStructNode.setCcPrjWbsTypeId(JdbcMapUtil.getString(valueMap, "CC_PRJ_WBS_TYPE_ID"));
+
+
+            ccPrjStructNode.insertById();
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    public void isEdittingNodeLegal() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            String id = JdbcMapUtil.getString(valueMap, "ID");
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(id);
+
+//            if (id == null) {
+//                throw new BaseException("仅能在第二层级及以下维护层级");
+//            }
+//            log.info(ccPrjStructNode.getCcPrjStructNodePid());
+
+            String ccPrjStructNodePid = ccPrjStructNode.getCcPrjStructNodePid();
+
+            if (ccPrjStructNodePid == null) {
+                throw new BaseException("仅能在第二层级及以下维护层级");
+            }
+
+            CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(ccPrjStructNodePid);
+
+            if (!ccPrjStructNode.getCcPrjWbsTypeId().equals(ccPrjStructNode1.getCcPrjWbsTypeId())) {
+                throw new BaseException("仅能在第二层级及以下维护层级");
+            }
+
         }
     }
 }
