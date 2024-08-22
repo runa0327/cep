@@ -2460,28 +2460,30 @@ public class StructNodeExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
-    public void isEdittingNodeLegal() {
+    public void isEdittingNodeLegal() throws BaseException {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
 
             String id = JdbcMapUtil.getString(valueMap, "ID");
             CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(id);
 
-//            if (id == null) {
-//                throw new BaseException("仅能在第二层级及以下维护层级");
-//            }
-//            log.info(ccPrjStructNode.getCcPrjStructNodePid());
+            try {
+                String ccPrjStructNodePid = ccPrjStructNode.getCcPrjStructNodePid();
 
-            String ccPrjStructNodePid = ccPrjStructNode.getCcPrjStructNodePid();
+                if (ccPrjStructNodePid == null) {
+                    throw new BaseException("仅能在第二层级及以下维护层级");
+                }
 
-            if (ccPrjStructNodePid == null) {
-                throw new BaseException("仅能在第二层级及以下维护层级");
+                CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(ccPrjStructNodePid);
+
+                if (!ccPrjStructNode.getCcPrjWbsTypeId().equals(ccPrjStructNode1.getCcPrjWbsTypeId())) {
+                    throw new BaseException("仅能在第二层级及以下维护层级");
+                }
             }
-
-            CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(ccPrjStructNodePid);
-
-            if (!ccPrjStructNode.getCcPrjWbsTypeId().equals(ccPrjStructNode1.getCcPrjWbsTypeId())) {
-                throw new BaseException("仅能在第二层级及以下维护层级");
+            finally {
+                InvokeActResult invokeActResult = new InvokeActResult();
+                invokeActResult.reFetchData = true;
+                ExtJarHelper.setReturnValue(invokeActResult);
             }
 
         }
