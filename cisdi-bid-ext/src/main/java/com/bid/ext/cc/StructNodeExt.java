@@ -2352,11 +2352,15 @@ public class StructNodeExt {
                 String apTypeSql;
                 for (String wbsType : residualTypeList) {
                     apTypeSql = "select * from cc_prj_struct_node n  where n.cc_prj_struct_node_pid in (select id from cc_prj_struct_node n1 where n1.CC_PRJ_STRUCT_NODE_PID is null) and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS = 'AP' and n.CC_PRJ_ID = ? and n.CC_PRJ_WBS_TYPE_ID = ?";
-                    Map<String, Object> queryForMap = myJdbcTemplate.queryForMap(apTypeSql, ccPrjId, wbsType);
-                    String id = JdbcMapUtil.getString(queryForMap, "ID");
-                    CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(id);
-                    ccPrjStructNode1.setCcPrjStructNodePid(csCommId);
-                    ccPrjStructNode1.updateById();
+                    List<Map<String, Object>> queryForList1 = myJdbcTemplate.queryForList(apTypeSql, ccPrjId, wbsType);
+                    if (!queryForList1.isEmpty()) {
+                        for (Map<String, Object> queryForMap : queryForList1) {
+                            String id = JdbcMapUtil.getString(queryForMap, "ID");
+                            CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(id);
+                            ccPrjStructNode1.setCcPrjStructNodePid(csCommId);
+                            ccPrjStructNode1.updateById();
+                        }
+                    }
                 }
 
                 if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
