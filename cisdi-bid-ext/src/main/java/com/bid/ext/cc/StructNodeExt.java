@@ -2293,7 +2293,7 @@ public class StructNodeExt {
                 }
             }
 
-            String wbsTypeSql = "select * from cc_prj_wbs_type";
+            String wbsTypeSql = "select * from cc_prj_wbs_type where id != 'ALL'";
             List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(wbsTypeSql);
             ArrayList<String> allTypeList = new ArrayList<>();
             for (Map<String, Object> map : queryForList) {
@@ -2312,7 +2312,8 @@ public class StructNodeExt {
                     "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
                     "UNION ALL " +
                     "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
-                    "UPDATE cc_prj_struct_node SET STATUS = ? WHERE ID IN (SELECT ID FROM Subtree)";
+                    "UPDATE cc_prj_struct_node SET STATUS = ? WHERE ID IN (SELECT ID FROM Subtree)" +
+                    "AND CC_PRJ_WBS_TYPE_ID NOT IN (" + residualType + ")";
 
             String sql;
             if (residualType.isEmpty()) {
@@ -2327,7 +2328,7 @@ public class StructNodeExt {
                         "UNION ALL " +
                         "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
                         "SELECT * FROM cc_prj_struct_node WHERE ID IN (SELECT ID FROM Subtree) AND is_wbs = 1 " +
-                        "AND n.CC_PRJ_WBS_TYPE_ID NOT IN (" + residualType + ")";
+                        "AND CC_PRJ_WBS_TYPE_ID NOT IN (" + residualType + ")";
             }
 
 
@@ -2350,8 +2351,12 @@ public class StructNodeExt {
                 int update = myJdbcTemplate.update(updateStatusSql, csCommId, StatusE.AP.toString());
                 String apTypeSql;
                 for (String wbsType : residualTypeList) {
-                    apTypeSql = "update cc_prj_struct_node n set n.cc_prj_struct_node_pid = ? where n.cc_prj_struct_node_pid in (select id from cc_prj_struct_node n1 where n1.CC_PRJ_STRUCT_NODE_PID is null) and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS = 'AP' and n.CC_PRJ_ID = ? and n.CC_PRJ_WBS_TYPE_ID = ?";
-                    myJdbcTemplate.queryForMap(apTypeSql, csCommId, ccPrjId, wbsType);
+                    apTypeSql = "select * from cc_prj_struct_node n  where n.cc_prj_struct_node_pid in (select id from cc_prj_struct_node n1 where n1.CC_PRJ_STRUCT_NODE_PID is null) and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS = 'AP' and n.CC_PRJ_ID = ? and n.CC_PRJ_WBS_TYPE_ID = ?";
+                    Map<String, Object> queryForMap = myJdbcTemplate.queryForMap(apTypeSql, ccPrjId, wbsType);
+                    String id = JdbcMapUtil.getString(queryForMap, "ID");
+                    CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(id);
+                    ccPrjStructNode1.setCcPrjStructNodePid(csCommId);
+                    ccPrjStructNode1.updateById();
                 }
 
                 if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
@@ -2540,8 +2545,7 @@ public class StructNodeExt {
                 if (ccPrjStructNodes.size() > 1) {
                     throw new BaseException("仅能在第二层级及以下维护层级");
                 }
-            }
-            else {
+            } else {
                 CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(ccPrjStructNodePid);
                 if (!ccPrjStructNode.getCcPrjWbsTypeId().equals(ccPrjStructNode1.getCcPrjWbsTypeId())) {
                     List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where()
