@@ -2282,17 +2282,54 @@ public class StructNodeExt {
             String ccPrjWbsTypeId = ccPrjStructNode.getCcPrjWbsTypeId(); //计划类型
             String ccPrjId = ccPrjStructNode.getCcPrjId();
 
+            //查询编制计划下的直接子节点
+            List<CcPrjStructNode> ccPrjStructChildNodeList = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, csCommId).eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).in(CcPrjStructNode.Cols.STATUS, "DR", "APING", "DN"));
+            //提交的全景计划下存在的计划类型
+            ArrayList<String> typeList = new ArrayList<>();
+            if (!SharedUtil.isEmpty(ccPrjStructChildNodeList)) {
+                for (CcPrjStructNode ccPrjStructChildNode : ccPrjStructChildNodeList) {
+                    String wbsTypeId = ccPrjStructChildNode.getCcPrjWbsTypeId();
+                    typeList.add(wbsTypeId);
+                }
+            }
+
+            String wbsTypeSql = "select * from cc_prj_wbs_type";
+            List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(wbsTypeSql);
+            ArrayList<String> allTypeList = new ArrayList<>();
+            for (Map<String, Object> map : queryForList) {
+                String wbsTypeId = map.get("ID").toString();
+                allTypeList.add(wbsTypeId);
+            }
+            // 移除 allTypeList 中所有在 typeList 出现的元素
+            allTypeList.removeAll(typeList);
+
+            List<String> residualTypeList = new ArrayList<>(allTypeList);
+            String residualType = residualTypeList.stream()
+                    .map(s -> "'" + s + "'")
+                    .collect(Collectors.joining(","));
+
             String updateStatusSql = "WITH RECURSIVE Subtree AS (" +
                     "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
                     "UNION ALL " +
                     "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
                     "UPDATE cc_prj_struct_node SET STATUS = ? WHERE ID IN (SELECT ID FROM Subtree)";
 
-            String sql = "WITH RECURSIVE Subtree AS (" +
-                    "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
-                    "UNION ALL " +
-                    "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
-                    "SELECT * FROM cc_prj_struct_node WHERE ID IN (SELECT ID FROM Subtree) and is_wbs =1";
+            String sql;
+            if (residualType.isEmpty()) {
+                sql = "WITH RECURSIVE Subtree AS (" +
+                        "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
+                        "UNION ALL " +
+                        "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
+                        "SELECT * FROM cc_prj_struct_node WHERE ID IN (SELECT ID FROM Subtree) and is_wbs =1";
+            } else {
+                sql = "WITH RECURSIVE Subtree AS (" +
+                        "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
+                        "UNION ALL " +
+                        "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
+                        "SELECT * FROM cc_prj_struct_node WHERE ID IN (SELECT ID FROM Subtree) AND is_wbs = 1 " +
+                        "AND n.CC_PRJ_WBS_TYPE_ID NOT IN (" + residualType + ")";
+            }
+
 
             List<CcPrjStructNode> ccPrjStructNodes = null;
 
@@ -2311,12 +2348,17 @@ public class StructNodeExt {
                 }
                 // 当前DR改成AP
                 int update = myJdbcTemplate.update(updateStatusSql, csCommId, StatusE.AP.toString());
+                String apTypeSql;
+                for (String wbsType : residualTypeList) {
+                    apTypeSql = "update cc_prj_struct_node n set n.cc_prj_struct_node_pid = ? where n.cc_prj_struct_node_pid in (select id from cc_prj_struct_node n1 where n1.CC_PRJ_STRUCT_NODE_PID is null) and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS = 'AP' and n.CC_PRJ_ID = ? and n.CC_PRJ_WBS_TYPE_ID = ?";
+                    myJdbcTemplate.queryForMap(apTypeSql, csCommId, ccPrjId, wbsType);
+                }
 
                 if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
                     // 进展明细从原来计划改到新计划
                     for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                         String rootId = ccPrjStructNode0.getId();
-                        
+
                         for (Map<String, Object> node : nodes) {
                             String id = node.get("ID").toString();
                             // 通过拷贝自项目结构节点ID获取新计划树
@@ -2338,6 +2380,10 @@ public class StructNodeExt {
                     }
                 }
             } else {
+                //查询现行计划的全景计划根节点
+                CcPrjStructNode ccPrjStructNodeRoot = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.IS_WBS, 1).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+                String ccPrjStructNodeRootId = ccPrjStructNodeRoot.getId();
+
                 // 当 ccPrjWbsTypeId 不为 "ALL" 时,将此类型的计划状态改为VD
                 //先前的现行计划 改为VD
                 ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.IS_WBS, 1).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjWbsTypeId));
@@ -2364,6 +2410,8 @@ public class StructNodeExt {
 
                     }
                 }
+                ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodeRootId);
+                ccPrjStructNode.updateById();
             }
 
             // 重算计划
