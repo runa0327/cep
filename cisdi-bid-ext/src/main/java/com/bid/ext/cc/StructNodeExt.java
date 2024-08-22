@@ -2228,6 +2228,20 @@ public class StructNodeExt {
                 if (!SharedUtil.isEmpty(checkMap)) {
                     throw new BaseException("已存在" + typeName + "编制中计划");
                 }
+
+                //创建前期、设计等计划时，若有全景计划，则加入到全景计划下
+                String checkAllSql = "select * from cc_prj_struct_node t where t.is_template = 0 AND t.is_wbs = 1 AND t.status IN ('DR', 'APING', 'DN') AND t.CC_PRJ_WBS_TYPE_ID = 'ALL' AND t.CC_PRJ_ID = ? AND (t.cc_prj_struct_node_pid IS NULL OR t.cc_prj_struct_node_pid IN (SELECT id FROM cc_prj_struct_node WHERE cc_prj_struct_node_pid IS NULL)) AND t.id != ?";
+                List<Map<String, Object>> checkAllMap = myJdbcTemplate.queryForList(checkAllSql, ccPrjId, csCommId);
+                if (!SharedUtil.isEmpty(checkAllMap)) {
+                    for (Map<String, Object> map : checkAllMap) {
+                        String pid = JdbcMapUtil.getString(map, "ID");
+                        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+                        ccPrjStructNode.setCcPrjStructNodePid(pid);
+                        ccPrjStructNode.updateById();
+                    }
+                }
+
+
                 //获取项目已发布对应类型计划
                 String sql = "select * from cc_prj_struct_node n where n.cc_prj_struct_node_pid in (select id from cc_prj_struct_node n1 where n1.CC_PRJ_STRUCT_NODE_PID is null) and n.is_template = 0 AND n.is_wbs = 1 and n.STATUS = 'AP' and n.CC_PRJ_ID = ? and n.CC_PRJ_WBS_TYPE_ID = ?";
                 List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, ccPrjId, ccPrjWbsTypeId);
@@ -2302,8 +2316,7 @@ public class StructNodeExt {
                     // 进展明细从原来计划改到新计划
                     for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                         String rootId = ccPrjStructNode0.getId();
-
-
+                        
                         for (Map<String, Object> node : nodes) {
                             String id = node.get("ID").toString();
                             // 通过拷贝自项目结构节点ID获取新计划树
@@ -2352,7 +2365,6 @@ public class StructNodeExt {
                     }
                 }
             }
-
 
             // 重算计划
             recalculationPlan();
