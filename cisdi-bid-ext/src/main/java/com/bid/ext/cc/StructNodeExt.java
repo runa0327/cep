@@ -2530,15 +2530,32 @@ public class StructNodeExt {
             String ccPrjStructNodePid = ccPrjStructNode.getCcPrjStructNodePid();
 
             if (ccPrjStructNodePid == null) {
-                throw new BaseException("仅能在第二层级及以下维护层级");
+                List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where()
+                        .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
+                        .eq(CcPrjStructNode.Cols.IS_WBS, true)
+                        .eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null)
+                        .eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjStructNode.getCcPrjWbsTypeId())
+                        .eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjStructNode.getCcPrjId())
+                );
+                if (ccPrjStructNodes.size() > 1) {
+                    throw new BaseException("仅能在第二层级及以下维护层级");
+                }
             }
-
-            CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(ccPrjStructNodePid);
-
-            if (!ccPrjStructNode.getCcPrjWbsTypeId().equals(ccPrjStructNode1.getCcPrjWbsTypeId())) {
-                throw new BaseException("仅能在第二层级及以下维护层级");
+            else {
+                CcPrjStructNode ccPrjStructNode1 = CcPrjStructNode.selectById(ccPrjStructNodePid);
+                if (!ccPrjStructNode.getCcPrjWbsTypeId().equals(ccPrjStructNode1.getCcPrjWbsTypeId())) {
+                    List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where()
+                            .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
+                            .eq(CcPrjStructNode.Cols.IS_WBS, true)
+                            .eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, ccPrjStructNodePid)
+                            .eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjStructNode.getCcPrjWbsTypeId())
+                            .eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjStructNode.getCcPrjId())
+                    );
+                    if (ccPrjStructNodes.size() > 1) {
+                        throw new BaseException("仅能在第二层级及以下维护层级");
+                    }
+                }
             }
-
         }
     }
 }
