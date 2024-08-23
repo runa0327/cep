@@ -346,9 +346,15 @@ public class DocExt {
             String urlHead = JdbcMapUtil.getString(map, "name");
             String sessionId = ExtJarHelper.getLoginInfo().sessionId;
             LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
-            String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
+//            String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
 
-            BufferedImage originalImage = ImageIO.read(new URL(url));
+//            BufferedImage originalImage = ImageIO.read(new URL(url));
+
+            String originFilePhysicalLocation = flFile.getOriginFilePhysicalLocation();
+            BufferedImage originalImage = ImageIO.read(new File(originFilePhysicalLocation));
+//            String flPathId = flFile.getFlPathId();
+
+
             int targetWidth = 300; // 目标宽度
             int targetHeight = 300; // 目标高度
             Image resizedImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
@@ -545,11 +551,15 @@ public class DocExt {
 
             FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment()); // 获取文件对象
             if (null != flFile) {
-                String fileInlineUrl = flFile.getFileInlineUrl(); // 获取文件 URL
+                String originFilePhysicalLocation = flFile.getOriginFilePhysicalLocation();
+                BufferedImage originalImage = ImageIO.read(new File(originFilePhysicalLocation));
                 String flPathId = flFile.getFlPathId();
-                String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
 
-                BufferedImage originalImage = ImageIO.read(new URL(url));
+//                String fileInlineUrl = flFile.getFileInlineUrl(); // 获取文件 URL
+//                String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
+//                BufferedImage originalImage = ImageIO.read(new URL(url));
+
+//                BufferedImage originalImage = ImageIO.read(new URL(url));
                 int targetWidth = 300; // 目标宽度
                 int targetHeight = 300; // 目标高度
                 Image resizedImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
