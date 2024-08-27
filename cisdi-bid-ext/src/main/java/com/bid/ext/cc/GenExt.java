@@ -167,7 +167,7 @@ public class GenExt {
                 fos.write(wordContent);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new BaseException(e);
         }
     }
 

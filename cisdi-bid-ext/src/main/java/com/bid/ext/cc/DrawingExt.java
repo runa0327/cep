@@ -826,7 +826,7 @@ public class DrawingExt {
                     throw new BaseException("文件未找到：" + path);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new BaseException(e);
             }
 
             // 加水印
