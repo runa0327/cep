@@ -1130,14 +1130,14 @@ public class StructNodeExt {
             // 本次招标项目，金额，成本科目
             CcBid ccBid = CcBid.selectById(csCommId);
             String ccPrjId = ccBid.getCcPrjId();
-            Integer priceLimit = ccBid.getPriceLimit();
-            String ccPrjCbsTempalteNodeId = ccBid.getCcPrjCbsTempalteNodeId();
 
-            Integer bidAmtSum = priceLimit;
+            BigDecimal priceLimit = ccBid.getPriceLimit();
+            String ccPrjCbsTempalteNodeId = ccBid.getCcPrjCbsTempalteNodeId();
+            BigDecimal bidAmtSum = new BigDecimal(priceLimit.toString());
             // 1.查询项目此成本科目已招标金额
             CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjCbsTempalteNodeId)).get(0);
             BigDecimal bidAmt = ccPrjCostOverview.getBidAmt() != null ? ccPrjCostOverview.getBidAmt() : BigDecimal.ZERO;
-            BigDecimal bidAmtSumBig = new BigDecimal(bidAmtSum).add(bidAmt);
+            BigDecimal bidAmtSumBig = bidAmtSum.add(bidAmt);
 
             // 2.查询项目成本统览此成本科目的概算
             BigDecimal bidAmtInCbs = BigDecimal.ZERO;
@@ -1156,7 +1156,7 @@ public class StructNodeExt {
             // 4.存储成本统览关联明细
             CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
             ccPrjCostOverviewToDtl.setCcPrjCostOverviewId(ccPrjCostOverviewId);
-            ccPrjCostOverviewToDtl.setTrxAmt(BigDecimal.valueOf(priceLimit));
+            ccPrjCostOverviewToDtl.setTrxAmt(priceLimit);
             ccPrjCostOverviewToDtl.setEntCode("CC_BID");
             ccPrjCostOverviewToDtl.setEntityRecordId(csCommId);
             ccPrjCostOverviewToDtl.updateById();
@@ -1180,7 +1180,7 @@ public class StructNodeExt {
             //项目
             String ccPrjId = ccBid.getCcPrjId();
             // 此次更新的招标金额
-            Integer priceLimit = ccBid.getPriceLimit();
+            BigDecimal priceLimit = ccBid.getPriceLimit();
             // 此次更新的成本科目
             String ccPrjCbsTempalteNodeId = ccBid.getCcPrjCbsTempalteNodeId();
 
@@ -1214,7 +1214,7 @@ public class StructNodeExt {
                 String ccPrjCostOverviewNowId = ccPrjCostOverviewNow.getId();
                 ccPrjCostOverviewNowPid = ccPrjCostOverviewNow.getCcPrjCostOverviewPid();
                 BigDecimal bidAmt1 = ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO;
-                BigDecimal nowBidAmt = bidAmt1.add(BigDecimal.valueOf(priceLimit));
+                BigDecimal nowBidAmt = bidAmt1.add(priceLimit);
                 ccPrjCostOverviewNow.setBidAmt(nowBidAmt);
                 // 3.1比较已招标金额是否大于初设概算金额
                 // 3.1.1查询项目成本统览此成本科目的概算
@@ -1233,7 +1233,7 @@ public class StructNodeExt {
                 newCcPrjCostOverviewToDtl.setCcPrjCostOverviewId(ccPrjCostOverviewNowId);
                 newCcPrjCostOverviewToDtl.setEntCode(entCode);
                 newCcPrjCostOverviewToDtl.setEntityRecordId(csCommId);
-                newCcPrjCostOverviewToDtl.setTrxAmt(BigDecimal.valueOf(priceLimit));
+                newCcPrjCostOverviewToDtl.setTrxAmt(priceLimit);
                 newCcPrjCostOverviewToDtl.updateById();
 
                 // 5.删除先前招标关联记录

@@ -821,19 +821,19 @@ public class CcBid {
     /**
      * {"EN": "限价", "ZH_CN": "限价（元）", "ZH_TW": "限价"}。
      */
-    private Integer priceLimit;
+    private BigDecimal priceLimit;
 
     /**
      * 获取：{"EN": "限价", "ZH_CN": "限价（元）", "ZH_TW": "限价"}。
      */
-    public Integer getPriceLimit() {
+    public BigDecimal getPriceLimit() {
         return this.priceLimit;
     }
 
     /**
      * 设置：{"EN": "限价", "ZH_CN": "限价（元）", "ZH_TW": "限价"}。
      */
-    public CcBid setPriceLimit(Integer priceLimit) {
+    public CcBid setPriceLimit(BigDecimal priceLimit) {
         if (this.priceLimit == null && priceLimit == null) {
             // 均为null，不做处理。
         } else if (this.priceLimit != null && priceLimit != null) {

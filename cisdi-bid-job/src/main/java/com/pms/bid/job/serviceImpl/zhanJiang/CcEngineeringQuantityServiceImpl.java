@@ -111,7 +111,7 @@ public class CcEngineeringQuantityServiceImpl implements CcEngineeringQuantitySe
         ccEngineeringQuantity.setTotalWeight(pile);
         ccEngineeringQuantity.setMqMsgJson(message);
         ccEngineeringQuantity.setMqReceiveDateTime(now);
-        ccEngineeringQuantity.setEngineeringTypeId("BID");
+        ccEngineeringQuantity.setEngineeringTypeId("CONSTRUCT");
         list.add(ccEngineeringQuantity);
     }
 
