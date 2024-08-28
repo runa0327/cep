@@ -22,7 +22,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -303,7 +302,7 @@ public class DrawingExt {
         }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
-            Workbook workbook = new XSSFWorkbook(file);
+            Workbook workbook = WorkbookFactory.create(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
 
             // 遍历每一行
@@ -563,7 +562,7 @@ public class DrawingExt {
             BigDecimal totalWeight = BigDecimal.ZERO; // 初始化总重量为 0
 
             try (FileInputStream file = new FileInputStream(new File(filePath))) {
-                Workbook workbook = new XSSFWorkbook(file);
+                Workbook workbook = WorkbookFactory.create(file);
                 Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
                 FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 

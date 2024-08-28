@@ -8,7 +8,6 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.SharedUtil;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,7 +74,7 @@ public class BidExt {
         }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
-            Workbook workbook = new XSSFWorkbook(file);
+            Workbook workbook = WorkbookFactory.create(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 
@@ -176,7 +175,7 @@ public class BidExt {
             throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
         }
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
-            Workbook workbook = new XSSFWorkbook(file);
+            Workbook workbook = WorkbookFactory.create(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
 
             // 遍历每一行
