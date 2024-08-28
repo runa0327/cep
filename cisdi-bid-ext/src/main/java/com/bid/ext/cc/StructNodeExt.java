@@ -1789,6 +1789,11 @@ public class StructNodeExt {
 
             // 本次支付申请项目，金额，成本科目
             CcPayReq ccPayReq = CcPayReq.selectById(csCommId);
+
+            if ("DR".equals(ccPayReq.getStatus())) {
+                continue;
+            }
+
             String ccPrjId = ccPayReq.getCcPrjId();
             BigDecimal trxAmt = ccPayReq.getTrxAmt();
             String ccPrjCbsTempalteNodeId = ccPayReq.getCcPrjCbsTempalteNodeId();
@@ -1835,6 +1840,11 @@ public class StructNodeExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcPayReq ccPayReq = CcPayReq.selectById(csCommId);
+
+            if ("DR".equals(ccPayReq.getStatus())) {
+                continue;
+            }
+
             // 项目ID和成本科目
             String ccPrjId = ccPayReq.getCcPrjId();
             String ccPrjCbsTempalteNodeId = ccPayReq.getCcPrjCbsTempalteNodeId();
@@ -1952,8 +1962,8 @@ public class StructNodeExt {
                 CcPayReq ccPayReq = CcPayReq.selectById(ccPayReqId);
                 ccPrjCbsTempalteNodeId = ccPayReq.getCcPrjCbsTempalteNodeId();
             }
-
-
+            ccPay.setCcPrjCbsTempalteNodeId(ccPrjCbsTempalteNodeId);
+            ccPay.updateById();
             BigDecimal payAmtInReqSum = trxAmt;
             // 1.查询项目此成本科目已支付金额
             CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjCbsTempalteNodeId)).get(0);
@@ -1965,7 +1975,7 @@ public class StructNodeExt {
 
             // 3.对比已支付金额和已申请支付金额，若已支付金额大于已申请支付金额则提示
             if (payAmtInReqSum.compareTo(reqPayAmtInPo) > 0) {
-                throw new BaseException("已支付金额大于已申请支付金额！");
+                throw new BaseException("此次支付金额>（合同额-已支付额）");
             }
 
             // 4.存储成本统览关联明细
@@ -2012,7 +2022,7 @@ public class StructNodeExt {
 
             // 3.对比已支付金额和已申请支付金额，若已支付金额大于已申请支付金额则提示
             if (payAmtInReqSum.compareTo(reqPayAmtInPo) > 0) {
-                throw new BaseException("已支付金额大于已申请支付金额！");
+                throw new BaseException("此次支付金额>（合同额-已支付额）");
             }
 
             // 4.存储成本统览关联明细
@@ -2447,8 +2457,13 @@ public class StructNodeExt {
             String csCommId = entityRecord.csCommId;
             Map<String, Object> valueMap = entityRecord.valueMap;
             String ccPoId = JdbcMapUtil.getString(valueMap, "CC_PO_ID");
-            CcPo ccPo = CcPo.selectById(ccPoId);
             CcPayReq ccPayReq = CcPayReq.selectById(csCommId);
+
+            if (ccPoId == null) {
+                continue;
+            }
+
+            CcPo ccPo = CcPo.selectById(ccPoId);
             ccPayReq.setCcPrjCbsTempalteNodeId(ccPo.getCcPrjCbsTempalteNodeId());
             valueMap.put("CC_PRJ_CBS_TEMPALTE_NODE_ID", ccPo.getCcPrjCbsTempalteNodeId());
             ccPayReq.setPartyA(ccPo.getPartyA());
@@ -2516,7 +2531,12 @@ public class StructNodeExt {
             LocalDate pPlanFr = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_FR");
             LocalDate pPlanTo = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_TO");
 
-            checkDates(JdbcMapUtil.getString(varMap, "P_PLAN_FR"), JdbcMapUtil.getString(varMap, "P_PLAN_TO"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate from = LocalDate.parse(JdbcMapUtil.getString(varMap, "P_PLAN_FR"), formatter);
+            LocalDate to = LocalDate.parse(JdbcMapUtil.getString(varMap, "P_PLAN_TO"), formatter);
+            if (from.isAfter(to)) {
+                throw new BaseException("请检查并确保开始日期不晚于结束日期！");
+            }
 
             ccPrjStructNode.setPlanFr(pPlanFr);
             ccPrjStructNode.setPlanTo(pPlanTo);
