@@ -183,8 +183,17 @@ public class BidExt {
             for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 // 检查行是否为空
+                // 3保险：
                 if (row == null) {
-                    continue; // 如果为空，跳过该行
+                    break; // 如果为空，直接跳出。
+                }
+                Cell cell = row.getCell(1);
+                if (cell == null) {
+                    break;
+                }
+                String stringCellValue = getStringCellValue(cell);
+                if (SharedUtil.isEmpty(stringCellValue)) {
+                    break;
                 }
 
                 String bidCode = getStringCellValue(row.getCell(0)); //合同编号
