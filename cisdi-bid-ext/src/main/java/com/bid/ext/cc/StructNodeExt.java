@@ -2308,13 +2308,21 @@ public class StructNodeExt {
                     .map(s -> "'" + s + "'")
                     .collect(Collectors.joining(","));
 
-            String updateStatusSql = "WITH RECURSIVE Subtree AS (" +
-                    "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
-                    "UNION ALL " +
-                    "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
-                    "UPDATE cc_prj_struct_node SET STATUS = ? WHERE ID IN (SELECT ID FROM Subtree)" +
-                    "AND CC_PRJ_WBS_TYPE_ID NOT IN (" + residualType + ")";
-
+            String updateStatusSql;
+            if (residualType.isEmpty()) {
+                updateStatusSql = "WITH RECURSIVE Subtree AS (" +
+                        "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
+                        "UNION ALL " +
+                        "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
+                        "UPDATE cc_prj_struct_node SET STATUS = ? WHERE ID IN (SELECT ID FROM Subtree)";
+            } else {
+                updateStatusSql = "WITH RECURSIVE Subtree AS (" +
+                        "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
+                        "UNION ALL " +
+                        "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
+                        "UPDATE cc_prj_struct_node SET STATUS = ? WHERE ID IN (SELECT ID FROM Subtree) " +
+                        "AND CC_PRJ_WBS_TYPE_ID NOT IN (" + residualType + ")";
+            }
             String sql;
             if (residualType.isEmpty()) {
                 sql = "WITH RECURSIVE Subtree AS (" +
