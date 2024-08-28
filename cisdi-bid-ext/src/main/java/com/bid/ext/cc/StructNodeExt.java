@@ -1805,7 +1805,7 @@ public class StructNodeExt {
             // 3.对比已申请支付金额和已完成产值金额，若已申请支付金额大于已采购金额则提示
             int comparisonResult = reqPayAmtInPoSum.compareTo(purchaseAmtInBid);
             if (comparisonResult > 0) {
-                throw new BaseException("已申请支付金额大于已采购金额！");
+                throw new BaseException("此次申请金额>（合同额-已申请额）");
             }
 
             String ccPrjCostOverviewId = ccPrjCostOverview.getId();
