@@ -157,8 +157,11 @@ public class DocExt {
         pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
         FlPath flPath = FlPath.selectOneByWhere(pathWhere);
 
+        // 创建ZIP文件夹
+        String pathDir = flPath.getDir() + year + "/" + month + "/" + day + "/";
+        cn.hutool.core.io.FileUtil.mkdir(pathDir);
         // 指定ZIP文件保存位置
-        String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".zip";
+        String path = pathDir + fileId + ".zip";
 
         try (ZipArchiveOutputStream zipOut = new ZipArchiveOutputStream(new FileOutputStream(path))) {
             for (Map<String, String> fileMap : mapList) {
