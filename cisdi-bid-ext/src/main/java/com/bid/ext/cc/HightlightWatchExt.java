@@ -12,17 +12,17 @@ import java.util.Map;
 
 public class HightlightWatchExt {
     public void getHighlightWatch() {
-        String sqlHighlightWatch = "SELECT SEQ_NO, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CC_ATTACHMENTS, HIGHLIGHT_DATE, HIGHLIGHT_WATCH_IMG, REMARK FROM CC_HIGHLIGHT_WATCH";
+        String sqlHighlightWatch = "SELECT NAME, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CC_ATTACHMENTS, HIGHLIGHT_DATE, HIGHLIGHT_WATCH_IMG, HIGHLIGHT_REMARK FROM CC_HIGHLIGHT_WATCH";
         List<Map<String, Object>> highlights = ExtJarHelper.getMyJdbcTemplate().queryForList(sqlHighlightWatch);
         List<Map<String, String>> highlightLst = new ArrayList<>();
         for (Map<String, Object> highlight : highlights) {
-            String seqNo = JdbcMapUtil.getString(highlight, "SEQ_NO");
             String ccPrjId = JdbcMapUtil.getString(highlight, "CC_PRJ_ID");
             String ccPrjStructNodeId = JdbcMapUtil.getString(highlight, "CC_PRJ_STRUCT_NODE_ID");
             String ccAttachments = JdbcMapUtil.getString(highlight, "CC_ATTACHMENTS");
             String highlightDate = JdbcMapUtil.getString(highlight, "HIGHLIGHT_DATE");
             String highlightWatchImg = JdbcMapUtil.getString(highlight, "HIGHLIGHT_WATCH_IMG");
-            String remark = JdbcMapUtil.getString(highlight,"REMARK");
+            String remark = JdbcMapUtil.getString(highlight,"HIGHLIGHT_REMARK");
+            String name = JdbcMapUtil.getString(highlight, "NAME");
 
 
             CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(ccPrjStructNodeId);
@@ -30,12 +30,12 @@ public class HightlightWatchExt {
             FlFile previewImg = FlFile.selectById(highlightWatchImg);
 
             Map<String, String> highlightItem = new HashMap<>();
-//            highlightItem.put("SEQ_NO", seqNo);
             highlightItem.put("REMARK", remark==null?"":remark);
             highlightItem.put("HIGHLIGHT_DATE", highlightDate);
             highlightItem.put("HIGHLIGHT_IMG", previewImg.getFileInlineUrl());
 //            highlightItem.put("HIGHLIGHT_IMG_ID", previewImg.getId());
-            highlightItem.put("NAME", ccPrjStructNode.getName());
+            highlightItem.put("NAME", name);
+            highlightItem.put("CC_PRJ_STRUCT_NODE", ccPrjStructNode.getName());
             highlightLst.add(highlightItem);
         }
 
