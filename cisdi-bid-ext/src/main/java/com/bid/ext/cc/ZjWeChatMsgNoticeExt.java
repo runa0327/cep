@@ -36,41 +36,40 @@ public class ZjWeChatMsgNoticeExt {
      * 在进入节点时，向节点的用户，发送微信模板消息。
      */
     public void nodeExt() {
-//        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-//            String csCommId = entityRecord.csCommId;
-//            List<Map<String, Object>> list = getTaskList(csCommId);
-//
-//            // 遍历记录，进行发送:
-//            list.forEach(item -> {
-//                String msg = "流程实例（ID：" + item.get("WF_PROCESS_INSTANCE_ID") + "）的节点实例（ID:" + item.get("WF_NODE_INSTANCE_ID") + "）向用户（ID:" + item.get("user_id") + "，NAME：" + item.get("user_name") + "）发微信模板消息的状态：";
-//
-//                try {
-//                    String userExtraInfo = JdbcMapUtil.getString(item, "user_EXTRA_INFO");
-//                    if (SharedUtil.isEmpty(userExtraInfo)) {
-//                        log.error(msg + "失败！用户没有EXTRA_INFO，故忽略发送！");
-//                    } else {
-//                        Map map = JsonUtil.fromJson(userExtraInfo, Map.class);
-//                        if (SharedUtil.isEmpty(map.get("employeeId"))) {
-//                            log.error(msg + "失败！用户的EXTRA_INFO没有employeeId，故忽略发送！");
-//                        } else {
-//                            String employeeId = map.get("employeeId").toString(); //获取用户扩展中，走进湛钢用户工号
-//
-//                            String taskId = JdbcMapUtil.getString(item, "task_id"); //待办任务id
-//                            String viewId = JdbcMapUtil.getString(item, "AD_VIEW_ID"); //视图id
-//                            String pbsNodeName = JdbcMapUtil.getString(item, "pbs_node_name");//巡查项目
-//                            String rectificationPeriod = JdbcMapUtil.getString(item, "RECTIFICATION_PERIOD");//整改期限
-//                            String currentStateName = JdbcMapUtil.getString(item, "current_state_name"); //当前状态
-//                            sendTemplateMessage(employeeId, taskId, viewId, csCommId, pbsNodeName, rectificationPeriod, currentStateName);
-//                            log.error(msg + "成功。");
-//                        }
-//                    }
-//                } catch (Exception exception) {
-//                    log.error(msg + "失败！" + exception.getMessage());
-//                }
-//            });
-//        }
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            List<Map<String, Object>> list = getTaskList(csCommId);
 
-        sendTemplateMessage("LT0025", "taskId", "viewId", "csCommId", "测试项目", "2024-8-31", "待整改");
+            // 遍历记录，进行发送:
+            list.forEach(item -> {
+                String msg = "流程实例（ID：" + item.get("WF_PROCESS_INSTANCE_ID") + "）的节点实例（ID:" + item.get("WF_NODE_INSTANCE_ID") + "）向用户（ID:" + item.get("user_id") + "，NAME：" + item.get("user_name") + "）发微信模板消息的状态：";
+
+                try {
+                    String userExtraInfo = JdbcMapUtil.getString(item, "user_EXTRA_INFO");
+                    if (SharedUtil.isEmpty(userExtraInfo)) {
+                        log.error(msg + "失败！用户没有EXTRA_INFO，故忽略发送！");
+                    } else {
+                        Map map = JsonUtil.fromJson(userExtraInfo, Map.class);
+                        if (SharedUtil.isEmpty(map.get("employeeId"))) {
+                            log.error(msg + "失败！用户的EXTRA_INFO没有employeeId，故忽略发送！");
+                        } else {
+                            String employeeId = map.get("employeeId").toString(); //获取用户扩展中，走进湛钢用户工号
+
+                            String taskId = JdbcMapUtil.getString(item, "task_id"); //待办任务id
+                            String viewId = JdbcMapUtil.getString(item, "AD_VIEW_ID"); //视图id
+                            String pbsNodeName = JdbcMapUtil.getString(item, "pbs_node_name");//巡查项目
+                            String rectificationPeriod = JdbcMapUtil.getString(item, "RECTIFICATION_PERIOD");//整改期限
+                            String currentStateName = JdbcMapUtil.getString(item, "current_state_name"); //当前状态
+                            sendTemplateMessage(employeeId, taskId, viewId, csCommId, pbsNodeName, rectificationPeriod, currentStateName);
+                            log.info(msg + "成功。");
+                        }
+                    }
+                } catch (Exception exception) {
+                    log.error(msg + "失败！" + exception.getMessage());
+                }
+            });
+        }
+
     }
 
     /**
@@ -106,11 +105,10 @@ public class ZjWeChatMsgNoticeExt {
 
 
         //湛江微信公众页面地址：
-        String  pageUrl = "https:%2F%2Fzgwx.baosteel.com:10011%2FCFSP%2FQL%2Fvue%2F%23";
+        String  pageUrl = "https://zgwx.baosteel.com:10011/CFSP/QL/vue/#/";
 
         //消息跳转地址
-        String linkUrl = pageUrl + "%2F%3Ftype%3DACCESS%26orgId%3D" + currentOrgId + "%26hideTitleBar%3Dtrue%26hideMenu%3Dtrue%26viewId%3D" + viewId + "%26viewComponent%3DDETAIL_VIEW%26title%3D%E6%9F%A5%E7%9C%8B%EF%BC%9A%E8%B4%A8%E5%AE%89%E5%B7%A1%E6%A3%80%26id%3D" + entityRecordId;
-
+        String linkUrl = pageUrl + "/?type=ACCESS&orgId=" + currentOrgId + "&hideTitleBar=true&hideMenu=true&viewId=" + viewId + "&viewComponent=DETAIL_VIEW&title=%E6%9F%A5%E7%9C%8B%EF%BC%9A%E8%B4%A8%E5%AE%89%E5%B7%A1%E6%A3%80&id=" + entityRecordId;
 //        String linkUrl = pageUrl;
 
         String  projectCode = "zhanjiangcommunity";
@@ -120,8 +118,9 @@ public class ZjWeChatMsgNoticeExt {
         String signature = DigestUtils.md5DigestAsHex((projectCode + signmsg + "zhanjiang" + t).getBytes(StandardCharsets.UTF_8));
 
         //请求地址
-        String  requestUrl =  "http://10.99.255.203:9080/PlatWX/servlet/SendClientMsgService";
-        requestUrl = requestUrl+"?user_id="+employeeId+"&t="+t+"&signmsg="+signmsg+"&signature="+signature+"&template_id="+TEMPLATE_ID+"&proj_code=zhanjiangcommunity&linked="+linkUrl;
+        String  requestUrl =  "http://10.99.255.203:9080/PlatWX/servlet/SendTemplateMsgService?";
+//        String  requestUrl =  "http://zgwx.baosteel.com/PlatWX/servlet/WeChatGateServlet?project=zhanjiangcommunity";
+        requestUrl = requestUrl+"user_id="+employeeId+"&t="+t+"&signmsg="+signmsg+"&signature="+signature+"&template_id="+TEMPLATE_ID+"&proj_code=zhanjiangcommunity&linked="+linkUrl;
 
         //参数 user_id=user_id&t=time&signmsg=signMsg&signature=signature&template_id=template_id&&proj_code=project &linked= linked;
         //参数 user_id  （员工工号）,t  （时间戳）,signmsg （随机数）,signature （签名）, template_id (消息模板), proj_code（project）, linked（跳转地址）
@@ -134,20 +133,21 @@ public class ZjWeChatMsgNoticeExt {
         requestMap.put("time10",rectificationPeriod);
         requestMap.put("thing5",currentStateName);
 
+        log.info(requestUrl);
+        log.info(requestMap.toString());
+
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
         ResponseEntity<String> response = restTemplate.postForEntity(requestUrl, requestMap, String.class);
 
         log.info(response.toString());
 
-//        String responseBody = response.getBody();
+        String responseBody = response.getBody();
 
-//        Map map = JsonUtil.fromJson(responseBody, Map.class);
+        Map map = JsonUtil.fromJson(responseBody, Map.class);
 
-
-
-//        if (map == null || !"ok".equals(map.get("errmsg"))) {
-//            throw new BaseException("发送模板消息失败！" + responseBody);
-//        }
+        if (map == null || !"ok".equals(map.get("errmsg"))) {
+            throw new BaseException("发送模板消息失败！" + responseBody);
+        }
     }
 
 

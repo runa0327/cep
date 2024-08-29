@@ -7,7 +7,6 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -93,9 +92,9 @@ public class CcHighlightWatch {
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
          */
-        public static final String NAME = "NAME";
+        public static final String REMARK = "REMARK";
         /**
          * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
          */
@@ -104,10 +103,6 @@ public class CcHighlightWatch {
          * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
-        /**
-         * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
-         */
-        public static final String SEQ_NO = "SEQ_NO";
         /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
@@ -121,9 +116,13 @@ public class CcHighlightWatch {
          */
         public static final String HIGHLIGHT_DATE = "HIGHLIGHT_DATE";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
          */
-        public static final String REMARK = "REMARK";
+        public static final String NAME = "NAME";
+        /**
+         * {"EN": "亮点观摩备注", "ZH_CN": "亮点观摩备注", "ZH_TW": "亮点观摩备注"}。
+         */
+        public static final String HIGHLIGHT_REMARK = "HIGHLIGHT_REMARK";
         /**
          * {"EN": "亮点观摩图片", "ZH_CN": "亮点观摩图片", "ZH_TW": "亮点观摩图片"}。
          */
@@ -536,36 +535,36 @@ public class CcHighlightWatch {
     }
 
     /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
-    private String name;
+    private String remark;
 
     /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
-    public String getName() {
-        return this.name;
+    public String getRemark() {
+        return this.remark;
     }
 
     /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
-    public CcHighlightWatch setName(String name) {
-        if (this.name == null && name == null) {
+    public CcHighlightWatch setRemark(String remark) {
+        if (this.remark == null && remark == null) {
             // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
+        } else if (this.remark != null && remark != null) {
             // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
             }
         }
         return this;
@@ -638,42 +637,6 @@ public class CcHighlightWatch {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
-     */
-    private BigDecimal seqNo;
-
-    /**
-     * 获取：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
-     */
-    public BigDecimal getSeqNo() {
-        return this.seqNo;
-    }
-
-    /**
-     * 设置：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
-     */
-    public CcHighlightWatch setSeqNo(BigDecimal seqNo) {
-        if (this.seqNo == null && seqNo == null) {
-            // 均为null，不做处理。
-        } else if (this.seqNo != null && seqNo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.seqNo.compareTo(seqNo) != 0) {
-                this.seqNo = seqNo;
-                if (!this.toUpdateCols.contains("SEQ_NO")) {
-                    this.toUpdateCols.add("SEQ_NO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.seqNo = seqNo;
-            if (!this.toUpdateCols.contains("SEQ_NO")) {
-                this.toUpdateCols.add("SEQ_NO");
             }
         }
         return this;
@@ -788,36 +751,72 @@ public class CcHighlightWatch {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    private String remark;
+    private String name;
 
     /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public String getRemark() {
-        return this.remark;
+    public String getName() {
+        return this.name;
     }
 
     /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public CcHighlightWatch setRemark(String remark) {
-        if (this.remark == null && remark == null) {
+    public CcHighlightWatch setName(String name) {
+        if (this.name == null && name == null) {
             // 均为null，不做处理。
-        } else if (this.remark != null && remark != null) {
+        } else if (this.name != null && name != null) {
             // 均非null，判定不等，再做处理：
-            if (this.remark.compareTo(remark) != 0) {
-                this.remark = remark;
-                if (!this.toUpdateCols.contains("REMARK")) {
-                    this.toUpdateCols.add("REMARK");
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.remark = remark;
-            if (!this.toUpdateCols.contains("REMARK")) {
-                this.toUpdateCols.add("REMARK");
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "亮点观摩备注", "ZH_CN": "亮点观摩备注", "ZH_TW": "亮点观摩备注"}。
+     */
+    private String highlightRemark;
+
+    /**
+     * 获取：{"EN": "亮点观摩备注", "ZH_CN": "亮点观摩备注", "ZH_TW": "亮点观摩备注"}。
+     */
+    public String getHighlightRemark() {
+        return this.highlightRemark;
+    }
+
+    /**
+     * 设置：{"EN": "亮点观摩备注", "ZH_CN": "亮点观摩备注", "ZH_TW": "亮点观摩备注"}。
+     */
+    public CcHighlightWatch setHighlightRemark(String highlightRemark) {
+        if (this.highlightRemark == null && highlightRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.highlightRemark != null && highlightRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.highlightRemark.compareTo(highlightRemark) != 0) {
+                this.highlightRemark = highlightRemark;
+                if (!this.toUpdateCols.contains("HIGHLIGHT_REMARK")) {
+                    this.toUpdateCols.add("HIGHLIGHT_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.highlightRemark = highlightRemark;
+            if (!this.toUpdateCols.contains("HIGHLIGHT_REMARK")) {
+                this.toUpdateCols.add("HIGHLIGHT_REMARK");
             }
         }
         return this;

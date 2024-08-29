@@ -33,6 +33,11 @@ public class ConstructWorkExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcConstructWork ccConstructWork = CcConstructWork.selectById(csCommId);
+
+            if (pActWbsPct < ccConstructWork.getActWbsPct()) {
+                throw new BaseException("“实际进度比例”应不小于最新进度比例!");
+            }
+
             //插入进展
             CcConstructWorkProg ccConstructWorkProg = CcConstructWorkProg.insertData();
             ccConstructWorkProg.setProgTime(LocalDateTime.now());
