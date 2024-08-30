@@ -1951,7 +1951,6 @@ public class StructNodeExt {
             CcPay ccPay = CcPay.selectById(csCommId);
             String ccPrjId = ccPay.getCcPrjId();
             BigDecimal trxAmt = ccPay.getTrxAmt();
-
             String ccPayReqId = ccPay.getCcPayReqId();
             String ccPoId = ccPay.getCcPoId();
             String ccPrjCbsTempalteNodeId = null;
@@ -1959,7 +1958,7 @@ public class StructNodeExt {
                 CcPo ccPo = CcPo.selectById(ccPoId);
                 ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
                 BigDecimal resPayAmt = new BigDecimal(ccPo.getTrxAmt().toString());
-                List<CcPayReq> ccPayReqs = CcPayReq.selectByWhere(new Where().eq(CcPayReq.Cols.CC_PO_ID, ccPoId));
+                List<CcPayReq> ccPayReqs = CcPayReq.selectByWhere(new Where().eq(CcPayReq.Cols.CC_PO_ID, ccPoId).eq(CcPayReq.Cols.STATUS, "AP"));
                 for (CcPayReq ccPayReq : ccPayReqs) {
                     resPayAmt = resPayAmt.subtract(ccPayReq.getTrxAmt());
                 }
@@ -1967,7 +1966,8 @@ public class StructNodeExt {
                 for (CcPay pay : ccPays) {
                     resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
                 }
-                if (trxAmt.compareTo(resPayAmt) > 0) {
+                // 插入后调用扩展，所以包括当前记录
+                if (trxAmt.compareTo(BigDecimal.ZERO) > 0) {
                     throw new BaseException("此次支付金额>所关联合同剩余合同额");
                 }
             } else {
@@ -1978,7 +1978,8 @@ public class StructNodeExt {
                 for (CcPay pay : ccPays) {
                     resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
                 }
-                if (trxAmt.compareTo(resPayAmt) > 0) {
+                // 插入后调用扩展，所以包括当前记录
+                if (trxAmt.compareTo(BigDecimal.ZERO) > 0) {
                     throw new BaseException("此次支付金额>所关联支付申请剩余申请额");
                 }
             }
