@@ -1147,11 +1147,12 @@ public class StructNodeExt {
             String ccPrjCostOverviewId = ccPrjCostOverview.getId();
 
             // 3.对比已招标金额和概算，若招标金额大于概算金额则提示
+            // 2024/08/30 产品要求取消这条逻辑（安徽）
             // 比较priceLimitSumBD和bidAmtInCbs
-            int comparisonResult = bidAmtSumBig.compareTo(bidAmtInCbs);
-            if (comparisonResult > 0) {
-                throw new BaseException("已招标金额大于概算金额！");
-            }
+//            int comparisonResult = bidAmtSumBig.compareTo(bidAmtInCbs);
+//            if (comparisonResult > 0) {
+//                throw new BaseException("已招标金额大于概算金额！");
+//            }
 
             // 4.存储成本统览关联明细
             CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
@@ -1217,15 +1218,16 @@ public class StructNodeExt {
                 BigDecimal nowBidAmt = bidAmt1.add(priceLimit);
                 ccPrjCostOverviewNow.setBidAmt(nowBidAmt);
                 // 3.1比较已招标金额是否大于初设概算金额
+                // 2024/08/30 产品要求取消这条逻辑（安徽）
                 // 3.1.1查询项目成本统览此成本科目的概算
-                BigDecimal bidAmtInCbs = BigDecimal.ZERO;
-                BigDecimal cbsAmt2 = ccPrjCostOverviewNow.getCbs2Amt() != null ? ccPrjCostOverviewNow.getCbs2Amt() : BigDecimal.ZERO;
-                bidAmtInCbs = bidAmtInCbs.add(cbsAmt2);
-
-                int comparisonResult = nowBidAmt.compareTo(bidAmtInCbs);
-                if (comparisonResult > 0) {
-                    throw new BaseException("已招标金额大于概算金额！");
-                }
+//                BigDecimal bidAmtInCbs = BigDecimal.ZERO;
+//                BigDecimal cbsAmt2 = ccPrjCostOverviewNow.getCbs2Amt() != null ? ccPrjCostOverviewNow.getCbs2Amt() : BigDecimal.ZERO;
+//                bidAmtInCbs = bidAmtInCbs.add(cbsAmt2);
+//
+//                int comparisonResult = nowBidAmt.compareTo(bidAmtInCbs);
+//                if (comparisonResult > 0) {
+//                    throw new BaseException("已招标金额大于概算金额！");
+//                }
                 ccPrjCostOverviewNow.updateById();
 
                 // 4.生成此次更新招标关联记录
@@ -1313,11 +1315,12 @@ public class StructNodeExt {
             String ccPrjCostOverviewId = ccPrjCostOverview.getId();
 
             // 3.对比已招标金额和已采购金额，若已采购金额大于已招标金额则提示
+            // 2024/08/30 产品要求取消这条逻辑（安徽）
             // 比较PurchaseAmtSum和bidAmt
-            int comparisonResult = purchaseAmtInBidSum.compareTo(bidAmt);
-            if (comparisonResult > 0) {
-                throw new BaseException("合同额大于已招标额！");
-            }
+//            int comparisonResult = purchaseAmtInBidSum.compareTo(bidAmt);
+//            if (comparisonResult > 0) {
+//                throw new BaseException("合同额大于已招标额！");
+//            }
 
             // 4.存储成本统览关联明细
             CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
@@ -1386,12 +1389,13 @@ public class StructNodeExt {
                 ccPrjCostOverviewNow.setPurchaseAmt(nowBidAmt);
                 // 3.1比较已采购金额是否大于已招标金额
                 // 3.1.1查询项目成本统览此成本科目的已招标金额
-                BigDecimal bidAmt = ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO;
+                // 2024/08/30 产品要求取消这条逻辑（安徽）
+//                BigDecimal bidAmt = ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO;
 
-                int comparisonResult = nowBidAmt.compareTo(bidAmt);
-                if (comparisonResult > 0) {
-                    throw new BaseException("合同额大于已招标金额！");
-                }
+//                int comparisonResult = nowBidAmt.compareTo(bidAmt);
+//                if (comparisonResult > 0) {
+//                    throw new BaseException("合同额大于已招标金额！");
+//                }
                 ccPrjCostOverviewNow.updateById();
 
                 // 4.生成此次更新采购关联记录
@@ -1567,10 +1571,11 @@ public class StructNodeExt {
             BigDecimal nowBidAmt = purchaseAmtInBid1.add(trxAmt);
             ccPrjCostOverviewNow.setPurchaseAmt(nowBidAmt);
 
-            int comparisonResult = nowBidAmt.compareTo(ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO);
-            if (comparisonResult > 0) {
-                throw new BaseException("合同额大于已招标金额！");
-            }
+            // 2024/08/30 产品要求取消这条逻辑（安徽）
+//            int comparisonResult = nowBidAmt.compareTo(ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO);
+//            if (comparisonResult > 0) {
+//                throw new BaseException("合同额大于已招标金额！");
+//            }
             ccPrjCostOverviewNow.updateById();
 
             // 4.生成此次更新采购关联记录
@@ -1653,11 +1658,12 @@ public class StructNodeExt {
             String ccPrjCostOverviewId = ccPrjCostOverview.getId();
 
             // 3.对比已采购金额和已完成产值金额，若已完成产值金额大于已采购金额则提示
+            // 2024/08/30 产品要求取消这个逻辑（安徽）
             // 比较completeAmtInPoSum和purchaseAmtInBid
-            int comparisonResult = completeAmtInPoSum.compareTo(purchaseAmtInBid);
-            if (comparisonResult > 0) {
-                throw new BaseException("已完成产值金额大于合同额！");
-            }
+//            int comparisonResult = completeAmtInPoSum.compareTo(purchaseAmtInBid);
+//            if (comparisonResult > 0) {
+//                throw new BaseException("已完成产值金额大于合同额！");
+//            }
 
             // 4.存储成本统览关联明细
             CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
@@ -1716,12 +1722,13 @@ public class StructNodeExt {
                 BigDecimal nowCompleteAmt = completeAmtInBid1.add(trxAmt);
                 ccPrjCostOverviewNow.setCompleteAmt(nowCompleteAmt);
                 // 3.1比较已完成产值金额是否大于已招标金额
-                BigDecimal bidAmt = ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO;
-
-                int comparisonResult = nowCompleteAmt.compareTo(bidAmt);
-                if (comparisonResult > 0) {
-                    throw new BaseException("已完成产值金额大于已招标金额！");
-                }
+                // 2024/08/30 产品要求取消这条逻辑（安徽）
+//                BigDecimal bidAmt = ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO;
+//
+//                int comparisonResult = nowCompleteAmt.compareTo(bidAmt);
+//                if (comparisonResult > 0) {
+//                    throw new BaseException("已完成产值金额大于已招标金额！");
+//                }
                 ccPrjCostOverviewNow.updateById();
 
                 // 4.生成此次更新产值关联记录
@@ -1880,12 +1887,13 @@ public class StructNodeExt {
                 BigDecimal nowBidAmt = purchaseAmtInBid1.add(trxAmt);
                 ccPrjCostOverviewNow.setPurchaseAmt(nowBidAmt);
                 // 3.1比较已采购金额是否大于已招标金额
-                BigDecimal bidAmt = ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO;
-
-                int comparisonResult = nowBidAmt.compareTo(bidAmt);
-                if (comparisonResult > 0) {
-                    throw new BaseException("合同额大于已招标金额！");
-                }
+                // 2024/08/30 产品要求取消这条逻辑（安徽）
+//                BigDecimal bidAmt = ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO;
+//
+//                int comparisonResult = nowBidAmt.compareTo(bidAmt);
+//                if (comparisonResult > 0) {
+//                    throw new BaseException("合同额大于已招标金额！");
+//                }
                 ccPrjCostOverviewNow.updateById();
 
                 // 4.生成此次更新支付申请关联记录
