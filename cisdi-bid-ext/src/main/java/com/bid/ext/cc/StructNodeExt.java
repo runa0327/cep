@@ -1952,9 +1952,9 @@ public class StructNodeExt {
 
             Map<String, Object> valueMap = entityRecord.valueMap;
             String ccPayReqId = ccPay.getCcPayReqId(); // 变更前申请
-            String ccPayReqIdAft = JdbcMapUtil.getString(valueMap, "CC_PAY_REQ"); // 变更后申请
+            String ccPayReqIdAft = JdbcMapUtil.getString(valueMap, "CC_PAY_REQ_ID"); // 变更后申请
             String ccPoId = ccPay.getCcPoId(); // 变更前合同
-            String ccPoIdAft = JdbcMapUtil.getString(valueMap, "CC_PO"); // 变更后合同
+            String ccPoIdAft = JdbcMapUtil.getString(valueMap, "CC_PO_ID"); // 变更后合同
             BigDecimal trxAmt = ccPay.getTrxAmt(); // 更新前支付记录金额
             BigDecimal trxAmtAft = new BigDecimal(JdbcMapUtil.getString(valueMap, "TRX_AMT"));// 更新后支付记录金额
 
