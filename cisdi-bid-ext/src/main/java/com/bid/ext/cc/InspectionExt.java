@@ -33,20 +33,20 @@ public class InspectionExt {
     public void checkRectifyDate() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            // 巡检时间
-            LocalDate ccQsInspectionTime = LocalDate.parse(valueMap.get("CC_QS_INSPECTION_TIME").toString());
+
+            entityRecord.extraEditableAttCodeList = new ArrayList<>();
+            entityRecord.extraEditableAttCodeList.add("CC_QS_RECTIFY_TIME");
+            entityRecord.extraEditableAttCodeList.add("CC_QS_RECTIFY_IMG");
 
             // 检查整改时间是否为空
-            Object rectifyTimeObject = valueMap.get("CC_QS_RECTIFY_TIME");
-            if (rectifyTimeObject == null) {
-                throw new BaseException("请从工作台提交整改！");
+            LocalDate rectifyTimeObject = JdbcMapUtil.getLocalDate(valueMap, "CC_QS_RECTIFY_TIME");
+            if (SharedUtil.isEmpty(rectifyTimeObject)) {
+                break;
             }
-
-            // 整改时间
-            LocalDate ccQsRectifyTime = LocalDate.parse(rectifyTimeObject.toString());
-
+            // 巡检时间
+            LocalDate ccQsInspectionTime = JdbcMapUtil.getLocalDate(valueMap, "CC_QS_INSPECTION_TIME");
             // 检查整改时间是否早于巡检时间
-            if (ccQsRectifyTime.isBefore(ccQsInspectionTime)) {
+            if (rectifyTimeObject.isBefore(ccQsInspectionTime)) {
                 throw new BaseException("整改时间早于巡检时间！");
             }
         }
