@@ -1957,12 +1957,11 @@ public class StructNodeExt {
             String ccPoIdAft = JdbcMapUtil.getString(valueMap, "CC_PO"); // 变更后合同
             BigDecimal trxAmt = ccPay.getTrxAmt(); // 更新前支付记录金额
             BigDecimal trxAmtAft = new BigDecimal(JdbcMapUtil.getString(valueMap, "TRX_AMT"));// 更新后支付记录金额
-            CcPo ccPoAft = CcPo.selectById(ccPoIdAft);
-            CcPayReq ccPayReqAft = CcPayReq.selectById(ccPayReqIdAft);
 
             if (ccPayReqId == null) {
                 // 原支付记录绑定合同，未绑定支付申请
                 if (ccPayReqIdAft == null) {
+                    CcPo ccPoAft = CcPo.selectById(ccPoIdAft);
                     // 判断合同是否改变
                     if (!ccPoId.equals(ccPoIdAft)) {
                         // 2024/8/30 支付合同变更逻辑
@@ -1980,6 +1979,7 @@ public class StructNodeExt {
                 } else {
                     // 支付记录由绑定合同改为绑定支付申请
                     // 2024/8/30 判断改变后的支付记录是否合法
+                    CcPayReq ccPayReqAft = CcPayReq.selectById(ccPayReqIdAft);
                     BigDecimal resAmt = queryPayReqResAmt(ccPayReqAft);
                     if (resAmt.compareTo(trxAmtAft) < 0) {
                         throw new BaseException("所选支付申请剩余金额小于支付记录金额！");
@@ -1988,6 +1988,7 @@ public class StructNodeExt {
             } else {
                 // 原支付记录绑定支付申请，未绑定合同
                 if (ccPayReqIdAft != null) {
+                    CcPayReq ccPayReqAft = CcPayReq.selectById(ccPayReqIdAft);
                     // 仍然绑定的是支付申请，判断是否改变
                     if (!ccPayReqIdAft.equals(ccPayReqId)) {
                         // 2024/8/30 支付申请变更逻辑
@@ -2005,6 +2006,7 @@ public class StructNodeExt {
                 } else {
                     // 支付记录由绑定支付申请改为绑定支合同
                     // 2024/8/30 判断改变后的支付记录是否合法
+                    CcPo ccPoAft = CcPo.selectById(ccPoIdAft);
                     BigDecimal resAmt = queryPoResAmt(ccPoAft);
                     if (resAmt.compareTo(trxAmtAft) < 0) {
                         throw new BaseException("所选合同剩余金额小于支付记录金额！");
