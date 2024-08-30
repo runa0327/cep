@@ -1951,19 +1951,41 @@ public class StructNodeExt {
             CcPay ccPay = CcPay.selectById(csCommId);
             String ccPrjId = ccPay.getCcPrjId();
             BigDecimal trxAmt = ccPay.getTrxAmt();
-
             String ccPayReqId = ccPay.getCcPayReqId();
             String ccPoId = ccPay.getCcPoId();
             String ccPrjCbsTempalteNodeId = null;
             if (ccPayReqId == null) {
                 CcPo ccPo = CcPo.selectById(ccPoId);
                 ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
+                BigDecimal resPayAmt = new BigDecimal(ccPo.getTrxAmt().toString());
+                List<CcPayReq> ccPayReqs = CcPayReq.selectByWhere(new Where().eq(CcPayReq.Cols.CC_PO_ID, ccPoId).eq(CcPayReq.Cols.STATUS, "AP"));
+                for (CcPayReq ccPayReq : ccPayReqs) {
+                    resPayAmt = resPayAmt.subtract(ccPayReq.getTrxAmt());
+                }
+                List<CcPay> ccPays = CcPay.selectByWhere(new Where().eq(CcPay.Cols.CC_PO_ID, ccPoId));
+                for (CcPay pay : ccPays) {
+                    resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
+                }
+                // 插入后调用扩展，所以已经减去当前插入的记录值
+                if (resPayAmt.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new BaseException("此次支付金额>所关联合同剩余合同额");
+                }
             } else {
                 CcPayReq ccPayReq = CcPayReq.selectById(ccPayReqId);
                 ccPrjCbsTempalteNodeId = ccPayReq.getCcPrjCbsTempalteNodeId();
+                BigDecimal resPayAmt = new BigDecimal(ccPayReq.getTrxAmt().toString());
+                List<CcPay> ccPays = CcPay.selectByWhere(new Where().eq(CcPay.Cols.CC_PAY_REQ_ID, ccPayReqId));
+                for (CcPay pay : ccPays) {
+                    resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
+                }
+                // 插入后调用扩展，所以已经减去当前插入的记录值
+                if (resPayAmt.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new BaseException("此次支付金额>所关联支付申请剩余申请额");
+                }
             }
             ccPay.setCcPrjCbsTempalteNodeId(ccPrjCbsTempalteNodeId);
             ccPay.updateById();
+
             BigDecimal payAmtInReqSum = trxAmt;
             // 1.查询项目此成本科目已支付金额
             CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjCbsTempalteNodeId)).get(0);
@@ -1971,12 +1993,11 @@ public class StructNodeExt {
             payAmtInReqSum = payAmtInReqSum.add(payAmtInReq);
 
             // 2.查询项目已申请支付金额
-            BigDecimal reqPayAmtInPo = ccPrjCostOverview.getReqPayAmt() != null ? ccPrjCostOverview.getReqPayAmt() : BigDecimal.ZERO;
-
+//            BigDecimal reqPayAmtInPo = ccPrjCostOverview.getReqPayAmt() != null ? ccPrjCostOverview.getReqPayAmt() : BigDecimal.ZERO;
             // 3.对比已支付金额和已申请支付金额，若已支付金额大于已申请支付金额则提示
-            if (payAmtInReqSum.compareTo(reqPayAmtInPo) > 0) {
-                throw new BaseException("此次支付金额>（合同额-已支付额）");
-            }
+//            if (payAmtInReqSum.compareTo(reqPayAmtInPo) > 0) {
+//                throw new BaseException("此次支付金额>（合同额-已支付额）");
+//            }
 
             // 4.存储成本统览关联明细
             CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
