@@ -1966,8 +1966,8 @@ public class StructNodeExt {
                 for (CcPay pay : ccPays) {
                     resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
                 }
-                // 插入后调用扩展，所以包括当前记录
-                if (trxAmt.compareTo(BigDecimal.ZERO) > 0) {
+                // 插入后调用扩展，所以已经减去当前插入的记录值
+                if (resPayAmt.compareTo(BigDecimal.ZERO) < 0) {
                     throw new BaseException("此次支付金额>所关联合同剩余合同额");
                 }
             } else {
@@ -1978,8 +1978,8 @@ public class StructNodeExt {
                 for (CcPay pay : ccPays) {
                     resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
                 }
-                // 插入后调用扩展，所以包括当前记录
-                if (trxAmt.compareTo(BigDecimal.ZERO) > 0) {
+                // 插入后调用扩展，所以已经减去当前插入的记录值
+                if (resPayAmt.compareTo(BigDecimal.ZERO) < 0) {
                     throw new BaseException("此次支付金额>所关联支付申请剩余申请额");
                 }
             }
