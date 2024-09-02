@@ -1296,11 +1296,12 @@ public class StructNodeExt {
             // 本次合同项目，金额，成本科目
             CcPo ccPo = CcPo.selectById(csCommId);
             String ccPrjId = ccPo.getCcPrjId();
-            BigDecimal trxAmt = ccPo.getTrxAmt();
+            BigDecimal trxAmt = ccPo.getTrxAmtInit();
             String ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
 
             // 0.填入初始合同金额
             ccPo.setTrxAmtInit(trxAmt);
+            ccPo.setTrxAmt(trxAmt);
             ccPo.updateById();
 
             BigDecimal purchaseAmtInBidSum = trxAmt;
