@@ -8,8 +8,13 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.SharedConstants;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.ViewNavExtResult;
 import com.qygly.shared.util.EntityRecordUtil;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class WfExt {
 
@@ -77,5 +82,29 @@ public class WfExt {
             String id = EntityRecordUtil.getId(entityRecord);
             myJdbcTemplate.update("update " + entCode + " t set t.status=?,t.ver=t.ver+1,t.ts=now() where t.id=?", status.toString(), id);
         });
+    }
+
+    /**
+     * 工作台跳转时设置记录对应项目扩展
+     * 从工作台跳转进入具体记录时，设置全局变量P_CC_PRJ_IDS的值。
+     */
+    public void setPrj() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT ENTITY_RECORD_ID, ENT.CODE FROM (SELECT T.ID AS ID,P.ID AS WF_PROCESS_ID,P.EXTRA_INFO EXTRA_INFO,PI.ID AS WF_PROCESS_INSTANCE_ID,PI.NAME AS WF_PROCESS_INSTANCE_NAME,PI.START_USER_ID AS PI_START_USER_ID,PI.START_DATETIME AS PI_START_DT,PI.END_DATETIME AS PI_END_DT,PI.IS_URGENT,PI.TS PI_TS,NI.SEQ_NO AS NI_SEQ_NO,NI.NAME AS NI_NAME,N.ID AS WF_NODE_ID,N.NAME AS WF_NODE_NAME,N.AD_VIEW_ID AS WF_NODE_VIEW_ID,NI_ACT.ID AS NI_EFF_ACT_ID,T.WF_TASK_TYPE_ID AS WF_TASK_TYPE_ID,T.ID AS WF_TASK_ID,T.RECEIVE_DATETIME AS TASK_REC_DT,T.VIEW_DATETIME AS TASK_VIEW_DT,T.ACT_DATETIME AS TASK_ACT_DT,T.SEQ_NO AS TASK_SEQ_NO,U.ID AS TASK_USER_ID,TASK_ACT.ID AS TASK_ACT_ID,T.USER_COMMENT AS TASK_USER_COMMENT,T.USER_ATTACHMENT AS TASK_USER_ATTACHMENT,T.IS_CLOSED AS TASK_IS_CLOSED,T.IN_CURRENT_ROUND AS TASK_IN_CURRENT_ROUND,T.IS_PROC_INST_FIRST_TODO_TASK,T.IS_USER_LAST_CLOSED_TODO_TASK,PI.AD_ENT_ID AS AD_ENT_ID,PI.ENT_CODE AS ENT_CODE,PI.ENTITY_RECORD_ID AS ENTITY_RECORD_ID,PI.CURRENT_NODE_ID AS CURRENT_NODE_ID,PI.CURRENT_NI_ID AS CURRENT_WF_NODE_INSTANCE_ID,PI.CURRENT_NI_ID AS CURRENT_NI_ID,CURRENT_NODE_INSTANCE.START_DATETIME CURRENT_NI_START_DT,CURRENT_NODE_INSTANCE.END_DATETIME CURRENT_NI_END_DT,PI.CURRENT_TODO_USER_IDS FROM WF_PROCESS P JOIN WF_PROCESS_INSTANCE PI ON P.STATUS IN ('AP','VDING') AND P.ID=PI.WF_PROCESS_ID AND PI.STATUS='AP' JOIN WF_NODE_INSTANCE NI ON PI.ID=NI.WF_PROCESS_INSTANCE_ID AND NI.STATUS='AP' JOIN WF_NODE N ON NI.WF_NODE_ID=N.ID AND N.STATUS='AP' JOIN WF_TASK T ON NI.ID=T.WF_NODE_INSTANCE_ID AND T.STATUS='AP' JOIN AD_USER U ON T.AD_USER_ID=U.ID LEFT JOIN AD_ACT TASK_ACT ON T.AD_ACT_ID=TASK_ACT.ID LEFT JOIN AD_ACT NI_ACT ON NI.EFFECTIVE_ACT_ID=NI_ACT.ID JOIN WF_NODE_INSTANCE CURRENT_NODE_INSTANCE ON PI.CURRENT_NI_ID=CURRENT_NODE_INSTANCE.ID) WF_FLOW_INFO_V, ad_ent ENT WHERE WF_FLOW_INFO_V.AD_ENT_ID = ENT.ID AND WF_FLOW_INFO_V.ID = ?"
+                    , csCommId);
+            String entityRecordId = JdbcMapUtil.getString(map, "ENTITY_RECORD_ID");
+            String code = JdbcMapUtil.getString(map, "CODE");
+            String sql = "SELECT CC_PRJ_ID FROM " + code + " WHERE ID = " + entityRecordId;
+            Map<String, Object> map1 = myJdbcTemplate.queryForMap(sql);
+            String ccPrjId = JdbcMapUtil.getString(map1, "CC_PRJ_ID");
+            if (null != ccPrjId) {
+                ViewNavExtResult result = new ViewNavExtResult();
+                result.changedGlobalVarMap = new LinkedHashMap<>();
+                result.changedGlobalVarMap.put("P_CC_PRJ_IDS", ccPrjId);
+                ExtJarHelper.setReturnValue(result);
+            }
+        }
     }
 }
