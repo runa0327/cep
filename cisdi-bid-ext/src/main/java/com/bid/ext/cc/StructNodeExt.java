@@ -2144,12 +2144,16 @@ public class StructNodeExt {
         String ccPoId = ccPo.getId();
         BigDecimal resPayAmt = new BigDecimal(ccPo.getTrxAmt().toString());
         List<CcPayReq> ccPayReqs = CcPayReq.selectByWhere(new Where().eq(CcPayReq.Cols.CC_PO_ID, ccPoId).eq(CcPayReq.Cols.STATUS, "AP"));
-        for (CcPayReq ccPayReq : ccPayReqs) {
-            resPayAmt = resPayAmt.subtract(ccPayReq.getTrxAmt());
+        if (null != ccPayReqs) {
+            for (CcPayReq ccPayReq : ccPayReqs) {
+                resPayAmt = resPayAmt.subtract(ccPayReq.getTrxAmt());
+            }
         }
         List<CcPay> ccPays = CcPay.selectByWhere(new Where().eq(CcPay.Cols.CC_PO_ID, ccPoId));
-        for (CcPay pay : ccPays) {
-            resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
+        if (null != ccPays) {
+            for (CcPay pay : ccPays) {
+                resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
+            }
         }
         return resPayAmt;
     }
@@ -2163,8 +2167,10 @@ public class StructNodeExt {
         String ccPayReqId = ccPayReq.getId();
         BigDecimal resPayAmt = new BigDecimal(ccPayReq.getTrxAmt().toString());
         List<CcPay> ccPays = CcPay.selectByWhere(new Where().eq(CcPay.Cols.CC_PAY_REQ_ID, ccPayReqId));
-        for (CcPay pay : ccPays) {
-            resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
+        if (null != ccPays) {
+            for (CcPay pay : ccPays) {
+                resPayAmt = resPayAmt.subtract(pay.getTrxAmt());
+            }
         }
         return resPayAmt;
     }
