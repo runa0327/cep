@@ -283,23 +283,26 @@ public class DocExt {
             ccDocFile.setIsDefault(false);
             ccDocFile.setIsFavorites(false);
 
-            dspName = dspName.toLowerCase();
-            String fileType = null;
-            if (dspName.endsWith("rar") || dspName.endsWith("7z") || dspName.endsWith("tar") || dspName.endsWith("gzip") || dspName.endsWith("bzip2") || dspName.endsWith("iso")) {
-                fileType = "ARCHIVE";
-            } else if (dspName.endsWith("rvt") || dspName.endsWith("ifc") || dspName.endsWith("bimx") || dspName.endsWith("pln")) {
-                fileType = "BIM";
-            } else if (dspName.endsWith("dwg") || dspName.endsWith("dxf") || dspName.endsWith("cad") || dspName.endsWith("stl")) {
-                fileType = "CAD";
-            } else if (dspName.endsWith("xls") || dspName.endsWith("xlsx") || dspName.endsWith("doc") || dspName.endsWith("docx")) {
-                fileType = "DOC";
-            } else if (dspName.endsWith("mp4") || dspName.endsWith("avi") || dspName.endsWith("mov") || dspName.endsWith("wmv") || dspName.endsWith("flv") || dspName.endsWith("mkv") || dspName.endsWith("webm") || dspName.endsWith("wp3") || dspName.endsWith("wav")) {
-                fileType = "MEDIA";
-            } else if (dspName.endsWith("vrml") || dspName.endsWith("obj") || dspName.endsWith("fbx") || dspName.endsWith("dae")) {
-                fileType = "VR"; // todo 从资料文档批量上传VR的时候没有生成缩略图
-            } else {
-                continue; // todo 确认非法格式的逻辑是什么，前端过滤还是后端过滤，文件类型如何设置
-            }
+            String sql = "SELECT IFNULL((SELECT ID FROM CC_DOC_FILE_TYPE WHERE FILE_EXTENSION like CONCAT('%', (SELECT EXT FROM FL_FILE WHERE ID = ?), '%')), 'OTHER') ID";
+            Map<String, Object> map = ExtJarHelper.getMyJdbcTemplate().queryForMap(sql, attachmentId);
+
+//            dspName = dspName.toLowerCase();
+            String fileType = JdbcMapUtil.getString(map, "ID");
+//            if (dspName.endsWith("rar") || dspName.endsWith("7z") || dspName.endsWith("tar") || dspName.endsWith("gzip") || dspName.endsWith("bzip2") || dspName.endsWith("iso")) {
+//                fileType = "ARCHIVE";
+//            } else if (dspName.endsWith("rvt") || dspName.endsWith("ifc") || dspName.endsWith("bimx") || dspName.endsWith("pln")) {
+//                fileType = "BIM";
+//            } else if (dspName.endsWith("dwg") || dspName.endsWith("dxf") || dspName.endsWith("cad") || dspName.endsWith("stl")) {
+//                fileType = "CAD";
+//            } else if (dspName.endsWith("xls") || dspName.endsWith("xlsx") || dspName.endsWith("doc") || dspName.endsWith("docx")) {
+//                fileType = "DOC";
+//            } else if (dspName.endsWith("mp4") || dspName.endsWith("avi") || dspName.endsWith("mov") || dspName.endsWith("wmv") || dspName.endsWith("flv") || dspName.endsWith("mkv") || dspName.endsWith("webm") || dspName.endsWith("wp3") || dspName.endsWith("wav")) {
+//                fileType = "MEDIA";
+//            } else if (dspName.endsWith("vrml") || dspName.endsWith("obj") || dspName.endsWith("fbx") || dspName.endsWith("dae")) {
+//                fileType = "VR"; // todo 从资料文档批量上传VR的时候没有生成缩略图
+//            } else {
+//                continue; // todo 确认非法格式的逻辑是什么，前端过滤还是后端过滤，文件类型如何设置
+//            }
 
             ccDocFile.setCcDocFileTypeId(fileType);
             ccDocFile.setCcDocDirId(ccDocDirId);
