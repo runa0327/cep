@@ -24,4 +24,21 @@ public class CcSpotExamiExt {
             }
         }
     }
+
+    /**
+     * 获取现场检查参与人
+     */
+    public void getSpotExamiAttendUser() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcSpotExami ccSpotExami = CcSpotExami.selectById(csCommId);
+            String attendUserIds = ccSpotExami.getAttendUserIds();
+            if (attendUserIds != null && !attendUserIds.isEmpty()) {
+                String[] userIds = attendUserIds.split(",");
+                ArrayList<String> userIdList = new ArrayList<>(Arrays.asList(userIds));
+                ExtJarHelper.setReturnValue(userIdList);
+            }
+        }
+    }
 }
