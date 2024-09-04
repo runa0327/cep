@@ -1,12 +1,12 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.AdUser;
-import com.bid.ext.model.CcPartyCompanyPost;
-import com.bid.ext.model.CcPrjMember;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.DrivenInfo;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -107,4 +107,147 @@ public class MemberExt {
             throw new BaseException("请先创建岗位");
         }
     }
+
+    /**
+     * 更新前扩展，更新项目参建方的【参建方】属性时同步更新项目参建方公司、项目参建方公司岗位、项目成员的【参建方】属性
+     */
+    public void updateCcPartyId() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcPrjParty ccPrjPartyBefore = CcPrjParty.selectById(csCommId);
+            String ccPrjIdAft = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            if (!(ccPrjIdAft == null ? "" : ccPrjIdAft).equals(ccPrjPartyBefore.getCcPrjId())) {
+                throw new BaseException("不能修改参项目参建方所属项目！");
+            }
+
+            String ccPartyIdAft = JdbcMapUtil.getString(valueMap, "CC_PARTY_ID");
+            String ccPartyIdBefore = ccPrjPartyBefore.getCcPartyId();
+            if (!(ccPartyIdAft.equals(ccPartyIdBefore))) {
+                // 更新项目参建方公司的【参建方】属性
+                List<CcPartyCompany> ccPartyCompanies = CcPartyCompany.selectByWhere(new Where().eq(CcPartyCompany.Cols.CC_PRJ_PARTY_ID, csCommId).eq(CcPartyCompany.Cols.CC_PRJ_ID, ccPrjIdAft));
+                if (ccPartyCompanies != null) {
+                    for (CcPartyCompany ccPartyCompany : ccPartyCompanies) {
+                        ccPartyCompany.setCcPartyId(ccPartyIdAft);
+                        ccPartyCompany.updateById();
+                    }
+                }
+
+
+                // 更新项目参建方公司岗位的【参建方】属性
+                List<CcPartyCompanyPost> ccPartyCompanyPosts = CcPartyCompanyPost.selectByWhere(new Where().eq(CcPartyCompanyPost.Cols.CC_PRJ_PARTY_ID, csCommId).eq(CcPartyCompanyPost.Cols.CC_PRJ_ID, ccPrjIdAft));
+                if (ccPartyCompanyPosts != null) {
+                    for (CcPartyCompanyPost ccPartyCompanyPost : ccPartyCompanyPosts) {
+                        ccPartyCompanyPost.setCcPartyId(ccPartyIdAft);
+                        ccPartyCompanyPost.updateById();
+                    }
+                }
+
+
+
+                // 更新项目成员的【参建方】属性
+                List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(new Where().eq(CcPrjMember.Cols.CC_PRJ_PARTY_ID, csCommId).eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjIdAft));
+                if (ccPrjMembers != null) {
+                    for (CcPrjMember ccPrjMember : ccPrjMembers) {
+                        ccPrjMember.setCcPartyId(ccPartyIdAft);
+                        ccPrjMember.updateById();
+                    }
+                }
+
+                InvokeActResult invokeActResult = new InvokeActResult();
+                invokeActResult.reFetchData = true;
+                ExtJarHelper.setReturnValue(invokeActResult);
+            }
+        }
+
+    }
+
+    /**
+     * 更新前扩展，更新项目参建方公司的【公司】属性时同步更新项目参建方公司岗位、项目成员的【公司】属性
+     */
+    public void updateCcCompanyId() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcPartyCompany ccPartyCompanyBefore = CcPartyCompany.selectById(csCommId);
+            String ccPrjIdAft = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            if (!(ccPrjIdAft == null ? "" : ccPrjIdAft).equals(ccPartyCompanyBefore.getCcPrjId())) {
+                throw new BaseException("不能修改项目参建方公司所属项目！");
+            }
+
+            String ccCompanyIdAft = JdbcMapUtil.getString(valueMap, "CC_COMPANY_ID");
+            String ccCompanyIdBefore = ccPartyCompanyBefore.getCcCompanyId();
+            if (!(ccCompanyIdAft.equals(ccCompanyIdBefore))) {
+                // 更新项目参建方公司岗位的【公司】属性
+                List<CcPartyCompanyPost> ccPartyCompanyPosts = CcPartyCompanyPost.selectByWhere(
+                        new Where()
+                                .eq(CcPartyCompanyPost.Cols.CC_PARTY_COMPANY_ID, csCommId)
+                                .eq(CcPartyCompanyPost.Cols.CC_PRJ_ID, ccPrjIdAft)
+                );
+                if (ccPartyCompanyPosts != null) {
+                    for (CcPartyCompanyPost ccPartyCompanyPost : ccPartyCompanyPosts) {
+                        ccPartyCompanyPost.setCcCompanyId(ccCompanyIdAft);
+                        ccPartyCompanyPost.updateById();
+                    }
+                }
+
+                // 更新项目成员的【公司】属性
+                List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(
+                        new Where()
+                                .eq(CcPrjMember.Cols.CC_PARTY_COMPANY_ID, csCommId)
+                                .eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjIdAft)
+                );
+                if (ccPrjMembers != null) {
+                    for (CcPrjMember ccPrjMember : ccPrjMembers) {
+                        ccPrjMember.setCcCompanyId(ccCompanyIdAft);
+                        ccPrjMember.updateById();
+                    }
+                }
+
+                InvokeActResult invokeActResult = new InvokeActResult();
+                invokeActResult.reFetchData = true;
+                ExtJarHelper.setReturnValue(invokeActResult);
+            }
+        }
+    }
+
+    /**
+     * 更新前扩展，更新项目参建方公司岗位的【岗位】属性时同步更新项目成员的【岗位】属性
+     */
+    public void updateCcPostId() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcPartyCompanyPost ccPartyCompanyPostBefore = CcPartyCompanyPost.selectById(csCommId);
+            String ccPrjIdAft = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            if (!(ccPrjIdAft == null ? "" : ccPrjIdAft).equals(ccPartyCompanyPostBefore.getCcPrjId())) {
+                throw new BaseException("不能修改项目参建方公司岗位所属项目！");
+            }
+
+            String ccPostIdAft = JdbcMapUtil.getString(valueMap, "CC_POST_ID");
+            String ccPostIdBefore = ccPartyCompanyPostBefore.getCcPostId();
+            if (!(ccPostIdAft.equals(ccPostIdBefore))) {
+                // 更新项目成员的【岗位】属性
+                List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(
+                        new Where()
+                                .eq(CcPrjMember.Cols.CC_PARTY_COMPANY_POST_ID, csCommId)
+                                .eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjIdAft)
+                );
+                if (ccPrjMembers != null) {
+                    for (CcPrjMember ccPrjMember : ccPrjMembers) {
+                        ccPrjMember.setCcPostId(ccPostIdAft);
+                        ccPrjMember.updateById();
+                    }
+                }
+
+                InvokeActResult invokeActResult = new InvokeActResult();
+                invokeActResult.reFetchData = true;
+                ExtJarHelper.setReturnValue(invokeActResult);
+            }
+        }
+    }
+
 }
