@@ -2160,6 +2160,7 @@ public class StructNodeExt {
 
     /**
      * 查询数据库中支付申请剩余多少未绑定支付记录的金额
+     *
      * @param ccPayReq
      * @return
      */
@@ -2642,7 +2643,7 @@ public class StructNodeExt {
                 }
 
                 if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
-                    // 进展明细从原来计划改到新计划
+                    // 进展明细从原来计划改到新计划、指引从原来计划改到新计划
                     for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                         String rootId = ccPrjStructNode0.getId();
 
@@ -2653,12 +2654,20 @@ public class StructNodeExt {
 
                             // 获取此条计划的进展
                             List<CcPrjStructNodeProg> ccPrjStructNodeProgs = CcPrjStructNodeProg.selectByWhere(new Where().eq(CcPrjStructNodeProg.Cols.CC_PRJ_STRUCT_NODE_ID, id));
+                            // 获取此条计划的指引
+                            List<CcPrjStructNodeGuide> ccPrjStructNodeGuides = CcPrjStructNodeGuide.selectByWhere(new Where().eq(CcPrjStructNodeGuide.Cols.CC_PRJ_STRUCT_NODE_ID, id));
                             if (!SharedUtil.isEmpty(ccPrjStructNodes1)) {
                                 for (CcPrjStructNode ccPrjStructNode1 : ccPrjStructNodes1) {
                                     if (!SharedUtil.isEmpty(ccPrjStructNodeProgs)) {
                                         for (CcPrjStructNodeProg ccPrjStructNodeProg : ccPrjStructNodeProgs) {
                                             ccPrjStructNodeProg.setCcPrjStructNodeId(ccPrjStructNode1.getId());
                                             ccPrjStructNodeProg.updateById();
+                                        }
+                                    }
+                                    if (!SharedUtil.isEmpty(ccPrjStructNodeGuides)) {
+                                        for (CcPrjStructNodeGuide ccPrjStructNodeGuide : ccPrjStructNodeGuides) {
+                                            ccPrjStructNodeGuide.setCcPrjStructNodeId(ccPrjStructNode1.getId());
+                                            ccPrjStructNodeGuide.updateById();
                                         }
                                     }
                                 }
