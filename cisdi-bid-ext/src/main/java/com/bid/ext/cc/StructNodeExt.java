@@ -2700,9 +2700,18 @@ public class StructNodeExt {
                         String copyFromPrjStructNodeId = ccPrjStructNode1.getCopyFromPrjStructNodeId();
                         // 获取此条计划的进展
                         List<CcPrjStructNodeProg> ccPrjStructNodeProgs = CcPrjStructNodeProg.selectByWhere(new Where().eq(CcPrjStructNodeProg.Cols.CC_PRJ_STRUCT_NODE_ID, copyFromPrjStructNodeId));
+                        // 获取此条计划的指引
+                        List<CcPrjStructNodeGuide> ccPrjStructNodeGuides = CcPrjStructNodeGuide.selectByWhere(new Where().eq(CcPrjStructNodeGuide.Cols.CC_PRJ_STRUCT_NODE_ID, copyFromPrjStructNodeId));
                         if (!SharedUtil.isEmpty(ccPrjStructNodeProgs)) {
                             for (CcPrjStructNodeProg ccPrjStructNodeProg : ccPrjStructNodeProgs) {
                                 ccPrjStructNodeProg.setCcPrjStructNodeId(ccPrjStructNode1.getId());
+                                ccPrjStructNodeProg.updateById();
+                            }
+                        }
+                        if (!SharedUtil.isEmpty(ccPrjStructNodeGuides)) {
+                            for (CcPrjStructNodeGuide ccPrjStructNodeGuide : ccPrjStructNodeGuides) {
+                                ccPrjStructNodeGuide.setCcPrjStructNodeId(ccPrjStructNode1.getId());
+                                ccPrjStructNodeGuide.updateById();
                             }
                         }
                         ccPrjStructNode1.setStatus(StatusE.AP.toString());
