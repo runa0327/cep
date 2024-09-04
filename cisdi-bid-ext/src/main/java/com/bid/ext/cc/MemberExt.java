@@ -112,6 +112,7 @@ public class MemberExt {
      * 更新前扩展，更新项目参建方的【参建方】属性时同步更新项目参建方公司、项目参建方公司岗位、项目成员的【参建方】属性
      */
     public void updateCcPartyId() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             Map<String, Object> valueMap = entityRecord.valueMap;
@@ -125,6 +126,17 @@ public class MemberExt {
             String ccPartyIdAft = JdbcMapUtil.getString(valueMap, "CC_PARTY_ID");
             String ccPartyIdBefore = ccPrjPartyBefore.getCcPartyId();
             if (!(ccPartyIdAft.equals(ccPartyIdBefore))) {
+                List<CcPrjParty> ccPrjParties = CcPrjParty.selectByWhere(
+                        new Where().eq(CcPrjParty.Cols.CC_PRJ_ID, ccPrjIdAft)
+                                .eq(CcPrjParty.Cols.CC_PARTY_ID, ccPartyIdAft)
+                );
+                if (ccPrjParties != null) {
+                    String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_PARTY WHERE ID = ?";
+                    Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccPartyIdAft);
+                    String name = JdbcMapUtil.getString(map, "NAME");
+                    throw new BaseException("参建方中已存在【" + name + "】");
+                }
+
                 // 更新项目参建方公司的【参建方】属性
                 List<CcPartyCompany> ccPartyCompanies = CcPartyCompany.selectByWhere(new Where().eq(CcPartyCompany.Cols.CC_PRJ_PARTY_ID, csCommId).eq(CcPartyCompany.Cols.CC_PRJ_ID, ccPrjIdAft));
                 if (ccPartyCompanies != null) {
@@ -167,6 +179,7 @@ public class MemberExt {
      * 更新前扩展，更新项目参建方公司的【公司】属性时同步更新项目参建方公司岗位、项目成员的【公司】属性
      */
     public void updateCcCompanyId() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             Map<String, Object> valueMap = entityRecord.valueMap;
@@ -180,6 +193,18 @@ public class MemberExt {
             String ccCompanyIdAft = JdbcMapUtil.getString(valueMap, "CC_COMPANY_ID");
             String ccCompanyIdBefore = ccPartyCompanyBefore.getCcCompanyId();
             if (!(ccCompanyIdAft.equals(ccCompanyIdBefore))) {
+                List<CcPartyCompany> ccPartyCompanies = CcPartyCompany.selectByWhere(
+                        new Where().eq(CcPartyCompany.Cols.CC_PRJ_ID, ccPrjIdAft)
+                                .eq(CcPartyCompany.Cols.CC_COMPANY_ID, ccCompanyIdAft)
+                                .eq(CcPartyCompany.Cols.CC_PRJ_PARTY_ID, JdbcMapUtil.getString(valueMap, "CC_PRJ_PARTY_ID"))
+                );
+                if (ccPartyCompanies != null) {
+                    String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_COMPANY WHERE ID = ?";
+                    Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccCompanyIdAft);
+                    String name = JdbcMapUtil.getString(map, "NAME");
+                    throw new BaseException("项目参建方公司中已存在【" + name + "】");
+                }
+
                 // 更新项目参建方公司岗位的【公司】属性
                 List<CcPartyCompanyPost> ccPartyCompanyPosts = CcPartyCompanyPost.selectByWhere(
                         new Where()
@@ -217,6 +242,7 @@ public class MemberExt {
      * 更新前扩展，更新项目参建方公司岗位的【岗位】属性时同步更新项目成员的【岗位】属性
      */
     public void updateCcPostId() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             Map<String, Object> valueMap = entityRecord.valueMap;
@@ -230,6 +256,18 @@ public class MemberExt {
             String ccPostIdAft = JdbcMapUtil.getString(valueMap, "CC_POST_ID");
             String ccPostIdBefore = ccPartyCompanyPostBefore.getCcPostId();
             if (!(ccPostIdAft.equals(ccPostIdBefore))) {
+                List<CcPartyCompanyPost> ccPartyCompanyPosts = CcPartyCompanyPost.selectByWhere(
+                        new Where().eq(CcPartyCompanyPost.Cols.CC_PRJ_ID, ccPrjIdAft)
+                                .eq(CcPartyCompanyPost.Cols.CC_POST_ID, ccPostIdAft)
+                                .eq(CcPartyCompanyPost.Cols.CC_PARTY_COMPANY_ID, JdbcMapUtil.getString(valueMap, "CC_PARTY_COMPANY_ID"))
+                );
+                if (ccPartyCompanyPosts != null) {
+                    String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_POST WHERE ID = ?";
+                    Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccPostIdAft);
+                    String name = JdbcMapUtil.getString(map, "NAME");
+                    throw new BaseException("项目参建方公司岗位中已存在【" + name + "】");
+                }
+
                 // 更新项目成员的【岗位】属性
                 List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(
                         new Where()
