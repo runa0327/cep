@@ -3,12 +3,12 @@ package com.bid.ext.cc;
 import cn.hutool.json.JSONObject;
 import com.bid.ext.model.CcCoTask;
 import com.bid.ext.model.CcCoTaskProg;
-import com.bid.ext.model.CcMeeting;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
@@ -140,13 +140,31 @@ public class CoTaskExt {
         String pAttachments = varMap.get("P_ATTACHMENTS") != null ? varMap.get("P_ATTACHMENTS").toString() : null;
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
             List<CcCoTaskProg> ccCoTaskProgs = CcCoTaskProg.selectByWhere(new Where().eq(CcCoTaskProg.Cols.CC_CO_TASK_ID, csCommId).eq(CcCoTaskProg.Cols.AD_USER_ID, userId));
             if (!SharedUtil.isEmpty(ccCoTaskProgs)) {
                 for (CcCoTaskProg ccCoTaskProg : ccCoTaskProgs) {
-                    ccCoTaskProg.setProgTime(LocalDateTime.now());
-                    ccCoTaskProg.setRemark(pRemark);
-                    ccCoTaskProg.setCcAttachments(pAttachments);
-                    ccCoTaskProg.updateById();
+                    //若此条进展时间为空，则更新
+                    LocalDateTime progTime = ccCoTaskProg.getProgTime();
+                    if (SharedUtil.isEmpty(progTime)) {
+                        ccCoTaskProg.setProgTime(LocalDateTime.now());
+                        ccCoTaskProg.setRemark(pRemark);
+                        ccCoTaskProg.setCcAttachments(pAttachments);
+                        ccCoTaskProg.updateById();
+                    } else {
+                        //若不为空，则新建一条
+                        CcCoTaskProg coTaskProg = CcCoTaskProg.newData();
+                        coTaskProg.setCcCoTaskId(csCommId);
+                        coTaskProg.setAdUserId(userId);
+                        coTaskProg.setCcPrjId(ccPrjId);
+                        coTaskProg.setIsChief(ccCoTaskProg.getIsChief());
+                        coTaskProg.setIsSupervise(ccCoTaskProg.getIsSupervise());
+                        coTaskProg.setRemark(pRemark);
+                        coTaskProg.setProgTime(LocalDateTime.now());
+                        coTaskProg.setCcAttachments(pAttachments);
+                        coTaskProg.insertById();
+                    }
                 }
             }
         }
