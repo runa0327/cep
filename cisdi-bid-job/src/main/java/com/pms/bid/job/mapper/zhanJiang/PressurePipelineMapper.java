@@ -2,6 +2,7 @@ package com.pms.bid.job.mapper.zhanJiang;
 
 import com.pms.bid.job.domain.zhanJiang.CcReviewProgress;
 import com.pms.bid.job.domain.zhanJiang.PressurePipeline;
+import com.pms.bid.job.domain.zhanJiang.YjwInstallProgress;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -72,4 +73,45 @@ public interface PressurePipelineMapper {
      * @return
      */
     int deleteReviewProgressFill(@Param("id") String id);
+
+    /**
+     * 查询安装进度状态填报列表
+     * @param id
+     * @return
+     */
+    List<YjwInstallProgress> selectInstallProgressByPipelineId(@Param("id") String id);
+
+    /**
+     * 安装进度周期结束时间
+     * @param fillDateTo
+     * @param id
+     * @return
+     */
+    int updateInstallProgressFillDateTo(@Param("fillDateTo") String fillDateTo,@Param("id") String id);
+
+    /**
+     * 删除安装进度填报
+     * @param id
+     * @return
+     */
+    int deleteInstallProgress(@Param("id") String id);
+
+    /**
+     * 新增安装进度填报记录
+     * @param pip
+     * @param date
+     * @param date1
+     * @param number
+     * @param id
+     * @param creteTime
+     * @param lastModiDt
+     * @param ts
+     * @param createBy
+     * @param status
+     * @return
+     */
+    int  insertInstallProgress(@Param("YJW_PRESSURE_PIPELINE_ID") String pip,@Param("start") Date date, @Param("end") Date date1, @Param("review") String number,@Param("id") String id,
+                          @Param("createTime") Date creteTime,@Param("lastModiDt") Date lastModiDt,@Param("ts") Long ts,@Param("createBy") String createBy,@Param("status") String status);
 }
+
+

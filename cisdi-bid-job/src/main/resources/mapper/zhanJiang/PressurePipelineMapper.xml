@@ -86,6 +86,17 @@
         <result column="REVIEW_IS_FILLED" property="isFilled"></result>
     </resultMap>
 
+    <resultMap id="installProgressMap" type="com.pms.bid.job.domain.zhanJiang.YjwInstallProgress">
+        <result column="ID" property="id"></result>
+        <result column="CRT_DT" property="crtDt"></result>
+        <result column="YJW_PRESSURE_PIPELINE_ID" property="yjwPressurePipelineId"></result>
+        <result column="REVIEW_IS_FILLED" property="reviewIsFilled"></result>
+        <result column="CC_SPECIAL_EQUIP_INSTALL_PROGRESS" property="ccSpecialEquipInstallProgress"></result>
+        <result column="INSTALL_FILL_DATE_FR" property="installFillDateFr"></result>
+        <result column="INSTALL_FILL_DATE_TO" property="installFillDateTo"></result>
+    </resultMap>
+
+
     <sql id="Base_Column_List">
                 ID,
                 VER,
@@ -266,4 +277,28 @@
     <delete id="deleteReviewProgressFill">
         delete from yjw_review_progress  where id = #{id}
     </delete>
+
+
+<!--    根据压力管道查询安装进度状态-->
+    <select id="selectInstallProgressByPipelineId" resultMap="installProgressMap">
+        select ID,CRT_DT,REVIEW_IS_FILLED,INSTALL_FILL_DATE_FR,INSTALL_FILL_DATE_TO,CC_SPECIAL_EQUIP_INSTALL_PROGRESS,YJW_PRESSURE_PIPELINE_ID  from yjw_install_progress where  YJW_PRESSURE_PIPELINE_ID = #{id}
+    </select>
+
+<!--    更新压力管道安装进度状态-->
+    <update id="updateInstallProgressFillDateTo">
+        update yjw_install_progress set INSTALL_FILL_DATE_FR = #{fillDateTo} where id  = #{id}
+    </update>
+
+    <!--    删除压力管道安装进度状态-->
+    <delete id="deleteInstallProgress">
+        delete from yjw_install_progress  where id = #{id}
+    </delete>
+
+<!--    插入压力管理安装进度填报-->
+    <insert id="insertInstallProgress">
+        insert into yjw_install_progress (ID,YJW_PRESSURE_PIPELINE_ID,INSTALL_FILL_DATE_FR,INSTALL_FILL_DATE_TO,REVIEW_IS_FILLED,
+                                         CRT_DT,LAST_MODI_DT,CRT_USER_ID,LAST_MODI_USER_ID,STATUS,VER)
+        values (#{id},#{YJW_PRESSURE_PIPELINE_ID},#{start},#{end},#{review},#{createTime},#{lastModiDt},#{createBy},#{createBy},#{status},1)
+    </insert>
+
 </mapper>
