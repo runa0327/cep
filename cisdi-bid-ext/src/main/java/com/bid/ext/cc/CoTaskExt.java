@@ -164,6 +164,7 @@ public class CoTaskExt {
                         coTaskProg.setProgTime(LocalDateTime.now());
                         coTaskProg.setCcAttachments(pAttachments);
                         coTaskProg.insertById();
+                        break;
                     }
                 }
             }
