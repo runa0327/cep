@@ -155,10 +155,11 @@ public class ZJReviewFillExt {
             }
         }
 
+        log.info("isCompleted："+isComplete);
 
         if (isComplete) {
             YjwPressurePipeline yjwPressurePipeline = YjwPressurePipeline.selectById(pipelineId);
-            if(yjwPressurePipeline.getYjwTask19()!=null) {
+            if(yjwPressurePipeline.getYjwTask9()!=null) {
                 //验证是否完成
                 WfTask wfTask = new WfTask();
                 wfTask.setId(yjwPressurePipeline.getYjwTask9());
