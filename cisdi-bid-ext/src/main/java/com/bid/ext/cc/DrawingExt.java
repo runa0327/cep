@@ -425,7 +425,7 @@ public class DrawingExt {
                         ccDrawingManagement.setCcDrawingTypeId(!SharedUtil.isEmpty(drawingTypeId) ? drawingTypeId : ccDrawingManagement.getCcDrawingTypeId());
                         ccDrawingManagement.setName(!SharedUtil.isEmpty(getStringCellValue(row.getCell(4))) ? getStringCellValue(row.getCell(4)) : ccDrawingManagement.getName());
                         ccDrawingManagement.setCcConstructionDrawingId(!SharedUtil.isEmpty(ccConstructionDrawingId) ? ccConstructionDrawingId : ccDrawingManagement.getCcConstructionDrawingId());
-                        ccDrawingManagement.setCcSteelOwnerDrawingId(!SharedUtil.isEmpty(getStringCellValue(row.getCell(6))) ? getStringCellValue(row.getCell(6)) : ccDrawingManagement.getCcSteelOwnerDrawingId());
+                        ccDrawingManagement.setCcSteelOwnerDrawingId(!SharedUtil.isEmpty(ccSteelOwnerDrawingId) ? ccSteelOwnerDrawingId : ccDrawingManagement.getCcSteelOwnerDrawingId());
                         ccDrawingManagement.setCcPrjProfessionalCodeId(!SharedUtil.isEmpty(ccPrjProfessionalCode) ? lastLetter : ccDrawingManagement.getCcPrjProfessionalCodeId());
                         ccDrawingManagement.setPlanDate(!SharedUtil.isEmpty(getLocalDateCellValue(row.getCell(7))) ? getLocalDateCellValue(row.getCell(7)) : ccDrawingManagement.getPlanDate());
                         ccDrawingManagement.setActDate(!SharedUtil.isEmpty(actDate) ? actDate : ccDrawingManagement.getActDate());
