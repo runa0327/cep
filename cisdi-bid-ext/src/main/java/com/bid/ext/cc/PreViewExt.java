@@ -206,7 +206,7 @@ public class PreViewExt {
                     new Thread(() -> {
                         boolean translationComplete = false;
                         int pollCount = 0; // 轮询计数器
-                        while (!translationComplete && pollCount < 3) { // 最多轮询三次
+                        while (!translationComplete && pollCount < 10) { // 最多轮询三次
                             try {
                                 Thread.sleep(3000); // 初始延时，给予模型转换一定的处理时间
 

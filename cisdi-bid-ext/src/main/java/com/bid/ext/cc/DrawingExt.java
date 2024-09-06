@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.bid.ext.model.*;
 import com.itextpdf.text.DocumentException;
@@ -359,8 +360,8 @@ public class DrawingExt {
                     // 三维实际日期
 //                    LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
 
-                    String ccConstructionDrawingId = getStringCellValue(row.getCell(5));
-                    String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
+                    String ccConstructionDrawingId = StrUtil.replace(StrUtil.trim(getStringCellValue(row.getCell(5))), " ", "").replace("\n", "").replace("\r", "");
+                    String ccSteelOwnerDrawingId = StrUtil.replace(StrUtil.trim(getStringCellValue(row.getCell(6))), " ", "").replace("\n", "").replace("\r", "");
                     String lastLetter = "";
                     if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
                         for (int j = ccSteelOwnerDrawingId.length() - 1; j >= 0; j--) {
