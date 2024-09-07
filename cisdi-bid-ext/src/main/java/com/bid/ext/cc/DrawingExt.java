@@ -360,7 +360,7 @@ public class DrawingExt {
                     // 三维实际日期
 //                    LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
 
-                    String ccConstructionDrawingId = StrUtil.replace(StrUtil.trim(getStringCellValue(row.getCell(5))), " ", "").replace("\n", "").replace("\r", "");
+                    String ccConstructionDrawingId = getStringCellValue(row.getCell(5));
                     String ccSteelOwnerDrawingId = StrUtil.replace(StrUtil.trim(getStringCellValue(row.getCell(6))), " ", "").replace("\n", "").replace("\r", "");
                     String lastLetter = "";
                     if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
