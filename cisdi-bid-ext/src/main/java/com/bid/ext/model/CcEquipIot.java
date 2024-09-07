@@ -757,19 +757,19 @@ public class CcEquipIot {
     /**
      * {"EN": "是否在线", "ZH_CN": "是否在线", "ZH_TW": "是否在线"}。
      */
-    private Boolean isOnline;
+    private Integer isOnline;
 
     /**
      * 获取：{"EN": "是否在线", "ZH_CN": "是否在线", "ZH_TW": "是否在线"}。
      */
-    public Boolean getIsOnline() {
+    public Integer getIsOnline() {
         return this.isOnline;
     }
 
     /**
      * 设置：{"EN": "是否在线", "ZH_CN": "是否在线", "ZH_TW": "是否在线"}。
      */
-    public CcEquipIot setIsOnline(Boolean isOnline) {
+    public CcEquipIot setIsOnline(Integer isOnline) {
         if (this.isOnline == null && isOnline == null) {
             // 均为null，不做处理。
         } else if (this.isOnline != null && isOnline != null) {

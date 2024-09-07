@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcIotEquipMapper">
+
+    <!--根据id动态修改 轻呈-设备采购进度数据 数据-->
+    <update id="checkAndUpdateOnlineStatus">
+        update cc_equip_iot  set  IS_ONLINE=2 ,LAST_MODI_DT=NOW()  WHERE    ID IN (SELECT TEM.ID FROM (select  DISTINCT  e.id, MAX(IFNULL(et.CC_EQUIP_DATA_UP_DATETIME,'2000-01-01 00:00:01')) UP_DATA_TIME  from cc_equip_iot e left JOIN  cc_equip_iot_data et on   e.POINT_NAME = et.POINT_NAME GROUP BY E.ID)TEM  WHERE DATE_ADD(TEM.UP_DATA_TIME,INTERVAL 1  HOUR) &lt; NOW())
+    </update>
+</mapper>

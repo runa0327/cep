@@ -2,7 +2,9 @@ package com.pms.bid.job.cronTask;
 
 import com.pms.bid.job.service.process.CcSpecialEquipPreVeService;
 import com.pms.bid.job.service.process.ConstructionPlanService;
+import com.pms.bid.job.service.zhanJiang.CcIotEquipService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,10 @@ public class CronTask {
 
     @Resource
     private CcSpecialEquipPreVeService  specialEquipPreVeService;
+
+    @Autowired
+    private CcIotEquipService iotEquipService;
+
 
     /**
      * 每天早上6点执行施工方案计划预警定时任务
@@ -47,4 +53,11 @@ public class CronTask {
             log.error("特种设备提醒失败:"+e.getMessage());
         }
     }
+
+    @Scheduled(fixedRate = 1000*60)
+    public void pushMessage(){
+        log.info("检查物联网设备在线状态");
+        iotEquipService.checkOnlineStatus();
+    }
+
 }

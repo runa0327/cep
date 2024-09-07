@@ -27,15 +27,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ZJIOTEquipExt {
 
-
     /**
      * 检查更新基坑点位状态
      */
     public void equipIsOnlineCheck(){
 
-
     }
-
 
     /**
      * 检查更新基坑点位更新设备是否正常状态
@@ -58,7 +55,6 @@ public class ZJIOTEquipExt {
 
             Where queryEquip =  new Where();
             queryEquip.sql("T.STATUS = 'AP' AND  T.POINT_NAME='"+pointName+"'");
-
             CcEquipIot ccEquipIot = null;
             try{
                 ccEquipIot = CcEquipIot.selectOneByWhere(queryEquip);
@@ -67,17 +63,17 @@ public class ZJIOTEquipExt {
             }
 
             if (ccEquipIot!=null){
-                ccEquipIot.setIsOnline(true);
+                ccEquipIot.setIsOnline(1);
+
                 if ("1".equals(outOfLimit)){
-
+                    ccEquipIot.setCcEquipState(1);
                 }else{
-
+                    ccEquipIot.setCcEquipState(0);
                 }
-
+                ccEquipIot.updateById();
+                log.info("设备更新在线和告警状态");
             }
-
         }
-
     }
 
 
