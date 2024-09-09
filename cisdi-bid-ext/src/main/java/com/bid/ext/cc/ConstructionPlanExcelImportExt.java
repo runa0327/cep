@@ -56,6 +56,28 @@ public class ConstructionPlanExcelImportExt {
 
 //       String filePath = "/Users/hejialun/Downloads/施工方案.xlsx";
 
+//        filePath = "C:\\Users\\34451\\Downloads\\施工方案0.xlsx";
+
+        // 事项
+        int nameIndex = -1;
+        // 报审单位
+        int companyNameIdx = -1;
+        // 计划从
+        int fromIdx = -1;
+        // 计划到
+        int toIdx = -1;
+
+        try {
+            Map<String, Integer> indexMap = ExcelUtils.analyzeExcel(filePath, flFile.getExt(), false);
+            nameIndex = indexMap.getOrDefault("事项", -1);
+            companyNameIdx = indexMap.getOrDefault("报审单位", -1);
+            fromIdx = indexMap.getOrDefault("计划从", -1);
+            toIdx = indexMap.getOrDefault("计划到", -1);
+
+        } catch (IOException e) {
+            throw new BaseException("所上传的Excel文件格式不合法");
+        }
+
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
@@ -72,28 +94,28 @@ public class ConstructionPlanExcelImportExt {
                     String   name = ""; //事项
 
                     //事项
-                    Cell cell1 = row.getCell(5);
+                    Cell cell1 = row.getCell(nameIndex);
                     if (cell1.getCellType() == BLANK) {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'事项'不能为空");
                     }
                     name = getCellValueAsString(cell1);
 
                     //报审单位
-                    Cell cell2 = row.getCell(6);
+                    Cell cell2 = row.getCell(companyNameIdx);
                     if (cell1.getCellType() == BLANK) {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'报审单位'不能为空");
                     }
                     companyName = getCellValueAsString(cell2);
 
                     //计划从
-                    Cell cell3 = row.getCell(7);
+                    Cell cell3 = row.getCell(fromIdx);
                     if (cell3.getCellType() == BLANK) {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划从'不能为空");
                     }
                     LocalDate frDate = LocalDate.parse(getCellValueAsString(cell3));
 
                     //计划到
-                    Cell cell4 = row.getCell(8);
+                    Cell cell4 = row.getCell(toIdx);
                     if (cell4.getCellType() == BLANK) {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划到'不能为空");
                     }
