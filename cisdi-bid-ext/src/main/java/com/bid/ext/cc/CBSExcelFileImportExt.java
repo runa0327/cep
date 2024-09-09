@@ -154,7 +154,7 @@ public class CBSExcelFileImportExt {
 
 //       String filePath = "/Users/hejialun/Downloads/成本统览.xlsx";
 
-//        filePath = "C:\\Users\\34451\\Downloads\\test.xlsx";
+        filePath = "C:\\Users\\34451\\Downloads\\test.xlsx";
 
         if (!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
@@ -366,7 +366,6 @@ public class CBSExcelFileImportExt {
         if (flg) {
             StringBuilder idsStr = new StringBuilder("");
             if (ccPrjCostOverviewSimples != null) {
-
                 for (int i = 0; i < ccPrjCostOverviewSimples.size(); i++) {
                     if (i == ccPrjCostOverviewSimples.size() - 1) {
                         idsStr.append(ccPrjCostOverviewSimples.get(i).getId());
@@ -374,13 +373,13 @@ public class CBSExcelFileImportExt {
                         idsStr.append(ccPrjCostOverviewSimples.get(i).getId() + ",");
                     }
                 }
-            }
 
-            if (ccPrjCostOverviewSimples.size() > 0) {
-                Where where = new Where();
-                where.sql("t.id in (" +idsStr + ")");
-                CcPrjCostOverviewSimple.deleteByWhere(where);
+                if (ccPrjCostOverviewSimples.size() > 0) {
+                    Where where = new Where();
+                    where.sql("t.id in (" +idsStr + ")");
+                    CcPrjCostOverviewSimple.deleteByWhere(where);
 
+                }
             }
         }
 
