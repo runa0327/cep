@@ -154,7 +154,7 @@ public class CBSExcelFileImportExt {
 
 //       String filePath = "/Users/hejialun/Downloads/成本统览.xlsx";
 
-        filePath = "C:\\Users\\34451\\Downloads\\test.xlsx";
+//        filePath = "C:\\Users\\34451\\Downloads\\test.xlsx";
 
         if (!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
@@ -203,7 +203,7 @@ public class CBSExcelFileImportExt {
             //已付款
             yfkIndex = indexMap.getOrDefault("已付款", -1);
         } catch (IOException e) {
-            throw new BaseException("请保证上传的Excel文件格式合法");
+            throw new BaseException("所上传的Excel文件格式不合法");
         }
 
         // 是否导入成功至少一条
