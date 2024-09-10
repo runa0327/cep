@@ -345,7 +345,7 @@ public class CBSExcelFileImportExt {
                     if (ysqIndex == -1) {
                         throw new BaseException("已申请列不存在");
                     }
-                    Cell cell15 = row.getCell(17);
+                    Cell cell15 = row.getCell(ysqIndex);
                     ccPrjCostOverviewSimple.setReqPayAmt(getCellValueAsBigDecimal(cell15));
 
                     //已付款
