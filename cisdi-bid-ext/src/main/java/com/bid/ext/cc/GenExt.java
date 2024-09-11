@@ -187,6 +187,7 @@ public class GenExt {
 
             // 指定 LibreOffice 的安装路径及命令行工具
             String libreOfficePath = "/usr/bin/libreoffice";
+//            String libreOfficePath = "D:\\Program Files\\LibreOffice";
 
             // 调用 LibreOffice 进行转换
             ProcessBuilder builder = new ProcessBuilder();
@@ -207,8 +208,7 @@ public class GenExt {
 
             return pdfBytes;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new BaseException(e);
         }
     }
 
