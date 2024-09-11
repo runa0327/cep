@@ -232,7 +232,7 @@ public class GenExt {
         int index = 1; // 开始编号
         for (Map<String, Object> result : resultList) {
             Map<String, Object> formattedEntry = new HashMap<>();
-            formattedEntry.put("content", index++ + "、" + result.get("name").toString());
+            formattedEntry.put("content", index++ + "、" + JdbcMapUtil.getString(result, "name"));
             formattedNames.add(formattedEntry);
         }
 
