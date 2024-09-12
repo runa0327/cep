@@ -42,21 +42,33 @@ public class MeetingExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcMeeting ccMeeting = CcMeeting.selectById(csCommId);
-            //参与人
+            // 参与人
             String attendMemberIds = ccMeeting.getAttendUserIds();
-            //主持人
+            // 主持人
             String hostUserId = ccMeeting.getHostUserId();
             List<String> userIds = new ArrayList<>();
             userIds.add(hostUserId);
             // 检查参与人字符串是否不为空
             if (attendMemberIds != null && !attendMemberIds.isEmpty()) {
                 String[] members = attendMemberIds.split(",");
-                userIds.addAll(Arrays.asList(members));
+                List<String> membersList = Arrays.asList(members);
+                // 如果主持人不在参与人列表中，则添加所有参与人
+                if (!membersList.contains(hostUserId)) {
+                    userIds.addAll(membersList);
+                } else {
+                    // 如果主持人已经在参与人列表中，则去重后添加
+                    for (String member : membersList) {
+                        if (!member.equals(hostUserId)) {
+                            userIds.add(member);
+                        }
+                    }
+                }
             }
-            //发送通知
+            // 发送通知
             sendNotify(userIds, csCommId);
         }
     }
+
 
     /**
      * 发送通知
