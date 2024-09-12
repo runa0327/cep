@@ -2,6 +2,7 @@ package com.pms.bid.job.cronTask;
 
 import com.pms.bid.job.service.process.CcSpecialEquipPreVeService;
 import com.pms.bid.job.service.process.ConstructionPlanService;
+import com.pms.bid.job.service.zhanJiang.CcHoistingMachineryService;
 import com.pms.bid.job.service.zhanJiang.CcIotEquipService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,11 @@ public class CronTask {
     @Resource
     private CcSpecialEquipPreVeService  specialEquipPreVeService;
 
-    @Autowired
+    @Resource
     private CcIotEquipService iotEquipService;
+
+    @Resource
+    private CcHoistingMachineryService hoistingMachineryService;
 
 
     /**
@@ -54,10 +58,16 @@ public class CronTask {
         }
     }
 
-    @Scheduled(fixedRate = 1000*60)
-    public void pushMessage(){
+    @Scheduled(fixedRate = 1000*60*10)
+    public void checkIotStatus(){
         log.info("检查物联网设备在线状态");
         iotEquipService.checkOnlineStatus();
+    }
+
+
+    @Scheduled(fixedRate = 1000*60*60)
+    public void checkHoistingMachineryTodo(){
+        hoistingMachineryService.checkDate();
     }
 
 }

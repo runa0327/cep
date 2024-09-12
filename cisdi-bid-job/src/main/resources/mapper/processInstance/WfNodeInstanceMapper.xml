@@ -120,4 +120,9 @@
     <select id="queryYjwNodeInstanceId" resultType="string">
         select id from wf_node_instance where wf_process_INSTANCE_ID = #{processInstanceId} AND WF_NODE_ID = '1820723475472265216' AND IS_CURRENT = 1
     </select>
+
+    <select id="getNodeInstanceId" resultType="string">
+        select id from wf_node_instance where wf_process_INSTANCE_ID = #{processInstanceId} AND WF_NODE_ID = #{nodeId}  AND IS_CURRENT = 1
+    </select>
+
 </mapper>

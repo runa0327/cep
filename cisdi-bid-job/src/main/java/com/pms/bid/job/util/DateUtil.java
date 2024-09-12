@@ -19,6 +19,22 @@ public class DateUtil {
         return sdf.format(date);
     }
 
+
+    /**
+     * 根据字符串获取日期
+     * @param date
+     * @return
+     */
+    public static Date getDate(String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            return sdf.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Date();
+    }
+
     /**
      * 将字符串时间戳转为指定格式的字符串日期格式
      * @param timestampStr 时间戳

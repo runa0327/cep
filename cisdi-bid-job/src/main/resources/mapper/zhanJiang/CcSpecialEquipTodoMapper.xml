@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcSpecialEquipTodoMapper">
+    <resultMap id="hoistingMachineryResultMap" type="com.pms.bid.job.domain.zhanJiang.CcSpecialEquipTodo">
+        <!--id-->
+        <id property="id" column="ID"/>
+        <!--版本-->
+        <result property="ver" column="VER"/>
+        <!--时间戳-->
+        <result property="ts" column="TS"/>
+        <!--创建人-->
+        <result property="createBy" column="CRT_USER_ID"/>
+        <!--创建时间-->
+        <result property="createDate" column="CRT_DT"/>
+        <!--上次修改人-->
+        <result property="lastUpdateBy" column="LAST_UPDATE_BY"/>
+        <!--上次修改时间-->
+        <result property="lastUpdateDate" column="LAST_UPDATE_DATE"/>
+
+        <result property="ccSpecialEquipId" column="CC_SPECIAL_EQUIP_ID"/>
+        <result property="ccSpecialEquipCtg" column="CC_SPECIAL_EQUIP_CTG"/>
+        <result property="ccSpecialEquipTodoType" column="CC_SPECIAL_EQUIP_TODO_TYPE"/>
+        <result property="ccSpecialEquipTodoTaskId" column="CC_SPECIAL_EQUIP_TODO_TASK_ID"/>
+        <result property="taskIsEnd" column="TASK_IS_END"/>
+    </resultMap>
+
+
+    <!--  查询特种设备数据所有的待办-->
+    <select id="queryList" resultMap="hoistingMachineryResultMap">
+        select et.*, wt.IS_CLOSED TASK_IS_END
+        from CC_SPECIAL_EQUIP_TODO et,
+             wf_task wt
+        where et.CC_SPECIAL_EQUIP_ID = #{equipId}
+          and et.CC_SPECIAL_EQUIP_CTG = #{category}
+          and et.CC_SPECIAL_EQUIP_TODO_TYPE = #{todoType}
+          and et.CC_SPECIAL_EQUIP_TODO_TASK_ID = wt.ID
+    </select>
+
+    <!--  查询特种设备数据具有未办理的待办-->
+    <select id="queryIncompleteList" resultMap="hoistingMachineryResultMap">
+        select et.*, wt.IS_CLOSED TASK_IS_END
+        from CC_SPECIAL_EQUIP_TODO et,
+             wf_task wt
+        where et.CC_SPECIAL_EQUIP_ID = #{equipId}
+          and et.CC_SPECIAL_EQUIP_CTG = #{category}
+          and et.CC_SPECIAL_EQUIP_TODO_TYPE = #{todoType}
+          and et.CC_SPECIAL_EQUIP_TODO_TASK_ID = wt.ID
+          and wt.IS_CLOSED = 0
+    </select>
+
+
+    <insert id="addTodo" parameterType="com.pms.bid.job.domain.zhanJiang.CcSpecialEquipTodo">
+        insert into CC_SPECIAL_EQUIP_TODO (ID,
+                                           VER,
+                                           TS,
+                                           CRT_DT,
+                                           CRT_USER_ID,
+                                           LAST_MODI_DT,
+                                           LAST_MODI_USER_ID,
+                                           STATUS,
+                                           CODE,
+                                           CC_SPECIAL_EQUIP_ID, CC_SPECIAL_EQUIP_CTG, CC_SPECIAL_EQUIP_TODO_TYPE,
+                                           CC_SPECIAL_EQUIP_TODO_TASK_ID)
+        values (#{equipTodo.id},
+                #{equipTodo.ver},
+                #{equipTodo.ts},
+                #{equipTodo.createDate},
+                #{equipTodo.createBy},
+                #{equipTodo.lastUpdateDate},
+                #{equipTodo.lastUpdateBy},
+                #{equipTodo.status},
+                #{equipTodo.code},
+                #{equipTodo.ccSpecialEquipId},
+                #{equipTodo.ccSpecialEquipCtg},
+                #{equipTodo.ccSpecialEquipTodoType},
+                #{equipTodo.ccSpecialEquipTodoTaskId})
+
+    </insert>
+
+
+    <!--    根据项目成员id查询用户id-->
+    <select id="getUserIdByMemberId" resultType="java.lang.String">
+        select AD_USER_ID
+        from cc_prj_member
+        where ID = #{memberId}
+    </select>
+
+</mapper>

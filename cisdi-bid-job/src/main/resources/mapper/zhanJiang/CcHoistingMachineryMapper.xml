@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcHoistingMachineryMapper">
+    <resultMap id="hoistingMachineryResultMap" type="com.pms.bid.job.domain.zhanJiang.CcHoistingMachinery">
+        <!--id-->
+        <id property="id" column="ID"/>
+        <!--版本-->
+        <result property="ver" column="VER"/>
+        <!--时间戳-->
+        <result property="ts" column="TS"/>
+        <!--创建人-->
+        <result property="createBy" column="CRT_USER_ID"/>
+        <!--创建时间-->
+        <result property="createDate" column="CRT_DT"/>
+        <!--上次修改人-->
+        <result property="lastUpdateBy" column="LAST_UPDATE_BY"/>
+        <!--上次修改时间-->
+        <result property="lastUpdateDate" column="LAST_UPDATE_DATE"/>
+        <result property="lkWfInstId" column="LK_WF_INST_ID"/>
+        <!--        基本信息-->
+        <result property="name" column="NAME"/>
+        <result property="ccSpecificationAndModel" column="CC_SPECIFICATION_AND_MODEL"/>
+        <result property="ccEquipInstallLocation" column="CC_EQUIP_INSTALL_LOCATION"/>
+        <result property="ccFactoryNumber" column="CC_FACTORY_NUMBER"/>
+        <result property="ccWorkLevel" column="CC_WORK_LEVEL"/>
+        <result property="ccMainHookRatedLiftingCapacity" column="CC_MAIN_HOOK_RATED_LIFTING_CAPACITY"/>
+        <result property="ccAuxiliaryHookRatedLiftingCapacity" column="CC_AUXILIARY_HOOK_RATED_LIFTING_CAPACITY"/>
+        <result property="ccInstallationUnit" column="CC_INSTALLATION_UNIT"/>
+        <!--        到货-->
+        <result property="ccEquipPlanArriveDate" column="CC_EQUIP_PLAN_ARRIVE_DATE"/>
+        <result property="ccEquipActArriveDate" column="CC_EQUIP_ACT_ARRIVE_DATE"/>
+        <!--施工告知-->
+        <result property="ccPlanConstructionNoticeDate" column="CC_PLAN_CONSTRUCTION_NOTICE_DATE"/>
+        <result property="ccCompleteConstructionNoticeDate" column="CC_COMPLETE_CONSTRUCTION_NOTICE_DATE"/>
+        <result property="ccConstructionNoticeReceipt" column="CC_CONSTRUCTION_NOTICE_RECEIPT"/>
+        <!--        完成安装-->
+        <result property="ccPlanCompleteInstallTime" column="CC_PLAN_COMPLETE_INSTALL_TIME"/>
+        <result property="ccActCompleteInstallDate" column="CC_ACT_COMPLETE_INSTALL_DATE"/>
+        <!--        监督检验计划-->
+        <result property="ccPlanSuperviseInspection" column="CC_PLAN_SUPERVISE_INSPECTION"/>
+        <result property="ccCompleteSuperviseInspection" column="CC_COMPLETE_SUPERVISE_INSPECTION"/>
+        <result property="ccInspectionReport" column="CC_INSPECTION_REPORT"/>
+        <!--        现场试压-->
+        <result property="ccPlanSupInsAgeSceneCheckDate" column="CC_PLAN_SUP_INS_AGE_SCENE_CHECK_DATE"/>
+        <result property="ccCompleteSupInsAgeSceneCheckDate" column="CC_COMPLETE_SUP_INS_AGE_SCENE_CHECK_DATE"/>
+        <result property="ccSceneCheckOpinion" column="CC_SCENE_CHECK_OPINION"/>
+        <result property="ccGetSupInsQualifiedReportDate" column="CC_GET_SUP_INS_QUALIFIED_REPORT_DATE"/>
+        <result property="ccSupInsQualifiedReport" column="CC_SUP_INS_QUALIFIED_REPORT"/>
+        <!--        计划办理使用登记-->
+        <result property="ccPrjUnitPlanHandleUsageRegDate" column="CC_PRJ_UNIT_PLAN_HANDLE_USAGE_REG_DATE"/>
+        <!--    投用-->
+        <result property="ccPlanPutIntoUseDate" column="CC_PLAN_PUT_INTO_USE_DATE"/>
+        <result property="ccActPutIntoUseDate" column="CC_ACT_PUT_INTO_USE_DATE"/>
+        <!--        特种设备使用登记证-->
+        <result property="ccSpecialEuiqpUseRegistrationCart" column="CC_SPECIAL_EUIQP_USE_REGISTRATION_CART"/>
+        <!--       办理责任人-->
+        <result property="supervisorId" column="CC_SPECIAL_EQUIP_SUPERVISOR_ID"/>
+        <result property="regProHeadId" column="CC_SPECIAL_EQUIP_REG_PRO_HEAD_ID"/>
+        <result property="conHeadId" column="CC_SPECIAL_EQUIP_CON_HEAD_ID"/>
+        <result property="slippageWarningDays" column="SLIPPAGE_WARING_DAYS"/>
+    </resultMap>
+
+
+    <update id="updateWfInstIdById">
+        update cc_hoisting_machinery
+        set LK_WF_INST_ID = #{lkWfInstId}
+        where id = #{id}
+    </update>
+
+    <!--  查询到期需要通知的列表-->
+    <select id="queryList" resultMap="hoistingMachineryResultMap">
+        select *
+        from CC_HOISTING_MACHINERY
+    </select>
+
+</mapper>

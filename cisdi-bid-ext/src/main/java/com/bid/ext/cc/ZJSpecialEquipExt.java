@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 质量评估扩展
+ * 一般压力容器扩展
  */
 public class ZJSpecialEquipExt {
 
-    //导入压力容器
+    //一般导入压力容器
     public void importPressureVessel() {
 
         Map<String, Object> varMap = ExtJarHelper.getVarMap();

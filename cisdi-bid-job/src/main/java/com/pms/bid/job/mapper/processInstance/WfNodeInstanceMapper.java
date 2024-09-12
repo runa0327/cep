@@ -25,4 +25,6 @@ public interface WfNodeInstanceMapper {
     String  queryNodeInstanceId(@Param("processInstanceId") String processInstanceId);
 
     String  queryYjwNodeInstanceId(@Param("processInstanceId") String processInstanceId);
+
+    String  getNodeInstanceId(@Param("processInstanceId") String processInstanceId,@Param("nodeId")String nodeId);
 }
