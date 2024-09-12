@@ -1858,6 +1858,7 @@ public class WfTask {
     /**
      * 根据Where条件获取数据。
      *
+     * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
     public static List<WfTask> selectByWhere(Where where) {
