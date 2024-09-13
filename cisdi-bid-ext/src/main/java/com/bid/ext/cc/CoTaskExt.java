@@ -230,7 +230,7 @@ public class CoTaskExt {
                 userIds.addAll(Arrays.asList(supervises));  // 添加所有参与人ID到集合中
             }
             // 发送通知
-            sendNotify((List<String>) userIds, csCommId);
+            sendNotify(new ArrayList<>(userIds), csCommId);
         }
     }
 
