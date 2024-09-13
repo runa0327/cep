@@ -127,6 +127,10 @@ public class CcMeeting {
          */
         public static final String ATTEND_USER_IDS = "ATTEND_USER_IDS";
         /**
+         * {"EN": "参与人", "ZH_CN": "参与人", "ZH_TW": "参与人"}。
+         */
+        public static final String ATTEND_MEMBER_IDS = "ATTEND_MEMBER_IDS";
+        /**
          * {"EN": "参会方式", "ZH_CN": "参会方式", "ZH_TW": "参会方式"}。
          */
         public static final String CC_MEETING_ATTEND_TYPE_IDS = "CC_MEETING_ATTEND_TYPE_IDS";
@@ -150,6 +154,10 @@ public class CcMeeting {
          * {"EN": "会议提醒方式", "ZH_CN": "提醒方式", "ZH_TW": "会议提醒方式"}。
          */
         public static final String CC_REMIND_TYPE_IDS = "CC_REMIND_TYPE_IDS";
+        /**
+         * {"EN": "已发送提醒类型", "ZH_CN": "已发送提醒类型", "ZH_TW": "已发送提醒类型"}。
+         */
+        public static final String REMINDER_SENT = "REMINDER_SENT";
         /**
          * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
          */
@@ -886,6 +894,42 @@ public class CcMeeting {
     }
 
     /**
+     * {"EN": "参与人", "ZH_CN": "参与人", "ZH_TW": "参与人"}。
+     */
+    private String attendMemberIds;
+
+    /**
+     * 获取：{"EN": "参与人", "ZH_CN": "参与人", "ZH_TW": "参与人"}。
+     */
+    public String getAttendMemberIds() {
+        return this.attendMemberIds;
+    }
+
+    /**
+     * 设置：{"EN": "参与人", "ZH_CN": "参与人", "ZH_TW": "参与人"}。
+     */
+    public CcMeeting setAttendMemberIds(String attendMemberIds) {
+        if (this.attendMemberIds == null && attendMemberIds == null) {
+            // 均为null，不做处理。
+        } else if (this.attendMemberIds != null && attendMemberIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.attendMemberIds.compareTo(attendMemberIds) != 0) {
+                this.attendMemberIds = attendMemberIds;
+                if (!this.toUpdateCols.contains("ATTEND_MEMBER_IDS")) {
+                    this.toUpdateCols.add("ATTEND_MEMBER_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.attendMemberIds = attendMemberIds;
+            if (!this.toUpdateCols.contains("ATTEND_MEMBER_IDS")) {
+                this.toUpdateCols.add("ATTEND_MEMBER_IDS");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "参会方式", "ZH_CN": "参会方式", "ZH_TW": "参会方式"}。
      */
     private String ccMeetingAttendTypeIds;
@@ -1096,6 +1140,42 @@ public class CcMeeting {
             this.ccRemindTypeIds = ccRemindTypeIds;
             if (!this.toUpdateCols.contains("CC_REMIND_TYPE_IDS")) {
                 this.toUpdateCols.add("CC_REMIND_TYPE_IDS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "已发送提醒类型", "ZH_CN": "已发送提醒类型", "ZH_TW": "已发送提醒类型"}。
+     */
+    private String reminderSent;
+
+    /**
+     * 获取：{"EN": "已发送提醒类型", "ZH_CN": "已发送提醒类型", "ZH_TW": "已发送提醒类型"}。
+     */
+    public String getReminderSent() {
+        return this.reminderSent;
+    }
+
+    /**
+     * 设置：{"EN": "已发送提醒类型", "ZH_CN": "已发送提醒类型", "ZH_TW": "已发送提醒类型"}。
+     */
+    public CcMeeting setReminderSent(String reminderSent) {
+        if (this.reminderSent == null && reminderSent == null) {
+            // 均为null，不做处理。
+        } else if (this.reminderSent != null && reminderSent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reminderSent.compareTo(reminderSent) != 0) {
+                this.reminderSent = reminderSent;
+                if (!this.toUpdateCols.contains("REMINDER_SENT")) {
+                    this.toUpdateCols.add("REMINDER_SENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reminderSent = reminderSent;
+            if (!this.toUpdateCols.contains("REMINDER_SENT")) {
+                this.toUpdateCols.add("REMINDER_SENT");
             }
         }
         return this;

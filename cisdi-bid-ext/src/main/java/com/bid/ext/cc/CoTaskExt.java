@@ -14,6 +14,8 @@ import com.qygly.shared.util.SharedUtil;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.bid.ext.utils.FlowUtils.sendNotify;
+
 public class CoTaskExt {
     public void updateTask() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
@@ -203,5 +205,33 @@ public class CoTaskExt {
         }
     }
 
+    /**
+     * 立即通知（协同任务）
+     */
+    public void notifyImmediatelyTask() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcCoTask ccCoTask = CcCoTask.selectById(csCommId);
+            // 责任人
+            String chiefUserIds = ccCoTask.getChiefUserIds();
+            // 督办人
+            String superviseUserIds = ccCoTask.getSuperviseUserIds();
+            Set<String> userIds = new HashSet<>();
+
+            // 处理多个主持人
+            if (chiefUserIds != null && !chiefUserIds.isEmpty()) {
+                String[] chiefs = chiefUserIds.split(",");
+                userIds.addAll(Arrays.asList(chiefs));
+            }
+
+            // 检查参与人字符串是否不为空
+            if (superviseUserIds != null && !superviseUserIds.isEmpty()) {
+                String[] supervises = superviseUserIds.split(",");
+                userIds.addAll(Arrays.asList(supervises));  // 添加所有参与人ID到集合中
+            }
+            // 发送通知
+            sendNotify((List<String>) userIds, csCommId);
+        }
+    }
 
 }
