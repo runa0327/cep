@@ -6,11 +6,13 @@ import com.bid.ext.model.TranslateRequestBody;
 import com.bid.ext.utils.SysSettingUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.*;
+import com.tencentcloudapi.trp.v20210515.models.Ext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -94,6 +96,59 @@ public class PreViewExt {
     }
 
     public static final String uploadFileUrl = "https://api.bimface.com/bdfs/data/v1/projects/10000848931873/fileItems";
+
+    public void newPreview() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+//        invokeActResult.urlToOpenList = new ArrayList<>();
+
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String token = doGetStringStringMap();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String id = entityRecord.csCommId;
+            CcDocFile ccDocFile = CcDocFile.selectById(id);
+            String modelFileId = ccDocFile.getCcPreviewFileId();
+            String type = ccDocFile.getCcDocFileTypeId();
+            String previewUrl = ccDocFile.getCcPreviewUrl();
+
+            // todo 利用Nacos获取微服务
+
+            // 从 Nacos 获取服务实例列表
+//            List<ServiceInstance> instances = discoveryClient.getInstances("cisdi-microservice");
+
+//            String uploadAndConvertUrl = "http://cisdi-preview/test/upload-and-convert";
+
+            Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
+            String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
+            String uploadAndConvertUrl = gateWayUrl + "cisdi-microservice/preview/upload-and-convert";
+
+            uploadAndConvertUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/upload-and-convert/";
+
+
+            FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment());
+
+            String filePath = flFile.getPhysicalLocation();
+            filePath = "C:\\Users\\34451\\Desktop\\test.dwg";
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("filePath", filePath);
+            body.add("fileName", flFile.getDspName());
+            body.add("parentId", "10000848931873");
+            body.add("modelFileId", modelFileId);
+            body.add("token", token);
+            body.add("uploadFileUrl", uploadFileUrl);
+            body.add("ccDocFileId", id);
+//            HttpHeaders headers = new HttpHeaders();
+            HttpHeaders headers = new HttpHeaders();
+//            headers.set("Authorization", "Bearer " + token);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.exchange(uploadAndConvertUrl, HttpMethod.POST, entity, String.class);
+            log.info(response.toString());
+        }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
 
     /**
      * 预览

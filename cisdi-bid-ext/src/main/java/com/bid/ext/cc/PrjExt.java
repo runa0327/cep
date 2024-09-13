@@ -479,4 +479,19 @@ public class PrjExt {
         }
     }
 
+    /**
+     * 更新前扩展，查看暂存状态的记录是否有CC_PRJ_ID，如果没有返回报错
+     */
+    public void checkCcPrjBeforeUpdate() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            String status = JdbcMapUtil.getString(valueMap, "STATUS");
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            if ("DR".equals(status) && SharedUtil.isEmpty(ccPrjId)) {
+                throw new BaseException("请在选择项目后暂存！");
+            }
+        }
+    }
+
 }
