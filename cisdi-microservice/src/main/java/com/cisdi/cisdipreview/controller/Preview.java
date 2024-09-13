@@ -163,7 +163,7 @@ public class Preview {
         String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
         String callBackUrl = gateWayUrl + "cisdi-microservice/preview/preview_callback";
 
-        callBackUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/preview_callback/";
+//        callBackUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/preview_callback/";
 
         // 构建转换请求体
         TranslateRequestBody requestBody = new TranslateRequestBody(true, false, fileId, callBackUrl);
