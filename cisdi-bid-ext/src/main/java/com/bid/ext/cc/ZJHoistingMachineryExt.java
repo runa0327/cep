@@ -282,7 +282,7 @@ public class ZJHoistingMachineryExt {
 //                        }
 
                         //实际到货时间
-                        Cell cell9 = row.getCell(9);
+                        Cell cell9 = row.getCell(10);
                         if (cell9 != null && StringUtils.hasText(getCellValueAsString(cell9))) {
                             try {
                                 hoistingMachinery.setCcEquipActArriveDate(getDate(cell9));
@@ -292,7 +292,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //计划施工告知时间
-                        Cell cell10 = row.getCell(10);
+                        Cell cell10 = row.getCell(11);
                         if (cell10 != null && StringUtils.hasText(getCellValueAsString(cell10))) {
                             try {
                                 hoistingMachinery.setCcPlanConstructionNoticeDate(getDate(cell10));
@@ -302,7 +302,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //实际施工告知时间
-                        Cell cell11 = row.getCell(11);
+                        Cell cell11 = row.getCell(12);
                         if (cell11 != null && StringUtils.hasText(getCellValueAsString(cell11))) {
                             try {
                                 hoistingMachinery.setCcCompleteConstructionNoticeDate(getDate(cell11));
@@ -313,7 +313,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //计划安装时间
-                        Cell cell13 = row.getCell(13);
+                        Cell cell13 = row.getCell(14);
                         if (cell13 != null && StringUtils.hasText(getCellValueAsString(cell13))) {
                             try {
                                 hoistingMachinery.setCcPlanCompleteInstallTime(getDate(cell13));
@@ -324,7 +324,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //实际安装时间
-                        Cell cell14 = row.getCell(14);
+                        Cell cell14 = row.getCell(15);
                         if (cell14 != null && StringUtils.hasText(getCellValueAsString(cell14))) {
                             try {
                                 hoistingMachinery.setCcActCompleteInstallDate(getDate(cell14));
@@ -334,7 +334,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //监督检验计划时间
-                        Cell cell15 = row.getCell(15);
+                        Cell cell15 = row.getCell(16);
                         if (cell15 != null && StringUtils.hasText(getCellValueAsString(cell15))) {
                             try {
                                 hoistingMachinery.setCcPlanSuperviseInspection(getDate(cell15));
@@ -344,7 +344,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //完成报检时间
-                        Cell cell16 = row.getCell(16);
+                        Cell cell16 = row.getCell(17);
                         if (cell16 != null && StringUtils.hasText(getCellValueAsString(cell16))) {
                             try {
                                 hoistingMachinery.setCcCompleteSuperviseInspection(getDate(cell16));
@@ -354,7 +354,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //具备监检机构现场验收的计划时间
-                        Cell cell18 = row.getCell(18);
+                        Cell cell18 = row.getCell(19);
                         if (cell18 != null && StringUtils.hasText(getCellValueAsString(cell18))) {
                             try {
                                 hoistingMachinery.setCcPlanSupInsAgeSceneCheckDate(getDate(cell18));
@@ -364,7 +364,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //完成现场验收的时间
-                        Cell cell19 = row.getCell(19);
+                        Cell cell19 = row.getCell(20);
                         if (cell19 != null && StringUtils.hasText(getCellValueAsString(cell19))) {
                             try {
                                 hoistingMachinery.setCcCompleteSupInsAgeSceneCheckDate(getDate(cell19));
@@ -374,7 +374,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //取得监督检验合格报告的时间
-                        Cell cell21 = row.getCell(21);
+                        Cell cell21 = row.getCell(22);
                         if (cell21 != null && StringUtils.hasText(getCellValueAsString(cell21))) {
                             try {
                                 hoistingMachinery.setCcGetSupInsQualifiedReportDate(getDate(cell21));
@@ -384,7 +384,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //计划投用时间
-                        Cell cell24 = row.getCell(24);
+                        Cell cell24 = row.getCell(25);
                         if (cell24 != null && StringUtils.hasText(getCellValueAsString(cell24))) {
                             try {
                                 hoistingMachinery.setCcPlanPutIntoUseDate(getDate(cell24));
@@ -395,7 +395,7 @@ public class ZJHoistingMachineryExt {
                         }
 
                         //实际投用时间
-                        Cell cell25 = row.getCell(25);
+                        Cell cell25 = row.getCell(26);
                         if (cell25 != null && StringUtils.hasText(getCellValueAsString(cell25))) {
                             try {
                                 hoistingMachinery.setCcActPutIntoUseDate(getDate(cell25));
@@ -407,7 +407,7 @@ public class ZJHoistingMachineryExt {
                     } else if (userId.equals(member2.getAdUserId())) {
 
                         //计划办理登记时间
-                        Cell cell23 = row.getCell(23);
+                        Cell cell23 = row.getCell(24);
                         if (cell23 != null && StringUtils.hasText(getCellValueAsString(cell23))) {
                             try {
                                 hoistingMachinery.setCcPrjUnitPlanHandleUsageRegDate(getDate(cell23));

@@ -273,14 +273,14 @@ public class ZJSpecialEquipExt {
                         }
 
                         //计划到货时间
-                        Cell cell8 = row.getCell(8);
-                        if (cell8 != null && StringUtils.hasText(getCellValueAsString(cell8))) {
-                            try {
-                                equipPreVe.setCcSpecialEquipPlanArriveDate(cell8.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                            } catch (IllegalStateException E) {
-                                equipPreVe.setCcSpecialEquipPlanArriveDate(LocalDate.parse(getCellValueAsString(cell8), formatter));
-                            }
-                        }
+//                        Cell cell8 = row.getCell(8);
+//                        if (cell8 != null && StringUtils.hasText(getCellValueAsString(cell8))) {
+//                            try {
+//                                equipPreVe.setCcSpecialEquipPlanArriveDate(cell8.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+//                            } catch (IllegalStateException E) {
+//                                equipPreVe.setCcSpecialEquipPlanArriveDate(LocalDate.parse(getCellValueAsString(cell8), formatter));
+//                            }
+//                        }
 
                         //实际到货时间
                         Cell cell9 = row.getCell(9);

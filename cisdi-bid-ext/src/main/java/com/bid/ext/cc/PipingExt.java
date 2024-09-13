@@ -200,10 +200,10 @@ public class PipingExt {
                     if (userId.equals(member1.getAdUserId())) {
                         insertRows++;
                         //计划施工告知时间
-                        Cell cell11 = cells.getCell(11);
-                        if (null != cell11 && !StringUtils.isEmpty(getCellValueAsString(cell11))) {
-                            pressurePipeline.setYjwConstructionNoticeTimePlan(getDate(cell11));
-                        }
+//                        Cell cell11 = cells.getCell(11);
+//                        if (null != cell11 && !StringUtils.isEmpty(getCellValueAsString(cell11))) {
+//                            pressurePipeline.setYjwConstructionNoticeTimePlan(getDate(cell11));
+//                        }
                         //完成施工告知时间
                         Cell cell12 = cells.getCell(12);
                         if (null != cell12 && !StringUtils.isEmpty(getCellValueAsString(cell12))) {
@@ -215,27 +215,27 @@ public class PipingExt {
                             pressurePipeline.setYjwInstallationTimePlan(getDate(cell14));
                         }
                         //实际安装时间
-                        Cell cell15 = cells.getCell(15);
+                        Cell cell15 = cells.getCell(16);
                         if (null != cell15 && !StringUtils.isEmpty(getCellValueAsString(cell15))) {
                             pressurePipeline.setYjwInstallationTime(getDate(cell15));
                         }
                         //监督检验计划报检时间
-                        Cell cell16 = cells.getCell(16);
+                        Cell cell16 = cells.getCell(17);
                         if (null != cell16 && !StringUtils.isEmpty(getCellValueAsString(cell16))) {
                             pressurePipeline.setYjwReportInsuranceTimePlan(getDate(cell16));
                         }
                         //完成报检时间
-                        Cell cell17 = cells.getCell(17);
+                        Cell cell17 = cells.getCell(18);
                         if (null != cell17 && !StringUtils.isEmpty(getCellValueAsString(cell17))) {
                             pressurePipeline.setYjwReportInsuranceTime(getDate(cell17));
                         }
                         //具备现场试压条件的计划时间
-                        Cell cell19 = cells.getCell(19);
+                        Cell cell19 = cells.getCell(20);
                         if (null != cell19 && !StringUtils.isEmpty(getCellValueAsString(cell19))) {
                             pressurePipeline.setYjwQualifiedTimePlan(getDate(cell19));
                         }
                         //现场试压通过监检机构见证的时间
-                        Cell cell20 = cells.getCell(20);
+                        Cell cell20 = cells.getCell(21);
                         if (null != cell20 && !StringUtils.isEmpty(getCellValueAsString(cell20))) {
 
                             if (pressurePipeline.getYjwInstitutionTime() != null && !pressurePipeline.getYjwInstitutionTime().isEqual(getDate(cell20))) {
@@ -262,27 +262,27 @@ public class PipingExt {
                             pressurePipeline.setYjwInstitutionTime(getDate(cell20));
                         }
                         //竣工资料提交特检院受理计划时间
-                        Cell cell22 = cells.getCell(22);
+                        Cell cell22 = cells.getCell(21);
                         if (null != cell22 && !StringUtils.isEmpty(getCellValueAsString(cell22))) {
                             pressurePipeline.setYjwAcceptanceTimePlan(getDate(cell22));
                         }
                         //竣工资料提交特检院受理时间
-                        Cell cell23 = cells.getCell(23);
+                        Cell cell23 = cells.getCell(24);
                         if (null != cell23 && !StringUtils.isEmpty(getCellValueAsString(cell23))) {
                             pressurePipeline.setYjwAcceptanceTime(getDate(cell23));
                         }
                         //取得监督检验报告时间
-                        Cell cell25 = cells.getCell(25);
+                        Cell cell25 = cells.getCell(26);
                         if (null != cell25 && !StringUtils.isEmpty(getCellValueAsString(cell25))) {
                             pressurePipeline.setYjwQualifiedReportTime(getDate(cell25));
                         }
                         //计划投用
-                        Cell cell29 = cells.getCell(28);
+                        Cell cell29 = cells.getCell(29);
                         if (null != cell29 && !StringUtils.isEmpty(getCellValueAsString(cell29))) {
                             pressurePipeline.setYjwUsageTimePlan(getDate(cell29));
                         }
                         //实际投用
-                        Cell cell30 = cells.getCell(29);
+                        Cell cell30 = cells.getCell(30);
                         if (null != cell30 && !StringUtils.isEmpty(getCellValueAsString(cell30))) {
                             pressurePipeline.setYjwUsageTime(getDate(cell30));
                         }
@@ -291,12 +291,12 @@ public class PipingExt {
                     if (userId.equals(member2.getAdUserId())) {
                         insertRows++;
                         //项目单位计划办理使用登记的时间
-                        Cell cell27 = cells.getCell(27);
+                        Cell cell27 = cells.getCell(28);
                         if (null != cell27 && !StringUtils.isEmpty(getCellValueAsString(cell27))) {
                             pressurePipeline.setYjwRegistrationTime(getDate(cell27));
                         }
                         //项目单位办结使用登记的时间
-                        Cell cell28 = cells.getCell(30);
+                        Cell cell28 = cells.getCell(31);
                         if (null != cell28 && !StringUtils.isEmpty(getCellValueAsString(cell28))) {
                             pressurePipeline.setYjwCompleteRegistrationTime(getDate(cell28));
                         }
