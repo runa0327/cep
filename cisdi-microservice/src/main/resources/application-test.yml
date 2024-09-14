@@ -10,7 +10,7 @@ spring:
     username: qygly
     password: Qygly@123456
     # 注意更改ip和db：
-    url: jdbc:mysql://120.27.147.220:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    url: jdbc:mysql://192.168.30.26:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
