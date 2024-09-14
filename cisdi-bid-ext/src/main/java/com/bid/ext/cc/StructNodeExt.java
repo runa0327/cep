@@ -2879,7 +2879,7 @@ public class StructNodeExt {
     /**
      * 验证编制计划暂存必填项
      */
-    public void checkCcPrjBeforeUpdate() {
+    public void checkMakePlanBeforeUpdate() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
 
