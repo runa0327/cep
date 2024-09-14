@@ -2875,4 +2875,41 @@ public class StructNodeExt {
             }
         }
     }
+
+    /**
+     * 验证编制计划暂存必填项
+     */
+    public void checkCcPrjBeforeUpdate() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            String name = JdbcMapUtil.getString(valueMap, "NAME");
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            String ccPrjWbsTypeId = JdbcMapUtil.getString(valueMap, "CC_PRJ_WBS_TYPE_ID");
+            String wbsChiefUserId = JdbcMapUtil.getString(valueMap, "WBS_CHIEF_USER_ID");
+            String planFr = JdbcMapUtil.getString(valueMap, "PLAN_FR");
+            String planTo = JdbcMapUtil.getString(valueMap, "PLAN_TO");
+
+            // 检查是否为空，并抛出异常
+            if (name == null || name.trim().isEmpty()) {
+                throw new BaseException("名称为必填");
+            }
+            if (ccPrjId == null || ccPrjId.trim().isEmpty()) {
+                throw new BaseException("项目为必填");
+            }
+            if (ccPrjWbsTypeId == null || ccPrjWbsTypeId.trim().isEmpty()) {
+                throw new BaseException("计划类型为必填");
+            }
+            if (wbsChiefUserId == null || wbsChiefUserId.trim().isEmpty()) {
+                throw new BaseException("进度负责人为必填");
+            }
+            if (planFr == null || planFr.trim().isEmpty()) {
+                throw new BaseException("计划开始时间为必填");
+            }
+            if (planTo == null || planTo.trim().isEmpty()) {
+                throw new BaseException("计划结束时间为必填");
+            }
+        }
+    }
+
 }
