@@ -46,7 +46,7 @@ spring:
   #        ip: 115.236.153.174
 
   rabbitmq:
-    host: localhost
+    host: 47.98.230.64
     port: 5672
     username: admin
     password: admin@1234
@@ -78,7 +78,7 @@ qygly:
       #正式
       #      userPsd: Ldw58k5ZboUoLtaWVYsN6eC1dgkzlK/GQx0dICPqffh2rDliLsUH3pB08hz2rg3RWy0PjNNo0FMHw7xuHx8qzptfRe9oeEpZ1l2VcxEProUDU/IdFGEuFyonGhy8u5CMrqg5EfMTxVvA/K/SoCpjCw3+dAnA0Nj5ZCQVsz3iOho=
       #测试
-      userPsd: TVzD5Xhb1zg0Nh9cDTc3aAFq1mddYOTNHVaQ6Lg1rsUeailHxEAI1kn3fPvf94UzSwStD0U5xRqYVgdDZSIxvHhCAfOpAgamwRmtCPVX0r1Y3+c91ZcPX2BPRunA1ftudkY5GXf/JLmh3b2m7RVsklHR6LQhgFbJ8gcm5UMTGfw=
+      userPsd: Gm3OmZtgcavoWt65RXetpLCr8JoBlTVD/PDeIxrPY48DF/fcZUfwWLyXSJUjRed3cr4uHSfcgHGa/mCvZTYyK67O2+Z6ugZa+zbAlCBwSH/9wpnmZyeGXhnoXR3Cixo3PMaAYnmVgwYdl90cWX8WbKsCSUEUQhgHjmWRIa34G0k=
       valiCodeReqKey: ABCDEFGHIJKLMNOPQRSTUVWXYZ123456
       valiCode: 7890
       orgCode: prod
