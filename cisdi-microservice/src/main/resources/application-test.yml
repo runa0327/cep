@@ -1,16 +1,16 @@
 server:
-  port: 21114
+  port: 21112
   servlet:
-    context-path: /cisdi-microservice-prod
+    context-path: /cisdi-microservice-test
 
 spring:
   application:
-    name: cisdi-microservice-prod
+    name: cisdi-microservice-test
   datasource:
     username: qygly
     password: Qygly@123456
     # 注意更改ip和db：
-    url: jdbc:mysql://120.27.147.220:3306/prod?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    url: jdbc:mysql://120.27.147.220:3306:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
@@ -81,7 +81,7 @@ qygly:
       userPsd: TVzD5Xhb1zg0Nh9cDTc3aAFq1mddYOTNHVaQ6Lg1rsUeailHxEAI1kn3fPvf94UzSwStD0U5xRqYVgdDZSIxvHhCAfOpAgamwRmtCPVX0r1Y3+c91ZcPX2BPRunA1ftudkY5GXf/JLmh3b2m7RVsklHR6LQhgFbJ8gcm5UMTGfw=
       valiCodeReqKey: ABCDEFGHIJKLMNOPQRSTUVWXYZ123456
       valiCode: 7890
-      orgCode: prod
+      orgCode: test
       keeperIntervalSeconds: 5
     feign-client:
       name:

@@ -8,7 +8,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.BaseInfo;
 import com.qygly.shared.ad.ext.UrlToOpen;
+import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.*;
@@ -99,8 +101,9 @@ public class PreViewExt {
 
     public void newPreview() {
         InvokeActResult invokeActResult = new InvokeActResult();
-//        invokeActResult.urlToOpenList = new ArrayList<>();
-
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        BaseInfo currentOrgInfo = loginInfo.currentOrgInfo;
+        String orgCode = currentOrgInfo.code;
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String token = doGetStringStringMap();
@@ -110,8 +113,18 @@ public class PreViewExt {
             String modelFileId = ccDocFile.getCcPreviewFileId();
             String type = ccDocFile.getCcDocFileTypeId();
             String previewUrl = ccDocFile.getCcPreviewUrl();
-
-            // todo 利用Nacos获取微服务
+            String ccPreviewConversionStatusId = ccDocFile.getCcPreviewConversionStatusId();
+            if ("SUCC".equals(ccPreviewConversionStatusId)) {
+                UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
+                extBrowserWindowToOpen.url = previewUrl;
+                extBrowserWindowToOpen.title = "预览";
+                invokeActResult.urlToOpenList = new ArrayList<>();
+                invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
+                ExtJarHelper.setReturnValue(invokeActResult);
+                return;
+            } else if ("DOING".equals(ccPreviewConversionStatusId)) {
+                throw new BaseException("已经在转换中，请稍后再试");
+            }
 
             // 从 Nacos 获取服务实例列表
 //            List<ServiceInstance> instances = discoveryClient.getInstances("cisdi-microservice");
@@ -120,7 +133,7 @@ public class PreViewExt {
 
             Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
             String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
-            String uploadAndConvertUrl = gateWayUrl + "cisdi-microservice/preview/upload-and-convert";
+            String uploadAndConvertUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/preview/upload-and-convert";
 //            uploadAndConvertUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/upload-and-convert/";
             FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment());
             String filePath = flFile.getPhysicalLocation();
@@ -136,6 +149,7 @@ public class PreViewExt {
             body.add("token", token);
             body.add("uploadFileUrl", uploadFileUrl);
             body.add("ccDocFileId", id);
+            body.add("orgCode", orgCode);
 //            HttpHeaders headers = new HttpHeaders();
             HttpHeaders headers = new HttpHeaders();
 //            headers.set("Authorization", "Bearer " + token);

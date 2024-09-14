@@ -70,6 +70,7 @@ public class Preview {
         String token = (String) ((List<?>) fileData.get("token")).get(0);
         String uploadFileUrl = (String) ((List<?>) fileData.get("uploadFileUrl")).get(0);
         String ccDocFileId = (String) ((List<?>) fileData.get("ccDocFileId")).get(0);
+        String orgCode = (String) ((List<?>) fileData.get("orgCode")).get(0);
 
         // 启动多线程进行上传和转换操作
         CompletableFuture.runAsync(() -> {
@@ -92,7 +93,7 @@ public class Preview {
             }
             try {
                 // 转换文件逻辑
-                convertFileInBimface(uploadedFileId, token);
+                convertFileInBimface(uploadedFileId, token, orgCode);
 
                 // 文件转换请求提交成功，更新数据库状态
                 String uploadSql = "UPDATE CC_DOC_FILE SET CC_PREVIEW_CONVERSION_STATUS_ID = ? WHERE ID = ?";
@@ -152,7 +153,7 @@ public class Preview {
         return data.get("fileId").toString();
     }
 
-    private void convertFileInBimface(String fileId, String token) throws Exception {
+    private void convertFileInBimface(String fileId, String token, String orgCode) throws Exception {
 //        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
         HttpHeaders headers = new HttpHeaders();
 //        String token = doGetStringStringMap(); // 获取认证token
@@ -161,7 +162,7 @@ public class Preview {
 
         Map<String, Object> map = jdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
         String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
-        String callBackUrl = gateWayUrl + "cisdi-microservice/preview/preview_callback";
+        String callBackUrl = gateWayUrl + "cisdi-microservice-" + orgCode +"/preview/preview_callback";
 
 //        callBackUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/preview_callback/";
 
