@@ -6,6 +6,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -32,19 +33,21 @@ public class FlowUtils {
         String wfNodeId = (String) wfNodeInstances.get(0).get("WF_NODE_ID"); //节点Id
 
         for (String userId : userIds) {
-            WfTask wfTask = WfTask.newData();
-            wfTask.setReceiveDatetime(LocalDateTime.now());
-            wfTask.setWfProcessId(wfProcessId);
-            wfTask.setWfProcessInstanceId(wfProcessInstanceId);
-            wfTask.setWfNodeId(wfNodeId);
-            wfTask.setWfNodeInstanceId(wfNodeInstanceId);
-            wfTask.setAdUserId(userId);
-            wfTask.setWfTaskTypeId("NOTI");
-            wfTask.setInCurrentRound(true);
-            wfTask.setIsProcInstFirstTodoTask(false);
-            wfTask.setIsUserLastClosedTodoTask(false);
-            wfTask.insertById();
-
+            List<WfTask> wfTasks = WfTask.selectByWhere(new Where().eq(WfTask.Cols.AD_USER_ID, userId).eq(WfTask.Cols.IS_CLOSED, false).eq(WfTask.Cols.WF_TASK_TYPE_ID, "NOTI"));
+            if (SharedUtil.isEmpty(wfTasks)) {
+                WfTask wfTask = WfTask.newData();
+                wfTask.setReceiveDatetime(LocalDateTime.now());
+                wfTask.setWfProcessId(wfProcessId);
+                wfTask.setWfProcessInstanceId(wfProcessInstanceId);
+                wfTask.setWfNodeId(wfNodeId);
+                wfTask.setWfNodeInstanceId(wfNodeInstanceId);
+                wfTask.setAdUserId(userId);
+                wfTask.setWfTaskTypeId("NOTI");
+                wfTask.setInCurrentRound(true);
+                wfTask.setIsProcInstFirstTodoTask(false);
+                wfTask.setIsUserLastClosedTodoTask(false);
+                wfTask.insertById();
+            }
         }
     }
 
