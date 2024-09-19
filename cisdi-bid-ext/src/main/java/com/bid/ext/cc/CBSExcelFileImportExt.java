@@ -62,7 +62,7 @@ public class CBSExcelFileImportExt {
 
             int nameIndex = -1;
             int costIndex = -1;
-
+            int remarkIdx = -1;
 
             //循环行
             for (Row row : sheet) {
@@ -72,14 +72,18 @@ public class CBSExcelFileImportExt {
                         String cellValue = getCellValueAsString(cell);
                         if ("名称".equals(cellValue)) {
                             nameIndex = cell.getColumnIndex();
-                        } else if ("总成本".equals(cellValue)) {
+                        } else if ("金额（元）".equals(cellValue)) {
                             costIndex = cell.getColumnIndex();
+                        } else if ("备注".equals(cellValue)) {
+                            remarkIdx = cell.getColumnIndex();
                         }
                     }
                     if (nameIndex == -1) {
                         throw new BaseException("未找到'名称'列");
                     } else if (costIndex == -1) {
-                        throw new BaseException("未找到'总成本'列");
+                        throw new BaseException("未找到'金额（元）'列");
+                    } else if (remarkIdx == -1) {
+                        throw new BaseException("未找到'备注'列");
                     }
                 }
 
@@ -91,18 +95,22 @@ public class CBSExcelFileImportExt {
 
                     Cell costCell = row.getCell(costIndex);
                     if (costCell.getCellType() == BLANK) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，成本不能为空");
+                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，金额不能为空");
                     }
 
-                    String costName = getCellValueAsString(nameCell);
-                    String costValue = getCellValueAsString(costCell);
+                    try {
+                        String costName = getCellValueAsString(nameCell);
+                        String costValue = getCellValueAsString(costCell);
 
-                    for (CcPrjStructNode node : ccPrjStructNodes) {
+                        for (CcPrjStructNode node : ccPrjStructNodes) {
 
-                        if (costName.equals(node.getName())) {
-                            node.setPlanTotalCost(new BigDecimal(costValue));
+                            if (costName.equals(node.getName())) {
+                                node.setPlanTotalCost(new BigDecimal(costValue));
+                            }
+                            node.updateById();
                         }
-                        node.updateById();
+                    } catch (Exception e) {
+                        throw new BaseException("请确认第" + (row.getRowNum() + 1) + "行的成本科目存在且金额值合法");
                     }
                 }
             }
