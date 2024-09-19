@@ -102,6 +102,7 @@ public class DocExt {
         outputMap.put("fileInlineUrl", fileInlineUrl);
         String ccPreviewFileId = ccDocFile.getCcPreviewFileId();
         outputMap.put("ccPreviewFileId", ccPreviewFileId);
+        outputMap.put("name", ccDocFile.getName());
         ExtJarHelper.setReturnValue(outputMap);
     }
 
