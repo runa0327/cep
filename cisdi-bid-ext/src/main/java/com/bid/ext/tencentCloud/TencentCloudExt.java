@@ -45,7 +45,7 @@ public class TencentCloudExt {
     private static final double PI = 3.1415926535897932384626;
 
     //初始化IaiClient
-    public static IaiClient iaiClient;
+    public IaiClient iaiClient;
 
 //    static {
 //        Credential credential = new Credential(SECRET_ID, SECRET_KEY);
@@ -55,6 +55,8 @@ public class TencentCloudExt {
 
     //人脸入库
     public void createPerson() {
+        Credential credential = new Credential(SECRET_ID, SECRET_KEY);
+        iaiClient = new IaiClient(credential, REGION);
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         Map<String, Object> valueMap = entityRecord.valueMap;
 
@@ -109,7 +111,8 @@ public class TencentCloudExt {
 
     //人脸打卡，验证人脸，添加打卡记录
     public void verifyPerson() {
-
+        Credential credential = new Credential(SECRET_ID, SECRET_KEY);
+        iaiClient = new IaiClient(credential, REGION);
         LocalDateTime now = LocalDateTime.now();
 
         Map<String, Object> extApiParamMap = ExtJarHelper.getExtApiParamMap();
