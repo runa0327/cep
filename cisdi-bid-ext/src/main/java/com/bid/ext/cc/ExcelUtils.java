@@ -7,9 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +20,7 @@ public class ExcelUtils {
             Workbook workbook = null;
             if ("xlsx".equals(fileExt)) {
                 workbook = new XSSFWorkbook(file);
-            }
-            else if ("xls".equals(fileExt)) {
+            } else if ("xls".equals(fileExt)) {
                 workbook = new HSSFWorkbook(file);
             }
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
@@ -49,6 +46,9 @@ public class ExcelUtils {
 
     private static String getCellValueAsString(Cell cell) {
         String cellValue = "";
+        if (cell == null) {
+            return "";
+        }
         switch (cell.getCellType()) {
             case STRING:
                 cellValue = cell.getStringCellValue();

@@ -8,7 +8,6 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
-import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -384,7 +383,7 @@ public class CBSExcelFileImportExt {
 
                 if (ccPrjCostOverviewSimples.size() > 0) {
                     Where where = new Where();
-                    where.sql("t.id in (" +idsStr + ")");
+                    where.sql("t.id in (" + idsStr + ")");
                     CcPrjCostOverviewSimple.deleteByWhere(where);
 
                 }
@@ -399,6 +398,9 @@ public class CBSExcelFileImportExt {
 
     private BigDecimal getCellValueAsBigDecimal(Cell cell) {
         String cellValue = "";
+        if (cell == null) {
+            return new BigDecimal("0");
+        }
         switch (cell.getCellType()) {
             case STRING:
                 cellValue = cell.getStringCellValue();
@@ -423,6 +425,9 @@ public class CBSExcelFileImportExt {
 
     private String getCellValueAsString(Cell cell) {
         String cellValue = "";
+        if (cell == null) {
+            return "";
+        }
         switch (cell.getCellType()) {
             case STRING:
                 cellValue = cell.getStringCellValue();
