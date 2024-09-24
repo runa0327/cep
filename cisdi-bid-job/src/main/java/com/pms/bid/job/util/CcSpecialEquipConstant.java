@@ -14,6 +14,7 @@ public class CcSpecialEquipConstant {
     /**
      * 电梯
      */
+    public static  final String  E_TYPE_ELEVATOR="ELEVATOR";
 
     /**
      * 锅炉
@@ -22,13 +23,16 @@ public class CcSpecialEquipConstant {
     /**
      * 拼装压力容器
      */
+    public static final  String E_TYPE_ASSEMBLING_PRESSURE_VESSELS="ASSEMBLING_PRESSURE_VESSELS";
+
+
 
 
 
     //特种设备告知类型
     /**
      *计划到货时间到期，计划施工告知时间、计划完成安装时间、监督检验计划报检时间、具备监检机构现场验收的计划时间、计划投用时间
-      */
+     */
     public static  final String  ARRIVE_PLAN_DATE_EXPIRE_TASK="ARRIVE_PLAN_DATE_EXPIRE_TASK";
 
     /**
@@ -63,16 +67,33 @@ public class CcSpecialEquipConstant {
     public static  final String  USAGE_ACT_DATE_TASK="USAGE_ACT_DATE_TASK";
 
     /**
-     *实际投用时间到期，完成现场检验合格报告的时间、现场检验合格报告待办
+     *实际投用时间到期，完成取得监督检验合格报告时间、监督检验合格报告代办
      */
     public static  final String  SCENE_SUPERVISE_INSPECTION_REPORT_TASK="SCENE_SUPERVISE_INSPECTION_REPORT_TASK";
 
     /**
-     *计划投用前30天到期，计划办理使用登记时间任务
+     *实际投用前30天到期，计划办理使用登记时间任务
      */
     public static  final String  HANDLE_USAGE_REG_DATE_TASK="HANDLE_USAGE_REG_DATE_TASK";
 
-
-    //计划登记办理时间到发，上传设备使用登记证
+    /**
+     * 计划登记办理时间到发，上传设备使用登记证
+     */
     public static  final String  USAGE_REG_CART_TASK = "USAGE_REG_CART_TASK";
+
+    /**
+     * 安全阀计划检验任务
+     */
+    public static final String  SAFETY_VALVE_CHECK_TASK = "SAFETY_VALVE_CHECK_TASK";
+
+    /**
+     * 压力表计划检验任务
+     */
+    public static final String  PRESSURE_GAGE_CHECK_TASK = "PRESSURE_GAGE_CHECK_TASK";
+
+    /**
+     * 安装质量证明书任务
+     */
+    public static final String  INSTALL_QUALITY_CERTIFICATE_TASK = "INSTALL_QUALITY_CERTIFICATE_TASK";
+
 }

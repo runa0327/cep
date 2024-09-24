@@ -2,8 +2,8 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcHoistingMachineryMapper">
-    <resultMap id="hoistingMachineryResultMap" type="com.pms.bid.job.domain.zhanJiang.CcHoistingMachinery">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcElevatorMapper">
+    <resultMap id="elevatorResultMap" type="com.pms.bid.job.domain.zhanJiang.CcElevator">
         <!--id-->
         <id property="id" column="ID"/>
         <!--版本-->
@@ -21,12 +21,10 @@
         <result property="lkWfInstId" column="LK_WF_INST_ID"/>
         <!--        基本信息-->
         <result property="name" column="NAME"/>
-        <result property="ccSpecificationAndModel" column="CC_SPECIFICATION_AND_MODEL"/>
+        <result property="ccElevatorRatedLoad" column="CC_ELEVATOR_RATED_LOAD"/>
         <result property="ccEquipInstallLocation" column="CC_EQUIP_INSTALL_LOCATION"/>
         <result property="ccFactoryNumber" column="CC_FACTORY_NUMBER"/>
-        <result property="ccWorkLevel" column="CC_WORK_LEVEL"/>
-        <result property="ccMainHookRatedLiftingCapacity" column="CC_MAIN_HOOK_RATED_LIFTING_CAPACITY"/>
-        <result property="ccAuxiliaryHookRatedLiftingCapacity" column="CC_AUXILIARY_HOOK_RATED_LIFTING_CAPACITY"/>
+        <result property="ccSpecialEquipManufacturer" column="CC_SPECIAL_EQUIP_MANUFACTURER"/>
         <result property="ccInstallationUnit" column="CC_INSTALLATION_UNIT"/>
         <!--        到货-->
         <result property="ccEquipPlanArriveDate" column="CC_EQUIP_PLAN_ARRIVE_DATE"/>
@@ -64,15 +62,15 @@
 
 
     <update id="updateWfInstIdById">
-        update cc_hoisting_machinery
+        update CC_SPECIAL_EQUIP_ELEVATOR
         set LK_WF_INST_ID = #{lkWfInstId}
         where id = #{id}
     </update>
 
     <!--  查询到期需要通知的列表-->
-    <select id="queryList" resultMap="hoistingMachineryResultMap">
+    <select id="queryList" resultMap="elevatorResultMap">
         select *
-        from CC_HOISTING_MACHINERY
+        from CC_SPECIAL_EQUIP_ELEVATOR
     </select>
 
 </mapper>

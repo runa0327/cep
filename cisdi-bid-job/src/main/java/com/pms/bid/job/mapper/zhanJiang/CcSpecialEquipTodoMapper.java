@@ -12,13 +12,13 @@ public interface CcSpecialEquipTodoMapper {
      * 获取特种设备相关待办任务
      * @return
      */
-    List<CcHoistingMachinery> queryList(@Param("equipId")String equipId,@Param("category")String category,@Param("todoType")String todoType);
+    List<CcSpecialEquipTodo> queryList(@Param("equipId")String equipId,@Param("category")String category,@Param("todoType")String todoType);
 
     /**
      * 获取特种设备相关未完成任务
      * @return
      */
-    List<CcHoistingMachinery> queryIncompleteList(@Param("equipId")String equipId,@Param("category")String category,@Param("todoType")String todoType);
+    List<CcSpecialEquipTodo> queryIncompleteList(@Param("equipId")String equipId,@Param("category")String category,@Param("todoType")String todoType);
 
 
     /**

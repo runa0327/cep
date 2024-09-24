@@ -2,6 +2,8 @@ package com.pms.bid.job.cronTask;
 
 import com.pms.bid.job.service.process.CcSpecialEquipPreVeService;
 import com.pms.bid.job.service.process.ConstructionPlanService;
+import com.pms.bid.job.service.zhanJiang.CcAssemblingPressureVesselsService;
+import com.pms.bid.job.service.zhanJiang.CcElevatorService;
 import com.pms.bid.job.service.zhanJiang.CcHoistingMachineryService;
 import com.pms.bid.job.service.zhanJiang.CcIotEquipService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,12 @@ public class CronTask {
 
     @Resource
     private CcHoistingMachineryService hoistingMachineryService;
+
+    @Resource
+    private CcElevatorService elevatorService;
+
+    @Resource
+    private CcAssemblingPressureVesselsService assemblingPressureVesselsService;
 
 
     /**
@@ -68,6 +76,8 @@ public class CronTask {
     @Scheduled(fixedRate = 1000*60*60)
     public void checkHoistingMachineryTodo(){
         hoistingMachineryService.checkDate();
+        elevatorService.checkDate();
+        assemblingPressureVesselsService.checkDate();
     }
 
 }

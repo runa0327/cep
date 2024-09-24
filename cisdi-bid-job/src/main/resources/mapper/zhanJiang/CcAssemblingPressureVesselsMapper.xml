@@ -2,8 +2,8 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcHoistingMachineryMapper">
-    <resultMap id="hoistingMachineryResultMap" type="com.pms.bid.job.domain.zhanJiang.CcHoistingMachinery">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcAssemblingPressureVesselsMapper">
+    <resultMap id="assemblingPressureVesselsResultMap" type="com.pms.bid.job.domain.zhanJiang.CcAssemblingPressureVessels">
         <!--id-->
         <id property="id" column="ID"/>
         <!--版本-->
@@ -21,12 +21,13 @@
         <result property="lkWfInstId" column="LK_WF_INST_ID"/>
         <!--        基本信息-->
         <result property="name" column="NAME"/>
-        <result property="ccSpecificationAndModel" column="CC_SPECIFICATION_AND_MODEL"/>
-        <result property="ccEquipInstallLocation" column="CC_EQUIP_INSTALL_LOCATION"/>
         <result property="ccFactoryNumber" column="CC_FACTORY_NUMBER"/>
-        <result property="ccWorkLevel" column="CC_WORK_LEVEL"/>
-        <result property="ccMainHookRatedLiftingCapacity" column="CC_MAIN_HOOK_RATED_LIFTING_CAPACITY"/>
-        <result property="ccAuxiliaryHookRatedLiftingCapacity" column="CC_AUXILIARY_HOOK_RATED_LIFTING_CAPACITY"/>
+        <result property="ccEquipInstallLocation" column="CC_EQUIP_INSTALL_LOCATION"/>
+
+        <result property="ccSpecialEquipMedium" column="CC_SPECIAL_EQUIP_MEDIUM"/>
+        <result property="ccSpecialEquipVolume" column="CC_SPECIAL_EQUIP_VOLUME"/>
+        <result property="ccSpecialEquipPressure" column="CC_SPECIAL_EQUIP_PRESSURE"/>
+
         <result property="ccInstallationUnit" column="CC_INSTALLATION_UNIT"/>
         <!--        到货-->
         <result property="ccEquipPlanArriveDate" column="CC_EQUIP_PLAN_ARRIVE_DATE"/>
@@ -42,12 +43,21 @@
         <result property="ccPlanSuperviseInspection" column="CC_PLAN_SUPERVISE_INSPECTION"/>
         <result property="ccCompleteSuperviseInspection" column="CC_COMPLETE_SUPERVISE_INSPECTION"/>
         <result property="ccInspectionReport" column="CC_INSPECTION_REPORT"/>
-        <!--        现场试压-->
+        <!--        现场监督检验-->
         <result property="ccPlanSupInsAgeSceneCheckDate" column="CC_PLAN_SUP_INS_AGE_SCENE_CHECK_DATE"/>
         <result property="ccCompleteSupInsAgeSceneCheckDate" column="CC_COMPLETE_SUP_INS_AGE_SCENE_CHECK_DATE"/>
         <result property="ccSceneCheckOpinion" column="CC_SCENE_CHECK_OPINION"/>
         <result property="ccGetSupInsQualifiedReportDate" column="CC_GET_SUP_INS_QUALIFIED_REPORT_DATE"/>
         <result property="ccSupInsQualifiedReport" column="CC_SUP_INS_QUALIFIED_REPORT"/>
+<!--        安全阀-->
+        <result property="ccSpecialEquipSecValCheckDate" column="CC_SPECIAL_EQUIP_SEC_VAL_CHECK_DATE"/>
+        <result property="ccSpecialEquipComlSecValRep" column="CC_SPECIAL_EQUIP_COML_SEC_VAL_REP"/>
+<!--        压力表-->
+        <result property="ccSpecialEquipPreGageCheckDate" column="CC_SPECIAL_EQUIP_PRE_GAGE_CHECK_DATE"/>
+        <result property="ccSpecialEquipComlPreGageRep" column="CC_SPECIAL_EQUIP_COML_PRE_GAGE_REP"/>
+<!--        质量证明书-->
+        <result property="ccSpecialEquipInsQualityCert" column="CC_SPECIAL_EQUIP_INS_QUALITY_CERT"/>
+
         <!--        计划办理使用登记-->
         <result property="ccPrjUnitPlanHandleUsageRegDate" column="CC_PRJ_UNIT_PLAN_HANDLE_USAGE_REG_DATE"/>
         <!--    投用-->
@@ -64,15 +74,15 @@
 
 
     <update id="updateWfInstIdById">
-        update cc_hoisting_machinery
+        update CC_SPECIAL_EQUIP_ASSEMBLING_PRESSURE_VESSELS
         set LK_WF_INST_ID = #{lkWfInstId}
         where id = #{id}
     </update>
 
     <!--  查询到期需要通知的列表-->
-    <select id="queryList" resultMap="hoistingMachineryResultMap">
+    <select id="queryList" resultMap="assemblingPressureVesselsResultMap">
         select *
-        from CC_HOISTING_MACHINERY
+        from CC_SPECIAL_EQUIP_ASSEMBLING_PRESSURE_VESSELS
     </select>
 
 </mapper>

@@ -8,11 +8,9 @@ import com.pms.bid.job.mapper.processInstance.WfNodeInstanceMapper;
 import com.pms.bid.job.mapper.processInstance.WfNodeMapper;
 import com.pms.bid.job.mapper.processInstance.WfProcessInstanceMapper;
 import com.pms.bid.job.mapper.processInstance.WfProcessMapper;
-import com.pms.bid.job.mapper.zhanJiang.CcEarlyWarningMapper;
-import com.pms.bid.job.mapper.zhanJiang.CcHoistingMachineryMapper;
-import com.pms.bid.job.mapper.zhanJiang.CcSpecialEquipTodoMapper;
-import com.pms.bid.job.mapper.zhanJiang.PressurePipelineMapper;
+import com.pms.bid.job.mapper.zhanJiang.*;
 import com.pms.bid.job.service.processInstance.WfTaskService;
+import com.pms.bid.job.service.zhanJiang.CcElevatorService;
 import com.pms.bid.job.service.zhanJiang.CcHoistingMachineryService;
 import com.pms.bid.job.service.zhanJiang.CcSpecialEquipService;
 import com.pms.bid.job.service.zhanJiang.PressurePipelineService;
@@ -24,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -63,6 +62,12 @@ public class CcSpecialEquipServiceImpl implements CcSpecialEquipService {
     @Resource
     private CcHoistingMachineryMapper hoistingMachineryMapper;
 
+    @Resource
+    private CcElevatorMapper elevatorMapper;
+
+    @Resource
+    private CcAssemblingPressureVesselsMapper assemblingPressureVesselsMapper;
+
 
     /**
      * 将时间段内时间以七天为一周期取出
@@ -100,6 +105,7 @@ public class CcSpecialEquipServiceImpl implements CcSpecialEquipService {
      * 发起流程并提醒
      */
     @Override
+    @Async("threadPoolTaskExecutor")
     public void remind(String specialEquipId, String toUserId, String specialEquipCategory, String taskType, CcSpecialEquip specialEquip) {
 
         if (StringUtils.isEmpty(toUserId)) {
@@ -120,22 +126,47 @@ public class CcSpecialEquipServiceImpl implements CcSpecialEquipService {
                 String taskId = result.get("taskId");
                 hoistingMachineryMapper.updateWfInstIdById(specialEquip.getId(), wfId); //设置流程实例id、
                 wfTaskService.closeTask(taskId);
-            } else {
+            } else if(specialEquip instanceof CcElevator){
+
+                // 发起流程
+                Map<String, String> result =
+                        createWfProcessToSendNode(specialEquip, "1834511626925842432", "1834511626879705088", "1834415628236935168", "CC_SPECIAL_EQUIP_ELEVATOR", toUserId,"电梯-"+specialEquip.getName()+"-"+now);
+                wfId = result.get("wfProcessInstanceId");
+                String taskId = result.get("taskId");
+                elevatorMapper.updateWfInstIdById(specialEquip.getId(), wfId); //设置流程实例id、
+                wfTaskService.closeTask(taskId);
+
+            }else if(specialEquip instanceof CcAssemblingPressureVessels){
+                // 发起流程
+                Map<String, String> result =
+                        createWfProcessToSendNode(specialEquip, "1836587553704947712", "1836587553663004672", "1836314106420527104", "CC_SPECIAL_EQUIP_ASSEMBLING_PRESSURE_VESSELS", toUserId,"拼装压力容器-"+specialEquip.getName()+"-"+now);
+                wfId = result.get("wfProcessInstanceId");
+                String taskId = result.get("taskId");
+                assemblingPressureVesselsMapper.updateWfInstIdById(specialEquip.getId(), wfId); //设置流程实例id、
+                wfTaskService.closeTask(taskId);
+
+            }else {
                 log.error("特种设备类型错误！");
             }
         }
+        //流程结束节点
         if (specialEquip instanceof CcHoistingMachinery) {
             endNodeId = "1833686205883764736";
+        }else if (specialEquip instanceof CcElevator){
+            endNodeId = "1834511626951008256";
+        }else if (specialEquip instanceof CcAssemblingPressureVessels){
+            endNodeId = "1836587553746890752";
         }
 
         if(StringUtils.isEmpty(endNodeId)){
             throw new BaseException("不存在的特种设备，待办节点错误");
         }
+
         //  发起新的通知
         //检查是否有未完成的待办
-        List<CcHoistingMachinery> ccHoistingMachineries = specialEquipTodoMapper.queryIncompleteList(specialEquipId, specialEquipCategory, taskType);
+        List<CcSpecialEquipTodo> ccSpecialEquipTodos = specialEquipTodoMapper.queryIncompleteList(specialEquipId, specialEquipCategory, taskType);
 
-        if (ccHoistingMachineries==null || ccHoistingMachineries.size()<1 ){
+        if (ccSpecialEquipTodos==null || ccSpecialEquipTodos.size()<1 ){
             String taskId = createUserTaskMsg(wfId,endNodeId, toUserId, 1, now, "0099250247095871681");
             //新曾待办
             CcSpecialEquipTodo ccSpecialEquipTodo = new CcSpecialEquipTodo();

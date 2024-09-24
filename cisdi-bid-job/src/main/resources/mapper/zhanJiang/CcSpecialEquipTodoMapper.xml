@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcSpecialEquipTodoMapper">
-    <resultMap id="hoistingMachineryResultMap" type="com.pms.bid.job.domain.zhanJiang.CcSpecialEquipTodo">
+    <resultMap id="ccSpecialEquipTodoResultMap" type="com.pms.bid.job.domain.zhanJiang.CcSpecialEquipTodo">
         <!--id-->
         <id property="id" column="ID"/>
         <!--版本-->
@@ -28,7 +28,7 @@
 
 
     <!--  查询特种设备数据所有的待办-->
-    <select id="queryList" resultMap="hoistingMachineryResultMap">
+    <select id="queryList" resultMap="ccSpecialEquipTodoResultMap">
         select et.*, wt.IS_CLOSED TASK_IS_END
         from CC_SPECIAL_EQUIP_TODO et,
              wf_task wt
@@ -39,7 +39,7 @@
     </select>
 
     <!--  查询特种设备数据具有未办理的待办-->
-    <select id="queryIncompleteList" resultMap="hoistingMachineryResultMap">
+    <select id="queryIncompleteList" resultMap="ccSpecialEquipTodoResultMap">
         select et.*, wt.IS_CLOSED TASK_IS_END
         from CC_SPECIAL_EQUIP_TODO et,
              wf_task wt

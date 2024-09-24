@@ -541,7 +541,7 @@ public class ZJHoistingMachineryExt {
         HttpHeaders headers = new HttpHeaders();
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.exchange( "http://localhost:21112/cisdi-bid-job/specialEquip/checkData", HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange( "http://localhost:21112/cisdi-bid-job/specialEquip/checkData?type=hoistingMachinery", HttpMethod.GET, entity, String.class);
 
         if (response.getStatusCode() != HttpStatus.OK) {
             log.error("起重机械更新后检查待办请求失败！");

@@ -66,7 +66,7 @@ public class CcHoistingMachineryServiceImpl implements CcHoistingMachineryServic
 
             //计划到货时间
             if(ccHoistingMachinery.getCcEquipPlanArriveDate()!=null) {
-                if(ccSpecialEquipService.isMoreThanDaysOld(ccHoistingMachinery.getCcEquipPlanArriveDate(),7)){
+                if(!now.before(ccHoistingMachinery.getCcEquipPlanArriveDate())){
                     if(ccHoistingMachinery.getCcEquipActArriveDate()==null ||
                             ccHoistingMachinery.getCcPlanConstructionNoticeDate()==null ||
                             ccHoistingMachinery.getCcPlanCompleteInstallTime()==null ||
@@ -128,7 +128,7 @@ public class CcHoistingMachineryServiceImpl implements CcHoistingMachineryServic
                 if (ccSpecialEquipService.before30DaysLater(now,ccHoistingMachinery.getCcPlanPutIntoUseDate())){
                     if (ccHoistingMachinery.getCcPrjUnitPlanHandleUsageRegDate()==null){
                         this.remind(ccHoistingMachinery, regProHeadId,CcSpecialEquipConstant.HANDLE_USAGE_REG_DATE_TASK);
-                ccSpecialEquipService.checkWarningDay(slippageWarningDays,superviseId,ccHoistingMachinery.getCcPlanPutIntoUseDate(),"起重机械-"+ ccHoistingMachinery.getName()+"，计划投用时间超期，未填写'项目单位计划办理使用登记的时间'！",0);
+                ccSpecialEquipService.checkWarningDay(slippageWarningDays,superviseId,ccHoistingMachinery.getCcPlanPutIntoUseDate(),"起重机械-"+ ccHoistingMachinery.getName()+"，计划投用时间超期，未填写'项目单位计划办理使用登记的时间'！",-30);
                     }
                 }
             }
