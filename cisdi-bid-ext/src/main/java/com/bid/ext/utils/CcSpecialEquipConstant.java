@@ -62,6 +62,12 @@ public class CcSpecialEquipConstant {
     public static  final String  SCENE_SUPERVISE_INSPECTION_TASK="SCENE_SUPERVISE_INSPECTION_TASK";
 
     /**
+     *计划投用时间到期，完成现场试压通过监检机构见证的时间
+     */
+    public static  final String  SCENE_SUPERVISE_INSPECTION_PASS_PRESSURE_TEST_TASK="SCENE_SUPERVISE_INSPECTION_PASS_PRESSURE_TEST_TASK";
+
+
+    /**
      *计划投用时间到期,实际投用时间待办
      */
     public static  final String  USAGE_ACT_DATE_TASK="USAGE_ACT_DATE_TASK";
@@ -70,6 +76,12 @@ public class CcSpecialEquipConstant {
      *实际投用时间到期，完成取得监督检验合格报告时间、监督检验合格报告代办
      */
     public static  final String  SCENE_SUPERVISE_INSPECTION_REPORT_TASK="SCENE_SUPERVISE_INSPECTION_REPORT_TASK";
+
+    /**
+     *实际投用时间到期，完成上传耐压试验报告
+     */
+    public static  final String  SCENE_SUPERVISE_INSPECTION_PRESSURE_TEST_REPORT_TASK="SCENE_SUPERVISE_INSPECTION_PRESSURE_TEST_REPORT_TASK";
+
 
     /**
      *实际投用前30天到期，计划办理使用登记时间任务
@@ -95,5 +107,10 @@ public class CcSpecialEquipConstant {
      * 安装质量证明书任务
      */
     public static final String  INSTALL_QUALITY_CERTIFICATE_TASK = "INSTALL_QUALITY_CERTIFICATE_TASK";
+
+    /**
+     * 竣工资料提交特检院受理时间任务
+     */
+    public static final String  COMPLETION_DATA_TASK = "COMPLETION_DATA_TASK";
 
 }

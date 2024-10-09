@@ -104,11 +104,11 @@ public class ZJHoistingMachineryExt {
                     //设备名称
                     Cell cell1 = row.getCell(1);
                     if (cell1 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，'起重机名称'列为空");
+                        throw new BaseException("第" + row.getRowNum() + "行，'起重机械名称'列为空");
                     }
                     equipName = getCellValueAsString(cell1);
                     if (!StringUtils.hasText(equipName)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，'起重机名称'列为空");
+                        throw new BaseException("第" + row.getRowNum() + "行，'起重机械名称'列为空");
                     }
 
                     String installLocation = "";

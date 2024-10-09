@@ -44,8 +44,8 @@ public class ZJAssemblingPressureVesselsExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/导入/特种设备-拼装压力容器-初始导入模板.xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/湛江/导入/特种设备-拼装压力容器-初始导入模板.xlsx";
 
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
@@ -217,8 +217,8 @@ public class ZJAssemblingPressureVesselsExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/导入/特种设备-拼装压力容器 (1).xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/湛江/导入/特种设备-拼装压力容器 (1).xlsx";
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
 
