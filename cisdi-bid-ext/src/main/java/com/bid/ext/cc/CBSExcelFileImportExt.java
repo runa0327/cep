@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.model.CcPrjCostOverview;
 import com.bid.ext.model.CcPrjCostOverviewSimple;
 import com.bid.ext.model.CcPrjStructNode;
 import com.bid.ext.model.FlFile;
@@ -8,6 +9,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
+import com.qygly.shared.util.SharedUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -21,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.bid.ext.cc.StructNodeExt.recalculatePlanTotalCost;
 import static org.apache.poi.ss.usermodel.CellType.BLANK;
 
 public class CBSExcelFileImportExt {
@@ -107,6 +110,49 @@ public class CBSExcelFileImportExt {
                                 node.setPlanTotalCost(new BigDecimal(costValue));
                             }
                             node.updateById();
+
+                            BigDecimal planTotalCost = node.getPlanTotalCost();
+                            String copyFromPrjStructNodeId = node.getCopyFromPrjStructNodeId();
+                            String ccPrjId = node.getCcPrjId();
+                            List<CcPrjCostOverview> ccPrjCostOverviews = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, copyFromPrjStructNodeId).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
+                            if (!SharedUtil.isEmpty(ccPrjCostOverviews)) {
+                                for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
+                                    String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+                                    switch (structUsageId) {
+                                        case "CBS_0_AMT":
+                                            ccPrjCostOverview.setCbs0Amt(planTotalCost);
+                                            ccPrjCostOverview.updateById();
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            break;
+                                        case "CBS_1_AMT":
+                                            ccPrjCostOverview.setCbs1Amt(planTotalCost);
+                                            ccPrjCostOverview.updateById();
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            break;
+                                        case "CBS_2_AMT":
+                                            ccPrjCostOverview.setCbs2Amt(planTotalCost);
+                                            ccPrjCostOverview.updateById();
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            break;
+                                        case "CBS_3_AMT":
+                                            ccPrjCostOverview.setCbs3Amt(planTotalCost);
+                                            ccPrjCostOverview.updateById();
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            break;
+                                        case "CBS_11_AMT":
+                                            ccPrjCostOverview.setCbs11Amt(planTotalCost);
+                                            ccPrjCostOverview.updateById();
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            break;
+                                        case "CBS_12_AMT":
+                                            ccPrjCostOverview.setCbs12Amt(planTotalCost);
+                                            ccPrjCostOverview.updateById();
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            break;
+                                    }
+                                }
+                            }
+
                         }
                     } catch (Exception e) {
                         throw new BaseException("请确认第" + (row.getRowNum() + 1) + "行的成本科目存在且金额值合法");
