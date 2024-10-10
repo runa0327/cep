@@ -118,7 +118,7 @@ public class CBSExcelFileImportExt {
                             if (!SharedUtil.isEmpty(ccPrjCostOverviews)) {
                                 for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
                                     String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-                                    switch (structUsageId) {
+                                    switch (structUsageId + "_AMT") {
                                         case "CBS_0_AMT":
                                             ccPrjCostOverview.setCbs0Amt(planTotalCost);
                                             ccPrjCostOverview.updateById();
