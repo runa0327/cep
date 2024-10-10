@@ -118,36 +118,37 @@ public class CBSExcelFileImportExt {
                             if (!SharedUtil.isEmpty(ccPrjCostOverviews)) {
                                 for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
                                     String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-                                    switch (structUsageId + "_AMT") {
+                                    String entCode = structUsageId + "_AMT";
+                                    switch (entCode) {
                                         case "CBS_0_AMT":
                                             ccPrjCostOverview.setCbs0Amt(planTotalCost);
                                             ccPrjCostOverview.updateById();
-                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, entCode);
                                             break;
                                         case "CBS_1_AMT":
                                             ccPrjCostOverview.setCbs1Amt(planTotalCost);
                                             ccPrjCostOverview.updateById();
-                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, entCode);
                                             break;
                                         case "CBS_2_AMT":
                                             ccPrjCostOverview.setCbs2Amt(planTotalCost);
                                             ccPrjCostOverview.updateById();
-                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, entCode);
                                             break;
                                         case "CBS_3_AMT":
                                             ccPrjCostOverview.setCbs3Amt(planTotalCost);
                                             ccPrjCostOverview.updateById();
-                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, entCode);
                                             break;
                                         case "CBS_11_AMT":
                                             ccPrjCostOverview.setCbs11Amt(planTotalCost);
                                             ccPrjCostOverview.updateById();
-                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, entCode);
                                             break;
                                         case "CBS_12_AMT":
                                             ccPrjCostOverview.setCbs12Amt(planTotalCost);
                                             ccPrjCostOverview.updateById();
-                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, structUsageId);
+                                            recalculatePlanTotalCost(ccPrjCostOverviewPid, entCode);
                                             break;
                                     }
                                 }
