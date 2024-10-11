@@ -1644,7 +1644,7 @@ public class StructNodeExt {
             // 本次完成产值项目，金额，成本科目
             CcGdp ccGdp = CcGdp.selectById(csCommId);
             String ccPrjId = ccGdp.getCcPrjId();
-            BigDecimal trxAmt = ccGdp.getTrxAmt();
+            BigDecimal trxAmt = ccGdp.getTrxAmt() != null ? ccGdp.getTrxAmt() : BigDecimal.ZERO;
             String ccPrjCbsTempalteNodeId = ccGdp.getCcPrjCbsTempalteNodeId();
 
             BigDecimal completeAmtInPoSum = trxAmt;
@@ -1694,7 +1694,7 @@ public class StructNodeExt {
             String ccPrjId = ccGdp.getCcPrjId();
             String ccPrjCbsTempalteNodeId = ccGdp.getCcPrjCbsTempalteNodeId();
             // 此次更新的已完成产值金额
-            BigDecimal trxAmt = ccGdp.getTrxAmt();
+            BigDecimal trxAmt = ccGdp.getTrxAmt() != null ? ccGdp.getTrxAmt() : BigDecimal.ZERO;
 
             // 通过实体记录id查询此实体记录已完成产值金额
             List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
