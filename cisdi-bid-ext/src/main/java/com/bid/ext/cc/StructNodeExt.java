@@ -1131,7 +1131,7 @@ public class StructNodeExt {
             CcBid ccBid = CcBid.selectById(csCommId);
             String ccPrjId = ccBid.getCcPrjId();
 
-            BigDecimal priceLimit = ccBid.getPriceLimit();
+            BigDecimal priceLimit = ccBid.getPriceLimit() != null ? ccBid.getPriceLimit() : BigDecimal.ZERO;
             String ccPrjCbsTempalteNodeId = ccBid.getCcPrjCbsTempalteNodeId();
             BigDecimal bidAmtSum = new BigDecimal(priceLimit.toString());
             // 1.查询项目此成本科目已招标金额
@@ -1181,7 +1181,7 @@ public class StructNodeExt {
             //项目
             String ccPrjId = ccBid.getCcPrjId();
             // 此次更新的招标金额
-            BigDecimal priceLimit = ccBid.getPriceLimit();
+            BigDecimal priceLimit = ccBid.getPriceLimit() != null ? ccBid.getPriceLimit() : BigDecimal.ZERO;
             // 此次更新的成本科目
             String ccPrjCbsTempalteNodeId = ccBid.getCcPrjCbsTempalteNodeId();
 
