@@ -62,8 +62,17 @@ public class StatusExt {
     /**
      * 竣工验收状态变更为“验收申请审批中”
      */
+    public void changeStatusToDraft() {
+        //草稿
+        String status = "draft";
+        changeAcceptanceStatus(status);
+    }
+
+    /**
+     * 竣工验收状态变更为“验收申请审批中”
+     */
     public void changeStatusToApprove() {
-        //待复核
+        //验收申请审批中
         String status = "approve";
         changeAcceptanceStatus(status);
     }
@@ -72,7 +81,7 @@ public class StatusExt {
      * 竣工验收状态变更为“验收中”
      */
     public void changeStatusToAcceptanceInProgress() {
-        //待复核
+        //验收中
         String status = "acceptance_in_progress";
         changeAcceptanceStatus(status);
     }
@@ -81,7 +90,7 @@ public class StatusExt {
      * 竣工验收状态变更为“验收完成”
      */
     public void changeStatusToAccepted() {
-        //待复核
+        //验收完成
         String status = "accepted";
         changeAcceptanceStatus(status);
     }
