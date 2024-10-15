@@ -3,6 +3,7 @@ package com.bid.ext.cc;
 import com.bid.ext.model.CcDocFile;
 import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class DocToExt {
      * 竣工资料关联项目文档
      */
     public void acceptanceToDoc() {
+        InvokeActResult invokeActResult = new InvokeActResult();
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String ccPrjId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_ID");
         String ccDocDirId = JdbcMapUtil.getString(varMap, "P_DOC_DIR_ID");
@@ -35,7 +37,9 @@ public class DocToExt {
             ccDocFileAcceptance.setCcDocFileTypeId("ACCEPTANCE");
             ccDocFileAcceptance.setCcAttachment(ccAttachment);
             ccDocFileAcceptance.setCcDocFileFrom(5);
-            ccDocFile.insertById();
+            ccDocFileAcceptance.insertById();
         }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 }
