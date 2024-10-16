@@ -104,6 +104,10 @@ public class CcDocDir {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+         */
+        public static final String IS_TEMPLATE = "IS_TEMPLATE";
+        /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
@@ -111,6 +115,14 @@ public class CcDocDir {
          * {"EN": "资料文件夹类型", "ZH_CN": "资料文件夹类型", "ZH_TW": "资料文件夹类型"}。
          */
         public static final String CC_DOC_FOLDER_TYPE_ID = "CC_DOC_FOLDER_TYPE_ID";
+        /**
+         * {"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+         */
+        public static final String COPY_FROM_ID = "COPY_FROM_ID";
+        /**
+         * {"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+         */
+        public static final String CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = "CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID";
         /**
          * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
          */
@@ -635,6 +647,42 @@ public class CcDocDir {
     }
 
     /**
+     * {"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+     */
+    private Boolean isTemplate;
+
+    /**
+     * 获取：{"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+     */
+    public Boolean getIsTemplate() {
+        return this.isTemplate;
+    }
+
+    /**
+     * 设置：{"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+     */
+    public CcDocDir setIsTemplate(Boolean isTemplate) {
+        if (this.isTemplate == null && isTemplate == null) {
+            // 均为null，不做处理。
+        } else if (this.isTemplate != null && isTemplate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isTemplate.compareTo(isTemplate) != 0) {
+                this.isTemplate = isTemplate;
+                if (!this.toUpdateCols.contains("IS_TEMPLATE")) {
+                    this.toUpdateCols.add("IS_TEMPLATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isTemplate = isTemplate;
+            if (!this.toUpdateCols.contains("IS_TEMPLATE")) {
+                this.toUpdateCols.add("IS_TEMPLATE");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
     private String ccPrjId;
@@ -701,6 +749,78 @@ public class CcDocDir {
             this.ccDocFolderTypeId = ccDocFolderTypeId;
             if (!this.toUpdateCols.contains("CC_DOC_FOLDER_TYPE_ID")) {
                 this.toUpdateCols.add("CC_DOC_FOLDER_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+     */
+    private String copyFromId;
+
+    /**
+     * 获取：{"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+     */
+    public String getCopyFromId() {
+        return this.copyFromId;
+    }
+
+    /**
+     * 设置：{"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+     */
+    public CcDocDir setCopyFromId(String copyFromId) {
+        if (this.copyFromId == null && copyFromId == null) {
+            // 均为null，不做处理。
+        } else if (this.copyFromId != null && copyFromId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.copyFromId.compareTo(copyFromId) != 0) {
+                this.copyFromId = copyFromId;
+                if (!this.toUpdateCols.contains("COPY_FROM_ID")) {
+                    this.toUpdateCols.add("COPY_FROM_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.copyFromId = copyFromId;
+            if (!this.toUpdateCols.contains("COPY_FROM_ID")) {
+                this.toUpdateCols.add("COPY_FROM_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+     */
+    private String ccDocDirAcceptanceTemplateTypeId;
+
+    /**
+     * 获取：{"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+     */
+    public String getCcDocDirAcceptanceTemplateTypeId() {
+        return this.ccDocDirAcceptanceTemplateTypeId;
+    }
+
+    /**
+     * 设置：{"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+     */
+    public CcDocDir setCcDocDirAcceptanceTemplateTypeId(String ccDocDirAcceptanceTemplateTypeId) {
+        if (this.ccDocDirAcceptanceTemplateTypeId == null && ccDocDirAcceptanceTemplateTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDocDirAcceptanceTemplateTypeId != null && ccDocDirAcceptanceTemplateTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDocDirAcceptanceTemplateTypeId.compareTo(ccDocDirAcceptanceTemplateTypeId) != 0) {
+                this.ccDocDirAcceptanceTemplateTypeId = ccDocDirAcceptanceTemplateTypeId;
+                if (!this.toUpdateCols.contains("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDocDirAcceptanceTemplateTypeId = ccDocDirAcceptanceTemplateTypeId;
+            if (!this.toUpdateCols.contains("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID")) {
+                this.toUpdateCols.add("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID");
             }
         }
         return this;

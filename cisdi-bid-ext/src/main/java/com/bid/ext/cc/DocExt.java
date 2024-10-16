@@ -1,6 +1,8 @@
 package com.bid.ext.cc;
 
+import cn.hutool.core.io.FileUtil;
 import com.bid.ext.model.*;
+import com.bid.ext.utils.TemplateUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -170,7 +172,7 @@ public class DocExt {
 
         // 创建ZIP文件夹
         String pathDir = flPath.getDir() + year + "/" + month + "/" + day + "/";
-        cn.hutool.core.io.FileUtil.mkdir(pathDir);
+        FileUtil.mkdir(pathDir);
         // 指定ZIP文件保存位置
         String path = pathDir + fileId + ".zip";
 
@@ -641,5 +643,36 @@ public class DocExt {
     public static boolean checkFileExists(String path) {
         File file = new File(path);
         return file.exists();
+    }
+
+    /**
+     * 资料目录套用模板
+     */
+    public void docDirToTemplate() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String ccPrjId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_ID");
+        String ccDocFolderTypeId = JdbcMapUtil.getString(varMap, "P_CC_DOC_FOLDER_TYPE_ID");
+        String ccDocDirAcceptanceTemplateType = JdbcMapUtil.getString(varMap, "P_CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID");
+        //查询该类型下所有模板的根节点
+        String sql = "select t.id from cc_doc_dir t where t.CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? and t.CC_DOC_DIR_PID is null and t.CC_DOC_FOLDER_TYPE_ID = 'acceptance' and t.IS_TEMPLATE = 1";
+        List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, ccDocDirAcceptanceTemplateType);
+        for (Map<String, Object> map : queryForList) {
+            String templateRootId = JdbcMapUtil.getString(map, "ID");
+            //套用模板
+
+            List<Map<String, Object>> insertedNodes = TemplateUtils.applyTemplate(templateRootId, "CC_DOC_DIR", "ID", "CC_DOC_DIR_PID", true);
+            // 对插入后的节点进行统一处理
+            for (Map<String, Object> node : insertedNodes) {
+                String id = node.get("ID").toString();
+                node.put("CC_PRJ_ID", ccPrjId);
+                node.put("CC_DOC_FOLDER_TYPE_ID", ccDocFolderTypeId);
+                node.put("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID", ccDocDirAcceptanceTemplateType);
+
+                String updateSql = "UPDATE cc_doc_dir SET CC_PRJ_ID = ?, CC_DOC_FOLDER_TYPE_ID = ?, CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? WHERE id = ?";
+                myJdbcTemplate.update(updateSql, ccPrjId, ccDocFolderTypeId, ccDocDirAcceptanceTemplateType, id);
+            }
+
+        }
     }
 }
