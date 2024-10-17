@@ -132,6 +132,10 @@ public class CcDocDir {
          */
         public static final String SEQ_NO = "SEQ_NO";
         /**
+         * {"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+         */
+        public static final String CC_DOC_DIR_STATUS_ID = "CC_DOC_DIR_STATUS_ID";
+        /**
          * {"EN": "CC_DOC_DIR_PID", "ZH_CN": "资料父目录", "ZH_TW": "繁：资料父目录"}。
          */
         public static final String CC_DOC_DIR_PID = "CC_DOC_DIR_PID";
@@ -893,6 +897,42 @@ public class CcDocDir {
             this.seqNo = seqNo;
             if (!this.toUpdateCols.contains("SEQ_NO")) {
                 this.toUpdateCols.add("SEQ_NO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+     */
+    private String ccDocDirStatusId;
+
+    /**
+     * 获取：{"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+     */
+    public String getCcDocDirStatusId() {
+        return this.ccDocDirStatusId;
+    }
+
+    /**
+     * 设置：{"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+     */
+    public CcDocDir setCcDocDirStatusId(String ccDocDirStatusId) {
+        if (this.ccDocDirStatusId == null && ccDocDirStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDocDirStatusId != null && ccDocDirStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDocDirStatusId.compareTo(ccDocDirStatusId) != 0) {
+                this.ccDocDirStatusId = ccDocDirStatusId;
+                if (!this.toUpdateCols.contains("CC_DOC_DIR_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_DOC_DIR_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDocDirStatusId = ccDocDirStatusId;
+            if (!this.toUpdateCols.contains("CC_DOC_DIR_STATUS_ID")) {
+                this.toUpdateCols.add("CC_DOC_DIR_STATUS_ID");
             }
         }
         return this;

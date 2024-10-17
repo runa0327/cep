@@ -675,4 +675,31 @@ public class DocExt {
 
         }
     }
+
+    /**
+     * 锁定资料目录下文件
+     */
+    public void lockDoc() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
+            ccDocDir.setCcDocDirStatusId("lock");
+            ccDocDir.updateById();
+        }
+    }
+
+    /**
+     * 解锁资料目录下文件
+     */
+    public void unlockDoc() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
+            ccDocDir.setCcDocDirStatusId("unlock");
+            ccDocDir.updateById();
+        }
+    }
+
 }
