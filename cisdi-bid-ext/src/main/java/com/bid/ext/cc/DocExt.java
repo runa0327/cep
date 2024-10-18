@@ -10,6 +10,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
+import com.qygly.shared.interaction.DrivenInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
@@ -700,6 +701,17 @@ public class DocExt {
             ccDocDir.setCcDocDirStatusId("unlock");
             ccDocDir.updateById();
         }
+    }
+
+    /**
+     * 资料清单关联文件预检测
+     */
+    public void preCheckDocToFile() {
+        Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
+        if (drivenInfosMap.size() != 1) {
+            throw new BaseException("请勿选择多个目录");
+        }
+
     }
 
 }
