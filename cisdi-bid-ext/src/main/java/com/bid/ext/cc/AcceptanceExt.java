@@ -224,6 +224,7 @@ public class AcceptanceExt {
             // 构建文件名和路径
             String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
             saveWordToFile(b, path);
+//            saveWordToFile(word, path);
             boolean fileExists = checkFileExists(path);
             if (fileExists) {
                 //获取文件属性
@@ -297,11 +298,15 @@ public class AcceptanceExt {
             Files.write(tempDocx, docxBytes);
 
             // 定义 PDF 临时文件的路径
-            Path tempPdf = Files.createTempFile(null, ".pdf");
+            Path tempPdf = Files.createTempFile(null, ".PDF");
 
             // 指定 LibreOffice 的安装路径及命令行工具
-            String libreOfficePath = "/usr/bin/libreoffice";
-//            String libreOfficePath = "D:\\Program Files\\LibreOffice";
+//            String libreOfficePath = "/usr/bin/libreoffice";
+//            String libreOfficePath = "D:/Tools/LibreOffice/program/soffice.exe";
+            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
             // 调用 LibreOffice 进行转换
             ProcessBuilder builder = new ProcessBuilder();
@@ -322,9 +327,65 @@ public class AcceptanceExt {
 
             return pdfBytes;
         } catch (Exception e) {
-            throw new BaseException(e);
+            e.printStackTrace();
+            throw new BaseException("PDF文件转换失败", e);
         }
     }
+
+//    public static byte[] convertWordToPDF(byte[] docxBytes) {
+//        try {
+//            // 创建临时文件保存 DOCX 内容
+//            Path tempDocx = Files.createTempFile(null, ".docx");
+//
+//            // 检查文件是否存在
+//            if (!Files.exists(tempDocx)) {
+//                throw new BaseException("word不存在");
+//            }
+//
+//            Files.write(tempDocx, docxBytes);
+//
+//
+//            // 指定 LibreOffice 的安装路径及命令行工具
+//            String libreOfficePath = "/usr/bin/libreoffice";
+////            String libreOfficePath = "D:\\Program Files\\LibreOffice\\program\\soffice.exe";
+//
+//            // 调用 LibreOffice 进行转换
+//            ProcessBuilder builder = new ProcessBuilder();
+//            builder.command(libreOfficePath, "--convert-to", "pdf:writer_pdf_Export", tempDocx.toString(), "--outdir", tempDocx.getParent().toString());
+//            builder.redirectErrorStream(true);
+//            Process process = builder.start();
+//
+//            // 输出错误日志，确保转换成功
+//            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    System.out.println(line);
+//                }
+//            }
+//
+//            process.waitFor();
+//
+//            // 明确生成的 PDF 文件路径
+//            String pdfFileName = tempDocx.getFileName().toString().replaceAll("\\.docx$", ".pdf");
+//            Path pdfFilePath = tempDocx.getParent().resolve(pdfFileName);
+//
+//            // 检查文件是否存在
+//            if (!Files.exists(pdfFilePath)) {
+//                throw new BaseException("pdf不存在");
+//            }
+//
+//            // 读取生成的 PDF 文件
+//            byte[] pdfBytes = Files.readAllBytes(pdfFilePath);
+//
+//            // 清理临时文件
+//            Files.delete(tempDocx);
+//            Files.delete(pdfFilePath);
+//
+//            return pdfBytes;
+//        } catch (Exception e) {
+//            throw new BaseException(e);
+//        }
+//    }
 
     /**
      * 从指定表中获取名称
