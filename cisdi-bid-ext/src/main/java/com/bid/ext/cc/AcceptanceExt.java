@@ -66,7 +66,7 @@ public class AcceptanceExt {
             Object projectOwner = valueMap.get("PROJECT_OWNER");
             List<Map<String, Object>> projectOwnerName = null;
             if (!SharedUtil.isEmpty(projectOwner)) {
-                projectOwnerName = fetchAndFormatIssuePointNames("CC_COMPANY",
+                projectOwnerName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
                         valueMap.get("PROJECT_OWNER").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -74,7 +74,7 @@ public class AcceptanceExt {
             Object designContractor = valueMap.get("DESIGN_CONTRACTOR");
             List<Map<String, Object>> designContractorName = null;
             if (!SharedUtil.isEmpty(designContractor)) {
-                designContractorName = fetchAndFormatIssuePointNames("CC_COMPANY",
+                designContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
                         valueMap.get("DESIGN_CONTRACTOR").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -82,7 +82,7 @@ public class AcceptanceExt {
             Object surveyContractor = valueMap.get("SURVEY_CONTRACTOR");
             List<Map<String, Object>> surveyContractorName = null;
             if (!SharedUtil.isEmpty(surveyContractor)) {
-                surveyContractorName = fetchAndFormatIssuePointNames("CC_COMPANY",
+                surveyContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
                         valueMap.get("SURVEY_CONTRACTOR").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -90,7 +90,7 @@ public class AcceptanceExt {
             Object constructionContractor = valueMap.get("CONSTRUCTION_CONTRACTOR");
             List<Map<String, Object>> constructionContractorName = null;
             if (!SharedUtil.isEmpty(constructionContractor)) {
-                constructionContractorName = fetchAndFormatIssuePointNames("CC_COMPANY",
+                constructionContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
                         valueMap.get("PROJECT_OWNER").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -98,7 +98,7 @@ public class AcceptanceExt {
             Object supervisingContractor = valueMap.get("SUPERVISING_CONTRACTOR");
             List<Map<String, Object>> supervisingContractorName = null;
             if (!SharedUtil.isEmpty(supervisingContractor)) {
-                supervisingContractorName = fetchAndFormatIssuePointNames("CC_COMPANY",
+                supervisingContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
                         valueMap.get("PROJECT_OWNER").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -106,7 +106,7 @@ public class AcceptanceExt {
             Object projectOwnerChiefUserIds = valueMap.get("PROJECT_OWNER_CHIEF_USER_IDS");
             List<Map<String, Object>> projectOwnerChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(projectOwnerChiefUserIds)) {
-                projectOwnerChiefUserIdsName = fetchAndFormatIssuePointNames("CC_PRJ_MEMBER",
+                projectOwnerChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
                         valueMap.get("PROJECT_OWNER_CHIEF_USER_IDS").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -114,7 +114,7 @@ public class AcceptanceExt {
             Object designContractorChiefUserIds = valueMap.get("DESIGN_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> designContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(designContractorChiefUserIds)) {
-                designContractorChiefUserIdsName = fetchAndFormatIssuePointNames("CC_PRJ_MEMBER",
+                designContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
                         valueMap.get("DESIGN_CONTRACTOR_CHIEF_USER_IDS").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -122,7 +122,7 @@ public class AcceptanceExt {
             Object surveyContractorChiefUserIds = valueMap.get("SURVEY_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> surveyContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(surveyContractorChiefUserIds)) {
-                surveyContractorChiefUserIdsName = fetchAndFormatIssuePointNames("CC_PRJ_MEMBER",
+                surveyContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
                         valueMap.get("SURVEY_CONTRACTOR_CHIEF_USER_IDS").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -130,7 +130,7 @@ public class AcceptanceExt {
             Object constructionContractorChiefUserIds = valueMap.get("CONSTRUCTION_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> constructionContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(constructionContractorChiefUserIds)) {
-                constructionContractorChiefUserIdsName = fetchAndFormatIssuePointNames("CC_PRJ_MEMBER",
+                constructionContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
                         valueMap.get("CONSTRUCTION_CONTRACTOR_CHIEF_USER_IDS").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -138,7 +138,7 @@ public class AcceptanceExt {
             Object supervisingContractorChiefUserIds = valueMap.get("SUPERVISING_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> supervisingContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(supervisingContractorChiefUserIds)) {
-                supervisingContractorChiefUserIdsName = fetchAndFormatIssuePointNames("CC_PRJ_MEMBER",
+                supervisingContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
                         valueMap.get("SUPERVISING_CONTRACTOR_CHIEF_USER_IDS").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -408,6 +408,32 @@ public class AcceptanceExt {
         for (Map<String, Object> result : resultList) {
             Map<String, Object> formattedEntry = new HashMap<>();
             formattedEntry.put("content", index++ + "、" + JdbcMapUtil.getString(result, "name"));
+            formattedNames.add(formattedEntry);
+        }
+
+        return formattedNames;
+    }
+
+    /**
+     * 从指定表中获取名称
+     *
+     * @param tableName
+     * @param idString
+     * @param currentLangId
+     * @return
+     */
+    public static List<Map<String, Object>> fetchAndFormatIssuePointNamesNoIndex(String tableName, String idString, String currentLangId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        List<String> ids = Arrays.asList(idString.split(","));
+        String inSql = String.join(",", Collections.nCopies(ids.size(), "?")); // 动态创建SQL IN子句
+        String sql = "SELECT IF(JSON_VALID(NAME), NAME->>'$." + currentLangId + "', NAME) as name FROM " + tableName
+                + " WHERE NAME IS NOT NULL AND id IN (" + inSql + ")";
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList(sql, ids.toArray());
+        List<Map<String, Object>> formattedNames = new ArrayList<Map<String, Object>>();
+
+        for (Map<String, Object> result : resultList) {
+            Map<String, Object> formattedEntry = new HashMap<>();
+            formattedEntry.put("content", "、" + JdbcMapUtil.getString(result, "name"));
             formattedNames.add(formattedEntry);
         }
 
