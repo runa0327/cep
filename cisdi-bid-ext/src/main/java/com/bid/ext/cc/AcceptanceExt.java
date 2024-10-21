@@ -431,14 +431,18 @@ public class AcceptanceExt {
         List<Map<String, Object>> resultList = myJdbcTemplate.queryForList(sql, ids.toArray());
         List<Map<String, Object>> formattedNames = new ArrayList<Map<String, Object>>();
 
+        boolean isFirst = true; // 标识变量
         for (Map<String, Object> result : resultList) {
             Map<String, Object> formattedEntry = new HashMap<>();
-            formattedEntry.put("content", "、" + JdbcMapUtil.getString(result, "name"));
+            String prefix = isFirst ? "" : "、"; // 第一个元素前面不加“、”
+            formattedEntry.put("content", prefix + JdbcMapUtil.getString(result, "name"));
             formattedNames.add(formattedEntry);
+            isFirst = false; // 更新标识变量
         }
 
         return formattedNames;
     }
+
 
     /**
      * 从指定表中获取名称
