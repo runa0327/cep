@@ -4,8 +4,7 @@ import com.bid.ext.model.CcDocDir;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
-
-import java.util.prefs.BackingStoreException;
+import com.qygly.shared.util.SharedUtil;
 
 public class DocDirExt {
 
@@ -21,12 +20,26 @@ public class DocDirExt {
 
             if (ccDocDirPid != null) {
                 CcDocDir ccDocDir1 = CcDocDir.selectById(ccDocDirPid);
-                if(!ccDocDir.getCcPrjId().equals(ccDocDir1.getCcPrjId())) {
+                if (!ccDocDir.getCcPrjId().equals(ccDocDir1.getCcPrjId())) {
                     throw new BaseException("不能将目录置于其他项目的目录下！");
                 }
             }
         }
 
 
+    }
+
+    /**
+     * 判断目录是否为套用过模板的目录，用于更新后
+     */
+    public void isCopyFromDir() throws BaseException {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
+            String copyFromId = ccDocDir.getCopyFromId();
+            if (!SharedUtil.isEmpty(copyFromId)) {
+                throw new BaseException("不能修改模板目录结构！");
+            }
+        }
     }
 }
