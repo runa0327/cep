@@ -650,6 +650,7 @@ public class DocExt {
      * 资料目录套用模板
      */
     public void docDirToTemplate() {
+        InvokeActResult invokeActResult = new InvokeActResult();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String ccPrjId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_ID");
@@ -666,15 +667,12 @@ public class DocExt {
             // 对插入后的节点进行统一处理
             for (Map<String, Object> node : insertedNodes) {
                 String id = node.get("ID").toString();
-                node.put("CC_PRJ_ID", ccPrjId);
-                node.put("CC_DOC_FOLDER_TYPE_ID", ccDocFolderTypeId);
-                node.put("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID", ccDocDirAcceptanceTemplateType);
-
-                String updateSql = "UPDATE cc_doc_dir SET CC_PRJ_ID = ?, CC_DOC_FOLDER_TYPE_ID = ?, CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? WHERE id = ?";
+                String updateSql = "UPDATE cc_doc_dir SET CC_PRJ_ID = ?, CC_DOC_FOLDER_TYPE_ID = ?, CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ?, CC_DOC_DIR_STATUS_ID = 'unlock' WHERE id = ?";
                 myJdbcTemplate.update(updateSql, ccPrjId, ccDocFolderTypeId, ccDocDirAcceptanceTemplateType, id);
             }
-
         }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**
