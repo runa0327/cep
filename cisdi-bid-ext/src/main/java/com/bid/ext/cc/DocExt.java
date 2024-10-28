@@ -739,6 +739,7 @@ public class DocExt {
             ccDocFile.setIsDefault(false);
             ccDocFile.setIsFavorites(false);
 
+            ccDocFile.setCcDocFileFrom(4);
             ccDocFile.setCcDocFileTypeId("ACCEPTANCE");
             ccDocFile.setCcDocDirId(ccDocDirId);
             ccDocFile.setCcAttachment(attachmentId);
