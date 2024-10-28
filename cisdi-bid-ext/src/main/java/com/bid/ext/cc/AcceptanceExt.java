@@ -1,10 +1,13 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.entity.*;
 import com.bid.ext.model.AdAtt;
 import com.bid.ext.model.CcCompletionAcceptance;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
-import com.bid.ext.utils.DownloadUtils;
+import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
+import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -15,10 +18,12 @@ import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +32,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class AcceptanceExt {
+
+    private static final String TEMPLATE_PATH = "templates/acceptance.docx";
+
     /**
      * 生成竣工验收报告（pdf）
      */
@@ -66,39 +74,7 @@ public class AcceptanceExt {
             Object projectOwner = valueMap.get("PROJECT_OWNER");
             List<Map<String, Object>> projectOwnerName = null;
             if (!SharedUtil.isEmpty(projectOwner)) {
-                projectOwnerName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
-                        valueMap.get("PROJECT_OWNER").toString(),
-                        loginInfo.currentLangId.toString());
-            }
-
-            Object designContractor = valueMap.get("DESIGN_CONTRACTOR");
-            List<Map<String, Object>> designContractorName = null;
-            if (!SharedUtil.isEmpty(designContractor)) {
-                designContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
-                        valueMap.get("DESIGN_CONTRACTOR").toString(),
-                        loginInfo.currentLangId.toString());
-            }
-
-            Object surveyContractor = valueMap.get("SURVEY_CONTRACTOR");
-            List<Map<String, Object>> surveyContractorName = null;
-            if (!SharedUtil.isEmpty(surveyContractor)) {
-                surveyContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
-                        valueMap.get("SURVEY_CONTRACTOR").toString(),
-                        loginInfo.currentLangId.toString());
-            }
-
-            Object constructionContractor = valueMap.get("CONSTRUCTION_CONTRACTOR");
-            List<Map<String, Object>> constructionContractorName = null;
-            if (!SharedUtil.isEmpty(constructionContractor)) {
-                constructionContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
-                        valueMap.get("PROJECT_OWNER").toString(),
-                        loginInfo.currentLangId.toString());
-            }
-
-            Object supervisingContractor = valueMap.get("SUPERVISING_CONTRACTOR");
-            List<Map<String, Object>> supervisingContractorName = null;
-            if (!SharedUtil.isEmpty(supervisingContractor)) {
-                supervisingContractorName = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
+                projectOwnerName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
                         valueMap.get("PROJECT_OWNER").toString(),
                         loginInfo.currentLangId.toString());
             }
@@ -106,41 +82,113 @@ public class AcceptanceExt {
             Object projectOwnerChiefUserIds = valueMap.get("PROJECT_OWNER_CHIEF_USER_IDS");
             List<Map<String, Object>> projectOwnerChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(projectOwnerChiefUserIds)) {
-                projectOwnerChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
+                projectOwnerChiefUserIdsName = fetchAndFormatIssuePointNamesNoSign("CC_PRJ_MEMBER",
                         valueMap.get("PROJECT_OWNER_CHIEF_USER_IDS").toString(),
+                        loginInfo.currentLangId.toString());
+            }
+
+            List<ProjectOwner> projectOwnerList = new ArrayList<>();
+            for (int i = 1; i <= projectOwnerName.size(); i++) {
+                ProjectOwner projectOwner1 = new ProjectOwner();
+                projectOwner1.setProjectOwner(projectOwnerName.get(i - 1).get("name").toString());
+                projectOwner1.setProjectOwnerChiefUserIds(projectOwnerChiefUserIdsName.get(i - 1).get("name").toString());
+                projectOwnerList.add(projectOwner1);
+            }
+
+            Object designContractor = valueMap.get("DESIGN_CONTRACTOR");
+            List<Map<String, Object>> designContractorName = null;
+            if (!SharedUtil.isEmpty(designContractor)) {
+                designContractorName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
+                        valueMap.get("DESIGN_CONTRACTOR").toString(),
                         loginInfo.currentLangId.toString());
             }
 
             Object designContractorChiefUserIds = valueMap.get("DESIGN_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> designContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(designContractorChiefUserIds)) {
-                designContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
+                designContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoSign("CC_PRJ_MEMBER",
                         valueMap.get("DESIGN_CONTRACTOR_CHIEF_USER_IDS").toString(),
+                        loginInfo.currentLangId.toString());
+            }
+
+            List<DesignContractor> designContractorList = new ArrayList<>();
+            for (int i = 1; i <= designContractorName.size(); i++) {
+                DesignContractor designContractor1 = new DesignContractor();
+                designContractor1.setDesignContractor(designContractorName.get(i - 1).get("name").toString());
+                designContractor1.setDesignContractorChiefUserIds(designContractorChiefUserIdsName.get(i - 1).get("name").toString());
+                designContractorList.add(designContractor1);
+            }
+
+            Object surveyContractor = valueMap.get("SURVEY_CONTRACTOR");
+            List<Map<String, Object>> surveyContractorName = null;
+            if (!SharedUtil.isEmpty(surveyContractor)) {
+                surveyContractorName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
+                        valueMap.get("SURVEY_CONTRACTOR").toString(),
                         loginInfo.currentLangId.toString());
             }
 
             Object surveyContractorChiefUserIds = valueMap.get("SURVEY_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> surveyContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(surveyContractorChiefUserIds)) {
-                surveyContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
+                surveyContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoSign("CC_PRJ_MEMBER",
                         valueMap.get("SURVEY_CONTRACTOR_CHIEF_USER_IDS").toString(),
+                        loginInfo.currentLangId.toString());
+            }
+
+            List<SurveyContractor> surveyContractorList = new ArrayList<>();
+            for (int i = 1; i <= surveyContractorName.size(); i++) {
+                SurveyContractor surveyContractor1 = new SurveyContractor();
+                surveyContractor1.setSurveyContractor(surveyContractorName.get(i - 1).get("name").toString());
+                surveyContractor1.setSurveyContractorChiefUserIds(surveyContractorChiefUserIdsName.get(i - 1).get("name").toString());
+                surveyContractorList.add(surveyContractor1);
+            }
+
+            Object constructionContractor = valueMap.get("CONSTRUCTION_CONTRACTOR");
+            List<Map<String, Object>> constructionContractorName = null;
+            if (!SharedUtil.isEmpty(constructionContractor)) {
+                constructionContractorName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
+                        valueMap.get("PROJECT_OWNER").toString(),
                         loginInfo.currentLangId.toString());
             }
 
             Object constructionContractorChiefUserIds = valueMap.get("CONSTRUCTION_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> constructionContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(constructionContractorChiefUserIds)) {
-                constructionContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
+                constructionContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoSign("CC_PRJ_MEMBER",
                         valueMap.get("CONSTRUCTION_CONTRACTOR_CHIEF_USER_IDS").toString(),
+                        loginInfo.currentLangId.toString());
+            }
+
+            List<ConstructionContractor> constructionContractorList = new ArrayList<>();
+            for (int i = 1; i <= constructionContractorName.size(); i++) {
+                ConstructionContractor constructionContractor1 = new ConstructionContractor();
+                constructionContractor1.setConstructionContractor(constructionContractorName.get(i - 1).get("name").toString());
+                constructionContractor1.setConstructionContractorChiefUserIds(constructionContractorChiefUserIdsName.get(i - 1).get("name").toString());
+                constructionContractorList.add(constructionContractor1);
+            }
+
+            Object supervisingContractor = valueMap.get("SUPERVISING_CONTRACTOR");
+            List<Map<String, Object>> supervisingContractorName = null;
+            if (!SharedUtil.isEmpty(supervisingContractor)) {
+                supervisingContractorName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
+                        valueMap.get("PROJECT_OWNER").toString(),
                         loginInfo.currentLangId.toString());
             }
 
             Object supervisingContractorChiefUserIds = valueMap.get("SUPERVISING_CONTRACTOR_CHIEF_USER_IDS");
             List<Map<String, Object>> supervisingContractorChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(supervisingContractorChiefUserIds)) {
-                supervisingContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoIndex("CC_PRJ_MEMBER",
+                supervisingContractorChiefUserIdsName = fetchAndFormatIssuePointNamesNoSign("CC_PRJ_MEMBER",
                         valueMap.get("SUPERVISING_CONTRACTOR_CHIEF_USER_IDS").toString(),
                         loginInfo.currentLangId.toString());
+            }
+
+            List<SupervisingContractor> supervisingContractorList = new ArrayList<>();
+            for (int i = 1; i <= supervisingContractorName.size(); i++) {
+                SupervisingContractor supervisingContractor1 = new SupervisingContractor();
+                supervisingContractor1.setSupervisingContractor(supervisingContractorName.get(i - 1).get("name").toString());
+                supervisingContractor1.setSupervisingContractorChiefUserIds(supervisingContractorChiefUserIdsName.get(i - 1).get("name").toString());
+                supervisingContractorList.add(supervisingContractor1);
             }
 
             String projectCompletionStatus = JdbcMapUtil.getString(valueMap, "PROJECT_COMPLETION_STATUS");
@@ -173,19 +221,26 @@ public class AcceptanceExt {
             String outstandingProjectIssues = JdbcMapUtil.getString(valueMap, "OUTSTANDING_PROJECT_ISSUES");
 
             Map<String, Object> map = new HashMap<String, Object>();
+
+            map.put("projectOwnerList", projectOwnerList);
+            map.put("designContractorList", designContractorList);
+            map.put("surveyContractorList", surveyContractorList);
+            map.put("constructionContractorList", constructionContractorList);
+            map.put("supervisingContractorList", supervisingContractorList);
+
             map.put("CC_PRJ_ID", ccPrjId);
             map.put("ENGINEERING_UNIT", engineeringUnit);
             map.put("ACCEPTANCE_LOCATION", acceptanceLocation);
-            map.put("PROJECT_OWNER", projectOwnerName);
-            map.put("DESIGN_CONTRACTOR", designContractorName);
-            map.put("SURVEY_CONTRACTOR", surveyContractorName);
-            map.put("CONSTRUCTION_CONTRACTOR", constructionContractorName);
-            map.put("SUPERVISING_CONTRACTOR", supervisingContractorName);
-            map.put("PROJECT_OWNER_CHIEF_USER_IDS", projectOwnerChiefUserIdsName);
-            map.put("DESIGN_CONTRACTOR_CHIEF_USER_IDS", designContractorChiefUserIdsName);
-            map.put("SURVEY_CONTRACTOR_CHIEF_USER_IDS", surveyContractorChiefUserIdsName);
-            map.put("CONSTRUCTION_CONTRACTOR_CHIEF_USER_IDS", constructionContractorChiefUserIdsName);
-            map.put("SUPERVISING_CONTRACTOR_CHIEF_USER_IDS", supervisingContractorChiefUserIdsName);
+//            map.put("PROJECT_OWNER", projectOwnerName);
+//            map.put("DESIGN_CONTRACTOR", designContractorName);
+//            map.put("SURVEY_CONTRACTOR", surveyContractorName);
+//            map.put("CONSTRUCTION_CONTRACTOR", constructionContractorName);
+//            map.put("SUPERVISING_CONTRACTOR", supervisingContractorName);
+//            map.put("PROJECT_OWNER_CHIEF_USER_IDS", projectOwnerChiefUserIdsName);
+//            map.put("DESIGN_CONTRACTOR_CHIEF_USER_IDS", designContractorChiefUserIdsName);
+//            map.put("SURVEY_CONTRACTOR_CHIEF_USER_IDS", surveyContractorChiefUserIdsName);
+//            map.put("CONSTRUCTION_CONTRACTOR_CHIEF_USER_IDS", constructionContractorChiefUserIdsName);
+//            map.put("SUPERVISING_CONTRACTOR_CHIEF_USER_IDS", supervisingContractorChiefUserIdsName);
             map.put("PROJECT_COMPLETION_STATUS", projectCompletionStatus);
             map.put("SUPERVISION_UNIT_QUALITY_REPORT", supervisionUnitQualityReport);
             map.put("SURVEY_DOCUMENT_QUALITY_REPORT", surveyDocumentQualityReport);
@@ -213,8 +268,44 @@ public class AcceptanceExt {
             map.put("REMARK", remark);
             map.put("OUTSTANDING_PROJECT_ISSUES", outstandingProjectIssues);
 
-            byte[] word = DownloadUtils.createWord(map, "acceptance.docx");
-            byte[] b = convertWordToPDF(word);
+            System.out.println("Survey Contractor List: " + map.get("surveyContractorList"));
+
+            // 三、绑定插件
+            Configure config = Configure.builder()
+                    .bind("projectOwnerList", new LoopRowTableRenderPolicy())
+                    .bind("designContractorList", new LoopRowTableRenderPolicy())
+                    .bind("surveyContractorList", new LoopRowTableRenderPolicy())
+                    .bind("constructionContractorList", new LoopRowTableRenderPolicy())
+                    .bind("supervisingContractorList", new LoopRowTableRenderPolicy())
+                    .build();
+            byte[] docxBytes;
+            byte[] pdfBytes;
+            try (InputStream templateStream = new ClassPathResource(TEMPLATE_PATH).getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                XWPFTemplate template = XWPFTemplate.compile(templateStream, config).render(map);
+                // 写入到 byteArrayOutputStream
+                template.write(byteArrayOutputStream);
+
+
+                // 输出流【byteArrayOutputStream】转为输入流【ByteArrayInputStream】
+                try (XWPFDocument xwpfDocument = new XWPFDocument(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+                     ByteArrayOutputStream docxOutputStream = new ByteArrayOutputStream();
+                     ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream()) {
+
+                    // 输出为 docx
+                    xwpfDocument.write(docxOutputStream);
+                    docxBytes = docxOutputStream.toByteArray();
+
+                    // 输出为 PDF
+                    PdfConverter.getInstance().convert(xwpfDocument, pdfOutputStream, PdfOptions.create());
+                    pdfBytes = pdfOutputStream.toByteArray();
+                }
+
+            } catch (IOException e) {
+                throw new BaseException(e);
+            }
+
+//            byte[] word = DownloadUtils.createWord(map, "acceptance.docx");
+//            byte[] b = convertWordToPDF(word);
 
             FlFile flFile = FlFile.newData();
 
@@ -223,7 +314,7 @@ public class AcceptanceExt {
 
             // 构建文件名和路径
             String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
-            saveWordToFile(b, path);
+            saveWordToFile(pdfBytes, path);
 //            saveWordToFile(word, path);
             boolean fileExists = checkFileExists(path);
             if (fileExists) {
@@ -264,7 +355,7 @@ public class AcceptanceExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
-    public static void saveWordToFile(byte[] wordContent, String outputPath) {
+    private static void saveWordToFile(byte[] wordContent, String outputPath) {
         try {
             // 创建一个File对象，代表输出路径
             File outputFile = new File(outputPath);
@@ -286,12 +377,12 @@ public class AcceptanceExt {
         }
     }
 
-    public static boolean checkFileExists(String path) {
+    private static boolean checkFileExists(String path) {
         File file = new File(path);
         return file.exists();
     }
 
-    public static byte[] convertWordToPDF(byte[] docxBytes) {
+    private static byte[] convertWordToPDF(byte[] docxBytes) {
         try {
             // 创建临时文件保存 DOCX 内容
             Path tempDocx = Files.createTempFile(null, ".docx");
@@ -302,11 +393,11 @@ public class AcceptanceExt {
 
             // 指定 LibreOffice 的安装路径及命令行工具
 //            String libreOfficePath = "/usr/bin/libreoffice";
-//            String libreOfficePath = "D:/Tools/LibreOffice/program/soffice.exe";
-            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
-            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
-            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
+            String libreOfficePath = "D:/Program Files/LibreOffice/program/soffice.exe";
+//            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
+//            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+//            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+//            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
             // 调用 LibreOffice 进行转换
             ProcessBuilder builder = new ProcessBuilder();
@@ -340,7 +431,7 @@ public class AcceptanceExt {
      * @param currentLangId
      * @return
      */
-    public static List<Map<String, Object>> fetchAndFormatIssuePointNames(String tableName, String idString, String currentLangId) {
+    private static List<Map<String, Object>> fetchAndFormatIssuePointNames(String tableName, String idString, String currentLangId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         List<String> ids = Arrays.asList(idString.split(","));
         String inSql = String.join(",", Collections.nCopies(ids.size(), "?")); // 动态创建SQL IN子句
@@ -367,7 +458,7 @@ public class AcceptanceExt {
      * @param currentLangId
      * @return
      */
-    public static List<Map<String, Object>> fetchAndFormatIssuePointNamesNoIndex(String tableName, String idString, String currentLangId) {
+    private static List<Map<String, Object>> fetchAndFormatIssuePointNamesNoIndex(String tableName, String idString, String currentLangId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         List<String> ids = Arrays.asList(idString.split(","));
         String inSql = String.join(",", Collections.nCopies(ids.size(), "?")); // 动态创建SQL IN子句
@@ -388,6 +479,24 @@ public class AcceptanceExt {
         return formattedNames;
     }
 
+    /**
+     * 从指定表中获取名称（无编号无符号）
+     *
+     * @param tableName
+     * @param idString
+     * @param currentLangId
+     * @return
+     */
+    private static List<Map<String, Object>> fetchAndFormatIssuePointNamesNoSign(String tableName, String idString, String currentLangId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        List<String> ids = Arrays.asList(idString.split(","));
+        String inSql = String.join(",", Collections.nCopies(ids.size(), "?")); // 动态创建SQL IN子句
+        String sql = "SELECT IF(JSON_VALID(NAME), NAME->>'$." + currentLangId + "', NAME) as name FROM " + tableName
+                + " WHERE NAME IS NOT NULL AND id IN (" + inSql + ")";
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList(sql, ids.toArray());
+
+        return resultList;
+    }
 
     /**
      * 从指定表中获取名称
