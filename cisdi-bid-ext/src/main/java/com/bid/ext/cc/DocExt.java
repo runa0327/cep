@@ -752,4 +752,17 @@ public class DocExt {
         ExtJarHelper.setReturnValue(invokeActResult);
 
     }
+
+    /**
+     * 新建竣工资料模板
+     */
+    public void creatAcceptanceTemplate() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pName = JdbcMapUtil.getString(varMap, "P_NAME");
+        String pApplyZone = JdbcMapUtil.getString(varMap, "P_APPLY_ZONE_ID");
+        CcDocDirAcceptanceTemplateType ccDocDirAcceptanceTemplateType = CcDocDirAcceptanceTemplateType.newData();
+        ccDocDirAcceptanceTemplateType.setCcApplyZoneId(pApplyZone);
+        ccDocDirAcceptanceTemplateType.setName(pName);
+        ccDocDirAcceptanceTemplateType.insertById();
+    }
 }
