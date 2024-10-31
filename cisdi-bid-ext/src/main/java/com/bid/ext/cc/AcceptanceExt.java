@@ -5,6 +5,7 @@ import com.bid.ext.model.AdAtt;
 import com.bid.ext.model.CcCompletionAcceptance;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
+import com.bid.ext.utils.DownloadUtils;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
@@ -18,9 +19,10 @@ import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.*;
@@ -72,6 +74,13 @@ public class AcceptanceExt {
 
 
             Object projectOwner = valueMap.get("PROJECT_OWNER");
+            List<Map<String, Object>> projectOwnerList1 = null;
+            if (!SharedUtil.isEmpty(projectOwner)) {
+                projectOwnerList1 = fetchAndFormatIssuePointNamesNoIndex("CC_COMPANY",
+                        valueMap.get("PROJECT_OWNER").toString(),
+                        loginInfo.currentLangId.toString());
+            }
+
             List<Map<String, Object>> projectOwnerName = null;
             if (!SharedUtil.isEmpty(projectOwner)) {
                 projectOwnerName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
@@ -79,6 +88,7 @@ public class AcceptanceExt {
                         loginInfo.currentLangId.toString());
             }
 
+            //建设单位
             Object projectOwnerChiefUserIds = valueMap.get("PROJECT_OWNER_CHIEF_USER_IDS");
             List<Map<String, Object>> projectOwnerChiefUserIdsName = null;
             if (!SharedUtil.isEmpty(projectOwnerChiefUserIds)) {
@@ -95,6 +105,7 @@ public class AcceptanceExt {
                 projectOwnerList.add(projectOwner1);
             }
 
+            //设计单位
             Object designContractor = valueMap.get("DESIGN_CONTRACTOR");
             List<Map<String, Object>> designContractorName = null;
             if (!SharedUtil.isEmpty(designContractor)) {
@@ -119,6 +130,7 @@ public class AcceptanceExt {
                 designContractorList.add(designContractor1);
             }
 
+            //勘察单位
             Object surveyContractor = valueMap.get("SURVEY_CONTRACTOR");
             List<Map<String, Object>> surveyContractorName = null;
             if (!SharedUtil.isEmpty(surveyContractor)) {
@@ -143,11 +155,12 @@ public class AcceptanceExt {
                 surveyContractorList.add(surveyContractor1);
             }
 
+            //施工单位
             Object constructionContractor = valueMap.get("CONSTRUCTION_CONTRACTOR");
             List<Map<String, Object>> constructionContractorName = null;
             if (!SharedUtil.isEmpty(constructionContractor)) {
                 constructionContractorName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
-                        valueMap.get("PROJECT_OWNER").toString(),
+                        valueMap.get("CONSTRUCTION_CONTRACTOR").toString(),
                         loginInfo.currentLangId.toString());
             }
 
@@ -167,11 +180,12 @@ public class AcceptanceExt {
                 constructionContractorList.add(constructionContractor1);
             }
 
+            //监理单位
             Object supervisingContractor = valueMap.get("SUPERVISING_CONTRACTOR");
             List<Map<String, Object>> supervisingContractorName = null;
             if (!SharedUtil.isEmpty(supervisingContractor)) {
                 supervisingContractorName = fetchAndFormatIssuePointNamesNoSign("CC_COMPANY",
-                        valueMap.get("PROJECT_OWNER").toString(),
+                        valueMap.get("SUPERVISING_CONTRACTOR").toString(),
                         loginInfo.currentLangId.toString());
             }
 
@@ -231,7 +245,7 @@ public class AcceptanceExt {
             map.put("CC_PRJ_ID", ccPrjId);
             map.put("ENGINEERING_UNIT", engineeringUnit);
             map.put("ACCEPTANCE_LOCATION", acceptanceLocation);
-//            map.put("PROJECT_OWNER", projectOwnerName);
+            map.put("PROJECT_OWNER", projectOwnerName);
 //            map.put("DESIGN_CONTRACTOR", designContractorName);
 //            map.put("SURVEY_CONTRACTOR", surveyContractorName);
 //            map.put("CONSTRUCTION_CONTRACTOR", constructionContractorName);
@@ -270,42 +284,89 @@ public class AcceptanceExt {
 
             System.out.println("Survey Contractor List: " + map.get("surveyContractorList"));
 
-            // 三、绑定插件
-            Configure config = Configure.builder()
-                    .bind("projectOwnerList", new LoopRowTableRenderPolicy())
-                    .bind("designContractorList", new LoopRowTableRenderPolicy())
-                    .bind("surveyContractorList", new LoopRowTableRenderPolicy())
-                    .bind("constructionContractorList", new LoopRowTableRenderPolicy())
-                    .bind("supervisingContractorList", new LoopRowTableRenderPolicy())
-                    .build();
-            byte[] docxBytes;
-            byte[] pdfBytes;
-            try (InputStream templateStream = new ClassPathResource(TEMPLATE_PATH).getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                XWPFTemplate template = XWPFTemplate.compile(templateStream, config).render(map);
-                // 写入到 byteArrayOutputStream
-                template.write(byteArrayOutputStream);
+            byte[] word = null;
 
+            try {
+                ClassPathResource res = new ClassPathResource(TEMPLATE_PATH, DownloadUtils.class.getClassLoader());
+                Configure config = Configure.builder()
+                        .bind("projectOwnerList", new LoopRowTableRenderPolicy())
+                        .bind("designContractorList", new LoopRowTableRenderPolicy())
+                        .bind("surveyContractorList", new LoopRowTableRenderPolicy())
+                        .bind("constructionContractorList", new LoopRowTableRenderPolicy())
+                        .bind("supervisingContractorList", new LoopRowTableRenderPolicy())
+                        .build();
+                // 获取模板
+                XWPFTemplate template = XWPFTemplate.compile(res.getInputStream(), config).render(map);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                template.write(out);
+                word = out.toByteArray();
+                out.close();
+                template.close();
 
-                // 输出流【byteArrayOutputStream】转为输入流【ByteArrayInputStream】
-                try (XWPFDocument xwpfDocument = new XWPFDocument(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-                     ByteArrayOutputStream docxOutputStream = new ByteArrayOutputStream();
-                     ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream()) {
+                // 加载 Word 文件
+                ByteArrayInputStream bais = new ByteArrayInputStream(word);
+                XWPFDocument document = new XWPFDocument(bais);
 
-                    // 输出为 docx
-                    xwpfDocument.write(docxOutputStream);
-                    docxBytes = docxOutputStream.toByteArray();
+                // 获取第一个表格
+                XWPFTable table = document.getTables().get(1);
 
-                    // 输出为 PDF
-                    PdfConverter.getInstance().convert(xwpfDocument, pdfOutputStream, PdfOptions.create());
-                    pdfBytes = pdfOutputStream.toByteArray();
+                // 需要处理的目标文本列表
+                List<String> targetTexts = Arrays.asList("勘察单位", "建设单位", "设计单位", "施工单位", "监理单位");
+
+                for (String targetText : targetTexts) {
+                    int targetRowIndex = -1;
+
+                    // 找到包含 "建设单位" 的行
+                    for (int i = 0; i < table.getNumberOfRows(); i++) {
+                        XWPFTableRow row = table.getRow(i);
+                        for (XWPFTableCell cell : row.getTableCells()) {
+                            if (cell.getText().contains(targetText)) {
+                                targetRowIndex = i;
+                                break;
+                            }
+                        }
+                        if (targetRowIndex != -1) {
+                            break;
+                        }
+                    }
+
+                    // 如果找到了目标行并且它不是最后一行
+                    if (targetRowIndex != -1 && targetRowIndex < table.getNumberOfRows() - 1) {
+                        XWPFTableRow targetRow = table.getRow(targetRowIndex);
+                        XWPFTableRow nextRow = table.getRow(targetRowIndex + 1);
+
+                        // 合并目标行和下一行的所有单元格
+                        int columnCount = Math.min(targetRow.getTableCells().size(), nextRow.getTableCells().size());
+                        for (int colIndex = 2; colIndex < columnCount; colIndex++) {
+                            XWPFTableCell targetCell = targetRow.getCell(colIndex);
+                            XWPFTableCell nextCell = nextRow.getCell(colIndex);
+
+                            if (targetCell != null && nextCell != null) {
+                                // 将下一行的文本合并到目标行的单元格中
+                                targetCell.setText(targetCell.getText() + "\n" + nextCell.getText());
+                            }
+                        }
+
+                        // 移除下一行，避免多余的空白行
+                        table.removeRow(targetRowIndex + 1);
+
+                        // 调整合并后的行高度为原来的一半
+                        int originalHeight = targetRow.getHeight();
+                        targetRow.setHeight(originalHeight / 2);
+                    }
                 }
 
-            } catch (IOException e) {
+                // 将修改后的文档转换为 byte[]
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                document.write(baos);
+                word = baos.toByteArray();
+                baos.close();
+                document.close();
+            } catch (Exception e) {
                 throw new BaseException(e);
             }
 
-//            byte[] word = DownloadUtils.createWord(map, "acceptance.docx");
-//            byte[] b = convertWordToPDF(word);
+            byte[] b = convertWordToPDF(word);
 
             FlFile flFile = FlFile.newData();
 
@@ -314,8 +375,7 @@ public class AcceptanceExt {
 
             // 构建文件名和路径
             String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
-            saveWordToFile(pdfBytes, path);
-//            saveWordToFile(word, path);
+            saveWordToFile(b, path);
             boolean fileExists = checkFileExists(path);
             if (fileExists) {
                 //获取文件属性
@@ -393,11 +453,11 @@ public class AcceptanceExt {
 
             // 指定 LibreOffice 的安装路径及命令行工具
 //            String libreOfficePath = "/usr/bin/libreoffice";
-            String libreOfficePath = "D:/Program Files/LibreOffice/program/soffice.exe";
-//            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
-//            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-//            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
-//            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
+//            String libreOfficePath = "D:/Program Files/LibreOffice/program/soffice.exe";
+            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
             // 调用 LibreOffice 进行转换
             ProcessBuilder builder = new ProcessBuilder();
