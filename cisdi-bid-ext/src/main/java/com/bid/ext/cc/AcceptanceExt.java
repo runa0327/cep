@@ -245,7 +245,7 @@ public class AcceptanceExt {
             map.put("CC_PRJ_ID", ccPrjId);
             map.put("ENGINEERING_UNIT", engineeringUnit);
             map.put("ACCEPTANCE_LOCATION", acceptanceLocation);
-            map.put("PROJECT_OWNER", projectOwnerName);
+            map.put("PROJECT_OWNER_LIST", projectOwnerList1);
 //            map.put("DESIGN_CONTRACTOR", designContractorName);
 //            map.put("SURVEY_CONTRACTOR", surveyContractorName);
 //            map.put("CONSTRUCTION_CONTRACTOR", constructionContractorName);
@@ -389,9 +389,9 @@ public class AcceptanceExt {
                 flFile.setLastModiUserId(loginInfo.userInfo.id);
                 flFile.setFlPathId(flPath.getId());
                 flFile.setCode(fileId);
-                flFile.setName("竣工验收通知单");
+                flFile.setName("竣工验收报告");
                 flFile.setExt("pdf");
-                flFile.setDspName("竣工验收通知单.pdf");
+                flFile.setDspName("竣工验收报告.pdf");
                 flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
                 flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
                 flFile.setSizeKb(sizeKb);
