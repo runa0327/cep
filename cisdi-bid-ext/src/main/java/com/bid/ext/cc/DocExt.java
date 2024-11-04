@@ -713,4 +713,56 @@ public class DocExt {
 
     }
 
+
+    /**
+     * 批量上传竣工资料
+     */
+    public void uploadDocFileAcceptance() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+        String ccPrjId = JdbcMapUtil.getString(varMap, "P_PRJ_ID");
+        String ccDocDirId = JdbcMapUtil.getString(varMap, "P_DOC_DIR_ID");
+        List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+
+        for (String attachmentId : ccAttachmentList) {
+            FlFile flFile = FlFile.selectById(attachmentId);
+            String dspName = flFile.getDspName();
+            String name = flFile.getName();
+            String dspSize = flFile.getDspSize();
+
+            CcDocFile ccDocFile = CcDocFile.newData();
+            ccDocFile.setCcPrjId(ccPrjId);
+            ccDocFile.setName(name);
+            ccDocFile.setCcPreviewDspSize(dspSize);
+
+            ccDocFile.setIsDefault(false);
+            ccDocFile.setIsFavorites(false);
+
+            ccDocFile.setCcDocFileFrom(4);
+            ccDocFile.setCcDocFileTypeId("ACCEPTANCE");
+            ccDocFile.setCcDocDirId(ccDocDirId);
+            ccDocFile.setCcAttachment(attachmentId);
+            ccDocFile.insertById();
+
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+
+    }
+
+    /**
+     * 新建竣工资料模板
+     */
+    public void creatAcceptanceTemplate() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pName = JdbcMapUtil.getString(varMap, "P_NAME");
+        String pApplyZone = JdbcMapUtil.getString(varMap, "P_APPLY_ZONE_ID");
+        CcDocDirAcceptanceTemplateType ccDocDirAcceptanceTemplateType = CcDocDirAcceptanceTemplateType.newData();
+        ccDocDirAcceptanceTemplateType.setCcApplyZoneId(pApplyZone);
+        ccDocDirAcceptanceTemplateType.setName(pName);
+        ccDocDirAcceptanceTemplateType.insertById();
+    }
 }
