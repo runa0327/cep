@@ -61,6 +61,16 @@ public class EngineeringMetrics {
     private BigDecimal steelwork;
 
     /**
+     * 电缆（km）
+     */
+    private BigDecimal cable;
+
+    /**
+     * 设备（t）
+     */
+    private  BigDecimal device;
+
+    /**
      * 单元工程code
      */
     private String unitProjectCode;

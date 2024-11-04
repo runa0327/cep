@@ -88,6 +88,19 @@ public class CcEngineeringQuantityServiceImpl implements CcEngineeringQuantitySe
         if (superstructureConcrete != null) {
             getCcEngineeringQuantityAndAddList(superstructureConcrete,getPrjStructNodeIdByCode(tmp.getUnitProjectCode(),unitProjectList),"SUPERSTRUCTURECONCRETE","t",list,now,createBy,message);
         }
+
+        //  电缆（km）
+        BigDecimal cable = tmp.getCable();
+        if (superstructureConcrete != null) {
+            getCcEngineeringQuantityAndAddList(cable,getPrjStructNodeIdByCode(tmp.getUnitProjectCode(),unitProjectList),"CABLE","km",list,now,createBy,message);
+        }
+
+        //  设备（t）
+        BigDecimal device = tmp.getDevice();
+        if (superstructureConcrete != null) {
+            getCcEngineeringQuantityAndAddList(device,getPrjStructNodeIdByCode(tmp.getUnitProjectCode(),unitProjectList),"DEVICE","t",list,now,createBy,message);
+        }
+
         if (!CollectionUtils.isEmpty(list)){
             //  写入工程填报
             ccEngineeringQuantityMapper.inertBatch(list);
