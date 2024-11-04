@@ -572,4 +572,50 @@ public class AcceptanceExt {
         Map<String, Object> resultMap = myJdbcTemplate.queryForMap(sql, id);
         return resultMap.get("name").toString(); // 返回名称
     }
+
+    /**
+     * 检查负责人数量
+     */
+    public void checkChiefUer() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcCompletionAcceptance ccCompletionAcceptance = CcCompletionAcceptance.selectById(csCommId);
+
+            // 建设单位
+            String projectOwner = ccCompletionAcceptance.getProjectOwner();
+            String projectOwnerChiefUserIds = ccCompletionAcceptance.getProjectOwnerChiefUserIds();
+
+            // 设计单位
+            String designContractor = ccCompletionAcceptance.getDesignContractor();
+            String designContractorChiefUserIds = ccCompletionAcceptance.getDesignContractorChiefUserIds();
+
+            // 勘察单位
+            String surveyContractor = ccCompletionAcceptance.getSurveyContractor();
+            String surveyContractorChiefUserIds = ccCompletionAcceptance.getSurveyContractorChiefUserIds();
+
+            // 施工单位
+            String constructionContractor = ccCompletionAcceptance.getConstructionContractor();
+            String constructionContractorChiefUserIds = ccCompletionAcceptance.getConstructionContractorChiefUserIds();
+
+            // 监理单位
+            String supervisingContractor = ccCompletionAcceptance.getSupervisingContractor();
+            String supervisingContractorChiefUserIds = ccCompletionAcceptance.getSupervisingContractorChiefUserIds();
+
+            // 判断各单位负责人数量与单位数量是否一致
+            validateChiefUserCount(projectOwner, projectOwnerChiefUserIds, "建设单位负责人数量与建设单位不一致");
+            validateChiefUserCount(designContractor, designContractorChiefUserIds, "设计单位负责人数量与设计单位不一致");
+            validateChiefUserCount(surveyContractor, surveyContractorChiefUserIds, "勘察单位负责人数量与勘察单位不一致");
+            validateChiefUserCount(constructionContractor, constructionContractorChiefUserIds, "施工单位负责人数量与施工单位不一致");
+            validateChiefUserCount(supervisingContractor, supervisingContractorChiefUserIds, "监理单位负责人数量与监理单位不一致");
+        }
+    }
+
+    private void validateChiefUserCount(String contractors, String chiefUserIds, String errorMessage) {
+        int contractorCount = contractors.split(",", -1).length;
+        int chiefUserIdsCount = chiefUserIds.split(",", -1).length;
+        if (contractorCount != chiefUserIdsCount) {
+            throw new BaseException(errorMessage);
+        }
+    }
+
 }
