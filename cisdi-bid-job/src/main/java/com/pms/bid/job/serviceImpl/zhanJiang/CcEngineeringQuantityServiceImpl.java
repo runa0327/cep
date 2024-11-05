@@ -91,13 +91,13 @@ public class CcEngineeringQuantityServiceImpl implements CcEngineeringQuantitySe
 
         //  电缆（km）
         BigDecimal cable = tmp.getCable();
-        if (superstructureConcrete != null) {
+        if (cable != null) {
             getCcEngineeringQuantityAndAddList(cable,getPrjStructNodeIdByCode(tmp.getUnitProjectCode(),unitProjectList),"CABLE","km",list,now,createBy,message);
         }
 
         //  设备（t）
         BigDecimal device = tmp.getDevice();
-        if (superstructureConcrete != null) {
+        if (device != null) {
             getCcEngineeringQuantityAndAddList(device,getPrjStructNodeIdByCode(tmp.getUnitProjectCode(),unitProjectList),"DEVICE","t",list,now,createBy,message);
         }
 
