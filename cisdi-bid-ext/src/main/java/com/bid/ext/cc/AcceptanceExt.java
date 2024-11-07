@@ -230,6 +230,9 @@ public class AcceptanceExt {
 
 
             LocalDate acceptanceDate = JdbcMapUtil.getLocalDate(valueMap, "ACCEPTANCE_DATE");
+            String acceptanceYear = String.valueOf(acceptanceDate.getYear());
+            String acceptanceMonth = String.valueOf(acceptanceDate.getMonthValue());
+            String acceptanceDay = String.valueOf(acceptanceDate.getDayOfMonth());
             String projectContentScope = JdbcMapUtil.getString(valueMap, "PROJECT_CONTENT_SCOPE");
             String remark = JdbcMapUtil.getString(valueMap, "REMARK");
             String outstandingProjectIssues = JdbcMapUtil.getString(valueMap, "OUTSTANDING_PROJECT_ISSUES");
@@ -246,15 +249,6 @@ public class AcceptanceExt {
             map.put("ENGINEERING_UNIT", engineeringUnit);
             map.put("ACCEPTANCE_LOCATION", acceptanceLocation);
             map.put("PROJECT_OWNER_LIST", projectOwnerList1);
-//            map.put("DESIGN_CONTRACTOR", designContractorName);
-//            map.put("SURVEY_CONTRACTOR", surveyContractorName);
-//            map.put("CONSTRUCTION_CONTRACTOR", constructionContractorName);
-//            map.put("SUPERVISING_CONTRACTOR", supervisingContractorName);
-//            map.put("PROJECT_OWNER_CHIEF_USER_IDS", projectOwnerChiefUserIdsName);
-//            map.put("DESIGN_CONTRACTOR_CHIEF_USER_IDS", designContractorChiefUserIdsName);
-//            map.put("SURVEY_CONTRACTOR_CHIEF_USER_IDS", surveyContractorChiefUserIdsName);
-//            map.put("CONSTRUCTION_CONTRACTOR_CHIEF_USER_IDS", constructionContractorChiefUserIdsName);
-//            map.put("SUPERVISING_CONTRACTOR_CHIEF_USER_IDS", supervisingContractorChiefUserIdsName);
             map.put("PROJECT_COMPLETION_STATUS", projectCompletionStatus);
             map.put("SUPERVISION_UNIT_QUALITY_REPORT", supervisionUnitQualityReport);
             map.put("SURVEY_DOCUMENT_QUALITY_REPORT", surveyDocumentQualityReport);
@@ -277,12 +271,13 @@ public class AcceptanceExt {
             map.put("PLANNING_FIRE_ENVIRONMENTAL_ACCEPTANCE", planningFireEnvironmentalAcceptance);
             map.put("ACCEPTANCE_ISSUE", acceptanceIssue);
             map.put("ACCEPTANCE_OPINION", acceptanceOpinion);
-            map.put("ACCEPTANCE_DATE", acceptanceDate);
+            map.put("year", acceptanceYear);
+            map.put("month", acceptanceMonth);
+            map.put("day", acceptanceDay);
             map.put("PROJECT_CONTENT_SCOPE", projectContentScope);
             map.put("REMARK", remark);
             map.put("OUTSTANDING_PROJECT_ISSUES", outstandingProjectIssues);
 
-            System.out.println("Survey Contractor List: " + map.get("surveyContractorList"));
 
             byte[] word = null;
 

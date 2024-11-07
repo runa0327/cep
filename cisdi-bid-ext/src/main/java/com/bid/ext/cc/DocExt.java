@@ -114,10 +114,17 @@ public class DocExt {
      * 收藏文件
      */
     public void addFavoriteFile() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
-            ccDocFile.setIsFavorites(true);
+            String ccFavoritesUserIds = ccDocFile.getCcFavoritesUserIds();
+            if (!SharedUtil.isEmpty(ccFavoritesUserIds)) {
+                userId = ccFavoritesUserIds + "," + userId;
+
+            }
+            ccDocFile.setCcFavoritesUserIds(userId);
             ccDocFile.updateById();
         }
     }

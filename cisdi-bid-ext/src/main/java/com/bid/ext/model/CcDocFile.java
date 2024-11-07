@@ -97,6 +97,10 @@ public class CcDocFile {
          */
         public static final String SEQ_NO = "SEQ_NO";
         /**
+         * {"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+         */
+        public static final String CC_FAVORITES_USER_IDS = "CC_FAVORITES_USER_IDS";
+        /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
@@ -618,6 +622,42 @@ public class CcDocFile {
             this.seqNo = seqNo;
             if (!this.toUpdateCols.contains("SEQ_NO")) {
                 this.toUpdateCols.add("SEQ_NO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     */
+    private String ccFavoritesUserIds;
+
+    /**
+     * 获取：{"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     */
+    public String getCcFavoritesUserIds() {
+        return this.ccFavoritesUserIds;
+    }
+
+    /**
+     * 设置：{"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     */
+    public CcDocFile setCcFavoritesUserIds(String ccFavoritesUserIds) {
+        if (this.ccFavoritesUserIds == null && ccFavoritesUserIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccFavoritesUserIds != null && ccFavoritesUserIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccFavoritesUserIds.compareTo(ccFavoritesUserIds) != 0) {
+                this.ccFavoritesUserIds = ccFavoritesUserIds;
+                if (!this.toUpdateCols.contains("CC_FAVORITES_USER_IDS")) {
+                    this.toUpdateCols.add("CC_FAVORITES_USER_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccFavoritesUserIds = ccFavoritesUserIds;
+            if (!this.toUpdateCols.contains("CC_FAVORITES_USER_IDS")) {
+                this.toUpdateCols.add("CC_FAVORITES_USER_IDS");
             }
         }
         return this;
