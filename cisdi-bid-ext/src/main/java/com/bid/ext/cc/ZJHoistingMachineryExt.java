@@ -46,8 +46,8 @@ public class ZJHoistingMachineryExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-        String filePath = flFile.getPhysicalLocation();
-//        String filePath = "/Users/hejialun/Documents/湛江/导入/起重机械-初始导入模板（1）.xlsx";
+//        String filePath = flFile.getPhysicalLocation();
+        String filePath = "/Users/hejialun/Documents/湛江/导入/起重机械-初始导入模板（1）.xlsx";
 
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
@@ -181,8 +181,8 @@ public class ZJHoistingMachineryExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-        String filePath = flFile.getPhysicalLocation();
-//        String filePath = "/Users/hejialun/Documents/湛江/导入/特种设备-起重机械.xlsx";
+//        String filePath = flFile.getPhysicalLocation();
+        String filePath = "/Users/hejialun/Documents/湛江/导入/特种设备-起重机械.xlsx";
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
 
