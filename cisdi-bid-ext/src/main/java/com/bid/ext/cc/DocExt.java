@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -134,7 +136,7 @@ public class DocExt {
     /**
      * 打包导出
      */
-    public void exportPackage() {
+    public void exportPackage() throws IOException {
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         LocalDate now = LocalDate.now();
@@ -168,34 +170,51 @@ public class DocExt {
         pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
         FlPath flPath = FlPath.selectOneByWhere(pathWhere);
 
-        // 创建ZIP文件夹
+        // 创建ZIP文件夹和临时文件夹
         String pathDir = flPath.getDir() + year + "/" + month + "/" + day + "/";
         cn.hutool.core.io.FileUtil.mkdir(pathDir);
-        // 指定ZIP文件保存位置
-        String path = pathDir + fileId + ".zip";
 
-        try (ZipArchiveOutputStream zipOut = new ZipArchiveOutputStream(new FileOutputStream(path))) {
-            for (Map<String, String> fileMap : mapList) {
-                File file = new File(fileMap.get("path"));
-                if (file.exists()) {
-                    ZipArchiveEntry zipEntry = new ZipArchiveEntry(file, fileMap.get("name"));
-                    zipOut.putArchiveEntry(zipEntry);
-                    try (FileInputStream fis = new FileInputStream(file)) {
-                        byte[] buffer = new byte[1024];
-                        int length;
-                        while ((length = fis.read(buffer)) >= 0) {
-                            zipOut.write(buffer, 0, length);
-                        }
+        // 创建临时文件夹来存放文件
+        String tempDirPath = pathDir + fileId + "_temp/";
+        cn.hutool.core.io.FileUtil.mkdir(tempDirPath);
+
+        // 复制文件到临时文件夹
+        for (Map<String, String> fileMap : mapList) {
+            File sourceFile = new File(fileMap.get("path"));
+            if (sourceFile.exists()) {
+                File targetFile = new File(tempDirPath + fileMap.get("name"));
+                Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+
+        // 指定ZIP文件保存位置
+        String zipPath = pathDir + fileId + ".zip";
+
+        // 对临时文件夹进行打包
+        try (ZipArchiveOutputStream zipOut = new ZipArchiveOutputStream(new FileOutputStream(zipPath))) {
+            File tempDir = new File(tempDirPath);
+            for (File file : tempDir.listFiles()) {
+                ZipArchiveEntry zipEntry = new ZipArchiveEntry(file, file.getName());
+                zipOut.putArchiveEntry(zipEntry);
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = fis.read(buffer)) >= 0) {
+                        zipOut.write(buffer, 0, length);
                     }
-                    zipOut.closeArchiveEntry();
                 }
+                zipOut.closeArchiveEntry();
             }
             zipOut.finish();
         } catch (IOException e) {
             throw new BaseException(e);
+        } finally {
+            // 删除临时文件夹及其内容
+            cn.hutool.core.io.FileUtil.del(tempDirPath);
         }
-        //获取文件属性
-        File file = new File(path);
+
+        // 获取文件属性
+        File file = new File(zipPath);
         long bytes = file.length();
         double kilobytes = bytes / 1024.0;
 
@@ -213,14 +232,14 @@ public class DocExt {
         flFile.setSizeKb(sizeKb);
         flFile.setDspSize(dspSize);
         flFile.setUploadDttm(LocalDateTime.now());
-        flFile.setPhysicalLocation(path);
-        flFile.setOriginFilePhysicalLocation(path);
+        flFile.setPhysicalLocation(zipPath);
+        flFile.setOriginFilePhysicalLocation(zipPath);
         flFile.setIsPublicRead(false);
         flFile.insertById();
+
         // 将文件ID设置到CcDocFilePackage上：
         CcDocFilePackage ccDocFilePackage = CcDocFilePackage.insertData();
         ccDocFilePackage.setName(fileId + ".zip");
-
         ccDocFilePackage.setCcAttachment(fileId);
         ccDocFilePackage.updateById();
     }
