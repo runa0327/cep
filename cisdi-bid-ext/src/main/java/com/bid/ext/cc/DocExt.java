@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DocExt {
@@ -112,24 +113,54 @@ public class DocExt {
      * 收藏文件
      */
     public void addFavoriteFile() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String originalUserId = loginInfo.userInfo.id; // 保留原始的用户 ID
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String userId = originalUserId; // 每次循环重置为原始用户 ID
             String csCommId = entityRecord.csCommId;
             CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
-            ccDocFile.setIsFavorites(true);
+            String ccFavoritesUserIds = ccDocFile.getCcFavoritesUserIds();
+
+            if (!SharedUtil.isEmpty(ccFavoritesUserIds)) {
+                if (!ccFavoritesUserIds.contains(userId)) {
+                    userId = ccFavoritesUserIds + "," + userId;
+                } else {
+                    // 如果已经包含 userId，直接设置 userId 为当前的 ccFavoritesUserIds，跳过更新
+                    userId = ccFavoritesUserIds;
+                    continue;
+                }
+            }
+
+            ccDocFile.setCcFavoritesUserIds(userId);
             ccDocFile.updateById();
         }
     }
+
 
     /**
      * 取消收藏文件
      */
 
     public void removeFavoriteFile() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
-            ccDocFile.setIsFavorites(false);
-            ccDocFile.updateById();
+            String ccFavoritesUserIds = ccDocFile.getCcFavoritesUserIds();
+
+            if (!SharedUtil.isEmpty(ccFavoritesUserIds)) {
+                // 如果 ccFavoritesUserIds 包含 userId，则将其移除
+                if (ccFavoritesUserIds.contains(userId)) {
+                    // 移除 userId
+                    String updatedFavorites = Arrays.stream(ccFavoritesUserIds.split(","))
+                            .filter(id -> !id.equals(userId))
+                            .collect(Collectors.joining(","));
+
+                    ccDocFile.setCcFavoritesUserIds(updatedFavorites);
+                    ccDocFile.updateById();
+                }
+            }
         }
     }
 

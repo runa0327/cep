@@ -7,6 +7,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -92,6 +93,14 @@ public class CcDocFile {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+         */
+        public static final String SEQ_NO = "SEQ_NO";
+        /**
+         * {"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+         */
+        public static final String CC_FAVORITES_USER_IDS = "CC_FAVORITES_USER_IDS";
+        /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
@@ -167,6 +176,14 @@ public class CcDocFile {
          * {"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
          */
         public static final String CC_DOC_DIR_ID = "CC_DOC_DIR_ID";
+        /**
+         * {"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+         */
+        public static final String CC_COMPLET_FILE_TYPE_ID = "CC_COMPLET_FILE_TYPE_ID";
+        /**
+         * {"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+         */
+        public static final String CC_COMPLET_TYPE_ID = "CC_COMPLET_TYPE_ID";
         /**
          * {"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
          */
@@ -569,6 +586,78 @@ public class CcDocFile {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    private BigDecimal seqNo;
+
+    /**
+     * 获取：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    public BigDecimal getSeqNo() {
+        return this.seqNo;
+    }
+
+    /**
+     * 设置：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    public CcDocFile setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     */
+    private String ccFavoritesUserIds;
+
+    /**
+     * 获取：{"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     */
+    public String getCcFavoritesUserIds() {
+        return this.ccFavoritesUserIds;
+    }
+
+    /**
+     * 设置：{"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     */
+    public CcDocFile setCcFavoritesUserIds(String ccFavoritesUserIds) {
+        if (this.ccFavoritesUserIds == null && ccFavoritesUserIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccFavoritesUserIds != null && ccFavoritesUserIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccFavoritesUserIds.compareTo(ccFavoritesUserIds) != 0) {
+                this.ccFavoritesUserIds = ccFavoritesUserIds;
+                if (!this.toUpdateCols.contains("CC_FAVORITES_USER_IDS")) {
+                    this.toUpdateCols.add("CC_FAVORITES_USER_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccFavoritesUserIds = ccFavoritesUserIds;
+            if (!this.toUpdateCols.contains("CC_FAVORITES_USER_IDS")) {
+                this.toUpdateCols.add("CC_FAVORITES_USER_IDS");
             }
         }
         return this;
@@ -1253,6 +1342,78 @@ public class CcDocFile {
             this.ccDocDirId = ccDocDirId;
             if (!this.toUpdateCols.contains("CC_DOC_DIR_ID")) {
                 this.toUpdateCols.add("CC_DOC_DIR_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+     */
+    private String ccCompletFileTypeId;
+
+    /**
+     * 获取：{"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+     */
+    public String getCcCompletFileTypeId() {
+        return this.ccCompletFileTypeId;
+    }
+
+    /**
+     * 设置：{"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+     */
+    public CcDocFile setCcCompletFileTypeId(String ccCompletFileTypeId) {
+        if (this.ccCompletFileTypeId == null && ccCompletFileTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccCompletFileTypeId != null && ccCompletFileTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccCompletFileTypeId.compareTo(ccCompletFileTypeId) != 0) {
+                this.ccCompletFileTypeId = ccCompletFileTypeId;
+                if (!this.toUpdateCols.contains("CC_COMPLET_FILE_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_COMPLET_FILE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccCompletFileTypeId = ccCompletFileTypeId;
+            if (!this.toUpdateCols.contains("CC_COMPLET_FILE_TYPE_ID")) {
+                this.toUpdateCols.add("CC_COMPLET_FILE_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+     */
+    private String ccCompletTypeId;
+
+    /**
+     * 获取：{"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+     */
+    public String getCcCompletTypeId() {
+        return this.ccCompletTypeId;
+    }
+
+    /**
+     * 设置：{"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+     */
+    public CcDocFile setCcCompletTypeId(String ccCompletTypeId) {
+        if (this.ccCompletTypeId == null && ccCompletTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccCompletTypeId != null && ccCompletTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccCompletTypeId.compareTo(ccCompletTypeId) != 0) {
+                this.ccCompletTypeId = ccCompletTypeId;
+                if (!this.toUpdateCols.contains("CC_COMPLET_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_COMPLET_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccCompletTypeId = ccCompletTypeId;
+            if (!this.toUpdateCols.contains("CC_COMPLET_TYPE_ID")) {
+                this.toUpdateCols.add("CC_COMPLET_TYPE_ID");
             }
         }
         return this;
