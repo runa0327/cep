@@ -6,7 +6,6 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
-import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -683,7 +682,6 @@ public class DocExt {
      * 生成打包脚本
      */
     public void generateLinuxCopyCommand() {
-
         List<Map<String, String>> mapList = new ArrayList<>();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
@@ -712,8 +710,9 @@ public class DocExt {
         // 创建目标目录
         commandBuilder.append("mkdir -p ").append(targetBaseDir).append(" && ");
 
-        // 开始创建 tar 命令
-        commandBuilder.append("tar -zcvf ").append(tgzFilePath);
+        // 开始创建 tar 命令，添加一次 --transform 选项来指定 {fileId} 目录
+        commandBuilder.append("tar -zcvf ").append(tgzFilePath)
+                .append(" --transform='s|^|").append(fileId).append("/|'");
 
         Map<String, Integer> fileNameCountMap = new HashMap<>();
 
@@ -739,17 +738,14 @@ public class DocExt {
             String sourceDir = sourceFilePath.substring(0, sourceFilePath.lastIndexOf('/'));
             String sourceFileName = sourceFilePath.substring(sourceFilePath.lastIndexOf('/') + 1);
 
-            // 为每个文件添加 tar -C 和 --transform 参数
+            // 为每个文件添加 tar -C 和文件名的 --transform 参数
             commandBuilder.append(" -C ").append(sourceDir)
                     .append(" ").append(sourceFileName)
-                    .append(" --transform='s/").append(sourceFileName).append("/").append(dspName).append("/'");
+                    .append(" --transform='s|").append(sourceFileName).append("|").append(dspName).append("|'");
         }
         InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.urlToOpenList = new ArrayList<>();
-        UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
-        extBrowserWindowToOpen.name = commandBuilder.toString();
-        extBrowserWindowToOpen.title = "拉取文件命令";
-        invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
+        invokeActResult.msg = commandBuilder.toString();
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 }
