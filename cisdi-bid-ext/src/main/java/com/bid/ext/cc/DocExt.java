@@ -6,6 +6,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
+import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -26,10 +27,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -204,44 +204,30 @@ public class DocExt {
         // 创建ZIP文件夹和临时文件夹
         String pathDir = flPath.getDir() + year + "/" + month + "/" + day + "/";
         cn.hutool.core.io.FileUtil.mkdir(pathDir);
-
-        // 创建临时文件夹来存放文件
-        String tempDirPath = pathDir + fileId + "_temp/";
-        cn.hutool.core.io.FileUtil.mkdir(tempDirPath);
-
-        // 复制文件到临时文件夹
-        for (Map<String, String> fileMap : mapList) {
-            File sourceFile = new File(fileMap.get("path"));
-            if (sourceFile.exists()) {
-                File targetFile = new File(tempDirPath + fileMap.get("name"));
-                Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-        }
-
-        // 指定ZIP文件保存位置
+        // 指定 ZIP 文件保存位置
         String zipPath = pathDir + fileId + ".zip";
+        String folderNameInZip = fileId + "/"; // 压缩包内文件夹的名称
 
-        // 对临时文件夹进行打包
         try (ZipArchiveOutputStream zipOut = new ZipArchiveOutputStream(new FileOutputStream(zipPath))) {
-            File tempDir = new File(tempDirPath);
-            for (File file : tempDir.listFiles()) {
-                ZipArchiveEntry zipEntry = new ZipArchiveEntry(file, file.getName());
-                zipOut.putArchiveEntry(zipEntry);
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = fis.read(buffer)) >= 0) {
-                        zipOut.write(buffer, 0, length);
+            for (Map<String, String> fileMap : mapList) {
+                File file = new File(fileMap.get("path"));
+                if (file.exists()) {
+                    // 在压缩包中创建虚拟的文件夹路径
+                    ZipArchiveEntry zipEntry = new ZipArchiveEntry(folderNameInZip + fileMap.get("name"));
+                    zipOut.putArchiveEntry(zipEntry);
+                    try (FileInputStream fis = new FileInputStream(file)) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = fis.read(buffer)) >= 0) {
+                            zipOut.write(buffer, 0, length);
+                        }
                     }
+                    zipOut.closeArchiveEntry();
                 }
-                zipOut.closeArchiveEntry();
             }
             zipOut.finish();
         } catch (IOException e) {
             throw new BaseException(e);
-        } finally {
-            // 删除临时文件夹及其内容
-            cn.hutool.core.io.FileUtil.del(tempDirPath);
         }
 
         // 获取文件属性
@@ -692,4 +678,78 @@ public class DocExt {
         File file = new File(path);
         return file.exists();
     }
+
+    /**
+     * 生成打包脚本
+     */
+    public void generateLinuxCopyCommand() {
+
+        List<Map<String, String>> mapList = new ArrayList<>();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccAttachment = JdbcMapUtil.getString(valueMap, "CC_ATTACHMENT");
+            FlFile flFile = FlFile.selectById(ccAttachment);
+            String originFilePhysicalLocation = flFile.getOriginFilePhysicalLocation(); // 原始文件物理位置
+            String dspName = flFile.getDspName(); // 显示名称
+            Map<String, String> map = new HashMap<>();
+            map.put("path", originFilePhysicalLocation);
+            map.put("name", dspName);
+            mapList.add(map);
+        }
+
+        // 获取当前日期
+        LocalDate today = LocalDate.now();
+        String datePath = today.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        String targetBaseDir = "/data/qygly/qygly-zipped-file-for-download/ceecip/" + datePath;
+
+        // 创建 tgz 文件名
+        FlFile flFile = FlFile.newData();
+        String fileId = flFile.getId(); // 生成的唯一文件 ID
+        String tgzFilePath = targetBaseDir + "/" + fileId + ".tgz";
+
+        StringBuilder commandBuilder = new StringBuilder();
+
+        // 创建目标目录
+        commandBuilder.append("mkdir -p ").append(targetBaseDir).append(" && ");
+
+        // 开始创建 tar 命令
+        commandBuilder.append("tar -zcvf ").append(tgzFilePath);
+
+        Map<String, Integer> fileNameCountMap = new HashMap<>();
+
+        for (Map<String, String> fileMap : mapList) {
+            String sourceFilePath = fileMap.get("path");
+            String originalDspName = fileMap.get("name");
+
+            // 处理文件名重复，通过序号后缀生成唯一的显示名称
+            String dspName = originalDspName;
+            if (fileNameCountMap.containsKey(originalDspName)) {
+                int count = fileNameCountMap.get(originalDspName) + 1;
+                fileNameCountMap.put(originalDspName, count);
+                int dotIndex = originalDspName.lastIndexOf(".");
+                if (dotIndex != -1) {
+                    dspName = originalDspName.substring(0, dotIndex) + "-" + count + originalDspName.substring(dotIndex);
+                } else {
+                    dspName = originalDspName + "-" + count;
+                }
+            } else {
+                fileNameCountMap.put(originalDspName, 1);
+            }
+
+            String sourceDir = sourceFilePath.substring(0, sourceFilePath.lastIndexOf('/'));
+            String sourceFileName = sourceFilePath.substring(sourceFilePath.lastIndexOf('/') + 1);
+
+            // 为每个文件添加 tar -C 和 --transform 参数
+            commandBuilder.append(" -C ").append(sourceDir)
+                    .append(" ").append(sourceFileName)
+                    .append(" --transform='s/").append(sourceFileName).append("/").append(dspName).append("/'");
+        }
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.urlToOpenList = new ArrayList<>();
+        UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
+        extBrowserWindowToOpen.name = commandBuilder.toString();
+        extBrowserWindowToOpen.title = "拉取文件命令";
+        invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
+    }
+
 }
