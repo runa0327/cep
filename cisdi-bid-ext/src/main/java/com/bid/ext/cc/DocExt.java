@@ -1,7 +1,6 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.*;
-import com.bid.ext.utils.TemplateUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -9,7 +8,6 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
-import com.qygly.shared.interaction.DrivenInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
@@ -107,7 +105,6 @@ public class DocExt {
         String ccPreviewFileId = ccDocFile.getCcPreviewFileId();
         outputMap.put("ccPreviewFileId", ccPreviewFileId);
         outputMap.put("name", ccDocFile.getName());
-        outputMap.put("ccDocFileId", csCommId);
         ExtJarHelper.setReturnValue(outputMap);
     }
 
@@ -137,6 +134,7 @@ public class DocExt {
             ccDocFile.updateById();
         }
     }
+
 
     /**
      * 取消收藏文件
@@ -681,128 +679,10 @@ public class DocExt {
     }
 
     /**
-     * 资料目录套用模板
-     */
-    public void docDirToTemplate() {
-        InvokeActResult invokeActResult = new InvokeActResult();
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        Map<String, Object> varMap = ExtJarHelper.getVarMap();
-        String ccPrjId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_ID");
-        String ccDocFolderTypeId = JdbcMapUtil.getString(varMap, "P_CC_DOC_FOLDER_TYPE_ID");
-        String ccDocDirAcceptanceTemplateType = JdbcMapUtil.getString(varMap, "P_CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID");
-        //查询该类型下所有模板的根节点
-        String sql = "select t.id from cc_doc_dir t where t.CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? and t.CC_DOC_DIR_PID is null and t.CC_DOC_FOLDER_TYPE_ID = 'acceptance' and t.IS_TEMPLATE = 1";
-        List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, ccDocDirAcceptanceTemplateType);
-        for (Map<String, Object> map : queryForList) {
-            String templateRootId = JdbcMapUtil.getString(map, "ID");
-            //套用模板
-
-            List<Map<String, Object>> insertedNodes = TemplateUtils.applyTemplate(templateRootId, "CC_DOC_DIR", "ID", "CC_DOC_DIR_PID", true);
-            // 对插入后的节点进行统一处理
-            for (Map<String, Object> node : insertedNodes) {
-                String id = node.get("ID").toString();
-                String updateSql = "UPDATE cc_doc_dir SET CC_PRJ_ID = ?, CC_DOC_FOLDER_TYPE_ID = ?, CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ?, CC_DOC_DIR_STATUS_ID = 'unlock' WHERE id = ?";
-                myJdbcTemplate.update(updateSql, ccPrjId, ccDocFolderTypeId, ccDocDirAcceptanceTemplateType, id);
-            }
-        }
-        invokeActResult.reFetchData = true;
-        ExtJarHelper.setReturnValue(invokeActResult);
-    }
-
-    /**
-     * 锁定资料目录下文件
-     */
-    public void lockDoc() {
-        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
-        for (EntityRecord entityRecord : entityRecordList) {
-            String csCommId = entityRecord.csCommId;
-            CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
-            ccDocDir.setCcDocDirStatusId("lock");
-            ccDocDir.updateById();
-        }
-    }
-
-    /**
-     * 解锁资料目录下文件
-     */
-    public void unlockDoc() {
-        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
-        for (EntityRecord entityRecord : entityRecordList) {
-            String csCommId = entityRecord.csCommId;
-            CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
-            ccDocDir.setCcDocDirStatusId("unlock");
-            ccDocDir.updateById();
-        }
-    }
-
-    /**
-     * 资料清单关联文件预检测
-     */
-    public void preCheckDocToFile() {
-        Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
-        if (drivenInfosMap.size() != 1) {
-            throw new BaseException("请勿选择多个目录");
-        }
-
-    }
-
-
-    /**
-     * 批量上传竣工资料
-     */
-    public void uploadDocFileAcceptance() {
-        Map<String, Object> varMap = ExtJarHelper.getVarMap();
-
-        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
-        String ccPrjId = JdbcMapUtil.getString(varMap, "P_PRJ_ID");
-        String ccDocDirId = JdbcMapUtil.getString(varMap, "P_DOC_DIR_ID");
-        List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
-
-        for (String attachmentId : ccAttachmentList) {
-            FlFile flFile = FlFile.selectById(attachmentId);
-            String dspName = flFile.getDspName();
-            String name = flFile.getName();
-            String dspSize = flFile.getDspSize();
-
-            CcDocFile ccDocFile = CcDocFile.newData();
-            ccDocFile.setCcPrjId(ccPrjId);
-            ccDocFile.setName(name);
-            ccDocFile.setCcPreviewDspSize(dspSize);
-
-            ccDocFile.setIsDefault(false);
-            ccDocFile.setIsFavorites(false);
-
-            ccDocFile.setCcDocFileFrom(4);
-            ccDocFile.setCcDocFileTypeId("ACCEPTANCE");
-            ccDocFile.setCcDocDirId(ccDocDirId);
-            ccDocFile.setCcAttachment(attachmentId);
-            ccDocFile.insertById();
-
-        }
-
-        InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.reFetchData = true;
-        ExtJarHelper.setReturnValue(invokeActResult);
-
-    }
-
-    /**
-     * 新建竣工资料模板
-     */
-    public void creatAcceptanceTemplate() {
-        Map<String, Object> varMap = ExtJarHelper.getVarMap();
-        String pName = JdbcMapUtil.getString(varMap, "P_NAME");
-        String pApplyZone = JdbcMapUtil.getString(varMap, "P_APPLY_ZONE_ID");
-        CcDocDirAcceptanceTemplateType ccDocDirAcceptanceTemplateType = CcDocDirAcceptanceTemplateType.newData();
-        ccDocDirAcceptanceTemplateType.setCcApplyZoneId(pApplyZone);
-        ccDocDirAcceptanceTemplateType.setName(pName);
-        ccDocDirAcceptanceTemplateType.insertById();
-    }
-
-    /**
      * 生成打包脚本
      */
     public void generateLinuxCopyCommand() {
+
         List<Map<String, String>> mapList = new ArrayList<>();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
@@ -865,7 +745,7 @@ public class DocExt {
                     .append(" --transform='s|").append(sourceFileName).append("|").append(dspName).append("|'");
         }
         InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.msg = commandBuilder.toString();
+        invokeActResult.msg = "请将以下指令转交给系统管理员，以便进行文件打包操作" + System.lineSeparator() + commandBuilder.toString();
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
