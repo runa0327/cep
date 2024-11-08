@@ -803,7 +803,6 @@ public class DocExt {
      * 生成打包脚本
      */
     public void generateLinuxCopyCommand() {
-
         List<Map<String, String>> mapList = new ArrayList<>();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
@@ -832,7 +831,7 @@ public class DocExt {
         // 创建目标目录
         commandBuilder.append("mkdir -p ").append(targetBaseDir).append(" && ");
 
-        // 开始创建 tar 命令
+        // 开始创建 tar 命令，并在压缩包内添加一层“{fileId}/”目录
         commandBuilder.append("tar -zcvf ").append(tgzFilePath);
 
         Map<String, Integer> fileNameCountMap = new HashMap<>();
@@ -859,10 +858,11 @@ public class DocExt {
             String sourceDir = sourceFilePath.substring(0, sourceFilePath.lastIndexOf('/'));
             String sourceFileName = sourceFilePath.substring(sourceFilePath.lastIndexOf('/') + 1);
 
-            // 为每个文件添加 tar -C 和 --transform 参数
+            // 为每个文件添加 tar -C 和 --transform 参数，且在文件路径前添加 {fileId} 目录
             commandBuilder.append(" -C ").append(sourceDir)
                     .append(" ").append(sourceFileName)
-                    .append(" --transform='s/").append(sourceFileName).append("/").append(dspName).append("/'");
+                    .append(" --transform='s|^|").append(fileId).append("/|'")  // 在压缩包内添加 {fileId} 目录
+                    .append(" --transform='s|").append(sourceFileName).append("|").append(dspName).append("|'");
         }
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.msg = commandBuilder.toString();
