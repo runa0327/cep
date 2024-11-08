@@ -14,7 +14,6 @@
         <module>anhui-sso</module>
         <module>cisdi-bid-job</module>
         <module>cisdi-microservice</module>
-        <module>alipay-demo</module>
     </modules>
 
     <properties>
