@@ -1,6 +1,5 @@
 package com.bid.ext.cc;
 
-import cn.hutool.core.io.FileUtil;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.TemplateUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -8,7 +7,6 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
-import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.DrivenInfo;
@@ -867,11 +865,8 @@ public class DocExt {
                     .append(" --transform='s/").append(sourceFileName).append("/").append(dspName).append("/'");
         }
         InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.urlToOpenList = new ArrayList<>();
-        UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
-        extBrowserWindowToOpen.name = commandBuilder.toString();
-        extBrowserWindowToOpen.title = "拉取文件命令";
-        invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
+        invokeActResult.msg = commandBuilder.toString();
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 }
