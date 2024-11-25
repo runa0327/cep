@@ -47,7 +47,7 @@ public class ZJHoistingMachineryExt {
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-//        String filePath = "/Users/hejialun/Documents/湛江/导入/起重机械-初始导入模板（1）.xlsx";
+//        String filePath = "/Users/hejialun/Downloads/起重机械-初始导入模板-装卸桥与门座.xlsx";
 
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
@@ -113,33 +113,33 @@ public class ZJHoistingMachineryExt {
 
                     String installLocation = "";
                     //安装地点
-                    Cell cell2 = row.getCell(3);
-                    if (cell2 == null) {
+                    Cell cell3 = row.getCell(3);
+                    if (cell3 == null) {
                         throw new BaseException("第" +(row.getRowNum()+1) + "行，安装地点列为空");
                     }
-                    installLocation = getCellValueAsString(cell2);
+                    installLocation = getCellValueAsString(cell3);
                     if (!StringUtils.hasText(installLocation)) {
                         throw new BaseException("第" + (row.getRowNum()+1) + "行，安装地点列为空");
                     }
 
                     //安装单位
-                    Cell cell4 = row.getCell(8);
-                    if (cell4 == null) {
+                    Cell cell8 = row.getCell(8);
+                    if (cell8 == null) {
                         throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
                     }
-                    String installCompany = getCellValueAsString(cell4);
+                    String installCompany = getCellValueAsString(cell8);
                     if (!StringUtils.hasText(installCompany)) {
                         throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
                     }
 
                     //设备计划到货时间
-                    Cell cell5 = row.getCell(9);
-                    if (cell5 == null) {
+                    Cell cell9 = row.getCell(9);
+                    if (cell9 == null) {
                         throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列为空");
                     }
                     LocalDate planArriveDate = null;
                     try {
-                        planArriveDate = cell5.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        planArriveDate = cell9.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     } catch (Exception e) {
                         throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列格式错误");
                     }
@@ -157,6 +157,45 @@ public class ZJHoistingMachineryExt {
                     hoistingMachinery1.setCcEquipInstallLocation(installLocation);
                     hoistingMachinery1.setCcInstallationUnit(installCompany);
                     hoistingMachinery1.setCcEquipPlanArriveDate(planArriveDate);
+
+                    //规格型号
+                    Cell cell2 = row.getCell(2);
+                    if (cell2 != null && StringUtils.hasText(getCellValueAsString(cell2))) {
+                        hoistingMachinery1.setCcSpecificationAndModel(getCellValueAsString(cell2));
+                    }
+                    //出厂编号
+                    Cell cell4 = row.getCell(4);
+                    if (cell4 != null && StringUtils.hasText(getCellValueAsString(cell4))) {
+                        hoistingMachinery1.setCcFactoryNumber(getCellValueAsString(cell4));
+                    }
+
+                    //工作级别
+                    Cell cell5 = row.getCell(5);
+                    if (cell5 != null && StringUtils.hasText(getCellValueAsString(cell5))) {
+                        hoistingMachinery1.setCcWorkLevel(getCellValueAsString(cell5));
+                    }
+
+                    //主钩额定起重量
+                    Cell cell6 = row.getCell(6);
+                    if (cell6 != null && StringUtils.hasText(getCellValueAsString(cell6))) {
+                        hoistingMachinery1.setCcMainHookRatedLiftingCapacity(new BigDecimal(getCellValueAsString(cell6)));
+                    }
+
+                    //副钩额定起重量
+                    Cell cell7 = row.getCell(7);
+                    if (cell7 != null && StringUtils.hasText(getCellValueAsString(cell7))) {
+                        hoistingMachinery1.setCcAuxiliaryHookRatedLiftingCapacity(new BigDecimal(getCellValueAsString(cell7)));
+                    }
+
+                    //实际到货时间
+                    Cell cell10 = row.getCell(10);
+                    if (cell10 != null && StringUtils.hasText(getCellValueAsString(cell10))) {
+                        try {
+                            hoistingMachinery1.setCcEquipActArriveDate(getDate(cell10));
+                        } catch (IllegalStateException E) {
+                          throw new BaseException("实际到货时间格式错误!");
+                        }
+                    }
 
                     hoistingMachinery1.setCcSpecialEquipConHeadId(conHeadId);
                     hoistingMachinery1.setCcSpecialEquipSupervisorId(superisorId);
