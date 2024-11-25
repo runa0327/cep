@@ -42,7 +42,8 @@ public class MemberExt {
             }
 
             String pAdUserIds = JdbcMapUtil.getString(varMap, "P_AD_USER_IDS");
-            Boolean pIsPrimaryPos = (Boolean) varMap.get("P_IS_PRIMARY_POS");
+//            Boolean pIsPrimaryPos = (Boolean) varMap.get("P_IS_PRIMARY_POS");
+            Boolean pIsPrimaryPos = JdbcMapUtil.getBoolean(varMap, "P_IS_PRIMARY_POS");
             if (pAdUserIds != null && !pAdUserIds.isEmpty()) {
                 List<String> userIdList = Arrays.asList(pAdUserIds.split(","));
                 for (String userId : userIdList) {
@@ -222,7 +223,6 @@ public class MemberExt {
                         ccPartyCompanyPost.updateById();
                     }
                 }
-
 
 
                 // 更新项目成员的【参建方】属性
