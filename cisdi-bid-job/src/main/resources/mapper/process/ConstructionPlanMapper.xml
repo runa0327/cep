@@ -58,7 +58,7 @@
         where
             status = 'ap'
             and COMPL_PLAN_DATE >= date_format(now(),'%Y-%m-%d')
-            and ((IS_START = 1 and IS_COMPLETE = 0) or IS_START = 0)
+            and IS_COMPLETE = 0
         order by id asc
     </select>
 

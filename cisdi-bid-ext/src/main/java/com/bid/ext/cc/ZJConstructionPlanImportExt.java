@@ -256,9 +256,9 @@ public class ZJConstructionPlanImportExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
         //获取上传的excel文件
-//        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
+        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
 //        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/导入/副本湛江标点(3).xlsx";
+        String filePath = "/Users/hejialun/Documents/湛江/导入/副本湛江标点(4).xlsx";
 
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
