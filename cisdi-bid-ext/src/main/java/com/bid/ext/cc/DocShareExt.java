@@ -106,6 +106,7 @@ public class DocShareExt {
                 BigDecimal fileSize = getFileSize(ccDocFile);
 
                 FileInfo fileInfo = new FileInfo();
+                fileInfo.setFileId(ccDocFile.getCcAttachment());
                 fileInfo.setFileName(ccDocFile.getName());
                 fileInfo.setCreateTime(ccDocFile.getCrtDt().toString());
                 fileInfo.setCreateBy(ccDocFile.getCrtUserId());

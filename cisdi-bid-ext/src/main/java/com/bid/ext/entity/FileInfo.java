@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class FileInfo {
+    private String fileId;
     private String fileName;
     private String createTime;
     private String createBy;
