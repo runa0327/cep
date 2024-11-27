@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class FileInfo {
     private String fileId;
+    private String docName;
     private String fileName;
     private String fullFileName;
     private String iconFileGroupId;

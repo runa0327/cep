@@ -113,7 +113,7 @@ public class DocShareExt {
                 BigDecimal fileSize = getFileSize(ccDocFile);
 
                 String ccDocFileTypeId = ccDocFile.getCcDocFileTypeId();
-                String sql = "select t.ICON_FILE_GROUP_ID from CC_DOC_FILE_TYPE where t.id = ?";
+                String sql = "select t.ICON_FILE_GROUP_ID from CC_DOC_FILE_TYPE t where t.id = ?";
                 Map<String, Object> iconMap = myJdbcTemplate.queryForMap(sql, ccDocFileTypeId);
                 String iconFileGroupId = JdbcMapUtil.getString(iconMap, "ICON_FILE_GROUP_ID");
 
@@ -121,6 +121,7 @@ public class DocShareExt {
                 //插入文件共享表
                 String ccAttachment = ccDocFile.getCcAttachment();
                 FlFile flFile = FlFile.selectById(ccAttachment);
+                String dspName = flFile.getDspName();
                 String ext = flFile.getExt();
                 String fullFileName = ccAttachment + "." + ext;
                 FlFileShare flFileShare = FlFileShare.newData();
@@ -134,7 +135,8 @@ public class DocShareExt {
 
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileId(ccDocFile.getCcAttachment());
-                fileInfo.setFileName(ccDocFile.getName());
+                fileInfo.setDocName(ccDocFile.getName());
+                fileInfo.setFileName(dspName);
                 fileInfo.setFullFileName(fullFileName);
                 fileInfo.setIconFileGroupId(iconFileGroupId);
                 fileInfo.setCreateTime(ccDocFile.getCrtDt().toString());
