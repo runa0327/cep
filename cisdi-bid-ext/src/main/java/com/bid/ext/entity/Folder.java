@@ -9,6 +9,7 @@ public class Folder {
     private String fileName;
     private String createTime;
     private String createBy;
+    private String createByName;
     private String fileSize;
     private String type;  // dir
     private List<Object> children;  // 文件或子文件夹的列表

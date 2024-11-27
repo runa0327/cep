@@ -1,17 +1,17 @@
 package com.bid.ext.cc;
 
+import cn.hutool.json.JSONObject;
 import com.bid.ext.entity.FileInfo;
 import com.bid.ext.entity.Folder;
-import com.bid.ext.model.AdShare;
-import com.bid.ext.model.CcDocDir;
-import com.bid.ext.model.CcDocFile;
-import com.bid.ext.model.FlFile;
+import com.bid.ext.model.*;
 import com.google.gson.Gson;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
@@ -62,7 +62,7 @@ public class DocShareExt {
             );
 
             // 创建目录对象并递归处理子目录
-            Folder folder = buildFolder(ccDocDir, ccDocFiles, parentChildMap, processedDirs);  // 修改调用，传入 processedDirs
+            Folder folder = buildFolder(ccDocDir, ccDocFiles, parentChildMap, processedDirs, adShareId);  // 修改调用，传入 processedDirs
             if (folder != null) {  // 防止空的文件夹
                 originData.add(folder);
             }
@@ -74,7 +74,7 @@ public class DocShareExt {
         adShare.updateById();
 
         InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.msg = adShareId;
+        invokeActResult.shareId = adShareId;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
@@ -82,17 +82,23 @@ public class DocShareExt {
     /**
      * 根据父子关系构建目录树
      */
-    private Folder buildFolder(CcDocDir ccDocDir, List<CcDocFile> ccDocFiles, Map<String, Set<CcDocDir>> parentChildMap, Set<String> processedDirs) {
+    private Folder buildFolder(CcDocDir ccDocDir, List<CcDocFile> ccDocFiles, Map<String, Set<CcDocDir>> parentChildMap, Set<String> processedDirs, String adShareId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         // 如果当前目录已经处理过，直接返回
         if (processedDirs.contains(ccDocDir.getId())) {
             return null; // 如果已经处理过，则不再处理
         }
         processedDirs.add(ccDocDir.getId());  // 标记当前目录已处理
 
+        String crtDirUserId = ccDocDir.getCrtUserId();
+        AdUser dirAdUser = AdUser.selectById(crtDirUserId);
+        String dirAdUserName = new JSONObject(dirAdUser.getName()).getStr("ZH_CN");
+
         Folder folder = new Folder();
         folder.setFileName(ccDocDir.getName());
         folder.setCreateTime(ccDocDir.getCrtDt().toString());
-        folder.setCreateBy(ccDocDir.getCrtUserId());
+        folder.setCreateBy(crtDirUserId);
+        folder.setCreateByName(dirAdUserName);
         folder.setType("DIR");
 
         // 计算目录大小（目录下所有文件大小的总和）
@@ -102,16 +108,40 @@ public class DocShareExt {
         // 处理当前目录下的文件
         if (!SharedUtil.isEmpty(ccDocFiles)) {
             for (CcDocFile ccDocFile : ccDocFiles) {
+                //文件大小
                 String ccPreviewDspSize = ccDocFile.getCcPreviewDspSize();
                 BigDecimal fileSize = getFileSize(ccDocFile);
+
+                String ccDocFileTypeId = ccDocFile.getCcDocFileTypeId();
+                String sql = "select t.ICON_FILE_GROUP_ID from CC_DOC_FILE_TYPE where t.id = ?";
+                Map<String, Object> iconMap = myJdbcTemplate.queryForMap(sql, ccDocFileTypeId);
+                String iconFileGroupId = JdbcMapUtil.getString(iconMap, "ICON_FILE_GROUP_ID");
+
+
+                //插入文件共享表
+                String ccAttachment = ccDocFile.getCcAttachment();
+                FlFile flFile = FlFile.selectById(ccAttachment);
+                String ext = flFile.getExt();
+                String fullFileName = ccAttachment + "." + ext;
+                FlFileShare flFileShare = FlFileShare.newData();
+                flFileShare.setAdShareId(adShareId);
+                flFileShare.setFlFileId(ccAttachment);
+                flFileShare.insertById();
+
+                String crtFileUserId = ccDocFile.getCrtUserId();
+                AdUser adUser = AdUser.selectById(crtFileUserId);
+                String adUserName = new JSONObject(adUser.getName()).getStr("ZH_CN");
 
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileId(ccDocFile.getCcAttachment());
                 fileInfo.setFileName(ccDocFile.getName());
+                fileInfo.setFullFileName(fullFileName);
+                fileInfo.setIconFileGroupId(iconFileGroupId);
                 fileInfo.setCreateTime(ccDocFile.getCrtDt().toString());
-                fileInfo.setCreateBy(ccDocFile.getCrtUserId());
+                fileInfo.setCreateBy(crtFileUserId);
+                fileInfo.setCreateByName(adUserName);
                 fileInfo.setFileSize(ccPreviewDspSize);
-                fileInfo.setType(ccDocFile.getCcDocFileTypeId());
+                fileInfo.setType(ccDocFileTypeId);
                 folder.getChildren().add(fileInfo);
 
                 totalSize = totalSize.add(fileSize);
@@ -125,7 +155,7 @@ public class DocShareExt {
                 List<CcDocFile> subDirFiles = CcDocFile.selectByWhere(
                         new Where().eq(CcDocFile.Cols.CC_DOC_DIR_ID, subDir.getId())
                 );
-                Folder subFolder = buildFolder(subDir, subDirFiles, parentChildMap, processedDirs); // 递归调用
+                Folder subFolder = buildFolder(subDir, subDirFiles, parentChildMap, processedDirs, adShareId); // 递归调用
                 if (subFolder != null) {  // 确保不添加空的子文件夹
                     folder.getChildren().add(subFolder);
                 }
