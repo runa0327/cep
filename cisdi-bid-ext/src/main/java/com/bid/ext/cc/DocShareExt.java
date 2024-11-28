@@ -78,6 +78,84 @@ public class DocShareExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 获取文档分享数据
+     */
+    public void getDocFileShareStruct() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String orgId = loginInfo.currentOrgInfo.id;
+        String userId = loginInfo.userInfo.id;
+
+        List<FileInfo> originData = new ArrayList<>();
+
+        AdShare adShare = AdShare.insertData();
+        String adShareId = adShare.getId();
+        String shareUrl = "../cisdi-gczx-jszt/#/filelist?orgId=" + orgId + "&shareId=" + adShareId;
+
+        // 1. 遍历传入的所有文件ID
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String ccDocFileId = entityRecord.csCommId;
+            CcDocFile ccDocFile = CcDocFile.selectById(ccDocFileId);
+
+            // 2. 获取文件的相关信息并处理
+            FileInfo fileInfo = buildFileInfo(ccDocFile, adShareId);
+            if (fileInfo != null) {
+                originData.add(fileInfo);
+            }
+        }
+
+        adShare.setShareUrl(shareUrl);
+        adShare.setShareByUserId(userId);
+        adShare.setShareContextData(new Gson().toJson(originData));
+        adShare.updateById();
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.shareId = adShareId;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 构建文件信息
+     */
+    private FileInfo buildFileInfo(CcDocFile ccDocFile, String adShareId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+
+        String ccPreviewDspSize = ccDocFile.getCcPreviewDspSize();
+
+        String ccDocFileTypeId = ccDocFile.getCcDocFileTypeId();
+        String sql = "select t.ICON_FILE_GROUP_ID from CC_DOC_FILE_TYPE t where t.id = ?";
+        Map<String, Object> iconMap = myJdbcTemplate.queryForMap(sql, ccDocFileTypeId);
+        String iconFileGroupId = JdbcMapUtil.getString(iconMap, "ICON_FILE_GROUP_ID");
+
+        // 插入文件共享表
+        String ccAttachment = ccDocFile.getCcAttachment();
+        FlFile flFile = FlFile.selectById(ccAttachment);
+        String dspName = flFile.getDspName();
+        String ext = flFile.getExt();
+        String fullFileName = ccAttachment + "." + ext;
+        FlFileShare flFileShare = FlFileShare.newData();
+        flFileShare.setAdShareId(adShareId);
+        flFileShare.setFlFileId(ccAttachment);
+        flFileShare.insertById();
+
+        String crtFileUserId = ccDocFile.getCrtUserId();
+        AdUser adUser = AdUser.selectById(crtFileUserId);
+        String adUserName = new JSONObject(adUser.getName()).getStr("ZH_CN");
+
+        FileInfo fileInfo = new FileInfo();
+        fileInfo.setFileId(ccDocFile.getCcAttachment());
+        fileInfo.setDocName(ccDocFile.getName());
+        fileInfo.setFileName(dspName);
+        fileInfo.setFullFileName(fullFileName);
+        fileInfo.setIconFileGroupId(iconFileGroupId);
+        fileInfo.setCreateTime(ccDocFile.getCrtDt().toString());
+        fileInfo.setCreateBy(crtFileUserId);
+        fileInfo.setCreateByName(adUserName);
+        fileInfo.setFileSize(ccPreviewDspSize);
+        fileInfo.setType(ccDocFileTypeId);
+
+        return fileInfo;
+    }
 
     /**
      * 根据父子关系构建目录树
