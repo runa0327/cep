@@ -1,14 +1,18 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.CcDocDir;
+import com.bid.ext.model.CcDocDirAuth;
+import com.bid.ext.model.CcPrjMember;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -70,5 +74,54 @@ public class DocDirExt {
         myJdbcTemplate.update(delSql, pCcDocFolderTypeId, ccPrjId);
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 项目文档目录授权
+     */
+    public void ccDocDirAuthorize() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcMemberTreeIds = JdbcMapUtil.getString(varMap, "P_CC_MEMBER_TREE_IDS");
+        Boolean pIsGrant = JdbcMapUtil.getBoolean(varMap, "P_IS_GRANT");
+        Boolean pIsEdit = JdbcMapUtil.getBoolean(varMap, "P_IS_EDIT");
+        Boolean pIsView = JdbcMapUtil.getBoolean(varMap, "P_IS_VIEW");
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            if (pCcMemberTreeIds != null && !pCcMemberTreeIds.isEmpty()) {
+
+                List<String> memberIdList = Arrays.asList(pCcMemberTreeIds.split(","));
+
+                for (String memberId : memberIdList) {
+                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                    String adUserId = ccPrjMember.getAdUserId();
+                    CcDocDirAuth ccDocDirAuth = CcDocDirAuth.newData();
+                    ccDocDirAuth.setAdUserId(adUserId);
+                    ccDocDirAuth.setCcDocDirId(csCommId);
+                    ccDocDirAuth.setIsGrant(pIsGrant);
+                    ccDocDirAuth.setIsEdit(pIsEdit);
+                    ccDocDirAuth.setIsView(pIsView);
+                    ccDocDirAuth.insertById();
+                }
+            }
+        }
+    }
+
+    /**
+     * 创建目录时初始化文档权限（查看、编辑、授权）
+     */
+    public void initDocAuth() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+            String userId = loginInfo.userInfo.id;
+            String csCommId = entityRecord.csCommId;
+            CcDocDirAuth ccDocDirAuth = CcDocDirAuth.newData();
+            ccDocDirAuth.setCcDocDirId(csCommId);
+            ccDocDirAuth.setIsGrant(true);
+            ccDocDirAuth.setIsEdit(true);
+            ccDocDirAuth.setIsView(true);
+            ccDocDirAuth.setAdUserId(userId);
+            ccDocDirAuth.insertById();
+        }
     }
 }
