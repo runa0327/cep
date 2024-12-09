@@ -6,6 +6,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -668,7 +669,8 @@ public class StructNodeExt {
         }
 
         if (allHaveChildren) { // 如果所有节点都有子节点
-            throw new BaseException("所选计划不为最末级计划，所选计划至少包含一个最末级计划！");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.reportProgressPreCheck");
+            throw new BaseException(message);
         }
     }
 
@@ -687,11 +689,13 @@ public class StructNodeExt {
         LocalDateTime now = LocalDateTime.parse(progTimeStr, formatter);
         Integer actWbsPct = JdbcMapUtil.getInt(varMap, "P_ACT_WBS_PCT");
         if (actWbsPct > 100 || actWbsPct < 0) {
-            throw new BaseException("“实际进度比例”超出数据范围!");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.exceedsDataRange");
+            throw new BaseException(message);
         }
         int curWbsPct = JdbcMapUtil.getInt(varMap, "P_CUR_WBS_PCT");
         if (actWbsPct < curWbsPct) {
-            throw new BaseException("“实际进度比例”应不小于最新进展比例!");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.notLessThanLatestProgressRatio");
+            throw new BaseException(message);
         }
         String wbsStatusId = JdbcMapUtil.getString(varMap, "P_WBS_STATUS_ID");
         String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "P_WBS_PROGRESS_STATUS_ID");
@@ -887,7 +891,8 @@ public class StructNodeExt {
                     entityRecord.extraEditableAttCodeList.add("PLAN_DAYS");
                 }
             } else {
-                throw new BaseException("请检查并确保开始日期不晚于结束日期！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.nodeDateCheckCalculate");
+                throw new BaseException(message);
             }
         }
     }

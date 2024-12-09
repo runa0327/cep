@@ -3,6 +3,7 @@ package com.bid.ext.cc;
 import com.bid.ext.model.CcConstructWork;
 import com.bid.ext.model.CcConstructWorkProg;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -25,7 +26,8 @@ public class ConstructWorkExt {
         Integer pActWbsPct = JdbcMapUtil.getInt(varMap, "P_ACT_WBS_PCT");
 
         if (pActWbsPct > 100 || pActWbsPct < 0) {
-            throw new BaseException("“实际进度比例”超出数据范围!");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.exceedsDataRange");
+            throw new BaseException(message);
         }
         String progTimeStr = varMap.get("P_PROG_TIME").toString(); // 获取日期时间字符串
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -35,7 +37,8 @@ public class ConstructWorkExt {
             CcConstructWork ccConstructWork = CcConstructWork.selectById(csCommId);
 
             if (pActWbsPct < ccConstructWork.getActWbsPct()) {
-                throw new BaseException("“实际进度比例”应不小于最新进度比例!");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.notLessThanLatestProgressRatio");
+                throw new BaseException(message);
             }
 
             //插入进展

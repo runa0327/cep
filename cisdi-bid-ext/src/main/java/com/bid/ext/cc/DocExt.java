@@ -5,6 +5,7 @@ import com.bid.ext.utils.TemplateUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -98,7 +99,8 @@ public class DocExt {
         CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
         String ccAttachment = ccDocFile.getCcAttachment();
         if (SharedUtil.isEmpty(ccAttachment)) {
-            throw new IllegalStateException("未上传默认展示文件，请上传");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.getPreviewById");
+            throw new BaseException(message);
         }
         FlFile flFile = FlFile.selectById(ccAttachment);
         String fileInlineUrl = flFile.getFileInlineUrl();
@@ -741,7 +743,8 @@ public class DocExt {
     public void preCheckDocToFile() {
         Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
         if (drivenInfosMap.size() != 1) {
-            throw new BaseException("请勿选择多个目录");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.preCheckDocToFile");
+            throw new BaseException(message);
         }
 
     }

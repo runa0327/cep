@@ -12,6 +12,7 @@ import com.itextpdf.text.pdf.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.ext.UrlToOpen;
@@ -299,7 +300,8 @@ public class DrawingExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
         if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
-            throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+            throw new BaseException(message);
         }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
@@ -436,12 +438,14 @@ public class DrawingExt {
                         ccDrawingManagement.updateById();
                     }
                 } catch (Exception e) {
-                    throw new BaseException("在第 " + (i + 1) + " 行的单元格格式错误!" + e);
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelCellError", i + 1);
+                    throw new BaseException(message + e);
                 }
             }
 
         } catch (IOException e) {
-            throw new BaseException("上传文件失败", e);
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message);
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();
@@ -549,7 +553,8 @@ public class DrawingExt {
         // 验证文件类型
         String fileExt = flFile.getExt();
         if (!"xls".equals(fileExt) && !"xlsx".equals(fileExt)) {
-            throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+            throw new BaseException(message);
         }
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
@@ -623,7 +628,8 @@ public class DrawingExt {
                 ccEngineeringQuantity.insertById();
 
             } catch (IOException e) {
-                throw new BaseException("上传文件失败", e);
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+                throw new BaseException(message);
             }
         }
 
@@ -823,7 +829,8 @@ public class DrawingExt {
                         ccDrawingManagement.updateById();
                     }
                 } else {
-                    throw new BaseException("文件未找到：" + path);
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileNotFound", path);
+                    throw new BaseException(message);
                 }
             } catch (Exception e) {
                 throw new BaseException(e);
@@ -866,7 +873,8 @@ public class DrawingExt {
             String ccConstructionDrawingId = JdbcMapUtil.getString(valueMap, "CC_CONSTRUCTION_DRAWING_ID");
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
             if (!ccConstructionDrawingIdOrigin.equals(ccConstructionDrawingId) && !SharedUtil.isEmpty(ccDrawingManagement)) {
-                throw new BaseException("已存在套图：" + ccConstructionDrawingId + "!");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.updateCheckDrawing", ccConstructionDrawingId);
+                throw new BaseException(message);
             }
 
         }
@@ -911,7 +919,8 @@ public class DrawingExt {
                 File tempFile = new File(pdfPath + "tmp.pdf");
                 tempFile.renameTo(originalFile);
             } else {
-                throw new DocumentException("重命名添加水印后的pdf失败");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.addWaterMark");
+                throw new BaseException(message);
             }
 
         } catch (DocumentException | IOException e) {

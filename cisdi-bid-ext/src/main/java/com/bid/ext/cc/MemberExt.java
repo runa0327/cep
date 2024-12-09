@@ -4,6 +4,7 @@ import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.DrivenInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -38,7 +39,8 @@ public class MemberExt {
                     pCcPartyCompanyPostId = value.get();
                 }
             } else {
-                throw new BaseException("请先创建岗位");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.createPost");
+                throw new BaseException(message);
             }
 
             String pAdUserIds = JdbcMapUtil.getString(varMap, "P_AD_USER_IDS");
@@ -105,7 +107,8 @@ public class MemberExt {
     public void preCheckMember() {
         Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
         if (SharedUtil.isEmpty(drivenInfosMap)) {
-            throw new BaseException("请先创建岗位");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.createPost");
+            throw new BaseException(message);
         }
     }
 
@@ -125,7 +128,8 @@ public class MemberExt {
                 String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_PARTY WHERE ID = ?";
                 Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccPartyId);
                 String name = JdbcMapUtil.getString(map, "NAME");
-                throw new BaseException("参建方中已存在【" + name + "】");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isCcPrjPartyExists", name);
+                throw new BaseException(message);
             }
         }
     }
@@ -147,7 +151,8 @@ public class MemberExt {
                 String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_COMPANY WHERE ID = ?";
                 Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccCompanyId);
                 String name = JdbcMapUtil.getString(map, "NAME");
-                throw new BaseException("项目参建方公司中已存在【" + name + "】");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isCcPrjCompanyExists", name);
+                throw new BaseException(message);
             }
         }
     }
@@ -169,7 +174,8 @@ public class MemberExt {
                 String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_POST WHERE ID = ?";
                 Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccPostId);
                 String name = JdbcMapUtil.getString(map, "NAME");
-                throw new BaseException("项目参建方公司岗位中已存在【" + name + "】");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isCcPrjPostExists", name);
+                throw new BaseException(message);
             }
         }
 
@@ -188,7 +194,8 @@ public class MemberExt {
             CcPrjParty ccPrjPartyBefore = CcPrjParty.selectById(csCommId);
             String ccPrjIdAft = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
             if (!(ccPrjIdAft == null ? "" : ccPrjIdAft).equals(ccPrjPartyBefore.getCcPrjId())) {
-                throw new BaseException("不能修改参项目参建方所属项目！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.cannotModifyProjectOwner");
+                throw new BaseException(message);
             }
 
             String ccPartyIdAft = JdbcMapUtil.getString(valueMap, "CC_PARTY_ID");
@@ -202,7 +209,8 @@ public class MemberExt {
                     String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_PARTY WHERE ID = ?";
                     Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccPartyIdAft);
                     String name = JdbcMapUtil.getString(map, "NAME");
-                    throw new BaseException("参建方中已存在【" + name + "】");
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isCcPrjPartyExists", name);
+                    throw new BaseException(message);
                 }
 
                 // 更新项目参建方公司的【参建方】属性
@@ -254,7 +262,8 @@ public class MemberExt {
             CcPartyCompany ccPartyCompanyBefore = CcPartyCompany.selectById(csCommId);
             String ccPrjIdAft = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
             if (!(ccPrjIdAft == null ? "" : ccPrjIdAft).equals(ccPartyCompanyBefore.getCcPrjId())) {
-                throw new BaseException("不能修改项目参建方公司所属项目！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.cannotModifyProjectOwnerCompany");
+                throw new BaseException(message);
             }
 
             String ccCompanyIdAft = JdbcMapUtil.getString(valueMap, "CC_COMPANY_ID");
@@ -269,7 +278,8 @@ public class MemberExt {
                     String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_COMPANY WHERE ID = ?";
                     Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccCompanyIdAft);
                     String name = JdbcMapUtil.getString(map, "NAME");
-                    throw new BaseException("项目参建方公司中已存在【" + name + "】");
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isCcPrjCompanyExists", name);
+                    throw new BaseException(message);
                 }
 
                 // 更新项目参建方公司岗位的【公司】属性
@@ -317,7 +327,8 @@ public class MemberExt {
             CcPartyCompanyPost ccPartyCompanyPostBefore = CcPartyCompanyPost.selectById(csCommId);
             String ccPrjIdAft = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
             if (!(ccPrjIdAft == null ? "" : ccPrjIdAft).equals(ccPartyCompanyPostBefore.getCcPrjId())) {
-                throw new BaseException("不能修改项目参建方公司岗位所属项目！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.cannotModifyProjectOwnerCompanyPost");
+                throw new BaseException(message);
             }
 
             String ccPostIdAft = JdbcMapUtil.getString(valueMap, "CC_POST_ID");
@@ -332,7 +343,8 @@ public class MemberExt {
                     String sql = "SELECT `NAME`->'$.ZH_CN' AS NAME FROM CC_POST WHERE ID = ?";
                     Map<String, Object> map = myJdbcTemplate.queryForMap(sql, ccPostIdAft);
                     String name = JdbcMapUtil.getString(map, "NAME");
-                    throw new BaseException("项目参建方公司岗位中已存在【" + name + "】");
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isCcPrjPostExists", name);
+                    throw new BaseException(message);
                 }
 
                 // 更新项目成员的【岗位】属性

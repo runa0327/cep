@@ -5,6 +5,7 @@ import com.bid.ext.utils.SysSettingUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -47,7 +48,8 @@ public class InspectionExt {
             LocalDate ccQsInspectionTime = JdbcMapUtil.getLocalDate(valueMap, "CC_QS_INSPECTION_TIME");
             // 检查整改时间是否早于巡检时间
             if (rectifyTimeObject.isBefore(ccQsInspectionTime)) {
-                throw new BaseException("整改时间早于巡检时间！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.rectifyDate");
+                throw new BaseException(message);
             }
         }
     }
@@ -64,7 +66,8 @@ public class InspectionExt {
             // 到
             LocalDate planTo = LocalDate.parse(valueMap.get("PLAN_TO").toString());
             if (planTo.isBefore(planFr)) {
-                throw new BaseException("计划结束时间早于计划开始时间！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.checkPlanDate");
+                throw new BaseException(message);
             }
         }
     }
@@ -415,7 +418,8 @@ public class InspectionExt {
             Map map = JsonUtil.fromJson(responseBody, Map.class);
             Object accessToken = map.get("access_token");
             if (SharedUtil.isEmpty(accessToken)) {
-                throw new BaseException("获取微信AccessToken失败！" + responseBody);
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.getAccessTokenFailed");
+                throw new BaseException(message + responseBody);
             } else {
                 // 微信官方表示7200秒失效，我们自行另其6000秒失效，便于更换新的：
                 String accessTokenString = accessToken.toString();
@@ -488,7 +492,8 @@ public class InspectionExt {
         String responseBody = response.getBody();
         Map map = JsonUtil.fromJson(responseBody, Map.class);
         if (map == null || !"ok".equals(map.get("errmsg"))) {
-            throw new BaseException("发送模板消息失败！" + responseBody);
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.sendTemplateMessageFailed");
+            throw new BaseException(message + responseBody);
         }
     }
 

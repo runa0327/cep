@@ -7,6 +7,7 @@ import com.bid.ext.utils.SysSettingUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.BaseInfo;
 import com.qygly.shared.ad.ext.UrlToOpen;
@@ -14,7 +15,6 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.*;
-import com.tencentcloudapi.trp.v20210515.models.Ext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -123,7 +123,8 @@ public class PreViewExt {
                 ExtJarHelper.setReturnValue(invokeActResult);
                 return;
             } else if ("DOING".equals(ccPreviewConversionStatusId)) {
-                throw new BaseException("已经在转换中，请稍后再试");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.previewConverting");
+                throw new BaseException(message);
             }
 
             // 从 Nacos 获取服务实例列表
@@ -138,7 +139,6 @@ public class PreViewExt {
             FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment());
             String filePath = flFile.getPhysicalLocation();
 //            filePath = "C:\\Users\\34451\\Desktop\\test.dwg";
-
 
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -226,7 +226,8 @@ public class PreViewExt {
                         Map map = JsonUtil.fromJson(responseBody, Map.class);
                         Map data = (Map) map.get("data");
                         if (data == null) {
-                            throw new BaseException("该文件暂时只能在详情页预览！");
+                            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.detailPreviewOnly");
+                            throw new BaseException(message);
                         }
                         modelFileId = data.get("fileId").toString();
 
@@ -304,20 +305,24 @@ public class PreViewExt {
                                         if (pollCount >= 3) {
                                             log.info("正在转换中，请稍后查询");
                                             ccDocFile.setCcPreviewConversionStatusId(ModelConversionStatus.DOING.toString());
-                                            throw new BaseException("正在转换中，请稍后再尝试预览");
+                                            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.previewConverting");
+                                            throw new BaseException(message);
                                         }
                                     }
                                 } else {
                                     log.error("查询模型转换状态失败：" + response);
-                                    throw new BaseException("查询模型转换状态失败：" + response); // 发送错误抛出异常
+                                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.queryModelConversionStatusFailed", response);
+                                    throw new BaseException(message);
                                 }
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
                                 log.error("轮询查询模型转换状态时被中断", e);
-                                throw new BaseException("轮询查询模型转换状态时被中断", e); // 发送错误抛出异常
+                                String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.pollingModelConversionStatusInterrupted", e);
+                                throw new BaseException(message);
                             } catch (Exception e) {
                                 log.error("查询模型转换状态时发生异常", e);
-                                throw new BaseException("查询模型转换状态时发生异常", e); // 发送错误抛出异常
+                                String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.queryModelConversionStatusFailed", e);
+                                throw new BaseException(message);
                             }
                         }
                         latch.countDown(); // 通知第二个线程完成
@@ -334,7 +339,7 @@ public class PreViewExt {
                         HttpEntity<String> shareEntity = new HttpEntity<>("", shareHeaders);
                         ResponseEntity<String> shareResponse = restTemplate.exchange(shareUrl, HttpMethod.POST, shareEntity, String.class);
                         if (shareResponse.getStatusCode() != HttpStatus.OK) {
-                            String message = "获取预览地址失败！";
+                            String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.getPreViewUrlFailed");
                             log.error(message + shareResponse);
                             throw new BaseException(message);
                         }
@@ -348,7 +353,8 @@ public class PreViewExt {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         log.error("主线程等待异步操作完成时被中断", e);
-                        throw new BaseException("主线程等待异步操作完成时被中断", e);
+                        String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.mainThreadInterruptedWaitingForAsync", e);
+                        throw new BaseException(message);
                     }
                 }
             }
@@ -394,12 +400,14 @@ public class PreViewExt {
 
             Object ccAttachment = entityRecord.valueMap.get("CC_ATTACHMENT");
             if (SharedUtil.isEmpty(ccAttachment)) {
-                throw new BaseException("资料文件的CC_ATTACHMENT字段为空！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.ccAttachmentFieldIsEmpty");
+                throw new BaseException(message);
             }
 
             List<Map<String, Object>> fileList = ExtJarHelper.getMyJdbcTemplate().queryForList("select * from fl_file f where f.id=?", ccAttachment);
             if (SharedUtil.isEmpty(fileList)) {
-                throw new BaseException("资料文件的CC_ATTACHMENT字段对应FL_FILE记录不存在！");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.ccAttachmentNoFlFileRecord");
+                throw new BaseException(message);
             }
 
             Map<String, Object> file = fileList.get(0);

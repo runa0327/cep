@@ -5,6 +5,7 @@ import com.bid.ext.model.CcCoTask;
 import com.bid.ext.model.CcCoTaskProg;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -128,7 +129,9 @@ public class CoTaskExt {
             }
         }
         if (!isTaskUser) {
-            throw new BaseException("用户【" + userName + "】不是所选任务的责任人或督办人，无法反馈进度！");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.preCheckTaskProg", userName);
+            throw new BaseException(message);
+
         }
     }
 

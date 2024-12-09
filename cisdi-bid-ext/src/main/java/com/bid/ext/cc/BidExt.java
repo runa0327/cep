@@ -3,6 +3,7 @@ package com.bid.ext.cc;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -70,7 +71,8 @@ public class BidExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
         if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
-            throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+            throw new BaseException(message);
         }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
@@ -155,7 +157,8 @@ public class BidExt {
             }
 
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message);
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();
@@ -172,7 +175,8 @@ public class BidExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
         if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
-            throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+            throw new BaseException(message);
         }
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = WorkbookFactory.create(file);
@@ -330,7 +334,8 @@ public class BidExt {
             }
 
         } catch (IOException e) {
-            throw new BaseException("上传文件失败", e);
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message, e);
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();
