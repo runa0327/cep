@@ -188,8 +188,12 @@ public class GenExt {
             Path tempPdf = Files.createTempFile(null, ".pdf");
 
             // 指定 LibreOffice 的安装路径及命令行工具
-            String libreOfficePath = "/usr/bin/libreoffice";
+//            String libreOfficePath = "/usr/bin/libreoffice";
 //            String libreOfficePath = "D:\\Program Files\\LibreOffice";
+            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
             // 调用 LibreOffice 进行转换
             ProcessBuilder builder = new ProcessBuilder();
