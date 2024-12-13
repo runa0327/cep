@@ -6,9 +6,11 @@ import com.bid.ext.utils.ProcessCommon;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.tencentcloudapi.teo.v20220901.models.CC;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -117,8 +119,9 @@ public class ZJQulityCheckExt {
                         }
                     }
                     if (unitPrjNodeId == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "单元工程名称填写错误");
-
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "单元工程名称填写错误");
                     }
 
 
@@ -127,7 +130,9 @@ public class ZJQulityCheckExt {
                     //检测主体
                     Cell cell2 = row.getCell(2);
                     if (cell2 == null || !StringUtils.hasText(getCellValueAsString(cell2))) {
-                        throw new BaseException("第" + (row.getRowNum()) + "行，检测主体为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.importRowIsNull",row.getRowNum()+1,3);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()) + "行，检测主体为空");
                     }
                     mainBody = getCellValueAsString(cell2);
 
@@ -140,14 +145,18 @@ public class ZJQulityCheckExt {
                     }
 
                     if (mainBodyId == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "检测主体填写错误");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.checkMainBodyError",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "检测主体填写错误");
                     }
 
 
                     //检测时期
                     Cell cell3 = row.getCell(3);
                     if (cell3 == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测时期为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.importRowIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测时期为空");
                     }
                     LocalDate checkDate = null;
                     try {
@@ -157,7 +166,9 @@ public class ZJQulityCheckExt {
                             String date = getCellValueAsString(cell2);
                             checkDate = LocalDate.parse(date, formatter);
                         } catch (Exception ex) {
-                            throw new BaseException("第" + (row.getRowNum()+1) + "行，检测时期列格式错误");
+                            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.checkDateError",row.getRowNum()+1);
+                            throw new BaseException(msg);
+//                            throw new BaseException("第" + (row.getRowNum()+1) + "行，检测时期列格式错误");
                         }
                     }
 
@@ -178,14 +189,18 @@ public class ZJQulityCheckExt {
                     }
 
                     if (yearId == null || monthId == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行日期格式错误");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.checkDateError",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行日期格式错误");
                     }
 
                     //检测分类
                     String checkType = null;
                     Cell cell4 = row.getCell(4);
                     if (cell4 == null || !StringUtils.hasText(getCellValueAsString(cell4))) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测分类为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.importRowIsNull",row.getRowNum()+1,5);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测分类为空");
                     }
                     checkType = getCellValueAsString(cell4);
 
@@ -197,20 +212,31 @@ public class ZJQulityCheckExt {
                         }
                     }
                     if (checkTypeId == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测分类填写错误");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.checkCategoryError",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测分类填写错误");
                     }
 
                     //检测分类内容
                     String checkContent = null;
                     Cell cell5 = row.getCell(5);
                     if (cell5 == null || !StringUtils.hasText(getCellValueAsString(cell5))) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测内容为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.importRowIsNull",row.getRowNum()+1,6);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测内容为空");
                     }
                     checkContent = getCellValueAsString(cell5);
                     //检查检测主体填写是否错误
                     String checkContentId = null;
 
-                    if (checkType.equals("无损检测")) {
+                    String NDT = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.category.NDT");
+
+                    if (NDT == null){
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.category.i8nGetNull");
+                        throw new BaseException(msg);
+                    }
+
+                    if (checkType.equals(NDT)) {
                         for (CcQualityCheckTypeContent checkTypeContent : checkTypeContents) {
                             if (JsonUtil.getCN(checkTypeContent.getName()).equals(checkContent)) {
                                 checkContentId = checkTypeContent.getId();
@@ -225,7 +251,9 @@ public class ZJQulityCheckExt {
 
                     }
                     if (checkContentId == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测主体填写错误");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.mainBodyFillError",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，检测主体填写错误");
                     }
 
                     //查询是否存在相同时期检测数据
@@ -234,14 +262,18 @@ public class ZJQulityCheckExt {
                     CcQualityCheckRecord ccQualityCheckRecord = CcQualityCheckRecord.selectOneByWhere(queryRecord);
 
                     if (ccQualityCheckRecord != null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，存在相同检测日期数据");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.sameDateCheckData",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，存在相同检测日期数据");
                     }
 
                     //送检批次
                     String checkBatch = "";
                     Cell cell6 = row.getCell(6);
                     if (cell6 == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，送检批次容为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.importRowIsNull",row.getRowNum()+1,6);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，送检批次容为空");
                     }
                     checkBatch = getCellValueAsString(cell6);
 

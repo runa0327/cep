@@ -5,6 +5,7 @@ import com.bid.ext.utils.SysSettingUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -146,7 +147,10 @@ public class ZjWeChatMsgNoticeExt {
         Map map = JsonUtil.fromJson(responseBody, Map.class);
 
         if (map == null || !"ok".equals(map.get("errmsg"))) {
-            throw new BaseException("发送模板消息失败！" + responseBody);
+
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extWeChat.tpltMsgNoticeFail",responseBody);
+            throw new BaseException(msg);
+//            throw new BaseException("发送模板消息失败！" + responseBody);
         }
     }
 

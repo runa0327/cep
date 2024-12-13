@@ -5,6 +5,7 @@ import com.bid.ext.utils.ProcessCommon;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -47,7 +48,9 @@ public class ZJSpecialEquipExt {
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
         if (conHeadId == null) {
-            throw new BaseException("施工责任人不能为空");
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.conHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("施工责任人不能为空");
         }
         //督办人
         String superisorId = null;
@@ -57,7 +60,9 @@ public class ZJSpecialEquipExt {
         //使用登记办理责任人
         String regProId = varMap.get("P_REG_PRO_ID").toString();
         if (regProId == null) {
-            throw new BaseException("使用登记办理人不能为空");
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.regProHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("使用登记办理人不能为空");
         }
         //
         Integer slippageWarningDay = null;
@@ -100,63 +105,84 @@ public class ZJSpecialEquipExt {
                     //设备名称
                     Cell cell1 = row.getCell(1);
                     if (cell1 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备名称列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备名称列为空");
                     }
                     equipName = getCellValueAsString(cell1);
                     if (!StringUtils.hasText(equipName)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备名称列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备名称列为空");
                     }
 
                     String installLocation = "";
                     //安装地点
                     Cell cell2 = row.getCell(3);
                     if (cell2 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，安装地点列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,3);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，安装地点列为空");
                     }
                     installLocation = getCellValueAsString(cell2);
                     if (!StringUtils.hasText(installLocation)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，安装地点列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,3);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，安装地点列为空");
                     }
 
                     //介质
                     Cell cell3 = row.getCell(4);
                     if (cell3 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，介质列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，介质列为空");
                     }
                     String medium = getCellValueAsString(cell3);
                     if (!StringUtils.hasText(medium)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，介质列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，介质列为空");
                     }
 
                     //安装单位
                     Cell cell4 = row.getCell(7);
                     if (cell4 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，安装单位列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,8);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，安装单位列为空");
                     }
                     String installCompany = getCellValueAsString(cell4);
                     if (!StringUtils.hasText(installCompany)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，安装单位列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,8);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，安装单位列为空");
                     }
 
                     //设备计划到货时间
                     Cell cell5 = row.getCell(8);
                     if (cell5 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,9);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列为空");
                     }
                     LocalDate planArriveDate = null;
                     try {
                         planArriveDate = cell5.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     } catch (Exception e) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列格式错误");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelDateFormatError",row.getRowNum()+1,9);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列格式错误");
                     }
-
 
                     Where queryEquip = new Where();
                     queryEquip.sql("T.STATUS = 'AP' AND  T.`NAME` = '" + equipName + "' AND T.CC_SPECIAL_EQUIP_INS_LOCATION='" + installLocation + "'");
                     CcSpecialEquipPreVe ccSpecialEquipPreVe = CcSpecialEquipPreVe.selectOneByWhere(queryEquip);
 
                     if (ccSpecialEquipPreVe != null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备已存在，可删除再导入！");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelRowIsExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备已存在，可删除再导入！");
                     }
                     CcSpecialEquipPreVe ccSpecialEquipPreVe1 = CcSpecialEquipPreVe.newData();
                     ccSpecialEquipPreVe1.setName(equipName);
@@ -192,7 +218,9 @@ public class ZJSpecialEquipExt {
                 }
             }
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFileError");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
 
     }
@@ -230,7 +258,9 @@ public class ZJSpecialEquipExt {
                     if (cell0 != null && StringUtils.hasText(getCellValueAsString(cell0))) {
                         equipName = getCellValueAsString(cell0);
                     } else {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，设备名称为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelRowIsExist",row.getRowNum()+1,1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，设备名称为空");
                     }
 
                     String inslocation = "";
@@ -239,7 +269,9 @@ public class ZJSpecialEquipExt {
                     if (cell2 != null && StringUtils.hasText(getCellValueAsString(cell2))) {
                         inslocation = getCellValueAsString(cell2);
                     } else {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，安装位置名称为空");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelRowIsExist",row.getRowNum()+1,3);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，安装位置名称为空");
                     }
 
                     Where queryEquip = new Where();
@@ -247,7 +279,9 @@ public class ZJSpecialEquipExt {
                     CcSpecialEquipPreVe equipPreVe = CcSpecialEquipPreVe.selectOneByWhere(queryEquip);
 
                     if (equipPreVe == null) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行设备未找到");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFillEquipNotExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行设备未找到");
                     }
 
                     CcPrjMember member1 = CcPrjMember.selectById(equipPreVe.getCcSpecialEquipConHeadId());
@@ -399,7 +433,9 @@ public class ZJSpecialEquipExt {
                         }
 
                     } else {
-                        throw new BaseException("非责任人，不可操作！");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.nonResponsiblePerson");
+                        throw new BaseException(msg);
+//                        throw new BaseException("非责任人，不可操作！");
                     }
 
                     checkEquipRecord(equipPreVe);//检查数据并更新
@@ -407,7 +443,9 @@ public class ZJSpecialEquipExt {
                 }
             }
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFileError");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
 
     }
@@ -442,7 +480,9 @@ public class ZJSpecialEquipExt {
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
         if (conHeadId == null) {
-            throw new BaseException("施工责任人不能为空");
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.conHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("施工责任人不能为空");
         }
         //督办人
         String superisorId = null;
@@ -452,7 +492,9 @@ public class ZJSpecialEquipExt {
         //使用登记办理责任人
         String regProId = varMap.get("P_REG_PRO_ID").toString();
         if (regProId == null) {
-            throw new BaseException("使用登记办理人不能为空");
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.regProHeadNotExists");
+                throw new BaseException(msg);
+//            throw new BaseException("使用登记办理人不能为空");
         }
         //
         Integer slippageWarningDay = null;
@@ -917,7 +959,7 @@ public class ZJSpecialEquipExt {
                 }
             }
 
-            checkFillDate(equipPreVe);
+//            checkFillDate(equipPreVe);
             equipPreVe.updateById();
         }
 
@@ -927,7 +969,7 @@ public class ZJSpecialEquipExt {
     //检查数据装填
     private void checkEquipRecord(CcSpecialEquipPreVe equipPreVe) {
 
-        checkFillDate(equipPreVe);
+//        checkFillDate(equipPreVe);
 
         String userId = equipPreVe.getCrtUserId();
         String now = getNormalTimeStr(new Date());
@@ -1326,44 +1368,48 @@ public class ZJSpecialEquipExt {
 
 
     //检查设置的时间
-    private void checkFillDate(CcSpecialEquipPreVe equipPreVe) {
-
-        LocalDate planArriveDate = equipPreVe.getCcSpecialEquipPlanArriveDate();//计划到货
-        LocalDate planConNocDate = equipPreVe.getCcSpecialEquipPlanConNocDate();//计划施工告知时间
-        LocalDate planInstallDate = equipPreVe.getCcSpecialEquipPlanInstallDate();//计划安装时间
-
+//    private void checkFillDate(CcSpecialEquipPreVe equipPreVe) {
+//
+//        LocalDate planArriveDate = equipPreVe.getCcSpecialEquipPlanArriveDate();//计划到货
+//        LocalDate planConNocDate = equipPreVe.getCcSpecialEquipPlanConNocDate();//计划施工告知时间
+//        LocalDate planInstallDate = equipPreVe.getCcSpecialEquipPlanInstallDate();//计划安装时间
+//
 //        if (planConNocDate!=null && planArriveDate != null && planConNocDate.compareTo(planArriveDate)<0){
 //
 //            throw  new BaseException("计划施工告知时间小于计划到货时间");
 //        }
-
-        if (planInstallDate != null && planConNocDate != null && planInstallDate.compareTo(planConNocDate) < 0) {
-
-            throw new BaseException("计划安装时间小于计划施工告知时间");
-        }
-
-        LocalDate planUseDate = equipPreVe.getCcSpecialEquipPlanUseDate();//计划投用时间
-
-        if (planUseDate != null && planInstallDate != null && planUseDate.compareTo(planInstallDate) < 0) {
-
-            throw new BaseException("计划投用时间小于计划安装完成时间");
-        }
-
-        LocalDate actArriveDate = equipPreVe.getCcSpecialEquipActArriveDate();//实际到货时间
-        LocalDate conNocDate = equipPreVe.getCcSpecialEquipComlConNocDate();//实际施工告知时间
-        LocalDate actInstallDate = equipPreVe.getCcSpecialEquipActInstallDate();//实际安装时间
-
-        if (conNocDate != null && actArriveDate != null && conNocDate.compareTo(actArriveDate) < 0) {
-
-            throw new BaseException("实际施工告知时间小于实际到货时间");
-        }
-
-        if (actInstallDate != null && conNocDate != null && actInstallDate.compareTo(conNocDate) < 0) {
-
-            throw new BaseException("实际安装时间小于实际施工告知时间");
-        }
-
-    }
+//
+//        if (planInstallDate != null && planConNocDate != null && planInstallDate.compareTo(planConNocDate) < 0) {
+//            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.planInstallTimeLessThanPlanConTime");
+//            throw new BaseException(msg);
+//            throw new BaseException("计划安装时间小于计划施工告知时间");
+//        }
+//
+//        LocalDate planUseDate = equipPreVe.getCcSpecialEquipPlanUseDate();//计划投用时间
+//
+//        if (planUseDate != null && planInstallDate != null && planUseDate.compareTo(planInstallDate) < 0) {
+//
+//            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.planUseTimeLessThanPlanInstallTime");
+//            throw new BaseException(msg);
+//            throw new BaseException("计划投用时间小于计划安装完成时间");
+//        }
+//
+//        LocalDate actArriveDate = equipPreVe.getCcSpecialEquipActArriveDate();//实际到货时间
+//        LocalDate conNocDate = equipPreVe.getCcSpecialEquipComlConNocDate();//实际施工告知时间
+//        LocalDate actInstallDate = equipPreVe.getCcSpecialEquipActInstallDate();//实际安装时间
+//
+//        if (conNocDate != null && actArriveDate != null && conNocDate.compareTo(actArriveDate) < 0) {
+//            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.regProHeadNotExists");
+//            throw new BaseException(msg);
+//            throw new BaseException("实际施工告知时间小于实际到货时间");
+//        }
+//
+//        if (actInstallDate != null && conNocDate != null && actInstallDate.compareTo(conNocDate) < 0) {
+//
+//            throw new BaseException("实际安装时间小于实际施工告知时间");
+//        }
+//
+//    }
 
 
     //检查设置的时间
@@ -1409,24 +1455,21 @@ public class ZJSpecialEquipExt {
             if (plan_install_date != null)
                 planInstallDate = LocalDate.parse(plan_install_date, formatter);//计划安装时间
 
-            if (planConNocDate != null && planArriveDate != null && planConNocDate.compareTo(planArriveDate) < 0) {
+//            if (planConNocDate != null && planArriveDate != null && planConNocDate.compareTo(planArriveDate) < 0) {
+//                throw new BaseException("计划施工告知时间小于计划到货时间");
+//            }
 
-                throw new BaseException("计划施工告知时间小于计划到货时间");
-            }
-
-            if (planInstallDate != null && planConNocDate != null && planInstallDate.compareTo(planConNocDate) < 0) {
-
-                throw new BaseException("计划安装时间小于计划施工告知时间");
-            }
+//            if (planInstallDate != null && planConNocDate != null && planInstallDate.compareTo(planConNocDate) < 0) {
+//                throw new BaseException("计划安装时间小于计划施工告知时间");
+//            }
 
             LocalDate planUseDate = null;
             if (plan_use_date != null)
                 planUseDate = LocalDate.parse(plan_use_date, formatter);//计划投用时间
 
-            if (planUseDate != null && planInstallDate != null && planUseDate.compareTo(planInstallDate) < 0) {
-
-                throw new BaseException("计划投用时间小于计划安装完成时间");
-            }
+//            if (planUseDate != null && planInstallDate != null && planUseDate.compareTo(planInstallDate) < 0) {
+//                throw new BaseException("计划投用时间小于计划安装完成时间");
+//            }
 
             //实际
             String act_arrive_date = null;
@@ -1453,15 +1496,15 @@ public class ZJSpecialEquipExt {
             if (act_install_date != null)
                 actInstallDate = LocalDate.parse(act_install_date, formatter);//实际安装时间
 
-            if (conNocDate != null && actArriveDate != null && conNocDate.compareTo(actArriveDate) < 0) {
+//            if (conNocDate != null && actArriveDate != null && conNocDate.compareTo(actArriveDate) < 0) {
+//
+//                throw new BaseException("实际施工告知时间小于实际到货时间");
+//            }
 
-                throw new BaseException("实际施工告知时间小于实际到货时间");
-            }
-
-            if (actInstallDate != null && conNocDate != null && actInstallDate.compareTo(conNocDate) < 0) {
-
-                throw new BaseException("实际安装时间小于实际施工告知时间");
-            }
+//            if (actInstallDate != null && conNocDate != null && actInstallDate.compareTo(conNocDate) < 0) {
+//
+//                throw new BaseException("实际安装时间小于实际施工告知时间");
+//            }
         }
     }
 
