@@ -52,9 +52,21 @@ public class ScheduledTaskController {
         scheduleTask("CC_CO_TASK", "DUE_TIME", "1783792280128909312", "1834493376552837120");
     }
 
+    /**
+     * 工作日程通知定时器
+     */
+    @Scheduled(cron = "0 * * * * ?")
+    public void scheduleTaskWorkSchedule() {
+        // 未自动登录前不要执行：
+        if (LoginInfoManager.loginInfo == null) {
+            return;
+        }
+        scheduleTask("CC_WORK_SCHEDULE", "CC_SCHEDULE_TIME", "1863482975577686016", "1868541052077420544");
+    }
+
     private void scheduleTask(String entity, String timeField, String sevId, String actId) {
         LocalDateTime now = LocalDateTime.now();
-        //遍历会议列表
+        //遍历实体列表
         String sql = "select * from " + entity + " t where t.STATUS = 'AP'";
         List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
 
