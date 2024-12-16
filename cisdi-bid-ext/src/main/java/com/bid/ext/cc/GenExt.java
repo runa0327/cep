@@ -19,9 +19,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -187,19 +185,62 @@ public class GenExt {
             // 定义 PDF 临时文件的路径
             Path tempPdf = Files.createTempFile(null, ".pdf");
 
-            // 指定 LibreOffice 的安装路径及命令行工具
-//            String libreOfficePath = "/usr/bin/libreoffice";
-//            String libreOfficePath = "D:\\Program Files\\LibreOffice";
-            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
+            // 获取当前操作系统的具体发行版信息
+            String osReleaseFile = "/etc/os-release";
+            String distro = null;
+
+            try (BufferedReader br = new BufferedReader(new FileReader(osReleaseFile))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("ID=")) {
+                        distro = line.split("=")[1].replace("\"", "").trim();
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unableToReadSystemInfo", e);
+                throw new BaseException(message);
+            }
+
+            if (distro == null) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unrecognizedLinuxDistro");
+                throw new BaseException(message);
+            }
+
+            // 根据发行版设置 code
+            String code;
+            if (distro.contains("centos")) {
+                code = "LIBRE_PATH_CENTOS";
+            } else if (distro.contains("ubuntu")) {
+                code = "LIBRE_PATH_UBUNTU";
+            } else {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unsupportedLinuxDistro", distro);
+                throw new BaseException(message);
+            }
+
+            // 构造 SQL 语句
+            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = '" + code + "'";
+
+            // 查询数据库获取 LibreOffice 的路径
             MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
             List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+            if (list.isEmpty()) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.libreOfficePathNotFound", code);
+                throw new BaseException(message);
+            }
             String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
-            // 调用 LibreOffice 进行转换
+            // 调用 LibreOffice 进行 DOCX 转 PDF
             ProcessBuilder builder = new ProcessBuilder();
             builder.command(libreOfficePath, "--convert-to", "pdf:writer_pdf_Export", tempDocx.toString(), "--outdir", tempPdf.getParent().toString());
             Process process = builder.start();
-            process.waitFor();
+            int exitCode = process.waitFor();
+
+            // 检查转换是否成功
+            if (exitCode != 0) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.libreOfficeConversionFailed", exitCode);
+                throw new BaseException(message);
+            }
 
             // 计算转换后的 PDF 文件名
             String pdfFileName = tempDocx.getFileName().toString().replaceAll("\\.docx$", ".pdf");
@@ -209,13 +250,14 @@ public class GenExt {
             byte[] pdfBytes = Files.readAllBytes(pdfFilePath);
 
             // 清理临时文件
-            Files.delete(tempDocx);
-            Files.delete(pdfFilePath);
+            Files.deleteIfExists(tempDocx);
+            Files.deleteIfExists(pdfFilePath);
 
             return pdfBytes;
         } catch (Exception e) {
             throw new BaseException(e);
         }
+
     }
 
     /**
