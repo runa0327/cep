@@ -869,7 +869,8 @@ public class DocExt {
                     .append(" --transform='s|").append(sourceFileName).append("|").append(dspName).append("|'");
         }
         InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.msg = "请将以下指令转交给系统管理员，以便进行文件打包操作" + System.lineSeparator() + commandBuilder.toString();
+        String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.genCopyCommand");
+        invokeActResult.msg = message + System.lineSeparator() + commandBuilder.toString();
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 

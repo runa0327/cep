@@ -766,7 +766,7 @@ public class DrawingExt {
         }
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
-        invokeActResult.msg = "本次上传" + count1 + "套图纸，成功上传" + count2 + "套，命名不规范" + count3 + "套，图纸列表中未找到对应图纸套图号" + count4 + "套；未找到对应图纸套图号为：" + idList;
+        invokeActResult.msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.uploadZipDrawingPlan", count1, count2, count3, count4, idList);
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
