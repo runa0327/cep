@@ -65,6 +65,10 @@ public class ShareController {
             String ccVrAttachmentId = JdbcMapUtil.getString(map, "CC_ATTACHMENT");
             String ccVrAttachmentPreviewId = JdbcMapUtil.getString(map, "CC_PREVIEW_ATTACHMENT");
 
+            String insertSql = "insert into " + orgName + ".FL_FILE_SHARE (FL_FILE_ID, AD_SHARE_ID) values (?, ?)";
+            jdbcTemplate.update(insertSql, ccVrAttachmentId, shareId);
+            jdbcTemplate.update(insertSql, ccVrAttachmentPreviewId, shareId);
+
             // 根据附件ID查询文件URL
             String sql = "select * from " + orgName + ".fl_file f where f.id = ?";
             Map<String, Object> fileMap = jdbcTemplate.queryForMap(sql, ccVrAttachmentId);

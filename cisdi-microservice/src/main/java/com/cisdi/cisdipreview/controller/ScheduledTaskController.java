@@ -31,7 +31,7 @@ public class ScheduledTaskController {
     /**
      * 会议通知定时器
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "*/10 * * * * ?")
     public void scheduleTaskMeeting() {
         // 未自动登录前不要执行：
         if (LoginInfoManager.loginInfo == null) {
@@ -43,7 +43,7 @@ public class ScheduledTaskController {
     /**
      * 协同任务通知定时器
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "*/10 * * * * ?")
     public void scheduleTaskCoTask() {
         // 未自动登录前不要执行：
         if (LoginInfoManager.loginInfo == null) {
@@ -55,7 +55,7 @@ public class ScheduledTaskController {
     /**
      * 工作日程通知定时器
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "*/10 * * * * ?")
     public void scheduleTaskWorkSchedule() {
         // 未自动登录前不要执行：
         if (LoginInfoManager.loginInfo == null) {
