@@ -1,5 +1,6 @@
 package com.cisdi.cisdipreview.controller;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.cisdipreview.model.PanoData;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.JsonUtil;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,12 +64,25 @@ public class ShareController {
 
             String ccYearMonth = vrDate.format(formatter); // 格式化日期
 
+            String id = IdUtil.getSnowflakeNextIdStr();
+            String previewId = IdUtil.getSnowflakeNextIdStr();
+            LocalDateTime now = LocalDateTime.now();
             String ccVrAttachmentId = JdbcMapUtil.getString(map, "CC_ATTACHMENT");
             String ccVrAttachmentPreviewId = JdbcMapUtil.getString(map, "CC_PREVIEW_ATTACHMENT");
 
-            String insertSql = "insert into " + orgName + ".FL_FILE_SHARE (FL_FILE_ID, AD_SHARE_ID) values (?, ?)";
-            jdbcTemplate.update(insertSql, ccVrAttachmentId, shareId);
-            jdbcTemplate.update(insertSql, ccVrAttachmentPreviewId, shareId);
+            String flShareSql = "select * from " + orgName + ".fl_file_share fs where fs.AD_SHARE_ID = ? and fs.fl_file_id = ?";
+            List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(flShareSql, shareId, ccVrAttachmentId);
+            List<Map<String, Object>> queryForList1 = jdbcTemplate.queryForList(flShareSql, shareId, ccVrAttachmentPreviewId);
+
+            String insertSql = "insert into " + orgName + ".FL_FILE_SHARE (ID,VER,TS,CRT_DT,LAST_MODI_DT,STATUS,FL_FILE_ID, AD_SHARE_ID) values (?,?,?,?,?,?,?,?)";
+
+            if (SharedUtil.isEmpty(queryForList)) {
+                jdbcTemplate.update(insertSql, id, 1, now, now, now, "AP", ccVrAttachmentId, shareId);
+            }
+            if (SharedUtil.isEmpty(queryForList1)) {
+                jdbcTemplate.update(insertSql, previewId, 1, now, now, now, "AP", ccVrAttachmentPreviewId, shareId);
+            }
+
 
             // 根据附件ID查询文件URL
             String sql = "select * from " + orgName + ".fl_file f where f.id = ?";

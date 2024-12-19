@@ -270,7 +270,8 @@ public class DocExt {
     public void docFileAuth() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String pCcDocMemberIds = JdbcMapUtil.getString(varMap, "P_CC_DOC_MEMBER_IDS");
-        Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
+//        Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
+        Boolean isView = JdbcMapUtil.getBoolean(varMap, "P_IS_VIEW");
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;

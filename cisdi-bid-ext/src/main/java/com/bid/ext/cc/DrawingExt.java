@@ -162,7 +162,8 @@ public class DrawingExt {
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
             String pActDate = JdbcMapUtil.getString(varMap, "P_ACT_DATE");
 
-            Boolean isDefault = (Boolean) varMap.get("P_IS_DEFAULT");
+//            Boolean isDefault = (Boolean) varMap.get("P_IS_DEFAULT");
+            Boolean isDefault = JdbcMapUtil.getBoolean(varMap, "P_IS_DEFAULT");
 
             if (isDefault) {
                 List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
@@ -461,8 +462,10 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String pCcPrjStructNodeIds = JdbcMapUtil.getString(varMap, "P_CC_PRJ_STRUCT_NODE_ID");
         String pCcDrawingMemberIds = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_MEMBER_IDS");
-        Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
-        Boolean isUpload = (Boolean) varMap.get("P_IS_UPLOAD");
+//        Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
+//        Boolean isUpload = (Boolean) varMap.get("P_IS_UPLOAD");
+        Boolean isView = JdbcMapUtil.getBoolean(varMap, "P_IS_VIEW");
+        Boolean isUpload = JdbcMapUtil.getBoolean(varMap, "P_IS_UPLOAD");
 
         if (SharedUtil.isEmpty(pCcPrjStructNodeIds)) {
             for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
@@ -942,7 +945,8 @@ public class DrawingExt {
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
             String pActDate = JdbcMapUtil.getString(varMap, "P_ACT_DATE");
 
-            Boolean isDefault = (Boolean) varMap.get("P_IS_DEFAULT");
+//            Boolean isDefault = (Boolean) varMap.get("P_IS_DEFAULT");
+            Boolean isDefault = JdbcMapUtil.getBoolean(varMap, "P_IS_DEFAULT");
 
             if (isDefault) {
                 List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));

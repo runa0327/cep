@@ -37,7 +37,8 @@ public class StructNodeExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         // 获取模板结构
         String pWbsTempateId = varMap.get("P_WBS_TEMPATE_ID").toString();
-        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
+//        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
+        Boolean includeRootNode = JdbcMapUtil.getBoolean(varMap, "P_INCLUDE_ROOT_NODE");
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> topNode = getTopNode(entityRecord);
@@ -73,7 +74,8 @@ public class StructNodeExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         // 获取模板结构
         String pWbsTempateId = varMap.get("P_PBS_TEMPATE_ID").toString();
-        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
+//        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
+        Boolean includeRootNode = JdbcMapUtil.getBoolean(varMap, "P_INCLUDE_ROOT_NODE");
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             List<Map<String, Object>> templateStruct = getTemplateStruct(pWbsTempateId, includeRootNode);
@@ -704,6 +706,7 @@ public class StructNodeExt {
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String id = IdUtil.getSnowflakeNextIdStr();
+
             Map<String, Object> valueMap = entityRecord.valueMap;
             String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
             String nodeId = entityRecord.csCommId;
