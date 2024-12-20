@@ -1,6 +1,7 @@
 package com.cisdi.cisdipreview.controller;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.cisdipreview.interceptor.RequestHeaderContext;
 import com.cisdi.cisdipreview.model.PanoData;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.JsonUtil;
@@ -43,7 +44,9 @@ public class ShareController {
 
         Map<String, Object> sharemap = JsonUtil.convertJsonToMap(shareContextData);
         String ccPrjId = JdbcMapUtil.getString(sharemap, "prjId");
-
+        if (SharedUtil.isEmpty(ccPrjId)) {
+            String userSession = RequestHeaderContext.getInstance().getUserSession();
+        }
         // 根据项目id查询全景
         String panoSql = "select * from " + orgName + ".CC_DOC_FILE t where t.cc_prj_id = ? and t.CC_DOC_FILE_TYPE_ID = ?";
         List<Map<String, Object>> panoList = jdbcTemplate.queryForList(panoSql, ccPrjId, dataType);
