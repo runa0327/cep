@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -37,16 +38,20 @@ public class ConstructionPlanExcelImportExt {
         String prjId = varMap.get("P_PRJ_ID").toString();
 
         if (prjId != null && prjId.isEmpty()){
-            throw new BaseException("请选择指定项目");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.projectNotSelected");
+            throw new BaseException(msg);
+//            throw new BaseException("请选择指定项目");
         }
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
-            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
-
+        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt()))) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.fileTypeError");
+            throw new BaseException(msg);
+//            throw new BaseException("请上传'xlsx'格式的Excel文件");
+        }
         /**
          *  查询系统岗位
          */
@@ -75,7 +80,9 @@ public class ConstructionPlanExcelImportExt {
             toIdx = indexMap.getOrDefault("计划到", -1);
 
         } catch (IOException e) {
-            throw new BaseException("所上传的Excel文件格式不合法");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.excelFormatError");
+            throw new BaseException(msg);
+//            throw new BaseException("所上传的Excel文件格式不合法");
         }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
@@ -96,28 +103,36 @@ public class ConstructionPlanExcelImportExt {
                     //事项
                     Cell cell1 = row.getCell(nameIndex);
                     if (cell1.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'事项'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.itemNameIsNull",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'事项'不能为空");
                     }
                     name = getCellValueAsString(cell1);
 
                     //报审单位
                     Cell cell2 = row.getCell(companyNameIdx);
                     if (cell1.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'报审单位'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.companyNameIsNull",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'报审单位'不能为空");
                     }
                     companyName = getCellValueAsString(cell2);
 
                     //计划从
                     Cell cell3 = row.getCell(fromIdx);
                     if (cell3.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划从'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.planFromIsNull",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划从'不能为空");
                     }
                     LocalDate frDate = LocalDate.parse(getCellValueAsString(cell3));
 
                     //计划到
                     Cell cell4 = row.getCell(toIdx);
                     if (cell4.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划到'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.planToIsNull",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划到'不能为空");
                     }
                     LocalDate toDate = LocalDate.parse(getCellValueAsString(cell4));
 
@@ -133,8 +148,11 @@ public class ConstructionPlanExcelImportExt {
                         }
                     }
 
-                    if(!exist)
-                        throw  new BaseException("请检查"+row.getRowNum()+"'报审单位名称'是否正确！");
+                    if(!exist) {
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlanExcelImportExt.companyNameNotExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("请检查" + row.getRowNum() + "'报审单位名称'是否正确！");
+                    }
 
                     CcConstructPlan plan = CcConstructPlan.newData();
                     plan.setName(name);
@@ -146,7 +164,9 @@ public class ConstructionPlanExcelImportExt {
                 }
             }
         } catch (IOException e) {
-            throw  new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.fileImport.fileUploadFail");
+            throw new BaseException(msg);
+//            throw  new BaseException("上传文件失败");
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();

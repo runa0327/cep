@@ -6,6 +6,7 @@ import com.bid.ext.model.CcPrjStructNode;
 import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -39,7 +40,9 @@ public class CBSExcelFileImportExt {
 //        String  structUsageId = "CBS_0";
 
         if (structUsageId != null && structUsageId.isEmpty()) {
-            throw new BaseException("未选中数据，未知数据类型");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.recordNotSelected");
+            throw new BaseException(msg);
+//            throw new BaseException("未选中数据，未知数据类型");
         }
         String prjId = varMap.get("P_PRJ_ID").toString();
 //        String prjId ="1790672761571196928";
@@ -56,8 +59,11 @@ public class CBSExcelFileImportExt {
         String filePath = flFile.getPhysicalLocation();
 
 //       String filePath = "/Users/hejialun/Documents/excel-import-test.xlsx";
-        if (!"xlsx".equals(flFile.getExt()))
-            throw new BaseException("请上传'xlsx'格式的Excel文件");
+        if (!"xlsx".equals(flFile.getExt())) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.fileTypeError");
+            throw new BaseException(msg);
+//            throw new BaseException("请上传'xlsx'格式的Excel文件");
+        }
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
@@ -81,23 +87,33 @@ public class CBSExcelFileImportExt {
                         }
                     }
                     if (nameIndex == -1) {
-                        throw new BaseException("未找到'名称'列");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.nameCellNotFind");
+                        throw new BaseException(msg);
+//                        throw new BaseException("未找到'名称'列");
                     } else if (costIndex == -1) {
-                        throw new BaseException("未找到'金额（元）'列");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.amountCellNotFind");
+                        throw new BaseException(msg);
+//                        throw new BaseException("未找到'金额（元）'列");
                     } else if (remarkIdx == -1) {
-                        throw new BaseException("未找到'备注'列");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.remarkCellNotFind");
+                        throw new BaseException(msg);
+//                        throw new BaseException("未找到'备注'列");
                     }
                 }
 
                 if (row.getRowNum() > 1) {
                     Cell nameCell = row.getCell(nameIndex);
                     if (nameCell.getCellType() == BLANK) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，科目名称不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.rowNameCellIsNull",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，科目名称不能为空");
                     }
 
                     Cell costCell = row.getCell(costIndex);
                     if (costCell.getCellType() == BLANK) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，金额不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.rowAmountCellIsNull",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，金额不能为空");
                     }
 
                     try {
@@ -156,12 +172,16 @@ public class CBSExcelFileImportExt {
 
                         }
                     } catch (Exception e) {
-                        throw new BaseException("请确认第" + (row.getRowNum() + 1) + "行的成本科目存在且金额值合法");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.rowAmountCellFormatError");
+                        throw new BaseException(msg);
+//                        throw new BaseException("请确认第" + (row.getRowNum() + 1) + "行的成本科目存在且金额值合法");
                     }
                 }
             }
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.fileImport.fileUploadFail");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();
@@ -193,7 +213,9 @@ public class CBSExcelFileImportExt {
 //        }
 
         if (prjId != null && prjId.isEmpty()) {
-            throw new BaseException("请选择指定项目");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.projectNotSelected");
+            throw new BaseException(msg);
+//            throw new BaseException("请选择指定项目");
         }
 
 
@@ -210,9 +232,11 @@ public class CBSExcelFileImportExt {
 
 //        filePath = "C:\\Users\\34451\\Downloads\\test.xlsx";
 
-        if (!"xlsx".equals(flFile.getExt()))
-            throw new BaseException("请上传'xlsx'格式的Excel文件");
-
+        if (!"xlsx".equals(flFile.getExt())) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.fileTypeError");
+            throw new BaseException(msg);
+//            throw new BaseException("请上传'xlsx'格式的Excel文件");
+        }
         //成本科目列下标
         int cbkmIndex = -1;
         //立项匡算列下标
@@ -257,7 +281,9 @@ public class CBSExcelFileImportExt {
             //已付款
             yfkIndex = indexMap.getOrDefault("已付款", -1);
         } catch (IOException e) {
-            throw new BaseException("所上传的Excel文件格式不合法");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.excelFormatError");
+            throw new BaseException(msg);
+//            throw new BaseException("所上传的Excel文件格式不合法");
         }
 
         // 是否导入成功至少一条
@@ -337,7 +363,9 @@ public class CBSExcelFileImportExt {
 
                     //成本科目
                     if (cbkmIndex == -1) {
-                        throw new BaseException("成本科目列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.cbkmCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("成本科目列不存在");
                     }
                     Cell cell3 = row.getCell(cbkmIndex);
                     if (cell3.getCellType() == BLANK) {
@@ -348,28 +376,36 @@ public class CBSExcelFileImportExt {
 
 //                    立项匡算
                     if (lxksIndex == -1) {
-                        throw new BaseException("立项匡算列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.lxksCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("立项匡算列不存在");
                     }
                     Cell cell7 = row.getCell(lxksIndex);
                     ccPrjCostOverviewSimple.setCbs0Amt(getCellValueAsBigDecimal(cell7));
 
                     //可研估算
                     if (kygsIndex == -1) {
-                        throw new BaseException("可研估算列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.kygsCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("可研估算列不存在");
                     }
                     Cell cell8 = row.getCell(kygsIndex);
                     ccPrjCostOverviewSimple.setCbs1Amt(getCellValueAsBigDecimal(cell8));
 
                     //初设概算
                     if (csgsIndex == -1) {
-                        throw new BaseException("初设概算列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.csgsCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("初设概算列不存在");
                     }
                     Cell cell9 = row.getCell(csgsIndex);
                     ccPrjCostOverviewSimple.setCbs2Amt(getCellValueAsBigDecimal(cell9));
 
                     //施工预算
-                    if (lxksIndex == -1) {
-                        throw new BaseException("施工预算列不存在");
+                    if (sgysIndex == -1) {
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.sgysCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("施工预算列不存在");
                     }
                     Cell cell10 = row.getCell(sgysIndex);
                     ccPrjCostOverviewSimple.setCbs3Amt(getCellValueAsBigDecimal(cell10));
@@ -383,28 +419,36 @@ public class CBSExcelFileImportExt {
 
                     //合同签订额
                     if (htqdeIndex == -1) {
-                        throw new BaseException("合同签订额列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.htqdeCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("合同签订额列不存在");
                     }
                     Cell cell12 = row.getCell(htqdeIndex);
                     ccPrjCostOverviewSimple.setPurchaseAmt(getCellValueAsBigDecimal(cell12));
 
                     //已完成产值
                     if (ywcczIndex == -1) {
-                        throw new BaseException("已完成产值列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.ywcczCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("已完成产值列不存在");
                     }
                     Cell cell13 = row.getCell(ywcczIndex);
                     ccPrjCostOverviewSimple.setCompleteAmt(getCellValueAsBigDecimal(cell13));
 
                     //已申请
                     if (ysqIndex == -1) {
-                        throw new BaseException("已申请列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.ysqCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("已申请列不存在");
                     }
                     Cell cell15 = row.getCell(ysqIndex);
                     ccPrjCostOverviewSimple.setReqPayAmt(getCellValueAsBigDecimal(cell15));
 
                     //已付款
                     if (yfkIndex == -1) {
-                        throw new BaseException("已付款列不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.yfkCellNotExist");
+                        throw new BaseException(msg);
+//                        throw new BaseException("已付款列不存在");
                     }
                     Cell cell17 = row.getCell(yfkIndex);
                     ccPrjCostOverviewSimple.setPayAmt(getCellValueAsBigDecimal(cell17));
@@ -413,7 +457,9 @@ public class CBSExcelFileImportExt {
                 }
             }
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.fileImport.fileUploadFail");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
 
         //删除原来的数据

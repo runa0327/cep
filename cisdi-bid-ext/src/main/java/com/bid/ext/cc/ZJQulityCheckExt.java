@@ -286,7 +286,9 @@ public class ZJQulityCheckExt {
                     String qualifiedBatch = "";
                     Cell cell7 = row.getCell(7);
                     if (cell7 == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，合格批次为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.importRowIsNull",row.getRowNum()+1,8);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，合格批次为空");
                     }
                     qualifiedBatch = getCellValueAsString(cell7);
                     if (qualifiedBatch.indexOf(".")>0) {
@@ -294,14 +296,20 @@ public class ZJQulityCheckExt {
                     }
 
                     if (Integer.parseInt(checkBatch) < 1 ) {
-                        throw new BaseException("送检批次小于1");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.batchNumLessThanOne");
+                        throw new BaseException(msg);
+//                        throw new BaseException("送检批次小于1");
                     }
                     if (Integer.parseInt(qualifiedBatch) < 0 ) {
-                        throw new BaseException("合格批次小于0");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.qualifiedNumLessThanZero");
+                        throw new BaseException(msg);
+//                        throw new BaseException("合格批次小于0");
                     }
 
                     if (Integer.parseInt(checkBatch) < Integer.parseInt(qualifiedBatch)) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，合格批次大于送检批次");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.importQualifiedNumGreaterThanBatchNum",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，合格批次大于送检批次");
                     }
 
                     //备注
@@ -327,7 +335,9 @@ public class ZJQulityCheckExt {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFileError");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();
@@ -353,14 +363,20 @@ public class ZJQulityCheckExt {
             String qulifiedNum = record.valueMap.get("CC_QULITY_CHECK_BATCH_QULIFIED_NUM").toString();
 
             if (Integer.parseInt(batchNum) < 1 ) {
-                throw new BaseException("送检批次小于1");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.batchNumLessThanOne");
+                throw  new BaseException(msg);
+//                throw new BaseException("送检批次小于1");
             }
             if (Integer.parseInt(qulifiedNum) < 0 ) {
-                throw new BaseException("合格批次小于0");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.qualifiedNumLessThanZero");
+                throw  new BaseException(msg);
+//                throw new BaseException("合格批次小于0");
             }
 
             if (Integer.parseInt(batchNum) < Integer.parseInt(qulifiedNum)) {
-                throw new BaseException("合格批次大于送检批次");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.qualifiedNumGreaterThanBatchNum");
+                throw  new BaseException(msg);
+//                throw new BaseException("合格批次大于送检批次");
             }
 
 
@@ -369,7 +385,9 @@ public class ZJQulityCheckExt {
             CcQualityCheckRecord ccQualityCheckRecord = CcQualityCheckRecord.selectOneByWhere(query);
 
             if (ccQualityCheckRecord != null) {
-                throw new BaseException("存在同一时期检测数据");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.batchNumIsExist");
+                throw  new BaseException(msg);
+//                throw new BaseException("存在同一时期检测数据");
             }
 
         }

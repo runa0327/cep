@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -28,6 +29,9 @@ import java.util.Map;
 
 import static org.apache.poi.ss.usermodel.CellType.BLANK;
 
+/**
+ * 导入参建单位岗位
+ */
 public class PostExcelImportExt {
 
 
@@ -44,7 +48,9 @@ public class PostExcelImportExt {
         String partyId = (String) valueMap.get("CC_PARTY_ID");
 
         if (prjId != null && prjId.isEmpty()) {
-            throw new BaseException("未选中数据，未知数据类型");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.postExcelImport.recordNotSelected");
+            throw new BaseException(msg);
+//            throw new BaseException("未选中数据，未知数据类型");
         }
 
         /**
@@ -74,8 +80,11 @@ public class PostExcelImportExt {
 
 //        String filePath = "/Users/hejialun/Downloads/项目参建方公司岗位.xlsx";
 
-        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
-            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
+        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt()))) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.postExcelImport.fileTypeError");
+            throw new BaseException(msg);
+            //            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
+        }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
@@ -89,18 +98,23 @@ public class PostExcelImportExt {
                 if (row.getRowNum() == 0) {
                     for (Cell cell : row) {
                         String cellValue = getCellValueAsString(cell);
+//                        String post = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.postExcelImport.postCellName");
                         if ("岗位".equals(cellValue)) {
                             nameIndex = cell.getColumnIndex();
                         }
                     }
                     if (nameIndex == -1) {
-                        throw new BaseException("未找到'岗位'列");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.postExcelImport.notFindPostCell");
+                        throw new BaseException(msg);
+//                        throw new BaseException("未找到'岗位'列");
                     }
                 } else {
 
                     Cell nameCell = row.getCell(nameIndex);
                     if (nameCell.getCellType() == BLANK) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'岗位'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",row.getRowNum()+1,nameIndex+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'岗位'不能为空");
                     }
 
                     String postName = getCellValueAsString(nameCell);
@@ -134,7 +148,9 @@ public class PostExcelImportExt {
                         }
                     }
                     if(!exist){
-                        throw new BaseException("请检查"+row.getRowNum()+"行'岗位名称'是否正确！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.postExcelImport.postNameSpellError",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("请检查"+row.getRowNum()+"行'岗位名称'是否正确！");
                     }
 
 //                    if (!exist) {
@@ -161,7 +177,9 @@ public class PostExcelImportExt {
                 }
             }
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.fileImport.fileUploadFail");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();

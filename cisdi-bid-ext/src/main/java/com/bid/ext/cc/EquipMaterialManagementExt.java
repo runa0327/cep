@@ -5,6 +5,7 @@ import com.bid.ext.model.CcPrjStructNode;
 import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -39,14 +40,15 @@ public class EquipMaterialManagementExt {
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-
 //        String filePath = "/Users/hejialun/Documents/副本设备资料导入模板-1.xlsx";
 
         //
 
-        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
-            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
-
+        if (!("xlsx".equals(flFile.getExt()))) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.fileTypeError");
+            throw new BaseException(msg);
+//            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
+        }
 
         List<CcEquipmentMaterialManagement> equipmentMaterialManagements = new ArrayList<>();
 
@@ -54,7 +56,9 @@ public class EquipMaterialManagementExt {
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             workbook = new XSSFWorkbook(file);
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.fileImport.fileUploadFail");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
         Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
 
@@ -108,7 +112,9 @@ public class EquipMaterialManagementExt {
                     }
                 }
                 if ("".equals(unitPrjCode)) {
-                    throw new BaseException("表格第一行中未包含单元工程项目号！请检查。");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.rowUnitProjectCodeNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("表格第一行中未包含单元工程项目号！请检查。");
                 }
 
                 //单元工程查询
@@ -124,7 +130,9 @@ public class EquipMaterialManagementExt {
                 }
 
                 if ("".equals(unitPrjId)) {
-                    throw new BaseException("系统未内" + unitPrjCode + "置该项目号的单元工程！");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.systemUnitProjectCodeNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("系统未内" + unitPrjCode + "置该项目号的单元工程！");
                 }
             }
 
@@ -164,25 +172,32 @@ public class EquipMaterialManagementExt {
                 equipmentMaterialManagement.setCcPrjStructNodeId(unitPrjId);
 
                 if (xhIndex == -1) {
-                    throw new BaseException("'序号'列不存在！");
+                    String  msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.serialCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'序号'列不存在！");
                 }
                 Cell cell3 = row.getCell(xhIndex);
                 if (cell3.getCellType() == BLANK) {
-                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'序号'列为空！");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.serialCellIsNull",row.getRowNum()+1);
+                    throw new BaseException(msg);
+//                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'序号'列为空！");
                 }
                 equipmentMaterialManagement.setCcEquipMaterialDataSqNo(getCellValueAsString(cell3));
 
-
                 //设计方设备位号
                 if (sjfsbwhIndex == -1) {
-                    throw new BaseException("'设计方设备位号'列不存在");
+                    String  msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.sjfsbwhCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'设计方设备位号'列不存在");
                 }
                 Cell cell9 = row.getCell(sjfsbwhIndex);
                 equipmentMaterialManagement.setCcDesignPartyEquipTagNo(getCellValueAsString(cell9));
 
                 //单位
                 if (dwIndex == -1) {
-                    throw new BaseException("'单位'列不存在");
+                    String  msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.dwCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'单位'列不存在");
                 }
                 Cell cell10 = row.getCell(dwIndex);
                 if (cell10.getCellType() == BLANK) {
@@ -193,7 +208,9 @@ public class EquipMaterialManagementExt {
 
 
                 if (slIndex == -1) {
-                    throw new BaseException("'数量'列不存在!");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.slCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'数量'列不存在!");
                 }
                 Cell cell11 = row.getCell(slIndex);
                 if (cell11.getCellType() == BLANK) {
@@ -203,7 +220,9 @@ public class EquipMaterialManagementExt {
                 }
 
                 if (zlfhjhIndex == -1) {
-                    throw new BaseException("'资料返回计划'列不存在");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.zlfhjhCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'资料返回计划'列不存在");
                 }
                 Cell cell12 = row.getCell(zlfhjhIndex);
                 if (cell12.getCellType() != BLANK) {
@@ -224,7 +243,9 @@ public class EquipMaterialManagementExt {
 
 
                 if (sfzygksbIndex == -1) {
-                    throw new BaseException("'是否主要管控设备'列不存在");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.sfzygksbCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'是否主要管控设备'列不存在");
                 }
                 Cell cell15 = row.getCell(sfzygksbIndex);
                 String cellValueAsString = getCellValueAsString(cell15);
@@ -237,29 +258,41 @@ public class EquipMaterialManagementExt {
                 }
 
                 if (sbmcIndex == -1) {
-                    throw new BaseException("'设备名称'列不存在");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.sbmcCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'设备名称'列不存在");
                 }
                 Cell cell17 = row.getCell(sbmcIndex);
                 if (cell17.getCellType() == BLANK) {
-                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备名称'列为空！");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.sbmcCellIsNull",row.getRowNum()+1);
+                    throw new  BaseException(msg);
+//                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备名称'列为空！");
                 }
                 equipmentMaterialManagement.setName(getCellValueAsString(cell17));
 
                 if (wbssqIndex == -1) {
-                    throw new BaseException("'WBS编码'列不存在！");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.wbssqCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'WBS编码'列不存在！");
                 }
                 Cell cell7 = row.getCell(wbssqIndex);
                 if (cell7.getCellType() == BLANK && equipmentMaterialManagement.getCcEquipMaterailUnit() != null) {
-                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'WBS编码'列为空！");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.wbssqCellIsNull",row.getRowNum()+1);
+                    throw new BaseException(msg);
+//                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'WBS编码'列为空！");
                 }
                 equipmentMaterialManagement.setCcEquipMaterialWbsNo(getCellValueAsString(cell7));
 
                 if (sbbhIndex == -1) {
-                    throw new BaseException("'设备编号' 列不存在");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.sbbhCellNotExist");
+                    throw new BaseException(msg);
+//                    throw new BaseException("'设备编号' 列不存在");
                 }
                 Cell cell8 = row.getCell(sbbhIndex);
                 if (cell7.getCellType() == BLANK && equipmentMaterialManagement.getCcEquipMaterailUnit() != null) {
-                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备编号'列为空！");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.sbbhCellIsNull",row.getRowNum()+1);
+                    throw new BaseException(msg);
+//                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备编号'列为空！");
                 }
                 equipmentMaterialManagement.setCcEquipNo(getCellValueAsString(cell8));
 
@@ -344,11 +377,15 @@ public class EquipMaterialManagementExt {
                 equipmentMaterialManagement = CcEquipmentMaterialManagement.selectById(materialId);
 
             } catch (EmptyResultDataAccessException e) {
-                throw new BaseException("资料记录不存在！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.dataRecordNotExist");
+                throw new BaseException(msg);
+//                throw new BaseException("资料记录不存在！");
             }
 
             if (equipmentMaterialManagement == null) {
-                throw new BaseException("资料记录不存在！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.dataRecordNotExist");
+                throw new BaseException(msg);
+//                throw new BaseException("资料记录不存在！");
             }
 
             String ccEquipMaterialDataAtts = equipmentMaterialManagement.getCcEquipMaterialDataAtts();
@@ -356,7 +393,9 @@ public class EquipMaterialManagementExt {
             System.out.println(ccEquipMaterialDataAtts);
 
             if (ccEquipMaterialDataAtts == null) {
-                throw new BaseException("当前记录返回资料为空，不可完成");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.EquipMaterialManagementExt.recordRsultDataIsNull");
+                throw new BaseException(msg);
+//                throw new BaseException("当前记录返回资料为空，不可完成");
             }
             equipmentMaterialManagement.setCcEquipMaterialBackDate(LocalDate.now());
 

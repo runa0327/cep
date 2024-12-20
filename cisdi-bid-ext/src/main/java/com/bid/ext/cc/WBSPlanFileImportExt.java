@@ -3,6 +3,7 @@ package com.bid.ext.cc;
 import com.bid.ext.model.CcPrjStructNode;
 import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -40,14 +41,18 @@ public class WBSPlanFileImportExt {
         String  wbsTypeId = (String) valueMap.get("CC_PRJ_WBS_TYPE_ID");
 
         if(nodePid != null && nodePid.isEmpty()){
-           throw new BaseException("未选中节点");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.nodeNotSelected");
+            throw new BaseException(msg);
+//           throw new BaseException("未选中节点");
         }
         //获取上传的图片
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
         if (!"mpp".equals(flFile.getExt())){
-            throw new BaseException("非mpp文件格式");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.fileTypeError");
+            throw new BaseException(msg);
+//            throw new BaseException("非mpp文件格式");
         }
 
 //        filePath = "C:\\Users\\xx\\Desktop\\test-import.mpp";
@@ -60,7 +65,9 @@ public class WBSPlanFileImportExt {
             pf = mppReader.read(file);
         } catch (MPXJException e) {
             e.printStackTrace();
-            throw  new BaseException("mpp文件解析失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.fileAnalyze");
+            throw new BaseException(msg);
+//            throw  new BaseException("mpp文件解析失败");
         }
         // 获取mpp文件数据集合
         List<Task> taskList = pf.getTasks(); //pf.getAllTasks();

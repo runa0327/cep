@@ -4,6 +4,7 @@ import com.bid.ext.model.*;
 import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -35,9 +36,9 @@ public class ZJDevicePurchaseDateExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
         //获取上传的excel文件
-//        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "C:\\Users\\hejia\\Downloads\\设备采购报表_20240928.xlsx";
+        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "C:\\Users\\hejia\\Downloads\\设备采购报表_20240928.xlsx";
 
         try {
             FileInputStream file = new FileInputStream(new File(filePath));
@@ -77,7 +78,9 @@ public class ZJDevicePurchaseDateExt {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFileError");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
     }
 

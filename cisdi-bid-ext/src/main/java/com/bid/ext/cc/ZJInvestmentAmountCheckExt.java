@@ -4,6 +4,7 @@ import com.bid.ext.model.*;
 import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -43,8 +44,9 @@ public class ZJInvestmentAmountCheckExt {
             CcInvestmentAmount ccInvestmentAmount = CcInvestmentAmount.selectOneByWhere(query);
 
             if (ccInvestmentAmount != null) {
-
-                throw new BaseException("相同类型数据已存在");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qualityCheck.typeSameRecordExist");
+                throw new BaseException(msg);
+//                throw new BaseException("相同类型数据已存在");
             }
 
         }

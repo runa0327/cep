@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -41,9 +42,11 @@ public class ZJConstructionPlanImportExt {
         String filePath = flFile.getPhysicalLocation();
 //        String filePath = "/Users/hejialun/Documents/湛江/导入/附件：十七冶施工方案计划模板.xlsx";
 
-        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
-            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
-
+        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt()))) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.improtFileTypeError");
+            throw new BaseException(msg);
+//            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
+        }
 
         /**
          *  获取单元工程
@@ -100,7 +103,9 @@ public class ZJConstructionPlanImportExt {
                         break;
                     }
                     if (cell1.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'单元工程' 不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.importExcelCellIsNull",row.getRowNum()+1,1);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'单元工程' 不能为空");
                     }
                     unitPrjName = getCellValueAsString(cell1);
 
@@ -108,7 +113,9 @@ public class ZJConstructionPlanImportExt {
                     //方案名称
                     Cell cell2 = row.getCell(1);
                     if (cell2.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'方案名称'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'方案名称'不能为空");
                     }
                     planName = getCellValueAsString(cell2);
 
@@ -117,13 +124,17 @@ public class ZJConstructionPlanImportExt {
                     List<CcConstructionplan> ccConstructionplans = CcConstructionplan.selectByWhere(qPlan);
 
                     if (ccConstructionplans!=null && ccConstructionplans.size()>0){
-                        throw new BaseException("第"+(row.getRowNum()+1)+"行，'方案名称'为'"+planName+"'已存在");
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.planNameExist",row.getRowNum()+1,planName);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第"+(row.getRowNum()+1)+"行，'方案名称'为'"+planName+"'已存在");
                     }
 
 
                     Cell cell3 = row.getCell(2);
                     if (cell3.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'责任单位'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.importExcelCellIsNull",row.getRowNum()+1,3);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'责任单位'不能为空");
                     }
                     companyName = getCellValueAsString(cell3);
 
@@ -131,7 +142,9 @@ public class ZJConstructionPlanImportExt {
                     //计划时间
                     Cell cell4= row.getCell(3);
                     if (cell4.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'时间'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.importExcelCellIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'时间'不能为空");
                     }
 
                     LocalDate frDate = cell4.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -140,7 +153,9 @@ public class ZJConstructionPlanImportExt {
                     //预警天数
                     Cell cell5 = row.getCell(4);
                     if (cell5.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'提前预警天数'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.importExcelCellIsNull",row.getRowNum()+1,5);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'提前预警天数'不能为空");
                     }
                     constructionPlan.setAdvanceWarningDays(getCellValueAsString(cell5 ));
 
@@ -148,14 +163,18 @@ public class ZJConstructionPlanImportExt {
                     //责任人
                     Cell cell6 = row.getCell(5);
                     if (cell6.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'责任人'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.importExcelCellIsNull",row.getRowNum()+1,6);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'责任人'不能为空");
                     }
                       userName = getCellValueAsString(cell6 );
 
                     //是否专家论证
                     Cell cell7 = row.getCell(6);
                     if (cell7.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'是否专家论证'不能为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.importExcelCellIsNull",row.getRowNum()+1,7);
+                        throw new BaseException(msg);
+//                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'是否专家论证'不能为空");
                     }
                     if("是".equals(getCellValueAsString(cell7))){
                         constructionPlan.setIsExpertValidation(true);
@@ -181,9 +200,11 @@ public class ZJConstructionPlanImportExt {
                             companyExist = true;
                         }
                     }
-                    if(!companyExist)
-                        throw new BaseException("请检"+row.getRowNum()+"行'查责任单位'名称是否正确！");
-
+                    if(!companyExist) {
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.companyExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("请检" + row.getRowNum() + "行'查责任单位'名称是否正确！");
+                    }
                     //公司id
                     String partCompanyId = "";
                     boolean  partCompanyExist = false;
@@ -194,9 +215,11 @@ public class ZJConstructionPlanImportExt {
                             partCompanyExist = true;
                         }
                     }
-                    if(!partCompanyExist)
-                        throw new BaseException("请检"+row.getRowNum()+"行'查责任单位'是否已配置，名称是否正确！");
-
+                    if(!partCompanyExist) {
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.companyExist", row.getRowNum() + 1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("请检查"+row.getRowNum()+"行'责任单位'是否已配置，名称是否正确！");
+                    }
 
                     String unitPrjId = "";//单元工程id
                     boolean  unitPrjIdExist = false;
@@ -206,9 +229,11 @@ public class ZJConstructionPlanImportExt {
                             unitPrjIdExist = true;
                         }
                     }
-                    if(!unitPrjIdExist)
-                        throw new BaseException("请检"+row.getRowNum()+"行'单元工程'是否已配置，名称是否正确！");
-
+                    if(!unitPrjIdExist) {
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.unitProjectNameError",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("请检" + row.getRowNum() + "行'单元工程'是否已配置，名称是否正确！");
+                    }
 
                     //人员id
                     String adUserId = "";
@@ -224,9 +249,11 @@ public class ZJConstructionPlanImportExt {
                         }
                     }
 
-                    if (!userExist)
-                        throw new BaseException("请检"+row.getRowNum()+"行'责任人'名称是否正确！");
-
+                    if (!userExist) {
+                        String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.constructionPlan.responsiblePersonNameError",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("请检" + row.getRowNum() + "行'责任人'名称是否正确！");
+                    }
 
 //                    constructionPlan.setName(planName);
 
@@ -242,7 +269,9 @@ public class ZJConstructionPlanImportExt {
                 }
             }
         } catch (IOException e) {
-            throw  new BaseException("上传文件失败");
+            String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFileError");
+            throw new BaseException(msg);
+//            throw  new BaseException("上传文件失败");
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();

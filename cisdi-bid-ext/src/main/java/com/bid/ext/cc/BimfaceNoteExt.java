@@ -4,6 +4,7 @@ import com.bid.ext.model.CcBimfaceNote;
 import com.bid.ext.model.CcDocFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.util.StringUtils;
@@ -21,16 +22,22 @@ public class BimfaceNoteExt {
         String docId = (String) extApiParamMap.get("docId");
 
         if(!StringUtils.hasLength(docId)){
-            throw new BaseException("批注文档ID不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.idIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("批注文档ID不能为空");
         }
 
         if(!StringUtils.hasLength(content)){
-            throw new BaseException("批注内容不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.contentIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("批注内容不能为空");
         }
 
         CcDocFile ccDocFile = CcDocFile.selectById(docId);
         if (ccDocFile==null){
-            throw new BaseException("批注文档ID错误");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.docIdIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("批注文档ID错误");
         }
 
         CcBimfaceNote ccBimfaceNote = CcBimfaceNote.newData();
@@ -67,7 +74,9 @@ public class BimfaceNoteExt {
         try {
              ccBimfaceNote = CcBimfaceNote.selectById(noteId);
         }catch (EmptyResultDataAccessException e){
-            throw  new BaseException("数据不存在！");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.recordNotExist");
+            throw new BaseException(msg);
+//            throw  new BaseException("数据不存在！");
         }
 
         if (ccBimfaceNote!=null){
@@ -75,7 +84,9 @@ public class BimfaceNoteExt {
             ccBimfaceNote.deleteById();
 
         }else{
-            throw new BaseException("数据不存在！");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.recordNotExist");
+            throw new BaseException(msg);
+//            throw new BaseException("数据不存在！");
         }
     }
 
@@ -85,19 +96,27 @@ public class BimfaceNoteExt {
         String noteId = (String) extApiParamMap.get("noteId");
 
         if (!StringUtils.hasLength(noteId)){
-            throw  new BaseException("ID不能为空！");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.noteIdIsNull");
+            throw new BaseException(msg);
+//            throw  new BaseException("ID不能为空！");
         }
         if (!StringUtils.hasLength(content)){
-            throw  new BaseException("内容不能为空！");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.noteContentIsNull");
+            throw new BaseException(msg);
+//            throw  new BaseException("内容不能为空！");
         }
         CcBimfaceNote ccBimfaceNote=null;
         try{
              ccBimfaceNote = CcBimfaceNote.selectById(noteId);
         }catch (EmptyResultDataAccessException  e){
-            throw new BaseException("批注记录不存在！");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.recordNotExist");
+            throw new BaseException(msg);
+//            throw new BaseException("批注记录不存在！");
         }
         if (ccBimfaceNote==null){
-            throw new BaseException("批注记录不存在！");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.bimfaceNote.recordNotExist");
+            throw new BaseException(msg);
+//            throw new BaseException("批注记录不存在！");
         }
 
         ccBimfaceNote.setContent(content);

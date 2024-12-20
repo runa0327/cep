@@ -3,6 +3,7 @@ package com.bid.ext.cc;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,9 @@ public class ZJQualifedRecordExt {
 
             Object id = entityRecord.valueMap.get("ID");
             if (id==null){
-                throw  new BaseException("请选择记录！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.updateAttCheck.recordNotExist");
+                throw new BaseException(msg);
+//                throw  new BaseException("请选择记录！");
             }
             CcQualityCheckUnqualifiedRecord record = CcQualityCheckUnqualifiedRecord.selectById(id.toString());
 

@@ -8,6 +8,7 @@ import com.bid.ext.utils.ProcessCommon;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -55,7 +56,9 @@ public class ZJCriticalPrjExt {
 
             List<String>  ids =  new ArrayList<>();
             if(!StringUtils.hasText(proposalApprovalHeadId)){
-                throw new BaseException("方案报审责任人未选择！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.approverNotExist");
+                throw new BaseException(msg);
+//                throw new BaseException("方案报审责任人未选择！");
             }
             ids.add(proposalApprovalHeadId);
             if(StringUtils.hasText(tripartiteTestingHeadId)){
@@ -82,11 +85,16 @@ public class ZJCriticalPrjExt {
             CcCriticalPrjPlan ccCriticalPrjPlan = CcCriticalPrjPlan.selectById(criticalPlanId);//危大工程记录
 
             if (ccCriticalPrjPlan==null){
-                throw new BaseException("危大工程数据id错误！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.recordIDError");
+                throw new BaseException(msg);
+//                throw new BaseException("危大工程数据id错误！");
             }
             if (!("0".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()) || "1".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()))){
                 CcCriticalPrjImplPhase ccCriticalPrjImplPhase = CcCriticalPrjImplPhase.selectById(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId());//获取当前所处阶段
-                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'方案报审阶段'！");
+//                String currentLangId = I18nUtil.getCurrentLangId();
+                String msg  = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.cannotEnterApprovalStep",JsonUtil.getCN(ccCriticalPrjImplPhase.getName()));
+                throw new BaseException(msg);
+//                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'方案报审阶段'！");
             }
 
            String now =  LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -188,11 +196,15 @@ public class ZJCriticalPrjExt {
             CcCriticalPrjPlan ccCriticalPrjPlan = CcCriticalPrjPlan.selectById(criticalPlanId);//危大工程记录
 
             if (ccCriticalPrjPlan==null){
-                throw new BaseException("危大工程数据id错误！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.recordIDError");
+                throw new BaseException(msg);
+//                throw new BaseException("危大工程数据id错误！");
             }
             if (!("1".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()) || "2".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()))){
                 CcCriticalPrjImplPhase ccCriticalPrjImplPhase = CcCriticalPrjImplPhase.selectById(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId());//获取当前所处阶段
-                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'实施前交底'！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.cannotEnterImplDiscloseStep",JsonUtil.getCN(ccCriticalPrjImplPhase.getName()));
+                throw new BaseException(msg);
+//                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'实施前交底'！");
             }
 
             String now =  LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -314,11 +326,16 @@ public class ZJCriticalPrjExt {
             CcCriticalPrjPlan ccCriticalPrjPlan = CcCriticalPrjPlan.selectById(criticalPlanId);//危大工程记录
 
             if (ccCriticalPrjPlan==null){
-                throw new BaseException("危大工程数据id错误！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.recordIDError");
+                throw new BaseException(msg);
+//                throw new BaseException("危大工程数据id错误！");
             }
             if (!("2".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()) || "3".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()))){
                 CcCriticalPrjImplPhase ccCriticalPrjImplPhase = CcCriticalPrjImplPhase.selectById(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId());//获取当前所处阶段
-                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'实施中记录'！");
+
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.cannotEnterImplRecordStep",JsonUtil.getCN(ccCriticalPrjImplPhase.getName()));
+                throw new BaseException(msg);
+//                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'实施中记录'！");
             }
 
             String now =  LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -439,11 +456,15 @@ public class ZJCriticalPrjExt {
             CcCriticalPrjPlan ccCriticalPrjPlan = CcCriticalPrjPlan.selectById(criticalPlanId);//危大工程记录
 
             if (ccCriticalPrjPlan==null){
-                throw new BaseException("危大工程数据id错误！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.recordIDError");
+                throw new BaseException(msg);
+//                throw new BaseException("危大工程数据id错误！");
             }
             if (!("3".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()) || "4".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId()))){
                 CcCriticalPrjImplPhase ccCriticalPrjImplPhase = CcCriticalPrjImplPhase.selectById(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId());//获取当前所处阶段
-                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'实施后验收'！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.cannotEnterCheckAndAcceptStep",JsonUtil.getCN(ccCriticalPrjImplPhase.getName()));
+                throw new BaseException(msg);
+//                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可进入'实施后验收'！");
             }
 
             String now =  LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -534,7 +555,9 @@ public class ZJCriticalPrjExt {
             CcCriticalPrjPlan ccCriticalPrjPlan = CcCriticalPrjPlan.selectById(criticalPlanId);//危大工程记录
 
             if (ccCriticalPrjPlan==null){
-                throw new BaseException("危大工程数据id错误！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.recordIDError");
+                throw new BaseException(msg);
+//                throw new BaseException("危大工程数据id错误！");
             }
 
             if("5.".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId())){
@@ -543,7 +566,9 @@ public class ZJCriticalPrjExt {
 
             if (!"4".equals(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId())){
                 CcCriticalPrjImplPhase ccCriticalPrjImplPhase = CcCriticalPrjImplPhase.selectById(ccCriticalPrjPlan.getCcCriticalPrjImplPhaseId());//获取当前所处阶段
-                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可完成验收！");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.criticalPrj.cannotEnterCompleteCheckAndAcceptStep",JsonUtil.getCN(ccCriticalPrjImplPhase.getName()));
+                throw new BaseException(msg);
+//                throw new BaseException("当前阶段为'"+ JsonUtil.getCN(ccCriticalPrjImplPhase.getName())+"'，不可完成验收！");
             }
 
             String now =  LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

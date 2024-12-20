@@ -6,11 +6,13 @@ import com.pms.bid.job.util.CcSpecialEquipConstant;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.omg.CORBA.BAD_CONTEXT;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -52,7 +54,9 @@ public class ZJHoistingMachineryExt {
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
         if (conHeadId == null) {
-            throw new BaseException("施工责任人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.conHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("施工责任人不能为空");
         }
         //督办人
         String superisorId = null;
@@ -62,7 +66,9 @@ public class ZJHoistingMachineryExt {
         //使用登记办理责任人
         String regProId = varMap.get("P_REG_PRO_ID").toString();
         if (regProId == null) {
-            throw new BaseException("使用登记办理人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.regProHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("使用登记办理人不能为空");
         }
         //
         Integer slippageWarningDay = null;
@@ -104,44 +110,60 @@ public class ZJHoistingMachineryExt {
                     //设备名称
                     Cell cell1 = row.getCell(1);
                     if (cell1 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，'起重机械名称'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，'起重机械名称'列为空");
                     }
                     equipName = getCellValueAsString(cell1);
                     if (!StringUtils.hasText(equipName)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，'起重机械名称'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，'起重机械名称'列为空");
                     }
 
                     String installLocation = "";
                     //安装地点
                     Cell cell3 = row.getCell(3);
                     if (cell3 == null) {
-                        throw new BaseException("第" +(row.getRowNum()+1) + "行，安装地点列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" +(row.getRowNum()+1) + "行，安装地点列为空");
                     }
                     installLocation = getCellValueAsString(cell3);
                     if (!StringUtils.hasText(installLocation)) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，安装地点列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，安装地点列为空");
                     }
 
                     //安装单位
                     Cell cell8 = row.getCell(8);
                     if (cell8 == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,9);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
                     }
                     String installCompany = getCellValueAsString(cell8);
                     if (!StringUtils.hasText(installCompany)) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,9);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
                     }
 
                     //设备计划到货时间
                     Cell cell9 = row.getCell(9);
                     if (cell9 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,10);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列为空");
                     }
                     LocalDate planArriveDate = null;
                     try {
                         planArriveDate = cell9.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     } catch (Exception e) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列格式错误");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelDateFormatError",row.getRowNum()+1,10);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列格式错误");
                     }
 
                     Where queryEquip = new Where();
@@ -149,7 +171,9 @@ public class ZJHoistingMachineryExt {
                     CcHoistingMachinery hoistingMachinery = CcHoistingMachinery.selectOneByWhere(queryEquip);
 
                     if (hoistingMachinery != null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备已存在，可删除再导入！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelRowIsExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备已存在，可删除再导入！");
                     }
 
                     CcHoistingMachinery hoistingMachinery1 = CcHoistingMachinery.newData();
@@ -193,7 +217,9 @@ public class ZJHoistingMachineryExt {
                         try {
                             hoistingMachinery1.setCcEquipActArriveDate(getDate(cell10));
                         } catch (IllegalStateException E) {
-                          throw new BaseException("实际到货时间格式错误!");
+                            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelDateFormatError",row.getRowNum()+1,11);
+                            throw new BaseException(msg);
+//                          throw new BaseException("实际到货时间格式错误!");
                         }
                     }
 
@@ -207,7 +233,9 @@ public class ZJHoistingMachineryExt {
             }
             checkData();
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelRowIsExist");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
 
     }
@@ -243,7 +271,9 @@ public class ZJHoistingMachineryExt {
                     if (cell0 != null && StringUtils.hasText(getCellValueAsString(cell0))) {
                         equipName = getCellValueAsString(cell0);
                     } else {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备名称'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备名称'列为空");
                     }
 
                     String inslocation = "";
@@ -252,7 +282,9 @@ public class ZJHoistingMachineryExt {
                     if (cell2 != null && StringUtils.hasText(getCellValueAsString(cell2))) {
                         inslocation = getCellValueAsString(cell2);
                     } else {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'安装地点'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,3);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'安装地点'列为空");
                     }
 
                 String installUnit = "";
@@ -261,7 +293,9 @@ public class ZJHoistingMachineryExt {
                 if (cell7 != null && StringUtils.hasText(getCellValueAsString(cell7))) {
                     installUnit = getCellValueAsString(cell7);
                 } else {
-                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'安装单位'列为空");
+                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,8);
+                    throw new BaseException(msg);
+//                    throw new BaseException("第" + (row.getRowNum() + 1) + "行，'安装单位'列为空");
                 }
 
                     Where queryEquip = new Where();
@@ -269,7 +303,9 @@ public class ZJHoistingMachineryExt {
                     CcHoistingMachinery hoistingMachinery = CcHoistingMachinery.selectOneByWhere(queryEquip);
 
                     if (hoistingMachinery == null) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行设备未找到");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFillEquipNotExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行设备未找到");
                     }
 
                     CcPrjMember member1 = CcPrjMember.selectById(hoistingMachinery.getCcSpecialEquipConHeadId());
@@ -456,14 +492,18 @@ public class ZJHoistingMachineryExt {
                         }
 
                     } else {
-                        throw new BaseException("非责任人，不可操作！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.nonResponsiblePerson");
+                        throw new BaseException(msg);
+//                        throw new BaseException("非责任人，不可操作！");
                     }
                     hoistingMachinery.updateById();
                     checkEquipRecord(hoistingMachinery);//检查数据并更新
             }
             checkData();
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelRowIsExist");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
     }
 
@@ -497,7 +537,9 @@ public class ZJHoistingMachineryExt {
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
         if (conHeadId == null) {
-            throw new BaseException("施工责任人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.conHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("施工责任人不能为空");
         }
         //督办人
         String superisorId = null;
@@ -507,7 +549,9 @@ public class ZJHoistingMachineryExt {
         //使用登记办理责任人
         String regProId = varMap.get("P_REG_PRO_ID").toString();
         if (regProId == null) {
-            throw new BaseException("使用登记办理人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.regProHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("使用登记办理人不能为空");
         }
         //
         Integer slippageWarningDay = null;
@@ -564,7 +608,7 @@ public class ZJHoistingMachineryExt {
 
             CcHoistingMachinery hoistingMachinery = CcHoistingMachinery.selectById(id);
 
-            checkFillDate(hoistingMachinery);
+//            checkFillDate(hoistingMachinery);
             checkEquipRecord(hoistingMachinery);
             checkData();
         }
@@ -594,7 +638,7 @@ public class ZJHoistingMachineryExt {
      */
     private void checkEquipRecord(CcHoistingMachinery hoistingMachinery) {
 
-        checkFillDate(hoistingMachinery);
+//        checkFillDate(hoistingMachinery);
 
         //计划到货时间
         if (hoistingMachinery.getCcEquipActArriveDate() != null &&

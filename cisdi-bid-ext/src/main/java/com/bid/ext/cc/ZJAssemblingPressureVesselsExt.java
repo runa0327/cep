@@ -5,6 +5,7 @@ import com.bid.ext.utils.ProcessCommon;
 import com.pms.bid.job.util.CcSpecialEquipConstant;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,9 @@ public class ZJAssemblingPressureVesselsExt {
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
         if (conHeadId == null) {
-            throw new BaseException("施工责任人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.conHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("施工责任人不能为空");
         }
         //督办人
         String superisorId = null;
@@ -60,7 +63,9 @@ public class ZJAssemblingPressureVesselsExt {
         //使用登记办理责任人
         String regProId = varMap.get("P_REG_PRO_ID").toString();
         if (regProId == null) {
-            throw new BaseException("使用登记办理人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.regProHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("使用登记办理人不能为空");
         }
         //
         Integer slippageWarningDay = null;
@@ -102,11 +107,15 @@ public class ZJAssemblingPressureVesselsExt {
                     //设备名称
                     Cell cell1 = row.getCell(1);
                     if (cell1 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，'拼装压力容器名称'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，'拼装压力容器名称'列为空");
                     }
                     equipName = getCellValueAsString(cell1);
                     if (!StringUtils.hasText(equipName)) {
-                        throw new BaseException("第" + row.getRowNum() + "行，'拼装压力容器名称'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，'拼装压力容器名称'列为空");
                     }
 
                     String factoryNumber = "";
@@ -120,22 +129,30 @@ public class ZJAssemblingPressureVesselsExt {
                     //安装地点
                     Cell cell3 = row.getCell(3);
                     if (cell3 == null) {
-                        throw new BaseException("第" +(row.getRowNum()+1) + "行，'安装地点'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" +(row.getRowNum()+1) + "行，'安装地点'列为空");
                     }
                     installLocation = getCellValueAsString(cell3);
                     if (!StringUtils.hasText(installLocation)) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装地点'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装地点'列为空");
                     }
 
                     String  medium = "";
                     //介质
                     Cell cell4 = row.getCell(4);
                     if (cell4 == null) {
-                        throw new BaseException("第" +(row.getRowNum()+1) + "行，'介质'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,5);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" +(row.getRowNum()+1) + "行，'介质'列为空");
                     }
                     medium = getCellValueAsString(cell4);
                     if (!StringUtils.hasText(medium)) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'介质'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,5);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'介质'列为空");
                     }
 
                     //容积
@@ -155,23 +172,31 @@ public class ZJAssemblingPressureVesselsExt {
                     //安装单位
                     Cell cell7 = row.getCell(7);
                     if (cell7 == null) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,8);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
                     }
                     String installCompany = getCellValueAsString(cell7);
                     if (!StringUtils.hasText(installCompany)) {
-                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,8);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum()+1) + "行，'安装单位'列为空");
                     }
 
                     //设备计划到货时间
                     Cell cell8 = row.getCell(8);
                     if (cell8 == null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,9);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列为空");
                     }
                     LocalDate planArriveDate = null;
                     try {
                         planArriveDate = getDate(cell8);
                     } catch (Exception e) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列格式错误");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelDateFormatError",row.getRowNum()+1,9);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备计划到货时间列格式错误");
                     }
 
                     Where queryEquip = new Where();
@@ -179,7 +204,9 @@ public class ZJAssemblingPressureVesselsExt {
                     CcSpecialEquipAssemblingPressureVessels assemblingPressureVessels = CcSpecialEquipAssemblingPressureVessels.selectOneByWhere(queryEquip);
 
                     if (assemblingPressureVessels != null) {
-                        throw new BaseException("第" + row.getRowNum() + "行，设备已存在，可删除再导入！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelRowIsExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + row.getRowNum() + "行，设备已存在，可删除再导入！");
                     }
 
                     CcSpecialEquipAssemblingPressureVessels assemblingPressureVessels1 = CcSpecialEquipAssemblingPressureVessels.newData();
@@ -240,7 +267,9 @@ public class ZJAssemblingPressureVesselsExt {
                     if (cell0 != null && StringUtils.hasText(getCellValueAsString(cell0))) {
                         equipName = getCellValueAsString(cell0);
                     } else {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备名称'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'设备名称'列为空");
                     }
 
                     String inslocation = "";
@@ -249,7 +278,9 @@ public class ZJAssemblingPressureVesselsExt {
                     if (cell1 != null && StringUtils.hasText(getCellValueAsString(cell1))) {
                         inslocation = getCellValueAsString(cell1);
                     } else {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'安装地点'列为空");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importExcelCellIsNull",row.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，'安装地点'列为空");
                     }
 
                     Where queryEquip = new Where();
@@ -257,7 +288,9 @@ public class ZJAssemblingPressureVesselsExt {
                     CcSpecialEquipAssemblingPressureVessels assemblingPressureVessels = CcSpecialEquipAssemblingPressureVessels.selectOneByWhere(queryEquip);
 
                     if (assemblingPressureVessels == null) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行设备未找到");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFillEquipNotExist",row.getRowNum()+1);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行设备未找到");
                     }
 
                     CcPrjMember member1 = CcPrjMember.selectById(assemblingPressureVessels.getCcSpecialEquipConHeadId());
@@ -444,14 +477,18 @@ public class ZJAssemblingPressureVesselsExt {
                         }
 
                     } else {
-                        throw new BaseException("非责任人，不可操作！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.nonResponsiblePerson");
+                        throw new BaseException(msg);
+//                        throw new BaseException("非责任人，不可操作！");
                     }
                     assemblingPressureVessels.updateById();
                     checkEquipRecord(assemblingPressureVessels);//检查数据并更新
             }
             checkData();
         } catch (IOException e) {
-            throw new BaseException("上传文件失败");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.importFileError");
+            throw new BaseException(msg);
+//            throw new BaseException("上传文件失败");
         }
     }
 
@@ -485,7 +522,9 @@ public class ZJAssemblingPressureVesselsExt {
         //施工责任人
         String conHeadId = varMap.get("P_CON_HEAD_ID").toString();
         if (conHeadId == null) {
-            throw new BaseException("施工责任人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.conHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("施工责任人不能为空");
         }
         //督办人
         String superisorId = null;
@@ -495,7 +534,9 @@ public class ZJAssemblingPressureVesselsExt {
         //使用登记办理责任人
         String regProId = varMap.get("P_REG_PRO_ID").toString();
         if (regProId == null) {
-            throw new BaseException("使用登记办理人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.regProHeadNotExists");
+            throw new BaseException(msg);
+//            throw new BaseException("使用登记办理人不能为空");
         }
         //
         Integer slippageWarningDay = null;

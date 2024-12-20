@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -138,7 +139,8 @@ public class ZJCameraExt {
             ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL+"/lapp/token/get", HttpMethod.POST, entity, String.class);
 
             if (response.getStatusCode() != HttpStatus.OK) {
-                String message = "获取萤石云accessToken失败！";
+//                String message = "获取萤石云accessToken失败！";
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.getAccessTokenFail");
                 log.error(message + response);
                 throw new BaseException(message);
             }
@@ -205,7 +207,8 @@ public class ZJCameraExt {
             ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL + "/lapp/device/camera/list", HttpMethod.POST, entity, String.class);
 
             if (response.getStatusCode() != HttpStatus.OK) {
-                String message = "获取萤石云摄像头列表失败！";
+//                String message = "获取萤石云摄像头列表失败！";
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.getCameraListFail");
                 log.error(message + response);
                 throw new BaseException(message);
             }
@@ -236,16 +239,24 @@ public class ZJCameraExt {
 //        Object speed = paramMap.get("speed");//移动速度
 
         if (accessToken == null ){
-            throw new BaseException("accessToken不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.accessTokenIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("accessToken不能为空");
         }
         if (deviceSerial == null ){
-            throw new BaseException("设备序号不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.equipSerialNumIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("设备序号不能为空");
         }
         if (channelNo == null ){
-            throw new BaseException("通道号不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.channelNumIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("通道号不能为空");
         }
         if (direction == null ){
-            throw new BaseException("控制命令不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.directionIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("控制命令不能为空");
         }
 //        if (speed == null ){
 //            throw new BaseException("云台速度不能为空");
@@ -269,7 +280,9 @@ public class ZJCameraExt {
             ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL + "/lapp/device/ptz/start", HttpMethod.POST, entity, String.class);
 
             if (response.getStatusCode() != HttpStatus.OK) {
-                String message = "控制摄像头失败！";
+
+//                String message = "控制摄像头失败！";
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.getCameraListFail");
                 log.error(message + response);
                 throw new BaseException(message);
             }
@@ -292,16 +305,24 @@ public class ZJCameraExt {
         Object direction = paramMap.get("direction");//操作命令
 
         if (accessToken == null ){
-            throw new BaseException("accessToken不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.accessTokenIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("accessToken不能为空");
         }
         if (deviceSerial == null ){
-            throw new BaseException("设备序号不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.equipSerialNumIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("设备序号不能为空");
         }
         if (channelNo == null ){
-            throw new BaseException("通道号不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.channelNumIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("通道号不能为空");
         }
         if (direction == null ){
-            throw new BaseException("控制命令不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.directionIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("控制命令不能为空");
         }
 
         Map<String,Object>   result =  stop(accessToken.toString(),deviceSerial.toString(),Integer.parseInt(channelNo.toString()),Integer.parseInt(direction.toString()));
@@ -329,7 +350,8 @@ public class ZJCameraExt {
         ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL + "/lapp/device/ptz/stop", HttpMethod.POST, entity, String.class);
 
         if (response.getStatusCode() != HttpStatus.OK) {
-            String message = "控制停止失败！";
+//            String message = "控制停止失败！";
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.cameraControlFail");
             log.error(message + response);
             throw new BaseException(message);
         }

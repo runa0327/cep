@@ -6,6 +6,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -13,6 +14,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.omg.CORBA.BAD_CONTEXT;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +53,9 @@ public class PipingExt {
                     //检查填报内容
                     if (checkIsFilled(yjwPressurePipeline)) {
                         AdUser adUser = AdUser.selectById(yjwPressurePipeline.getCrtUserId());
-                        throw new BaseException("'填写竣工资料编制及报审进展'存在填报数据，请联系数据创建人：" + JsonUtil.getCN(adUser.getName()));
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.fillCompletionDataAndReviewProgressError",JsonUtil.getCN(adUser.getName()));
+                        throw new BaseException(msg);
+//                        throw new BaseException("'填写竣工资料编制及报审进展'存在填报数据，请联系数据创建人：" + JsonUtil.getCN(adUser.getName()));
                     } else {
                         //删除存在的填报数据
                         Where delProgress = new Where();
@@ -59,7 +63,9 @@ public class PipingExt {
                         try{
                             YjwReviewProgress.deleteByWhere(delProgress);
                         }catch (Exception e){
-                            throw new BaseException("竣工资料填报数据跟新失败");
+                            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.fillCompletionDataUpdateFail");
+                            throw new BaseException(msg);
+//                            throw new BaseException("竣工资料填报数据跟新失败");
                         }
 
                         //关闭待办
@@ -105,7 +111,9 @@ public class PipingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         try {
             if (null == varMap.get("Y_IMPORT_PIPING")) {
-                throw new BaseException("请上传附件");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.attachmentNotUpload");
+                throw new BaseException(msg);
+//                throw new BaseException("请上传附件");
             }
             //获取上传的excel文件
             FlFile flFile = FlFile.selectById(varMap.get("Y_IMPORT_PIPING").toString());
@@ -190,7 +198,9 @@ public class PipingExt {
                     YjwPressurePipeline pressurePipeline = YjwPressurePipeline.selectOneByWhere(queryPipeline);
 
                     if (null == pressurePipeline) {
-                        throw new BaseException("第" + (cells.getRowNum() + startRowNum) + "行记录不存在");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.rowNotExist",cells.getRowNum()+startRowNum);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + (cells.getRowNum() + startRowNum) + "行记录不存在");
                     }
 
                     CcPrjMember member1 = CcPrjMember.selectById(pressurePipeline.getYjwAcceptanceManager());//施工责任人
@@ -242,8 +252,9 @@ public class PipingExt {
 
                                 if (checkIsFilled(pressurePipeline)) {
                                     AdUser adUser = AdUser.selectById(pressurePipeline.getCrtUserId());
-
-                                    throw new BaseException("第" + (cells.getRowNum() + startRowNum) + "行，'填写竣工资料编制及报审进展'存在填报数据，请联系数据创建人：" + JsonUtil.getCN(adUser.getName()));
+                                    String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.fillCompletionDataAndReviewProgressAlreadyExists",JsonUtil.getCN(adUser.getName()));
+                                    throw new BaseException(msg);
+//                                    throw new BaseException("第" + (cells.getRowNum() + startRowNum) + "行，'填写竣工资料编制及报审进展'存在填报数据，请联系数据创建人：" + JsonUtil.getCN(adUser.getName()));
                                 } else {
 
                                     //关闭待办
@@ -306,7 +317,9 @@ public class PipingExt {
                 }
             }
             if (insertRows == 0) {
-                throw new BaseException("非导入数据责任人，填报失败");
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.extSpecialEquip.nonResponsiblePerson");
+                throw new BaseException(msg);
+//                throw new BaseException("非导入数据责任人，填报失败");
             }
 
         } catch (
@@ -397,12 +410,16 @@ public class PipingExt {
         //验收负责人
         Object yAcceptanceManager = varMap.get("Y_ACCEPTANCE_MANAGER");
         if (yAcceptanceManager == null) {
-            throw new BaseException("负责人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.headIdIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("负责人不能为空");
         }
         //施工负责人
         Object yConstructionManager = varMap.get("Y_CONSTRUCTION_MANAGER");
         if (yConstructionManager == null) {
-            throw new BaseException("负责人不能为空");
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.headIdIsNull");
+            throw new BaseException(msg);
+//            throw new BaseException("负责人不能为空");
         }
 
         //督办人
@@ -442,10 +459,14 @@ public class PipingExt {
                     if (cell1 != null) {
                         YJW_PIPING_DESING_NAME = getCellValueAsString(cell1);
                         if (StringUtils.isEmpty(YJW_PIPING_DESING_NAME)) {
-                            throw new BaseException("第" + cells.getRowNum() + "行‘管道设计单元名称’不能为空！");
+                            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,2);
+                            throw new BaseException(msg);
+//                            throw new BaseException("第" + cells.getRowNum() + "行‘管道设计单元名称’不能为空！");
                         }
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘管道设计单元名称’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,2);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘管道设计单元名称’不能为空！");
                     }
                     //设计图的管线号
                     String YJW_DRAWING_PIPELINE = "";
@@ -464,7 +485,9 @@ public class PipingExt {
 //                            throw new BaseException("第"+cells.getRowNum()+"行‘设计图的管线号’重复！");
 //                        }
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘设计图的管线号’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,3);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘设计图的管线号’不能为空！");
                     }
                     String YJW_PIPING_NAME = "";
                     //管道名称
@@ -481,10 +504,14 @@ public class PipingExt {
                         }
 
                         if (!StringUtils.isEmpty(name)) {
-                            throw new BaseException("第" + cells.getRowNum() + "行‘设计图的管线号’+‘管道名称’重复！");
+                            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.pipingExt.pipingNumAndPipingNameAlreadyExists",cells.getRowNum()+1);
+                            throw new BaseException(msg);
+//                            throw new BaseException("第" + cells.getRowNum() + "行‘设计图的管线号’+‘管道名称’重复！");
                         }
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘管道名称’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,4);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘管道名称’不能为空！");
                     }
                     //公称直径
                     String YJW_DIAMETER = "";
@@ -492,7 +519,9 @@ public class PipingExt {
                     if (cell4 != null) {
                         YJW_DIAMETER = getCellValueAsString(cell4);
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘公称直径’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,5);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘公称直径’不能为空！");
                     }
                     //管道长度
                     String YJW_PIPING_LENGTH = "";
@@ -500,7 +529,9 @@ public class PipingExt {
                     if (cell5 != null) {
                         YJW_PIPING_LENGTH = getCellValueAsString(cell5);
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘管道长度’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,6);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘管道长度’不能为空！");
                     }
                     //设计压力Mpa
                     String YJW_DESIGN_PRESSURE = "";
@@ -508,7 +539,9 @@ public class PipingExt {
                     if (cell6 != null) {
                         YJW_DESIGN_PRESSURE = getCellValueAsString(cell6);
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘设计压力Mpa’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,6);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘设计压力Mpa’不能为空！");
                     }
                     //介质
                     String YJW_MEDIUM = "";
@@ -516,7 +549,9 @@ public class PipingExt {
                     if (cell7 != null) {
                         YJW_MEDIUM = getCellValueAsString(cell7);
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘介质’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,8);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘介质’不能为空！");
                     }
                     //管道级别
                     String YJW_PIPING_LEVEL = "";
@@ -524,7 +559,9 @@ public class PipingExt {
                     if (cell8 != null) {
                         YJW_PIPING_LEVEL = getCellValueAsString(cell8);
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘管道级别’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,9);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘管道级别’不能为空！");
                     }
                     //安装单位
                     String YJW_INSTALLATION_UNIT = "";
@@ -532,7 +569,9 @@ public class PipingExt {
                     if (cell9 != null) {
                         YJW_INSTALLATION_UNIT = getCellValueAsString(cell9);
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘安装单位’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,10);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘安装单位’不能为空！");
                     }
                     //设计发图时间
                     Date YJW_DESIGN_TIME;
@@ -541,7 +580,9 @@ public class PipingExt {
                         double excelDate = cell10.getNumericCellValue();
                         YJW_DESIGN_TIME = DateUtil.getJavaDate(excelDate);
                     } else {
-                        throw new BaseException("第" + cells.getRowNum() + "行‘设计发图时间’不能为空！");
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.excelImport.importExcelCellIsNull",cells.getRowNum()+1,11);
+                        throw new BaseException(msg);
+//                        throw new BaseException("第" + cells.getRowNum() + "行‘设计发图时间’不能为空！");
                     }
                     String id = Crud.from("yjw_pressure_pipeline").insertData();
 
