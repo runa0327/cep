@@ -187,9 +187,9 @@ public class EsExt {
 
         QbqBody.User user3 = new QbqBody.User();
         user3.setId("2");
-        user3.setName("刘洪傲");
-        user3.setTel("15703027876");
-        user3.setIdCardNo("500108200006273714");
+        user3.setName("唐宇皓");
+        user3.setTel("13072855637");
+        user3.setIdCardNo("500108199908255130");
         userList.add(user3);
 
         QbqBody.User user4 = new QbqBody.User();
