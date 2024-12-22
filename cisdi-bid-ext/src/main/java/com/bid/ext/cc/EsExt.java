@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.bid.ext.entity.QbqBody;
 import com.bid.ext.model.*;
@@ -27,8 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bid.ext.cc.GenExt.checkFileExists;
-import static com.bid.ext.cc.GenExt.saveWordToFile;
+import static com.bid.ext.cc.GenExt.*;
 
 public class EsExt {
 
@@ -95,7 +95,7 @@ public class EsExt {
             map.put("CONSTRUCTION_COMMENT", constructionComment);
 
             byte[] word = DownloadUtils.createWord(map, "acceptance_demo.docx");
-//            byte[] b = convertWordToPDF(word);
+            byte[] b = convertWordToPDF(word);
 
             FlFile flFile = FlFile.newData();
 
@@ -104,7 +104,7 @@ public class EsExt {
 
             // 构建文件名和路径
             String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
-            saveWordToFile(word, path);
+            saveWordToFile(b, path);
             boolean fileExists = checkFileExists(path);
             if (fileExists) {
                 //获取文件属性
@@ -160,12 +160,14 @@ public class EsExt {
 
         WfProcessInstance wfProcessInstance = WfProcessInstance.selectById(wfProcessInstanceId);
         String wfProcessInstanceName = wfProcessInstance.getName();
+        JSONObject entries = JSONUtil.parseObj(wfProcessInstanceName);
+        String zh_cn = entries.getStr("ZH_CN");
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filePhysicalLocation", physicalLocation);
         requestBody.put("fileDspName", dspName);
         requestBody.put("wfProcInstId", wfProcessInstanceId);
-        requestBody.put("wfProcInstName", wfProcessInstanceName);
+        requestBody.put("wfProcInstName", zh_cn);
 
 
         List<QbqBody.User> userList = new ArrayList<>();
@@ -185,9 +187,9 @@ public class EsExt {
 
         QbqBody.User user3 = new QbqBody.User();
         user3.setId("2");
-        user3.setName("唐宇皓");
-        user3.setTel("13072855637");
-        user3.setIdCardNo("500108199908255130");
+        user3.setName("刘洪傲");
+        user3.setTel("15703027876");
+        user3.setIdCardNo("500108200006273714");
         userList.add(user3);
 
         QbqBody.User user4 = new QbqBody.User();
