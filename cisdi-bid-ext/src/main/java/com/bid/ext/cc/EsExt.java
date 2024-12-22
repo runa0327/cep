@@ -15,6 +15,7 @@ import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.JsonUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -309,6 +310,101 @@ public class EsExt {
                 CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(csCommId);
                 ccChangeSignDemonstrate.setCcEngineeringData(fileId);
                 ccChangeSignDemonstrate.updateById();
+            }
+        }
+    }
+
+
+    /**
+     * 重新发起签署
+     */
+    public void ReInitiateSigning() {
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(csCommId);
+            String fileId = ccChangeSignDemonstrate.getCcEngineeringData();
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            FlFile flFile = FlFile.selectById(fileId);
+            String physicalLocation = flFile.getPhysicalLocation();
+            String dspName = flFile.getDspName();
+            WfProcessInstance wfProcessInstance = WfProcessInstance.selectOneByWhere(new Where().eq(WfProcessInstance.Cols.ENTITY_RECORD_ID, csCommId));
+            String wfProcessInstanceId = wfProcessInstance.getId();
+            String wfProcessInstanceName = wfProcessInstance.getName();
+            JSONObject entries = JSONUtil.parseObj(wfProcessInstanceName);
+            String zh_cn = entries.getStr("ZH_CN");
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("filePhysicalLocation", physicalLocation);
+            requestBody.put("fileDspName", dspName);
+            requestBody.put("wfProcInstId", wfProcessInstanceId);
+            requestBody.put("wfProcInstName", zh_cn);
+
+
+            List<QbqBody.User> userList = new ArrayList<>();
+            QbqBody.User user1 = new QbqBody.User();
+            user1.setId("0");
+            user1.setName("黎静");
+            user1.setTel("18223619813");
+            user1.setIdCardNo("500233199510309524");
+            userList.add(user1);
+
+            QbqBody.User user2 = new QbqBody.User();
+            user2.setId("1");
+            user2.setName("伊少宇");
+            user2.setTel("13688410304");
+            user2.setIdCardNo("22020419880912271X");
+            userList.add(user2);
+
+            QbqBody.User user3 = new QbqBody.User();
+            user3.setId("2");
+            user3.setName("唐宇皓");
+            user3.setTel("13072855637");
+            user3.setIdCardNo("500108199908255130");
+            userList.add(user3);
+
+            QbqBody.User user4 = new QbqBody.User();
+            user4.setId("3");
+            user4.setName("龚淳");
+            user4.setTel("15523320797");
+            user4.setIdCardNo("421003199106242315");
+            userList.add(user4);
+
+            requestBody.put("userList", userList);
+
+            // 将 Map 转换为 JSON 字符串
+            String jsonBody = JSONUtil.toJsonStr(requestBody);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+
+            // 发送上传请求
+            String uploadFileUrl = "http://localhost:9999/qbq/uploadFileAndCreateTask";
+            ResponseEntity<String> response = restTemplate.exchange(uploadFileUrl, HttpMethod.POST, entity, String.class);
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+                throw new BaseException(message);
+            }
+
+            // 获取任务ID
+            String taskCode = response.getBody();
+            // 保存任务ID
+            List<TaskToBusiData> taskToBusiDataList = TaskToBusiData.selectByWhere(new Where().eq(TaskToBusiData.Cols.ENTITY_RECORD_ID, csCommId));
+            if (SharedUtil.isEmpty(taskToBusiDataList)) {
+                TaskToBusiData taskToBusiData = TaskToBusiData.newData();
+                taskToBusiData.setTaskCode(taskCode);
+                taskToBusiData.setEntCode("CC_CHANGE_SIGN_DEMONSTRATE");
+                taskToBusiData.setEntityRecordId(csCommId);
+                taskToBusiData.insertById();
+            } else {
+                for (TaskToBusiData taskToBusiData : taskToBusiDataList) {
+                    taskToBusiData.setTaskCode(taskCode);
+                    taskToBusiData.updateById();
+                }
             }
         }
     }
