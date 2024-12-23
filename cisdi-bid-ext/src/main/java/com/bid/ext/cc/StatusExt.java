@@ -117,4 +117,63 @@ public class StatusExt {
         }
     }
 
+    /**
+     * 变更状态变为“草稿”
+     */
+    public void changeStatusToDR() {
+        //验收完成
+        String status = "DR";
+        changeSignStatus(status);
+    }
+
+    /**
+     * 变更状态变为“审批中”
+     */
+    public void changeStatusToPI() {
+        //验收完成
+        String status = "PI";
+        changeSignStatus(status);
+    }
+
+    /**
+     * 变更状态变为“签署中”
+     */
+    public void changeStatusToSI() {
+        //验收完成
+        String status = "SI";
+        changeSignStatus(status);
+    }
+
+    /**
+     * 变更状态变为“签署完成”
+     */
+    public void changeStatusToSF() {
+        //验收完成
+        String status = "SF";
+        changeSignStatus(status);
+    }
+
+
+    /**
+     * 变更验收状态
+     *
+     * @param status
+     */
+    private void changeSignStatus(String status) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        SevInfo sevInfo = ExtJarHelper.getSevInfo();
+        EntityInfo entityInfo = sevInfo.entityInfo;
+        String entityCode = entityInfo.code;
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+
+        if (entityRecordList != null) {
+            for (EntityRecord entityRecord : entityRecordList) {
+                String csCommId = entityRecord.csCommId;
+//                Map<String, Object> valueMap = entityRecord.valueMap;
+                int update = myJdbcTemplate.update("update " + entityCode + " t set t.CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID = ? where t.id=?", status, csCommId);
+                log.info("已更新：{}", update);
+            }
+        }
+    }
+
 }
