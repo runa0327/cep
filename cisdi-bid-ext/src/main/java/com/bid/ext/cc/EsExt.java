@@ -310,11 +310,16 @@ public class EsExt {
 
                     CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(csCommId);
                     ccChangeSignDemonstrate.setCcAttachment(fileId);
+                    ccChangeSignDemonstrate.setCcChangeSignDemonstrateStatusId("SF");
                     ccChangeSignDemonstrate.updateById();
                 } else {
                     String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileNotFound", filePhysicalLocation);
                     throw new BaseException(message);
                 }
+            } else {
+                CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(csCommId);
+                ccChangeSignDemonstrate.setCcChangeSignDemonstrateStatusId("SI");
+                ccChangeSignDemonstrate.updateById();
             }
         }
     }

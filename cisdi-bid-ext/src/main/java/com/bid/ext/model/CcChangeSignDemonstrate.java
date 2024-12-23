@@ -48,6 +48,10 @@ public class CcChangeSignDemonstrate {
 
     public static class Cols {
         /**
+         * 项目。
+         */
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        /**
          * ID。
          */
         public static final String ID = "ID";
@@ -152,6 +156,10 @@ public class CcChangeSignDemonstrate {
          */
         public static final String CC_ENGINEERING_DATA = "CC_ENGINEERING_DATA";
         /**
+         * 变更状态。
+         */
+        public static final String CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID = "CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID";
+        /**
          * 附件。
          */
         public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
@@ -161,6 +169,42 @@ public class CcChangeSignDemonstrate {
 
     // 各个属性及setter、getter：
     // <editor-fold>
+
+    /**
+     * 项目。
+     */
+    private String ccPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getCcPrjId() {
+        return this.ccPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public CcChangeSignDemonstrate setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjId != null && ccPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
 
     /**
      * ID。
@@ -1093,6 +1137,42 @@ public class CcChangeSignDemonstrate {
             this.ccEngineeringData = ccEngineeringData;
             if (!this.toUpdateCols.contains("CC_ENGINEERING_DATA")) {
                 this.toUpdateCols.add("CC_ENGINEERING_DATA");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 变更状态。
+     */
+    private String ccChangeSignDemonstrateStatusId;
+
+    /**
+     * 获取：变更状态。
+     */
+    public String getCcChangeSignDemonstrateStatusId() {
+        return this.ccChangeSignDemonstrateStatusId;
+    }
+
+    /**
+     * 设置：变更状态。
+     */
+    public CcChangeSignDemonstrate setCcChangeSignDemonstrateStatusId(String ccChangeSignDemonstrateStatusId) {
+        if (this.ccChangeSignDemonstrateStatusId == null && ccChangeSignDemonstrateStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccChangeSignDemonstrateStatusId != null && ccChangeSignDemonstrateStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccChangeSignDemonstrateStatusId.compareTo(ccChangeSignDemonstrateStatusId) != 0) {
+                this.ccChangeSignDemonstrateStatusId = ccChangeSignDemonstrateStatusId;
+                if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccChangeSignDemonstrateStatusId = ccChangeSignDemonstrateStatusId;
+            if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID")) {
+                this.toUpdateCols.add("CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID");
             }
         }
         return this;
