@@ -50,7 +50,7 @@ public class EsExt {
         for (EntityRecord entityRecord : entityRecordList) {
             // 获取属性：
             Where attWhere = new Where();
-            attWhere.eq(AdAtt.Cols.CODE, CcQsInspection.Cols.CC_QS_NOTICE_ID);
+            attWhere.eq(AdAtt.Cols.CODE, CcChangeSignDemonstrate.Cols.CC_ENGINEERING_DATA);
             AdAtt adAtt = AdAtt.selectOneByWhere(attWhere);
 
             // 获取路径：
@@ -259,57 +259,62 @@ public class EsExt {
                         .queryParam("taskCode", taskCode)
                         .toUriString();
                 ResponseEntity<String> downloadResponse = restTemplate.getForEntity(downloadUrl, String.class);
-                String downloadBody = response.getBody();
+                String downloadBody = downloadResponse.getBody();
                 Map downloadMap = JsonUtil.fromJson(downloadBody, Map.class);
                 String errMsg = JdbcMapUtil.getString(downloadMap, "errMsg");
-                if (errMsg == null) {
+                if (errMsg != null) {
                     throw new BaseException(errMsg);
                 }
 
                 //下载签署完成的文件物理地址
                 String filePhysicalLocation = JdbcMapUtil.getString(downloadMap, "filePhysicalLocation");
+                boolean fileExists = checkFileExists(filePhysicalLocation);
+                if (fileExists) {
+                    //插入文件表
+                    FlFile flFile = FlFile.newData();
+                    String fileId = flFile.getId();
+                    // 获取属性：
+                    Where attWhere = new Where();
+                    attWhere.eq(AdAtt.Cols.CODE, CcChangeSignDemonstrate.Cols.CC_ATTACHMENT);
+                    AdAtt adAtt = AdAtt.selectOneByWhere(attWhere);
+                    // 获取路径：
+                    Where pathWhere = new Where();
+                    pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
+                    FlPath flPath = FlPath.selectOneByWhere(pathWhere);
 
-                //插入文件表
-                FlFile flFile = FlFile.newData();
-                String fileId = flFile.getId();
-                // 获取属性：
-                Where attWhere = new Where();
-                attWhere.eq(AdAtt.Cols.CODE, CcQsInspection.Cols.CC_QS_NOTICE_ID);
-                AdAtt adAtt = AdAtt.selectOneByWhere(attWhere);
-                // 获取路径：
-                Where pathWhere = new Where();
-                pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
-                FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+                    //获取文件属性
+                    File file = new File(filePhysicalLocation);
+                    long bytes = file.length();
+                    double kilobytes = bytes / 1024.0;
 
-                //获取文件属性
-                File file = new File(filePhysicalLocation);
-                long bytes = file.length();
-                double kilobytes = bytes / 1024.0;
+                    String fileName = JdbcMapUtil.getString(valueMap, "NAME") + "工程施工联系单";
 
-                String fileName = JdbcMapUtil.getString(valueMap, "name") + "工程施工联系单";
+                    BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
+                    String dspSize = String.format("%d KB", Math.round(kilobytes));
+                    flFile.setCrtUserId(loginInfo.userInfo.id);
+                    flFile.setLastModiUserId(loginInfo.userInfo.id);
+                    flFile.setFlPathId(flPath.getId());
+                    flFile.setCode(fileId);
+                    flFile.setName(fileName);
+                    flFile.setExt("pdf");
+                    flFile.setDspName(fileName + ".pdf");
+                    flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
+                    flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    flFile.setSizeKb(sizeKb);
+                    flFile.setDspSize(dspSize);
+                    flFile.setUploadDttm(LocalDateTime.now());
+                    flFile.setPhysicalLocation(filePhysicalLocation);
+                    flFile.setOriginFilePhysicalLocation(filePhysicalLocation);
+                    flFile.setIsPublicRead(false);
+                    flFile.insertById();
 
-                BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
-                String dspSize = String.format("%d KB", Math.round(kilobytes));
-                flFile.setCrtUserId(loginInfo.userInfo.id);
-                flFile.setLastModiUserId(loginInfo.userInfo.id);
-                flFile.setFlPathId(flPath.getId());
-                flFile.setCode(fileId);
-                flFile.setName(fileName);
-                flFile.setExt("pdf");
-                flFile.setDspName(fileName + ".pdf");
-                flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
-                flFile.setSizeKb(sizeKb);
-                flFile.setDspSize(dspSize);
-                flFile.setUploadDttm(LocalDateTime.now());
-                flFile.setPhysicalLocation(filePhysicalLocation);
-                flFile.setPhysicalLocation(filePhysicalLocation);
-                flFile.setIsPublicRead(false);
-                flFile.insertById();
-
-                CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(csCommId);
-                ccChangeSignDemonstrate.setCcEngineeringData(fileId);
-                ccChangeSignDemonstrate.updateById();
+                    CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(csCommId);
+                    ccChangeSignDemonstrate.setCcAttachment(fileId);
+                    ccChangeSignDemonstrate.updateById();
+                } else {
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileNotFound", filePhysicalLocation);
+                    throw new BaseException(message);
+                }
             }
         }
     }

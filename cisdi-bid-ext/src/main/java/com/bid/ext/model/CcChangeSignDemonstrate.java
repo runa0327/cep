@@ -151,6 +151,10 @@ public class CcChangeSignDemonstrate {
          * 工程资料。
          */
         public static final String CC_ENGINEERING_DATA = "CC_ENGINEERING_DATA";
+        /**
+         * 附件。
+         */
+        public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
     }
 
     // </editor-fold>
@@ -1089,6 +1093,42 @@ public class CcChangeSignDemonstrate {
             this.ccEngineeringData = ccEngineeringData;
             if (!this.toUpdateCols.contains("CC_ENGINEERING_DATA")) {
                 this.toUpdateCols.add("CC_ENGINEERING_DATA");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件。
+     */
+    private String ccAttachment;
+
+    /**
+     * 获取：附件。
+     */
+    public String getCcAttachment() {
+        return this.ccAttachment;
+    }
+
+    /**
+     * 设置：附件。
+     */
+    public CcChangeSignDemonstrate setCcAttachment(String ccAttachment) {
+        if (this.ccAttachment == null && ccAttachment == null) {
+            // 均为null，不做处理。
+        } else if (this.ccAttachment != null && ccAttachment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccAttachment.compareTo(ccAttachment) != 0) {
+                this.ccAttachment = ccAttachment;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                    this.toUpdateCols.add("CC_ATTACHMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccAttachment = ccAttachment;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                this.toUpdateCols.add("CC_ATTACHMENT");
             }
         }
         return this;
