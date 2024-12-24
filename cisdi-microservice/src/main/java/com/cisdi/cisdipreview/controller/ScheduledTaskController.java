@@ -52,17 +52,18 @@ public class ScheduledTaskController {
         scheduleTask("CC_CO_TASK", "DUE_TIME", "1783792280128909312", "1834493376552837120");
     }
 
-    /**
-     * 工作日程通知定时器
-     */
-    @Scheduled(cron = "*/10 * * * * ?")
-    public void scheduleTaskWorkSchedule() {
-        // 未自动登录前不要执行：
-        if (LoginInfoManager.loginInfo == null) {
-            return;
-        }
-        scheduleTask("CC_WORK_SCHEDULE", "CC_SCHEDULE_TIME", "1863482975577686016", "1868541052077420544");
-    }
+    //此为标准版功能安徽打包时注释
+//    /**
+//     * 工作日程通知定时器
+//     */
+//    @Scheduled(cron = "*/10 * * * * ?")
+//    public void scheduleTaskWorkSchedule() {
+//        // 未自动登录前不要执行：
+//        if (LoginInfoManager.loginInfo == null) {
+//            return;
+//        }
+//        scheduleTask("CC_WORK_SCHEDULE", "CC_SCHEDULE_TIME", "1863482975577686016", "1868541052077420544");
+//    }
 
     private void scheduleTask(String entity, String timeField, String sevId, String actId) {
         LocalDateTime now = LocalDateTime.now();

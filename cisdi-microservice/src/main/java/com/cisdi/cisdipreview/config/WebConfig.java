@@ -16,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(sessionInterceptor)
-                .addPathPatterns("/**") // 拦截所有请求
+                .addPathPatterns("/share/data") // 拦截请求
                 .excludePathPatterns(
                         "/login",
                         "/register",

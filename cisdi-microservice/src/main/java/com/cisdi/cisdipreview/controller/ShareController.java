@@ -53,7 +53,9 @@ public class ShareController {
         }
 
         // 拆分 ccPrjId 为列表
-        List<String> ccPrjIds = Arrays.stream(ccPrjId.split(","))
+        List<String> ccPrjIds = (ccPrjId == null || ccPrjId.trim().isEmpty())
+                ? new ArrayList<>()
+                : Arrays.stream(ccPrjId.split(","))
                 .map(String::trim)
                 .filter(id -> !id.isEmpty())
                 .collect(Collectors.toList());
