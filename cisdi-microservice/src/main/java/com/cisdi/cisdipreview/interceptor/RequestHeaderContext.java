@@ -17,6 +17,8 @@ public class RequestHeaderContext {
 
     private String userCode;
 
+    private String pCcPrjIds;
+
     public String getUserSession() {
         return userSession;
     }
@@ -31,6 +33,10 @@ public class RequestHeaderContext {
 
     public String getUserCode() {
         return userCode;
+    }
+
+    public String getpCcPrjIds() {
+        return pCcPrjIds;
     }
 
     public static RequestHeaderContext getInstance() {
@@ -50,6 +56,7 @@ public class RequestHeaderContext {
         this.userId = requestHeaderContextBuild.userId;
         this.userCode = requestHeaderContextBuild.userCode;
         this.userName = requestHeaderContextBuild.userName;
+        this.pCcPrjIds = requestHeaderContextBuild.pCcPrjIds;
         setContext(this);
     }
 
@@ -61,6 +68,8 @@ public class RequestHeaderContext {
         private String userName;
 
         private String userCode;
+
+        private String pCcPrjIds;
 
         public RequestHeaderContextBuild userSession(String userSession) {
             this.userSession = userSession;
@@ -79,6 +88,11 @@ public class RequestHeaderContext {
 
         public RequestHeaderContextBuild userCode(String userCode) {
             this.userCode = userCode;
+            return this;
+        }
+
+        public RequestHeaderContextBuild pCcPrjIds(String pCcPrjIds) {
+            this.pCcPrjIds = pCcPrjIds;
             return this;
         }
 

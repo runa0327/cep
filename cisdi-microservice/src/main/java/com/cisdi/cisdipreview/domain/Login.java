@@ -14,4 +14,11 @@ public class Login {
      * 本次登陆sessionId
      */
     private String sessionId;
+
+    /**
+     * 全局项目变量
+     */
+    private GlobalVarMap globalVarMap;
+
+
 }

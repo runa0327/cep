@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping(value = "/share")
@@ -33,10 +33,12 @@ public class ShareController {
         String dataType = panoData.getDataType();
         String code = panoData.getOrgId();
         String shareId = panoData.getShareId();
-        //orgId查询数据库名
+
+        // orgId查询数据库名
         String orgSql = "select t.SERVICE_NAME from main.AD_ORG t where t.CODE = ?";
         Map<String, Object> orgMap = jdbcTemplate.queryForMap(orgSql, code);
         String orgName = JdbcMapUtil.getString(orgMap, "SERVICE_NAME");
+
         // 获取分享内容的所属项目
         String shareSql = "select t.SHARE_CONTEXT_DATA from " + orgName + ".AD_SHARE t where t.id = ?";
         Map<String, Object> shareMap = jdbcTemplate.queryForMap(shareSql, shareId);
@@ -44,12 +46,34 @@ public class ShareController {
 
         Map<String, Object> sharemap = JsonUtil.convertJsonToMap(shareContextData);
         String ccPrjId = JdbcMapUtil.getString(sharemap, "prjId");
+
+        // 处理 prjId 为空的情况
         if (SharedUtil.isEmpty(ccPrjId)) {
-            String userSession = RequestHeaderContext.getInstance().getUserSession();
+            ccPrjId = RequestHeaderContext.getInstance().getpCcPrjIds();
         }
-        // 根据项目id查询全景
-        String panoSql = "select * from " + orgName + ".CC_DOC_FILE t where t.cc_prj_id = ? and t.CC_DOC_FILE_TYPE_ID = ?";
-        List<Map<String, Object>> panoList = jdbcTemplate.queryForList(panoSql, ccPrjId, dataType);
+
+        // 拆分 ccPrjId 为列表
+        List<String> ccPrjIds = Arrays.stream(ccPrjId.split(","))
+                .map(String::trim)
+                .filter(id -> !id.isEmpty())
+                .collect(Collectors.toList());
+
+        if (ccPrjIds.isEmpty()) {
+            // 如果没有有效的项目 ID，返回空数据或根据需求处理
+            return Collections.singletonMap("data", new ArrayList<>());
+        }
+
+        // 根据项目 id 查询全景
+        String placeholders = ccPrjIds.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(", "));
+        String panoSql = "select * from " + orgName + ".CC_DOC_FILE t where t.cc_prj_id in (" + placeholders + ") and t.CC_DOC_FILE_TYPE_ID = ?";
+
+        // 构建参数数组：项目 ID 列表 + dataType
+        Object[] params = Stream.concat(ccPrjIds.stream(), Stream.of(dataType))
+                .toArray();
+
+        List<Map<String, Object>> panoList = jdbcTemplate.queryForList(panoSql, params);
 
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> dataList = new ArrayList<>();
@@ -60,7 +84,6 @@ public class ShareController {
 
         // 按月份分组
         Map<String, List<Map<String, Object>>> monthMap = new HashMap<>();
-
         for (Map<String, Object> map : panoList) {
             String ccDocFileId = JdbcMapUtil.getString(map, "ID");
             LocalDate vrDate = JdbcMapUtil.getLocalDate(map, "CC_DOC_DATE");
@@ -85,7 +108,6 @@ public class ShareController {
             if (SharedUtil.isEmpty(queryForList1)) {
                 jdbcTemplate.update(insertSql, previewId, 1, now, now, now, "AP", ccVrAttachmentPreviewId, shareId);
             }
-
 
             // 根据附件ID查询文件URL
             String sql = "select * from " + orgName + ".fl_file f where f.id = ?";
@@ -116,11 +138,31 @@ public class ShareController {
             monthMap.computeIfAbsent(ccYearMonth, k -> new ArrayList<>()).add(panoItem);
         }
 
-        // 将分组数据加入到结果中
-        for (Map.Entry<String, List<Map<String, Object>>> entry : monthMap.entrySet()) {
+        // 定义日期格式化器用于解析
+        DateTimeFormatter parseFormatter = DateTimeFormatter.ofPattern("yyyy年M月");
+
+        // 获取排序后的月份列表（按年月降序）
+        List<String> sortedMonths = monthMap.keySet().stream()
+                .sorted((m1, m2) -> {
+                    YearMonth ym1 = YearMonth.parse(m1, parseFormatter);
+                    YearMonth ym2 = YearMonth.parse(m2, parseFormatter);
+                    return ym2.compareTo(ym1); // 降序
+                })
+                .collect(Collectors.toList());
+
+        for (String month : sortedMonths) {
+            List<Map<String, Object>> panoItems = monthMap.get(month);
+
+            // 对pano-list按VR_DATE降序排序
+            panoItems.sort((p1, p2) -> {
+                LocalDate date1 = LocalDate.parse((String) p1.get("VR_DATE"));
+                LocalDate date2 = LocalDate.parse((String) p2.get("VR_DATE"));
+                return date2.compareTo(date1); // 降序
+            });
+
             Map<String, Object> monthData = new HashMap<>();
-            monthData.put("pano-month", entry.getKey());
-            monthData.put("pano-list", entry.getValue());
+            monthData.put("pano-month", month);
+            monthData.put("pano-list", panoItems);
             dataList.add(monthData);
         }
 

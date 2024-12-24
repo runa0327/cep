@@ -49,6 +49,7 @@ public class SessionInterceptor implements HandlerInterceptor {
                         .userCode(login.getUserInfo().getCode())
                         .userId(login.getUserInfo().getId())
                         .userName(JsonUtil.getCN(login.getUserInfo().getName()))
+                        .pCcPrjIds(login.getGlobalVarMap().getPCcPrjIds())
                         .bulid();
                 log.info("token有效!");
                 ok = true;
