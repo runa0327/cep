@@ -174,10 +174,24 @@ public class BidExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
+        filePath = "C:\\Users\\Administrator\\Documents\\合同台账第三次导入20241225.xlsx";
         if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
             throw new BaseException(message);
         }
+        //所有合同状态
+        Where  where = new Where();
+        where.sql("T.`STATUS`='AP'");
+        List<CcPoStatus> ccPoStatuses = CcPoStatus.selectByWhere(where);
+        if (SharedUtil.isEmpty(ccPoStatuses)){
+            throw new BaseException("合同状态查询失败");
+        }
+        //所有合同类型
+        List<CcPoType> ccPoTypes = CcPoType.selectByWhere(where);
+        if (SharedUtil.isEmpty(ccPoTypes)){
+            throw new BaseException("合同类型查询失败");
+        }
+
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = WorkbookFactory.create(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
@@ -219,48 +233,75 @@ public class BidExt {
                 String partyB = getStringCellValue(row.getCell(8)); //乙方
                 String ccPoTypeId = getStringCellValue(row.getCell(10)); //合同类型
 
-                switch (ccPoTypeId) {
-                    case "技术服务合同":
-                        ccPoTypeId = "TechnicalServiceContract";
-                        break;
-                    case "工程设计合同":
-                        ccPoTypeId = "EngineeringDesignContract";
-                        break;
-                    case "技术咨询合同":
-                        ccPoTypeId = "TechnicalConsultingContract";
-                        break;
-                    case "监理合同":
-                        ccPoTypeId = "SupervisionContract";
-                        break;
-                    case "勘察合同":
-                        ccPoTypeId = "SurveyContract";
-                        break;
-                    case "施工合同":
-                        ccPoTypeId = "ConstructionContract";
-                        break;
-                    case "施工准备合同":
-                        ccPoTypeId = "ConstructionPreparationContract";
-                        break;
+//                switch (ccPoTypeId) {
+//                    case "技术服务合同":
+//                        ccPoTypeId = "TechnicalServiceContract";
+//                        break;
+//                    case "工程设计合同":
+//                        ccPoTypeId = "EngineeringDesignContract";
+//                        break;
+//                    case "技术咨询合同":
+//                        ccPoTypeId = "TechnicalConsultingContract";
+//                        break;
+//                    case "监理合同":
+//                        ccPoTypeId = "SupervisionContract";
+//                        break;
+//                    case "勘察合同":
+//                        ccPoTypeId = "SurveyContract";
+//                        break;
+//                    case "施工合同":
+//                        ccPoTypeId = "ConstructionContract";
+//                        break;
+//                    case "施工准备合同":
+//                        ccPoTypeId = "ConstructionPreparationContract";
+//                        break;
+//                }
+                //设置类型id
+                boolean typeExists = false;
+                for (CcPoType poType:ccPoTypes) {
+                    if(poType.getName().contains(ccPoTypeId)){
+                        ccPoTypeId = poType.getId();
+                        typeExists=true;
+                    }
+                }
+                if (!typeExists){
+                    throw new BaseException("第"+(row.getRowNum()+1)+"行，合同类型：'"+ccPoTypeId+"'填写错误，请检查");
                 }
 
                 String ccPoStatusId = getStringCellValue(row.getCell(11)); //合同状态
-                switch (ccPoStatusId) {
-                    case "生效":
-                        ccPoStatusId = "Effective";
-                        break;
-                    case "已发送":
-                        ccPoStatusId = "Sent";
-                        break;
-                    case "关闭":
-                        ccPoStatusId = "Closed";
-                        break;
-                    case "结案":
-                        ccPoStatusId = "Closed";
-                        break;
-                    case "关闭(结案)":
-                        ccPoStatusId = "Closed";
-                        break;
+//                switch (ccPoStatusId) {
+//                    case "草案":
+//                        ccPoStatusId = "Draft";
+//                        break;
+//                    case "生效":
+//                        ccPoStatusId = "Effective";
+//                        break;
+//                    case "已发送":
+//                        ccPoStatusId = "Sent";
+//                        break;
+//                    case "关闭":
+//                        ccPoStatusId = "Closed";
+//                        break;
+//                    case "结案":
+//                        ccPoStatusId = "Closed";
+//                        break;
+//                    case "关闭(结案)":
+//                        ccPoStatusId = "Closed";
+//                        break;
+//
+//                }
+                //设置合同状态
+                boolean statusExists = false;
+                for (CcPoStatus poStatus:ccPoStatuses) {
+                    if(poStatus.getName().contains(ccPoStatusId)){
+                        ccPoStatusId = poStatus.getId();
+                        statusExists = true;
+                    }
                 }
+                if (!statusExists){
+                    throw new BaseException("第"+(row.getRowNum()+1)+"行，合同状态：'"+ccPoTypeId+"'填写错误，请检查");
+                }
+
 
                 String ccRegisteredStatusId = getStringCellValue(row.getCell(16)); //备案状态
                 switch (ccRegisteredStatusId) {
