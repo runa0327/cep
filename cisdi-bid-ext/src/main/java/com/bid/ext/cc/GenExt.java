@@ -230,6 +230,8 @@ public class GenExt {
             }
             String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
+//            String libreOfficePath = "D:/Program Files/LibreOffice/program/soffice.exe";
+
             // 调用 LibreOffice 进行 DOCX 转 PDF
             ProcessBuilder builder = new ProcessBuilder();
             builder.command(libreOfficePath, "--convert-to", "pdf:writer_pdf_Export", tempDocx.toString(), "--outdir", tempPdf.getParent().toString());
