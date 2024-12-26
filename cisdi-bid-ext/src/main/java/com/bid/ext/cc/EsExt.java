@@ -280,9 +280,9 @@ public class EsExt {
                 List<QbqBody.User> userList = new ArrayList<>();
                 QbqBody.User user1 = new QbqBody.User();
                 user1.setId("0");
-                user1.setName("黎静");
-                user1.setTel("18223619813");
-                user1.setIdCardNo("500233199510309524");
+                user1.setName("伊少宇");
+                user1.setTel("13688410304");
+                user1.setIdCardNo("22020419880912271X");
                 userList.add(user1);
                 initiateSigning("Type1", userList, fileId, wfProcessInstanceId, csCommId);
             } else {
@@ -434,7 +434,7 @@ public class EsExt {
                     Boolean isChange = ccChangeSignDemonstrate.getIsChange();
                     extMsg = isChange ? " 已发起变更设计流程" : "";
                     List<CcChangeDesignDemonstrate> ccChangeDesignDemonstrates = CcChangeDesignDemonstrate.selectByWhere(new Where().eq(CcChangeDesignDemonstrate.Cols.CC_CHANGE_SIGN_DEMONSTRATE_ID, csCommId));
-                    if (!SharedUtil.isEmpty(ccChangeDesignDemonstrates)) {
+                    if (SharedUtil.isEmpty(ccChangeDesignDemonstrates)) {
                         newChangeDesign(ccChangeSignDemonstrate, isChange);
                     }
                 } else {
