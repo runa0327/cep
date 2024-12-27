@@ -12,6 +12,7 @@ import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -446,12 +447,49 @@ public class AcceptanceExt {
             // 定义 PDF 临时文件的路径
             Path tempPdf = Files.createTempFile(null, ".PDF");
 
-            // 指定 LibreOffice 的安装路径及命令行工具
-//            String libreOfficePath = "/usr/bin/libreoffice";
-//            String libreOfficePath = "D:/Program Files/LibreOffice/program/soffice.exe";
-            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = 'LIBRE_PATH' ";
+            // 获取当前操作系统的具体发行版信息
+            String osReleaseFile = "/etc/os-release";
+            String distro = null;
+
+            try (BufferedReader br = new BufferedReader(new FileReader(osReleaseFile))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("ID=")) {
+                        distro = line.split("=")[1].replace("\"", "").trim();
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unableToReadSystemInfo", e);
+                throw new BaseException(message);
+            }
+
+            if (distro == null) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unrecognizedLinuxDistro");
+                throw new BaseException(message);
+            }
+
+            // 根据发行版设置 code
+            String code;
+            if (distro.contains("centos")) {
+                code = "LIBRE_PATH_CENTOS";
+            } else if (distro.contains("ubuntu")) {
+                code = "LIBRE_PATH_UBUNTU";
+            } else {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unsupportedLinuxDistro", distro);
+                throw new BaseException(message);
+            }
+
+            // 构造 SQL 语句
+            String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = '" + code + "'";
+
+            // 查询数据库获取 LibreOffice 的路径
             MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
             List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+            if (list.isEmpty()) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.libreOfficePathNotFound", code);
+                throw new BaseException(message);
+            }
             String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
             // 调用 LibreOffice 进行转换
