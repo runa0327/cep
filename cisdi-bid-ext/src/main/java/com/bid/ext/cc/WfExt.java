@@ -96,14 +96,29 @@ public class WfExt {
                     , csCommId);
             String entityRecordId = JdbcMapUtil.getString(map, "ENTITY_RECORD_ID");
             String code = JdbcMapUtil.getString(map, "CODE");
-            String sql = "SELECT CC_PRJ_ID FROM " + code + " WHERE ID = " + entityRecordId;
-            Map<String, Object> map1 = myJdbcTemplate.queryForMap(sql);
-            String ccPrjId = JdbcMapUtil.getString(map1, "CC_PRJ_ID");
-            if (null != ccPrjId) {
-                ViewNavExtResult result = new ViewNavExtResult();
-                result.changedGlobalVarMap = new LinkedHashMap<>();
-                result.changedGlobalVarMap.put("P_CC_PRJ_IDS", ccPrjId);
-                ExtJarHelper.setReturnValue(result);
+            //判断表是否有项目字段
+            String checkColumnSql = "SELECT COUNT(*) AS cnt " +
+                    "FROM information_schema.columns " +
+                    "WHERE table_name = ? " +
+                    "AND column_name = 'CC_PRJ_ID'";
+
+            // 执行查询以检查列是否存在
+            Map<String, Object> queryForMap = myJdbcTemplate.queryForMap(checkColumnSql, code);
+            // 获取 COUNT(*) 的值，别名为 cnt
+            Integer columnCount = JdbcMapUtil.getInt(queryForMap, "cnt");
+            if (columnCount != null && columnCount > 0) {
+                // 如果存在CC_PRJ_ID列，则执行查询获取其值
+                String sql = "SELECT CC_PRJ_ID FROM " + code + " WHERE ID = ?";
+                Map<String, Object> map1 = myJdbcTemplate.queryForMap(sql, entityRecordId);
+                String ccPrjId = JdbcMapUtil.getString(map1, "CC_PRJ_ID");
+
+                if (ccPrjId != null) {
+                    // 如果CC_PRJ_ID不为空，则设置全局变量
+                    ViewNavExtResult result = new ViewNavExtResult();
+                    result.changedGlobalVarMap = new LinkedHashMap<>();
+                    result.changedGlobalVarMap.put("P_CC_PRJ_IDS", ccPrjId);
+                    ExtJarHelper.setReturnValue(result);
+                }
             }
         }
     }
