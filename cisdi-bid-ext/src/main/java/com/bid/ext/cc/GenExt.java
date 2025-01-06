@@ -5,6 +5,7 @@ import com.bid.ext.model.CcQsInspection;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
 import com.bid.ext.utils.DownloadUtils;
+import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.Pictures;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -18,7 +19,10 @@ import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Picture;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -87,7 +91,7 @@ public class GenExt {
             if (!SharedUtil.isEmpty(valueMap.get("CC_QS_ISSUES_IMG"))) {
                 issuesImgId = valueMap.get("CC_QS_ISSUES_IMG").toString();
             }
-            List<Map<String, Object>> imageEntries = fetchAndFormatImages(issuesImgId);
+            List<Map<String, Object>> imageEntries = fetchAndFormatImagesByPl(issuesImgId);
 
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("csCommId", entityRecord.csCommId);
@@ -336,5 +340,72 @@ public class GenExt {
         }
 
         return imgs;
+    }
+
+    /**
+     * 处理图片 - 使用物理路径并转换 WebP
+     *
+     * @param idsString 图片ID字符串，逗号分隔
+     * @return 格式化后的图片列表
+     */
+    private static List<Map<String, Object>> fetchAndFormatImagesByPl(String idsString) {
+        if (idsString == null || idsString.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<String> ids = Arrays.asList(idsString.split(","));
+        List<Map<String, Object>> imgs = new ArrayList<>();
+
+        for (int i = 0; i < ids.size(); i++) {
+            FlFile flFile = FlFile.selectById(ids.get(i)); // 获取文件对象
+            if (flFile != null) {
+                String physicalPath = flFile.getPhysicalLocation(); // 获取文件的物理路径
+                File imageFile = new File(physicalPath);
+                if (imageFile.exists()) {
+                    try {
+                        String imagePathToUse = physicalPath;
+                        String lowerCasePath = physicalPath.toLowerCase();
+                        if (lowerCasePath.endsWith(".webp")) {
+                            // 转换 WebP 为 PNG
+                            imagePathToUse = convertWebPToPng(physicalPath);
+                        }
+
+                        PictureRenderData picture = Pictures.ofLocal(imagePathToUse)
+                                .size(350, 350) // 设置图片大小，可根据需要调整
+                                .create();
+
+                        Map<String, Object> imgEntry = new HashMap<>();
+                        imgEntry.put("order", (i + 1) + "、");
+                        imgEntry.put("img", picture);
+                        imgs.add(imgEntry);
+                    } catch (Exception e) {
+                        // 处理图片加载异常
+                        e.printStackTrace();
+                    }
+                } else {
+                    // 处理文件不存在的情况
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed",physicalPath);
+                    throw new BaseException(message);
+                }
+            }
+        }
+
+        return imgs;
+    }
+
+    /**
+     * 将 WebP 图片转换为 PNG 格式
+     *
+     * @param webpPath 原始 WebP 图片路径
+     * @return 转换后的 PNG 图片路径
+     * @throws IOException 如果读取或写入图片失败
+     */
+    private static String convertWebPToPng(String webpPath) throws IOException {
+        File webpFile = new File(webpPath);
+        BufferedImage image = ImageIO.read(webpFile);
+        String pngPath = webpPath.replaceFirst("(?i)\\.webp$", ".png");
+        File pngFile = new File(pngPath);
+        ImageIO.write(image, "png", pngFile);
+        return pngPath;
     }
 }
