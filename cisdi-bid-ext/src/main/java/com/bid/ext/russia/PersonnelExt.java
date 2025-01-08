@@ -1,0 +1,311 @@
+package com.bid.ext.russia;
+
+import com.bid.ext.model.*;
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
+import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
+import com.qygly.shared.util.SharedUtil;
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import static com.bid.ext.utils.ImportValueUtils.*;
+
+public class PersonnelExt {
+
+    /**
+     * 新增人员进场扩展
+     */
+    public void addPersonnelEntryInfoExt() {
+
+        for(EntityRecord entityRecord :  ExtJarHelper.getEntityRecordList()){
+            String csCommId = entityRecord.csCommId;
+            RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectById(csCommId);
+
+            int frequency = getFrequency(userEntryInfo.getRuUserName(), userEntryInfo.getRuUserWorkTypeId());
+            userEntryInfo.setRuEntryFrequency(frequency);
+
+            userEntryInfo.updateById();//更新频次
+
+            //检查人员
+            Where selectPerson =  new Where();
+            selectPerson.eq("RU_USER_NAME",userEntryInfo.getRuUserName());
+            RuUserInfo ruUserInfo = RuUserInfo.selectOneByWhere(selectPerson);
+
+            if (SharedUtil.isEmpty(ruUserInfo)){
+                RuUserInfo ruUserInfo1 = RuUserInfo.newData();
+                insertUserInfo(userEntryInfo.getCcPrjId(),userEntryInfo.getRuUserName(),userEntryInfo.getRuUserAge(),userEntryInfo.getRuUserPhoneNumber(),userEntryInfo.getRuUserWorkTypeId(),ruUserInfo1);
+                userEntryInfo.setRuUserInfoId(ruUserInfo1.getId());
+            }else{
+                ruUserInfo.setRuUserName(userEntryInfo.getRuUserName());
+                ruUserInfo.setRuUserAge(userEntryInfo.getRuUserAge());
+                ruUserInfo.setRuUserWorkTypeId(userEntryInfo.getRuUserWorkTypeId());
+                ruUserInfo.setRuUserPhoneNumber(userEntryInfo.getRuUserPhoneNumber());
+                ruUserInfo.updateById();
+            }
+
+            //检查住宿地
+            Where selectAccommodation =  new Where();
+            selectAccommodation.eq("`NAME`",userEntryInfo.getRuUserAccommodation());
+            RuUserAccommodation userAccommodation = RuUserAccommodation.selectOneByWhere(selectAccommodation);
+
+            if(SharedUtil.isEmpty(userAccommodation)){
+                RuUserAccommodation userAccommodation1 = RuUserAccommodation.newData();
+                userAccommodation1.setCcPrjId(userEntryInfo.getCcPrjId());
+                userAccommodation1.setName(userEntryInfo.getRuUserAccommodation());
+                userAccommodation1.insertById();
+                userEntryInfo.setRuUserAccommodationId(userAccommodation1.getId());
+            }
+
+            userEntryInfo.updateById();
+        }
+    }
+
+    /**
+     * 导入人员入场信息，新增入场，通过人员和入境时间判断是否为更新数据
+     */
+    public void importPersonnelEntryInfo() {
+
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String prjId = varMap.get("PRJ_ID").toString();
+        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
+        String filePath = flFile.getPhysicalLocation();
+        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板.xlsx";
+
+        if (!"xlsx".equals(flFile.getExt())) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+            throw new BaseException(message);
+        }
+
+        //所有工种
+        Where where = new Where();
+        where.sql("T.`STATUS`='AP'");
+        List<RuUserWorkType> ruUserWorkTypes = RuUserWorkType.selectByWhere(where);
+
+        //所有人员信息
+        List<RuUserInfo> ruUserInfos = RuUserInfo.selectByWhere(where);
+
+        //所有住宿地
+        List<RuUserAccommodation> ruUserAccommodations = RuUserAccommodation.selectByWhere(where);
+
+        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+            Workbook workbook = WorkbookFactory.create(file);
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+            // 遍历每一行
+            for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                // 检查行是否为空
+                if (row == null) {
+                    break; // 如果为空，直接跳出。
+                }
+                Cell cell = row.getCell(1);
+                if (cell == null) {
+                    break;
+                }
+
+                //获取人员姓名
+                String  personName  = getStringCellValue(cell);
+                if (SharedUtil.isEmpty(personName)) {
+                    break;
+                }
+
+                //获取年龄
+                Double   age  =  getNumericCellValue(row.getCell(2));
+                if (SharedUtil.isEmpty(age)) {
+                    break;
+                }
+                //获取工种
+                String  workerTypeName  = getStringCellValue(row.getCell(3));
+                if (SharedUtil.isEmpty(workerTypeName)) {
+                    break;
+                }
+                //获取手机号
+                String  phoneNum  = getStringCellValue(row.getCell(4));
+                if (SharedUtil.isEmpty(phoneNum)) {
+                    break;
+                }
+
+                //签证到期日期
+                LocalDate  visaExpirationDate = getLocalDateCellValue(row.getCell(5));
+                if (SharedUtil.isEmpty(visaExpirationDate)) {
+                    break;
+                }
+
+                //入境时间
+                LocalDate  intoCountryDate = getLocalDateCellValue(row.getCell(6));
+
+                //住宿地
+                String  accommodation =  getStringCellValue(row.getCell(7));
+
+                //办理落地签时间
+                LocalDate  timeOfProcessingLandingVisa  = getLocalDateCellValue(row.getCell(8));
+
+                //进场时间
+                LocalDate  entryDate = getLocalDateCellValue(row.getCell(9));
+
+                //出场时间
+                LocalDate  exitDate = getLocalDateCellValue(row.getCell(10));
+                if (SharedUtil.isEmpty(intoCountryDate)) {
+                    break;
+                }
+
+                //出境时间
+                LocalDate  exitCountryDate = getLocalDateCellValue(row.getCell(11));
+
+                //判断工种
+                String  workTypeId = null;
+                boolean  workTypeExist= false;
+                for (RuUserWorkType workType: ruUserWorkTypes) {
+//                    String nameJson = workType.getName();
+//                    JSONObject entries = JSONUtil.parseObj(nameJson);
+//                    String zh_cn = entries.getStr("ZH_CN");
+                    if (workType.getName().equals(workerTypeName)){
+                        workTypeId = workType.getId();
+                        workTypeExist = true;
+                    }
+                }
+                if (!workTypeExist){//新增工种信息
+                    RuUserWorkType ruUserWorkType = RuUserWorkType.newData();
+                    ruUserWorkType.setCcPrjId(prjId);
+                    ruUserWorkType.setName(workerTypeName);
+                    ruUserWorkType.insertById();
+                    workTypeId = ruUserWorkType.getId();
+                }
+
+                //判断人员
+                String userInfoId =  null;
+                boolean  userInfoExist = false;
+                for(RuUserInfo ruUserInfo : ruUserInfos){
+                    if (ruUserInfo.getRuUserName().equals(personName)){
+                        userInfoId = ruUserInfo.getId();
+                        userInfoExist = true;
+                    }
+                }
+                if (!userInfoExist){//新增人员
+                    RuUserInfo ruUserInfo = RuUserInfo.newData();
+                    insertUserInfo(prjId,personName, age.intValue(), phoneNum, workTypeId, ruUserInfo);
+                    userInfoId = ruUserInfo.getId();
+                }
+
+                //判断住宿
+                String  accommodationId =  null;
+                boolean accommodationExist = false;
+                for (RuUserAccommodation userAccommodation:ruUserAccommodations){
+//                    String nameJson = userAccommodation.getName();
+//                    JSONObject entries = JSONUtil.parseObj(nameJson);
+//                    String zh_cn = entries.getStr("ZH_CN");
+                    if (userAccommodation.getName().equals(accommodation)){
+                        accommodationExist=true;
+                        accommodationId=userAccommodation.getId();
+                    }
+                }
+                if (!accommodationExist){
+                    RuUserAccommodation userAccommodation = RuUserAccommodation.newData();
+                    userAccommodation.setCcPrjId(prjId);
+                    userAccommodation.setName(accommodation);
+                    userAccommodation.insertById();
+                    accommodationId = userAccommodation.getId();
+                }
+
+                //查询是否存在相同数据
+                Where selectEntryInfo =  new Where();
+                selectEntryInfo.eq("RU_USER_NAME",personName);
+                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
+
+                RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
+                if (SharedUtil.isEmpty(userEntryInfo)){ //没有数据新增
+                    RuUserEntryInfo newUserEntryInfo = RuUserEntryInfo.newData();
+                    setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, newUserEntryInfo);
+                   //设置频次
+                    newUserEntryInfo.setRuEntryFrequency(getFrequency(personName, workTypeId)+1);
+                    newUserEntryInfo.insertById();
+                }else{//有数据，修改
+                    setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, userEntryInfo);
+                    userEntryInfo.updateById();
+                }
+            }
+        } catch (IOException e) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message, e);
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    //获取入场频次
+    private int getFrequency(String personName, String workTypeId) {
+        //查询入场情况
+        Where selectEntryInfoList =  new Where();
+        selectEntryInfoList.eq("RU_USER_NAME",personName);
+        selectEntryInfoList.eq("RU_USER_WORK_TYPE_ID",workTypeId);
+        List<RuUserEntryInfo> ruUserEntryInfos = RuUserEntryInfo.selectByWhere(selectEntryInfoList);
+        if (SharedUtil.isEmpty(ruUserEntryInfos)){
+            return 0;
+        }
+        return ruUserEntryInfos.size();
+    }
+
+    /**
+     * 新增人员信息
+     */
+    private void insertUserInfo(String prjId,String personName, Integer age, String phoneNum, String workTypeId, RuUserInfo ruUserInfo) {
+        ruUserInfo.setCcPrjId(prjId);
+        ruUserInfo.setName(personName);
+        ruUserInfo.setRuUserName(personName);
+        ruUserInfo.setRuUserPhoneNumber(phoneNum);
+        ruUserInfo.setRuUserAge(age);
+        ruUserInfo.setRuUserWorkTypeId(workTypeId);
+        ruUserInfo.insertById();
+    }
+
+    /***
+     * 设置入场信息字段值
+     * @param personName 人员姓名
+     * @param age 年龄
+     * @param phoneNum  手机号
+     * @param visaExpirationDate 签证到期时间
+     * @param intoCountryDate 入境时间
+     * @param accommodation 住宿地
+     * @param timeOfProcessingLandingVisa 办理落地签时间
+     * @param entryDate 入场时间
+     * @param exitDate 出场时间
+     * @param exitCountryDate 出境时间
+     * @param workTypeId 工种id
+     * @param userInfoId 用户信息id
+     * @param accommodationId 住宿地id
+     * @param userEntryInfo 用户入场信息对象
+     */
+    private void setUserEntryInfo(String  prjId,String personName, Double age, String phoneNum, LocalDate visaExpirationDate, LocalDate intoCountryDate, String accommodation, LocalDate timeOfProcessingLandingVisa, LocalDate entryDate, LocalDate exitDate, LocalDate exitCountryDate, String workTypeId, String userInfoId, String accommodationId, RuUserEntryInfo userEntryInfo) {
+        //关联id
+        userEntryInfo.setCcPrjId(prjId);
+        userEntryInfo.setRuUserWorkTypeId(workTypeId);
+        userEntryInfo.setRuUserInfoId(userInfoId);
+        userEntryInfo.setRuUserAccommodationId(accommodationId);
+        //基本信息
+        userEntryInfo.setRuUserAge(age.intValue());
+        userEntryInfo.setRuUserName(personName);
+        userEntryInfo.setRuUserPhoneNumber(phoneNum);
+
+        //进场信息
+        userEntryInfo.setRuUserVisaExpirationDate(visaExpirationDate);
+        userEntryInfo.setRuUserEnterACountryDate(intoCountryDate);
+        userEntryInfo.setRuUserAccommodation(accommodation);
+        userEntryInfo.setRuUserTimeOfProcessingLandingVisa(timeOfProcessingLandingVisa);
+        userEntryInfo.setRuUserEntryDate(entryDate);
+        userEntryInfo.setRuUserExitDate(exitDate);
+        userEntryInfo.setRuUserExitACountryDate(exitCountryDate);
+    }
+
+}
