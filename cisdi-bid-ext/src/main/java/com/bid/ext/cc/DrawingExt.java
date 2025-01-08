@@ -454,6 +454,140 @@ public class DrawingExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 俄罗斯-导入图纸计划
+     */
+    public void ruImportDrawingPlan() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
+        String filePath = flFile.getPhysicalLocation();
+//        filePath = "C:\\Users\\Administrator\\Downloads\\图纸与模型交付计划模板 (1).xlsx";
+
+        if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+            throw new BaseException(message);
+        }
+
+        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+            Workbook workbook = WorkbookFactory.create(file);
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+            // 遍历每一行
+            for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                // 检查行是否为空
+                // 3保险：
+                if (row == null) {
+                    break; // 如果为空，直接跳出。
+                }
+                Cell cell = row.getCell(1);
+                if (cell == null) {
+                    break;
+                }
+                String stringCellValue = getStringCellValue(cell);
+                if (SharedUtil.isEmpty(stringCellValue)) {
+                    break;
+                }
+
+                try {
+
+                    String drawingType = getStringCellValue(row.getCell(1));
+                    String drawingTypeId = null;
+                    switch (drawingType) {
+                        case "普通施工图":
+                            drawingTypeId = "common";
+                            break;
+                        case "安装图":
+                            drawingTypeId = "installation";
+                            break;
+                        case "施工设计文本":
+                            drawingTypeId = "constructionDesign";
+                            break;
+                        case "压力管道施工图":
+                            drawingTypeId = "pressurePipelineConstruction";
+                            break;
+                        case "转化图":
+                            drawingTypeId = "conversion";
+                            break;
+                    }
+
+                    // 实际发图日期
+                    LocalDate actDate = getLocalDateCellValue(row.getCell(5));
+
+                    String ccConstructionDrawingId = getStringCellValue(row.getCell(3));
+
+                    String ccSteelOwnerDrawingId = ccConstructionDrawingId;
+
+                    String lastLetter = "";
+                    if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
+                        for (int j = ccSteelOwnerDrawingId.length() - 1; j >= 0; j--) {
+                            char c = ccSteelOwnerDrawingId.charAt(j);
+                            if (Character.isLetter(c)) {
+                                lastLetter = String.valueOf(c);
+                                break;
+                            }
+                        }
+                    }
+                    CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(lastLetter);
+
+                    CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_STEEL_OWNER_DRAWING_ID, ccSteelOwnerDrawingId));
+                    if (SharedUtil.isEmpty(ccDrawingManagement)) {
+
+                        CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
+
+                        drawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
+                        drawingManagement.setCcDrawingTypeId(drawingTypeId); //文档类型
+                        drawingManagement.setName(getStringCellValue(row.getCell(2)));//图纸名称
+                        drawingManagement.setCcConstructionDrawingId(ccConstructionDrawingId);//施工图图
+                        drawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+                        if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
+                            drawingManagement.setCcPrjProfessionalCodeId(lastLetter);
+                        }
+                        drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(4)));
+                        drawingManagement.setActDate(actDate);
+                        drawingManagement.setIsThreeDimensional(false);
+                        drawingManagement.setThreeDPlanDate(null);
+                        drawingManagement.setCcDrawingStatusId("TODO");
+
+                        drawingManagement.insertById();
+
+                        // 初始化套图权限
+                        CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                        ccDrawingAuth.setCcDrawingManagementId(drawingManagement.getId());
+                        ccDrawingAuth.setIsView(true);
+                        ccDrawingAuth.setIsUpload(true);
+                        ccDrawingAuth.setAdUserId(userId);
+                        ccDrawingAuth.insertById();
+                    } else {
+                        ccDrawingManagement.setSeqNo(!SharedUtil.isEmpty(getNumericCellValue(row.getCell(0))) ? BigDecimal.valueOf(getNumericCellValue(row.getCell(0))) : ccDrawingManagement.getSeqNo());
+                        ccDrawingManagement.setCcDrawingTypeId(!SharedUtil.isEmpty(drawingTypeId) ? drawingTypeId : ccDrawingManagement.getCcDrawingTypeId());
+                        ccDrawingManagement.setName(!SharedUtil.isEmpty(getStringCellValue(row.getCell(2))) ? getStringCellValue(row.getCell(2)) : ccDrawingManagement.getName());
+                        ccDrawingManagement.setCcConstructionDrawingId(!SharedUtil.isEmpty(ccConstructionDrawingId) ? ccConstructionDrawingId : ccDrawingManagement.getCcConstructionDrawingId());
+                        ccDrawingManagement.setCcSteelOwnerDrawingId(!SharedUtil.isEmpty(ccSteelOwnerDrawingId) ? ccSteelOwnerDrawingId : ccDrawingManagement.getCcSteelOwnerDrawingId());
+                        ccDrawingManagement.setCcPrjProfessionalCodeId(!SharedUtil.isEmpty(ccPrjProfessionalCode) ? lastLetter : ccDrawingManagement.getCcPrjProfessionalCodeId());
+                        ccDrawingManagement.setPlanDate(!SharedUtil.isEmpty(getLocalDateCellValue(row.getCell(4))) ? getLocalDateCellValue(row.getCell(4)) : ccDrawingManagement.getPlanDate());
+                        ccDrawingManagement.setActDate(!SharedUtil.isEmpty(actDate) ? actDate : ccDrawingManagement.getActDate());
+                        ccDrawingManagement.updateById();
+                    }
+                } catch (Exception e) {
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelCellError", i + 1);
+                    throw new BaseException(message + e);
+                }
+            }
+
+        } catch (IOException e) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message);
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
 
     /**
      * 图纸权限

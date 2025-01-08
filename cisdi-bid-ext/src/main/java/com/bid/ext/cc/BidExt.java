@@ -174,7 +174,7 @@ public class BidExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-        filePath = "C:\\Users\\Administrator\\Documents\\合同台账第三次导入20241225.xlsx";
+//        filePath = "C:\\Users\\Administrator\\Documents\\合同台账第三次导入20241225.xlsx";
         if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
             throw new BaseException(message);
