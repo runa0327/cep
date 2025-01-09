@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "EN：资料目录", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
+ * 资料目录。
  */
 public class CcDocDir {
 
@@ -48,95 +48,99 @@ public class CcDocDir {
 
     public static class Cols {
         /**
-         * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+         * ID。
          */
         public static final String ID = "ID";
         /**
-         * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+         * 版本。
          */
         public static final String VER = "VER";
         /**
-         * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+         * 时间戳。
          */
         public static final String TS = "TS";
         /**
-         * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+         * 是否预设。
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+         * 创建日期时间。
          */
         public static final String CRT_DT = "CRT_DT";
         /**
-         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+         * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+         * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
         /**
-         * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+         * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+         * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+         * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+         * 代码。
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         * 备注。
          */
         public static final String REMARK = "REMARK";
         /**
-         * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+         * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
         /**
-         * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+         * 图标。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+         * 是否模板。
          */
         public static final String IS_TEMPLATE = "IS_TEMPLATE";
         /**
-         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-         */
-        public static final String CC_PRJ_ID = "CC_PRJ_ID";
-        /**
-         * {"EN": "资料文件夹类型", "ZH_CN": "资料文件夹类型", "ZH_TW": "资料文件夹类型"}。
+         * 资料文件夹类型。
          */
         public static final String CC_DOC_FOLDER_TYPE_ID = "CC_DOC_FOLDER_TYPE_ID";
         /**
-         * {"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+         * 拷贝自。
          */
         public static final String COPY_FROM_ID = "COPY_FROM_ID";
         /**
-         * {"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+         * 竣工资料目录模板类型。
          */
         public static final String CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = "CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID";
         /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         * 名称。
          */
         public static final String NAME = "NAME";
         /**
-         * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+         * 项目。
+         */
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        /**
+         * 序号。
          */
         public static final String SEQ_NO = "SEQ_NO";
         /**
-         * {"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+         * 资料目录状态。
          */
         public static final String CC_DOC_DIR_STATUS_ID = "CC_DOC_DIR_STATUS_ID";
         /**
-         * {"EN": "CC_DOC_DIR_PID", "ZH_CN": "资料父目录", "ZH_TW": "繁：资料父目录"}。
+         * 附件。
+         */
+        public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
+        /**
+         * 资料父目录。
          */
         public static final String CC_DOC_DIR_PID = "CC_DOC_DIR_PID";
     }
@@ -147,19 +151,19 @@ public class CcDocDir {
     // <editor-fold>
 
     /**
-     * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * ID。
      */
     private String id;
 
     /**
-     * 获取：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 获取：ID。
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 设置：ID。
      */
     public CcDocDir setId(String id) {
         if (this.id == null && id == null) {
@@ -183,19 +187,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 版本。
      */
     private Integer ver;
 
     /**
-     * 获取：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 获取：版本。
      */
     public Integer getVer() {
         return this.ver;
     }
 
     /**
-     * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 设置：版本。
      */
     public CcDocDir setVer(Integer ver) {
         if (this.ver == null && ver == null) {
@@ -219,19 +223,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 时间戳。
      */
     private LocalDateTime ts;
 
     /**
-     * 获取：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 获取：时间戳。
      */
     public LocalDateTime getTs() {
         return this.ts;
     }
 
     /**
-     * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 设置：时间戳。
      */
     public CcDocDir setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
@@ -255,19 +259,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 是否预设。
      */
     private Boolean isPreset;
 
     /**
-     * 获取：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 获取：是否预设。
      */
     public Boolean getIsPreset() {
         return this.isPreset;
     }
 
     /**
-     * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 设置：是否预设。
      */
     public CcDocDir setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
@@ -291,19 +295,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 创建日期时间。
      */
     private LocalDateTime crtDt;
 
     /**
-     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 获取：创建日期时间。
      */
     public LocalDateTime getCrtDt() {
         return this.crtDt;
     }
 
     /**
-     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 设置：创建日期时间。
      */
     public CcDocDir setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
@@ -327,19 +331,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 创建用户。
      */
     private String crtUserId;
 
     /**
-     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 获取：创建用户。
      */
     public String getCrtUserId() {
         return this.crtUserId;
     }
 
     /**
-     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 设置：创建用户。
      */
     public CcDocDir setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
@@ -363,19 +367,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
 
     /**
-     * 获取：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 获取：最后修改日期时间。
      */
     public LocalDateTime getLastModiDt() {
         return this.lastModiDt;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 设置：最后修改日期时间。
      */
     public CcDocDir setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
@@ -399,19 +403,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 最后修改用户。
      */
     private String lastModiUserId;
 
     /**
-     * 获取：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 获取：最后修改用户。
      */
     public String getLastModiUserId() {
         return this.lastModiUserId;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 设置：最后修改用户。
      */
     public CcDocDir setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
@@ -435,19 +439,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 记录状态。
      */
     private String status;
 
     /**
-     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 获取：记录状态。
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 设置：记录状态。
      */
     public CcDocDir setStatus(String status) {
         if (this.status == null && status == null) {
@@ -471,19 +475,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 锁定流程实例。
      */
     private String lkWfInstId;
 
     /**
-     * 获取：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 获取：锁定流程实例。
      */
     public String getLkWfInstId() {
         return this.lkWfInstId;
     }
 
     /**
-     * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 设置：锁定流程实例。
      */
     public CcDocDir setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
@@ -507,19 +511,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 代码。
      */
     private String code;
 
     /**
-     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 获取：代码。
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 设置：代码。
      */
     public CcDocDir setCode(String code) {
         if (this.code == null && code == null) {
@@ -543,19 +547,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 备注。
      */
     private String remark;
 
     /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 获取：备注。
      */
     public String getRemark() {
         return this.remark;
     }
 
     /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 设置：备注。
      */
     public CcDocDir setRemark(String remark) {
         if (this.remark == null && remark == null) {
@@ -579,19 +583,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 快捷码。
      */
     private String fastCode;
 
     /**
-     * 获取：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 获取：快捷码。
      */
     public String getFastCode() {
         return this.fastCode;
     }
 
     /**
-     * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 设置：快捷码。
      */
     public CcDocDir setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
@@ -615,19 +619,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 图标。
      */
     private String iconFileGroupId;
 
     /**
-     * 获取：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 获取：图标。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 设置：图标。
      */
     public CcDocDir setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
@@ -651,19 +655,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+     * 是否模板。
      */
     private Boolean isTemplate;
 
     /**
-     * 获取：{"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+     * 获取：是否模板。
      */
     public Boolean getIsTemplate() {
         return this.isTemplate;
     }
 
     /**
-     * 设置：{"EN": "IS_TEMPLATE", "ZH_CN": "是否模板", "ZH_TW": "繁：是否模板"}。
+     * 设置：是否模板。
      */
     public CcDocDir setIsTemplate(Boolean isTemplate) {
         if (this.isTemplate == null && isTemplate == null) {
@@ -687,55 +691,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    private String ccPrjId;
-
-    /**
-     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    public String getCcPrjId() {
-        return this.ccPrjId;
-    }
-
-    /**
-     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    public CcDocDir setCcPrjId(String ccPrjId) {
-        if (this.ccPrjId == null && ccPrjId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjId != null && ccPrjId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
-                this.ccPrjId = ccPrjId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjId = ccPrjId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "资料文件夹类型", "ZH_CN": "资料文件夹类型", "ZH_TW": "资料文件夹类型"}。
+     * 资料文件夹类型。
      */
     private String ccDocFolderTypeId;
 
     /**
-     * 获取：{"EN": "资料文件夹类型", "ZH_CN": "资料文件夹类型", "ZH_TW": "资料文件夹类型"}。
+     * 获取：资料文件夹类型。
      */
     public String getCcDocFolderTypeId() {
         return this.ccDocFolderTypeId;
     }
 
     /**
-     * 设置：{"EN": "资料文件夹类型", "ZH_CN": "资料文件夹类型", "ZH_TW": "资料文件夹类型"}。
+     * 设置：资料文件夹类型。
      */
     public CcDocDir setCcDocFolderTypeId(String ccDocFolderTypeId) {
         if (this.ccDocFolderTypeId == null && ccDocFolderTypeId == null) {
@@ -759,19 +727,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+     * 拷贝自。
      */
     private String copyFromId;
 
     /**
-     * 获取：{"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+     * 获取：拷贝自。
      */
     public String getCopyFromId() {
         return this.copyFromId;
     }
 
     /**
-     * 设置：{"EN": "拷贝", "ZH_CN": "拷贝自", "ZH_TW": "拷贝"}。
+     * 设置：拷贝自。
      */
     public CcDocDir setCopyFromId(String copyFromId) {
         if (this.copyFromId == null && copyFromId == null) {
@@ -795,19 +763,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+     * 竣工资料目录模板类型。
      */
     private String ccDocDirAcceptanceTemplateTypeId;
 
     /**
-     * 获取：{"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+     * 获取：竣工资料目录模板类型。
      */
     public String getCcDocDirAcceptanceTemplateTypeId() {
         return this.ccDocDirAcceptanceTemplateTypeId;
     }
 
     /**
-     * 设置：{"EN": "资料目录", "ZH_CN": "竣工资料目录模板类型", "ZH_TW": "资料目录"}。
+     * 设置：竣工资料目录模板类型。
      */
     public CcDocDir setCcDocDirAcceptanceTemplateTypeId(String ccDocDirAcceptanceTemplateTypeId) {
         if (this.ccDocDirAcceptanceTemplateTypeId == null && ccDocDirAcceptanceTemplateTypeId == null) {
@@ -831,19 +799,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 名称。
      */
     private String name;
 
     /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 获取：名称。
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 设置：名称。
      */
     public CcDocDir setName(String name) {
         if (this.name == null && name == null) {
@@ -867,19 +835,55 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     * 项目。
+     */
+    private String ccPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getCcPrjId() {
+        return this.ccPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public CcDocDir setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjId != null && ccPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 序号。
      */
     private BigDecimal seqNo;
 
     /**
-     * 获取：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     * 获取：序号。
      */
     public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
-     * 设置：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     * 设置：序号。
      */
     public CcDocDir setSeqNo(BigDecimal seqNo) {
         if (this.seqNo == null && seqNo == null) {
@@ -903,19 +907,19 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+     * 资料目录状态。
      */
     private String ccDocDirStatusId;
 
     /**
-     * 获取：{"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+     * 获取：资料目录状态。
      */
     public String getCcDocDirStatusId() {
         return this.ccDocDirStatusId;
     }
 
     /**
-     * 设置：{"EN": "资料目录状态", "ZH_CN": "资料目录状态", "ZH_TW": "资料目录状态"}。
+     * 设置：资料目录状态。
      */
     public CcDocDir setCcDocDirStatusId(String ccDocDirStatusId) {
         if (this.ccDocDirStatusId == null && ccDocDirStatusId == null) {
@@ -939,19 +943,55 @@ public class CcDocDir {
     }
 
     /**
-     * {"EN": "CC_DOC_DIR_PID", "ZH_CN": "资料父目录", "ZH_TW": "繁：资料父目录"}。
+     * 附件。
+     */
+    private String ccAttachment;
+
+    /**
+     * 获取：附件。
+     */
+    public String getCcAttachment() {
+        return this.ccAttachment;
+    }
+
+    /**
+     * 设置：附件。
+     */
+    public CcDocDir setCcAttachment(String ccAttachment) {
+        if (this.ccAttachment == null && ccAttachment == null) {
+            // 均为null，不做处理。
+        } else if (this.ccAttachment != null && ccAttachment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccAttachment.compareTo(ccAttachment) != 0) {
+                this.ccAttachment = ccAttachment;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                    this.toUpdateCols.add("CC_ATTACHMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccAttachment = ccAttachment;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                this.toUpdateCols.add("CC_ATTACHMENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 资料父目录。
      */
     private String ccDocDirPid;
 
     /**
-     * 获取：{"EN": "CC_DOC_DIR_PID", "ZH_CN": "资料父目录", "ZH_TW": "繁：资料父目录"}。
+     * 获取：资料父目录。
      */
     public String getCcDocDirPid() {
         return this.ccDocDirPid;
     }
 
     /**
-     * 设置：{"EN": "CC_DOC_DIR_PID", "ZH_CN": "资料父目录", "ZH_TW": "繁：资料父目录"}。
+     * 设置：资料父目录。
      */
     public CcDocDir setCcDocDirPid(String ccDocDirPid) {
         if (this.ccDocDirPid == null && ccDocDirPid == null) {

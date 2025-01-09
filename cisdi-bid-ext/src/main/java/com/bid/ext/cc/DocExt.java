@@ -703,9 +703,13 @@ public class DocExt {
             List<Map<String, Object>> insertedNodes = TemplateUtils.applyTemplate(templateRootId, "CC_DOC_DIR", "ID", "CC_DOC_DIR_PID", true);
             // 对插入后的节点进行统一处理
             for (Map<String, Object> node : insertedNodes) {
-                String id = node.get("ID").toString();
-                String updateSql = "UPDATE cc_doc_dir SET CC_PRJ_ID = ?, CC_DOC_FOLDER_TYPE_ID = ?, CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ?, CC_DOC_DIR_STATUS_ID = 'unlock' WHERE id = ?";
-                myJdbcTemplate.update(updateSql, ccPrjId, ccDocFolderTypeId, ccDocDirAcceptanceTemplateType, id);
+//                String id = node.get("ID").toString();
+                String id = JdbcMapUtil.getString(node, "ID");
+                String copyFromId = JdbcMapUtil.getString(node, "COPY_FROM_ID");
+                CcDocDir ccDocDir = CcDocDir.selectById(copyFromId);
+                String ccAttachment = ccDocDir.getCcAttachment();
+                String updateSql = "UPDATE cc_doc_dir SET CC_PRJ_ID = ?, CC_DOC_FOLDER_TYPE_ID = ?, CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ?, CC_DOC_DIR_STATUS_ID = 'unlock', CC_ATTACHMENT = ? WHERE id = ?";
+                myJdbcTemplate.update(updateSql, ccPrjId, ccDocFolderTypeId, ccDocDirAcceptanceTemplateType, ccAttachment, id);
             }
         }
         invokeActResult.reFetchData = true;
