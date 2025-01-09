@@ -27,6 +27,7 @@ public class DocToExt {
         for (String ccDocFileId : ccDocFileList) {
             CcDocFile ccDocFile = CcDocFile.selectById(ccDocFileId);
             String ccAttachment = ccDocFile.getCcAttachment();
+            String ccDocFileTypeId = ccDocFile.getCcDocFileTypeId();
             FlFile flFile = FlFile.selectById(ccAttachment);
             String flFileName = flFile.getName();
             CcDocFile ccDocFileAcceptance = CcDocFile.newData();
@@ -34,7 +35,7 @@ public class DocToExt {
             ccDocFileAcceptance.setCcPrjId(ccPrjId);
             ccDocFileAcceptance.setCcDocDirId(ccDocDirId);
             ccDocFileAcceptance.setCcDocDate(now);
-            ccDocFileAcceptance.setCcDocFileTypeId("ACCEPTANCE");
+            ccDocFileAcceptance.setCcDocFileTypeId(ccDocFileTypeId);
             ccDocFileAcceptance.setCcAttachment(ccAttachment);
             ccDocFileAcceptance.setCcDocFileFrom(5);
             ccDocFileAcceptance.insertById();

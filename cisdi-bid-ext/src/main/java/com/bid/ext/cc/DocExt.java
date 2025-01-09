@@ -775,9 +775,13 @@ public class DocExt {
 
             ccDocFile.setIsDefault(false);
             ccDocFile.setIsFavorites(false);
-
             ccDocFile.setCcDocFileFrom(4);
-            ccDocFile.setCcDocFileTypeId("ACCEPTANCE");
+            String sql = "SELECT IFNULL((SELECT ID FROM CC_DOC_FILE_TYPE WHERE FILE_EXTENSION like CONCAT('%', (SELECT EXT FROM FL_FILE WHERE ID = ?), '%')), 'OTHER') ID";
+            Map<String, Object> map = ExtJarHelper.getMyJdbcTemplate().queryForMap(sql, attachmentId);
+
+            String fileType = JdbcMapUtil.getString(map, "ID");
+
+            ccDocFile.setCcDocFileTypeId(fileType);
             ccDocFile.setCcDocDirId(ccDocDirId);
             ccDocFile.setCcAttachment(attachmentId);
             ccDocFile.insertById();
