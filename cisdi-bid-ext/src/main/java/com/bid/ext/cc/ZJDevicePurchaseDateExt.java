@@ -36,9 +36,9 @@ public class ZJDevicePurchaseDateExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
         //获取上传的excel文件
-        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-        String filePath = flFile.getPhysicalLocation();
-//        String filePath = "C:\\Users\\hejia\\Downloads\\设备采购报表_20240928.xlsx";
+//        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
+//        String filePath = flFile.getPhysicalLocation();
+         String filePath = "C:\\Users\\hejia\\Downloads\\设备采购报表_20250108.xlsx";
 
         try {
             FileInputStream file = new FileInputStream(new File(filePath));
