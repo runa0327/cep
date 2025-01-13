@@ -3,6 +3,7 @@ package com.bid.ext.cc;
 import com.bid.ext.model.CcDocDir;
 import com.bid.ext.model.CcDocDirAuth;
 import com.bid.ext.model.CcPrjMember;
+import com.bid.ext.utils.TemplateUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
@@ -40,6 +41,44 @@ public class DocDirExt {
     }
 
     /**
+     * 资料目录套用模板
+     */
+    public void docDirToTemplate() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String ccPrjId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_ID");
+        String ccDocFolderTypeId = JdbcMapUtil.getString(varMap, "P_CC_DOC_FOLDER_TYPE_ID");
+        String pCcDocDirAcceptanceTemplateTypeIds = JdbcMapUtil.getString(varMap, "P_CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_IDS");
+        if (!SharedUtil.isEmpty(pCcDocDirAcceptanceTemplateTypeIds)) {
+            List<String> pCcDocDirAcceptanceTemplateTypeIdList = Arrays.asList(pCcDocDirAcceptanceTemplateTypeIds.split(","));
+            for (String pCcDocDirAcceptanceTemplateTypeId : pCcDocDirAcceptanceTemplateTypeIdList) {
+                //查询该类型下所有模板的根节点
+                String sql = "select t.id from cc_doc_dir t where t.CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? and t.CC_DOC_DIR_PID is null and t.CC_DOC_FOLDER_TYPE_ID = 'acceptance' and t.IS_TEMPLATE = 1";
+                List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, pCcDocDirAcceptanceTemplateTypeId);
+                for (Map<String, Object> map : queryForList) {
+                    String templateRootId = JdbcMapUtil.getString(map, "ID");
+                    //套用模板
+
+                    List<Map<String, Object>> insertedNodes = TemplateUtils.applyTemplate(templateRootId, "CC_DOC_DIR", "ID", "CC_DOC_DIR_PID", true);
+                    // 对插入后的节点进行统一处理
+                    for (Map<String, Object> node : insertedNodes) {
+//                String id = node.get("ID").toString();
+                        String id = JdbcMapUtil.getString(node, "ID");
+                        String copyFromId = JdbcMapUtil.getString(node, "COPY_FROM_ID");
+                        CcDocDir ccDocDir = CcDocDir.selectById(copyFromId);
+                        String ccAttachment = ccDocDir.getCcAttachment();
+                        String updateSql = "UPDATE cc_doc_dir SET CC_PRJ_ID = ?, CC_DOC_FOLDER_TYPE_ID = ?, CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ?, CC_DOC_DIR_STATUS_ID = 'unlock', CC_ATTACHMENT = ? WHERE id = ?";
+                        myJdbcTemplate.update(updateSql, ccPrjId, ccDocFolderTypeId, pCcDocDirAcceptanceTemplateTypeId, ccAttachment, id);
+                    }
+                }
+            }
+        }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
      * 判断目录是否为套用过模板的目录，用于更新后
      */
     public void isCopyFromDir() throws BaseException {
@@ -61,17 +100,22 @@ public class DocDirExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String ccPrjId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_ID");
-        String pCcDocFolderTypeId = JdbcMapUtil.getString(varMap, "P_CC_DOC_FOLDER_TYPE_ID");
-        String sql = "select * from cc_doc_dir t where t.CC_DOC_FOLDER_TYPE_ID = ? and t.CC_PRJ_ID = ?  and t.COPY_FROM_ID is null and t.CC_DOC_DIR_PID in (SELECT ID from cc_doc_dir where COPY_FROM_ID is not null and CC_DOC_FOLDER_TYPE_ID = ? and CC_PRJ_ID = ?)";
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, pCcDocFolderTypeId, ccPrjId, pCcDocFolderTypeId, ccPrjId);
-        for (Map<String, Object> map : list) {
-            String ccDocDirId = JdbcMapUtil.getString(map, "ID");
-            CcDocDir ccDocDir = CcDocDir.selectById(ccDocDirId);
-            ccDocDir.setCcDocDirPid(null);
-            ccDocDir.updateById();
+        String pCcDocDirAcceptanceTemplateTypeIds = JdbcMapUtil.getString(varMap, "P_CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_IDS");
+        if (!SharedUtil.isEmpty(pCcDocDirAcceptanceTemplateTypeIds)){
+            List<String> pCcDocDirAcceptanceTemplateTypeIdList = Arrays.asList(pCcDocDirAcceptanceTemplateTypeIds.split(","));
+            for (String pCcDocDirAcceptanceTemplateTypeId : pCcDocDirAcceptanceTemplateTypeIdList){
+                String sql = "select * from cc_doc_dir t where t.CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? and t.CC_PRJ_ID = ?  and t.COPY_FROM_ID is null and t.CC_DOC_DIR_PID in (SELECT ID from cc_doc_dir where COPY_FROM_ID is not null and CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? and CC_PRJ_ID = ?)";
+                List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, pCcDocDirAcceptanceTemplateTypeId, ccPrjId, pCcDocDirAcceptanceTemplateTypeId, ccPrjId);
+                for (Map<String, Object> map : list) {
+                    String ccDocDirId = JdbcMapUtil.getString(map, "ID");
+                    CcDocDir ccDocDir = CcDocDir.selectById(ccDocDirId);
+                    ccDocDir.setCcDocDirPid(null);
+                    ccDocDir.updateById();
+                }
+                String delSql = "delete from cc_doc_dir where CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = ? and CC_PRJ_ID = ? and COPY_FROM_ID is not null";
+                myJdbcTemplate.update(delSql, pCcDocDirAcceptanceTemplateTypeId, ccPrjId);
+            }
         }
-        String delSql = "delete from cc_doc_dir where CC_DOC_FOLDER_TYPE_ID = ? and CC_PRJ_ID = ? and COPY_FROM_ID is not null";
-        myJdbcTemplate.update(delSql, pCcDocFolderTypeId, ccPrjId);
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
