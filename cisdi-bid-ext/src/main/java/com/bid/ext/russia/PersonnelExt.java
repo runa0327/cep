@@ -79,7 +79,7 @@ public class PersonnelExt {
         String prjId = varMap.get("PRJ_ID").toString();
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板.xlsx";
+//        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板.xlsx";
 
         if (!"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
@@ -137,9 +137,9 @@ public class PersonnelExt {
 
                 //签证到期日期
                 LocalDate  visaExpirationDate = getLocalDateCellValue(row.getCell(5));
-                if (SharedUtil.isEmpty(visaExpirationDate)) {
-                    break;
-                }
+//                if (SharedUtil.isEmpty(visaExpirationDate)) {
+//                    break;
+//                }
 
                 //入境时间
                 LocalDate  intoCountryDate = getLocalDateCellValue(row.getCell(6));
@@ -155,9 +155,9 @@ public class PersonnelExt {
 
                 //出场时间
                 LocalDate  exitDate = getLocalDateCellValue(row.getCell(10));
-                if (SharedUtil.isEmpty(intoCountryDate)) {
-                    break;
-                }
+//                if (SharedUtil.isEmpty(intoCountryDate)) {
+//                    break;
+//                }
 
                 //出境时间
                 LocalDate  exitCountryDate = getLocalDateCellValue(row.getCell(11));
