@@ -224,6 +224,7 @@ public class PersonnelExt {
 //                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
 
                 selectEntryInfo.eq("RU_USER_PHONE_NUMBER",phoneNum);
+                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
 
                 RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
                 if (SharedUtil.isEmpty(userEntryInfo)){ //没有数据新增
