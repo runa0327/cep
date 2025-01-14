@@ -33,7 +33,7 @@ public class PersonnelExt {
 
 //            int frequency = getFrequency(userEntryInfo.getRuUserName(), userEntryInfo.getRuUserWorkTypeId());
             int frequency = getFrequency(userEntryInfo.getRuUserPhoneNumber());
-            userEntryInfo.setRuEntryFrequency(frequency);
+            userEntryInfo.setRuEntryFrequency(frequency+1);
 
             userEntryInfo.updateById();//更新频次
 
