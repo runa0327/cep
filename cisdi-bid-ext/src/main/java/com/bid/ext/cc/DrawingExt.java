@@ -465,7 +465,7 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-        filePath = "C:\\Users\\Administrator\\Documents\\图纸计划导入模板.xlsx";
+//        filePath = "C:\\Users\\Administrator\\Documents\\图纸计划导入模板.xlsx";
 
         if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
