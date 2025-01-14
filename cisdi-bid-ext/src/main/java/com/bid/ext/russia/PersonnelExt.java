@@ -231,7 +231,7 @@ public class PersonnelExt {
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, newUserEntryInfo);
                    //设置频次
 //                    newUserEntryInfo.setRuEntryFrequency(getFrequency(personName, workTypeId)+1);
-                    newUserEntryInfo.setRuEntryFrequency(getFrequency(phoneNum));
+                    newUserEntryInfo.setRuEntryFrequency(getFrequency(phoneNum)+1);
                     newUserEntryInfo.insertById();
                 }else{//有数据，修改
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, userEntryInfo);
