@@ -465,7 +465,7 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-//        filePath = "C:\\Users\\Administrator\\Downloads\\图纸与模型交付计划模板 (1).xlsx";
+        filePath = "C:\\Users\\Administrator\\Documents\\图纸计划导入模板.xlsx";
 
         if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
@@ -522,16 +522,17 @@ public class DrawingExt {
 
                     String ccSteelOwnerDrawingId = ccConstructionDrawingId;
 
-                    String lastLetter = "";
-                    if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
-                        for (int j = ccSteelOwnerDrawingId.length() - 1; j >= 0; j--) {
-                            char c = ccSteelOwnerDrawingId.charAt(j);
-                            if (Character.isLetter(c)) {
-                                lastLetter = String.valueOf(c);
-                                break;
-                            }
-                        }
-                    }
+                    String lastLetter = "N";
+//                    if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
+//                        for (int j = ccSteelOwnerDrawingId.length() - 1; j >= 0; j--) {
+//                            char c = ccSteelOwnerDrawingId.charAt(j);
+//                            if (Character.isLetter(c)) {
+//                                lastLetter = String.valueOf(c);
+//                                break;
+//                            }
+//                        }
+//                    }
+
                     CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(lastLetter);
 
                     CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_STEEL_OWNER_DRAWING_ID, ccSteelOwnerDrawingId));
