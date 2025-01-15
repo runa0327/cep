@@ -121,6 +121,7 @@ public class StructNodeExt {
                     "SELECT n.* FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
                     "SELECT * FROM Subtree";
             nodes = myJdbcTemplate.queryForList(sql, pWbsTemplateId);
+        }
 
             // 设置直接子节点的父ID为null
             if (!nodes.isEmpty()) {
@@ -131,7 +132,7 @@ public class StructNodeExt {
                     }
                 }
             }
-        }
+
 
         for (Map<String, Object> node : nodes) {
             node.put("COPY_FROM_PRJ_STRUCT_NODE_ID", node.get("ID"));
