@@ -31,8 +31,9 @@ public class PersonnelExt {
             String csCommId = entityRecord.csCommId;
             RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectById(csCommId);
 
-            int frequency = getFrequency(userEntryInfo.getRuUserName(), userEntryInfo.getRuUserWorkTypeId());
-            userEntryInfo.setRuEntryFrequency(frequency);
+//            int frequency = getFrequency(userEntryInfo.getRuUserName(), userEntryInfo.getRuUserWorkTypeId());
+            int frequency = getFrequency(userEntryInfo.getRuUserPhoneNumber());
+            userEntryInfo.setRuEntryFrequency(frequency+1);
 
             userEntryInfo.updateById();//更新频次
 
@@ -58,7 +59,7 @@ public class PersonnelExt {
             selectAccommodation.eq("`NAME`",userEntryInfo.getRuUserAccommodation());
             RuUserAccommodation userAccommodation = RuUserAccommodation.selectOneByWhere(selectAccommodation);
 
-            if(SharedUtil.isEmpty(userAccommodation)){
+            if(SharedUtil.isEmpty(userAccommodation)&& !SharedUtil.isEmpty(userEntryInfo.getRuUserAccommodation())){
                 RuUserAccommodation userAccommodation1 = RuUserAccommodation.newData();
                 userAccommodation1.setCcPrjId(userEntryInfo.getCcPrjId());
                 userAccommodation1.setName(userEntryInfo.getRuUserAccommodation());
@@ -174,7 +175,7 @@ public class PersonnelExt {
                         workTypeExist = true;
                     }
                 }
-                if (!workTypeExist){//新增工种信息
+                if (!workTypeExist && !SharedUtil.isEmpty(workerTypeName)){//新增工种信息
                     RuUserWorkType ruUserWorkType = RuUserWorkType.newData();
                     ruUserWorkType.setCcPrjId(prjId);
                     ruUserWorkType.setName(workerTypeName);
@@ -191,7 +192,7 @@ public class PersonnelExt {
                         userInfoExist = true;
                     }
                 }
-                if (!userInfoExist){//新增人员
+                if (!userInfoExist && !SharedUtil.isEmpty(personName)){//新增人员
                     RuUserInfo ruUserInfo = RuUserInfo.newData();
                     insertUserInfo(prjId,personName, age.intValue(), phoneNum, workTypeId, ruUserInfo);
                     userInfoId = ruUserInfo.getId();
@@ -209,7 +210,7 @@ public class PersonnelExt {
                         accommodationId=userAccommodation.getId();
                     }
                 }
-                if (!accommodationExist){
+                if (!accommodationExist && !SharedUtil.isEmpty(accommodation)){
                     RuUserAccommodation userAccommodation = RuUserAccommodation.newData();
                     userAccommodation.setCcPrjId(prjId);
                     userAccommodation.setName(accommodation);
@@ -219,15 +220,18 @@ public class PersonnelExt {
 
                 //查询是否存在相同数据
                 Where selectEntryInfo =  new Where();
-                selectEntryInfo.eq("RU_USER_NAME",personName);
-                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
+//                selectEntryInfo.eq("RU_USER_NAME",personName);
+//                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
+
+                selectEntryInfo.eq("RU_USER_PHONE_NUMBER",phoneNum);
 
                 RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
                 if (SharedUtil.isEmpty(userEntryInfo)){ //没有数据新增
                     RuUserEntryInfo newUserEntryInfo = RuUserEntryInfo.newData();
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, newUserEntryInfo);
                    //设置频次
-                    newUserEntryInfo.setRuEntryFrequency(getFrequency(personName, workTypeId)+1);
+//                    newUserEntryInfo.setRuEntryFrequency(getFrequency(personName, workTypeId)+1);
+                    newUserEntryInfo.setRuEntryFrequency(getFrequency(phoneNum)+1);
                     newUserEntryInfo.insertById();
                 }else{//有数据，修改
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, userEntryInfo);
@@ -245,11 +249,12 @@ public class PersonnelExt {
     }
 
     //获取入场频次
-    private int getFrequency(String personName, String workTypeId) {
+    private int getFrequency(String phoneNum) {
         //查询入场情况
         Where selectEntryInfoList =  new Where();
-        selectEntryInfoList.eq("RU_USER_NAME",personName);
-        selectEntryInfoList.eq("RU_USER_WORK_TYPE_ID",workTypeId);
+        selectEntryInfoList.eq("RU_USER_PHONE_NUMBER",phoneNum);
+//        selectEntryInfoList.eq("RU_USER_NAME",personName);
+//        selectEntryInfoList.eq("RU_USER_WORK_TYPE_ID",workTypeId);
         List<RuUserEntryInfo> ruUserEntryInfos = RuUserEntryInfo.selectByWhere(selectEntryInfoList);
         if (SharedUtil.isEmpty(ruUserEntryInfos)){
             return 0;
