@@ -7,21 +7,20 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 项目结构节点指引。
+ * 项目结构节点历史版本。
  */
-public class CcPrjStructNodeGuide {
+public class CcPrjStructNodeVersion {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcPrjStructNodeGuide> modelHelper = new ModelHelper<>("CC_PRJ_STRUCT_NODE_GUIDE", new CcPrjStructNodeGuide());
+    private static final ModelHelper<CcPrjStructNodeVersion> modelHelper = new ModelHelper<>("CC_PRJ_STRUCT_NODE_VERSION", new CcPrjStructNodeVersion());
 
     /**
      * 待更新的列。
@@ -38,7 +37,7 @@ public class CcPrjStructNodeGuide {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_PRJ_STRUCT_NODE_GUIDE";
+    public static final String ENT_CODE = "CC_PRJ_STRUCT_NODE_VERSION";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -64,14 +63,6 @@ public class CcPrjStructNodeGuide {
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * 创建日期时间。
-         */
-        public static final String CRT_DT = "CRT_DT";
-        /**
-         * 创建用户。
-         */
-        public static final String CRT_USER_ID = "CRT_USER_ID";
-        /**
          * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
@@ -88,6 +79,14 @@ public class CcPrjStructNodeGuide {
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
+         * 代码。
+         */
+        public static final String CODE = "CODE";
+        /**
+         * 备注。
+         */
+        public static final String REMARK = "REMARK";
+        /**
          * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
@@ -96,33 +95,25 @@ public class CcPrjStructNodeGuide {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 项目。
-         */
-        public static final String CC_PRJ_ID = "CC_PRJ_ID";
-        /**
-         * 项目结构节点。
-         */
-        public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
-        /**
-         * 序号。
-         */
-        public static final String SEQ_NO = "SEQ_NO";
-        /**
-         * 代码。
-         */
-        public static final String CODE = "CODE";
-        /**
          * 名称。
          */
         public static final String NAME = "NAME";
         /**
-         * 备注。
+         * 创建用户。
          */
-        public static final String REMARK = "REMARK";
+        public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * 附件。
+         * 创建日期时间。
          */
-        public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
+        public static final String CRT_DT = "CRT_DT";
+        /**
+         * 项目。
+         */
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        /**
+         * 计划类型。
+         */
+        public static final String CC_PRJ_WBS_TYPE_ID = "CC_PRJ_WBS_TYPE_ID";
     }
 
     // </editor-fold>
@@ -145,7 +136,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：ID。
      */
-    public CcPrjStructNodeGuide setId(String id) {
+    public CcPrjStructNodeVersion setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -181,7 +172,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：版本。
      */
-    public CcPrjStructNodeGuide setVer(Integer ver) {
+    public CcPrjStructNodeVersion setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -217,7 +208,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：时间戳。
      */
-    public CcPrjStructNodeGuide setTs(LocalDateTime ts) {
+    public CcPrjStructNodeVersion setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -253,7 +244,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：是否预设。
      */
-    public CcPrjStructNodeGuide setIsPreset(Boolean isPreset) {
+    public CcPrjStructNodeVersion setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -275,78 +266,6 @@ public class CcPrjStructNodeGuide {
     }
 
     /**
-     * 创建日期时间。
-     */
-    private LocalDateTime crtDt;
-
-    /**
-     * 获取：创建日期时间。
-     */
-    public LocalDateTime getCrtDt() {
-        return this.crtDt;
-    }
-
-    /**
-     * 设置：创建日期时间。
-     */
-    public CcPrjStructNodeGuide setCrtDt(LocalDateTime crtDt) {
-        if (this.crtDt == null && crtDt == null) {
-            // 均为null，不做处理。
-        } else if (this.crtDt != null && crtDt != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.crtDt.compareTo(crtDt) != 0) {
-                this.crtDt = crtDt;
-                if (!this.toUpdateCols.contains("CRT_DT")) {
-                    this.toUpdateCols.add("CRT_DT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.crtDt = crtDt;
-            if (!this.toUpdateCols.contains("CRT_DT")) {
-                this.toUpdateCols.add("CRT_DT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 创建用户。
-     */
-    private String crtUserId;
-
-    /**
-     * 获取：创建用户。
-     */
-    public String getCrtUserId() {
-        return this.crtUserId;
-    }
-
-    /**
-     * 设置：创建用户。
-     */
-    public CcPrjStructNodeGuide setCrtUserId(String crtUserId) {
-        if (this.crtUserId == null && crtUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.crtUserId != null && crtUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.crtUserId.compareTo(crtUserId) != 0) {
-                this.crtUserId = crtUserId;
-                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                    this.toUpdateCols.add("CRT_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.crtUserId = crtUserId;
-            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                this.toUpdateCols.add("CRT_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
@@ -361,7 +280,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：最后修改日期时间。
      */
-    public CcPrjStructNodeGuide setLastModiDt(LocalDateTime lastModiDt) {
+    public CcPrjStructNodeVersion setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -397,7 +316,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：最后修改用户。
      */
-    public CcPrjStructNodeGuide setLastModiUserId(String lastModiUserId) {
+    public CcPrjStructNodeVersion setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -433,7 +352,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：记录状态。
      */
-    public CcPrjStructNodeGuide setStatus(String status) {
+    public CcPrjStructNodeVersion setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -469,7 +388,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：锁定流程实例。
      */
-    public CcPrjStructNodeGuide setLkWfInstId(String lkWfInstId) {
+    public CcPrjStructNodeVersion setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -491,6 +410,78 @@ public class CcPrjStructNodeGuide {
     }
 
     /**
+     * 代码。
+     */
+    private String code;
+
+    /**
+     * 获取：代码。
+     */
+    public String getCode() {
+        return this.code;
+    }
+
+    /**
+     * 设置：代码。
+     */
+    public CcPrjStructNodeVersion setCode(String code) {
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 备注。
+     */
+    private String remark;
+
+    /**
+     * 获取：备注。
+     */
+    public String getRemark() {
+        return this.remark;
+    }
+
+    /**
+     * 设置：备注。
+     */
+    public CcPrjStructNodeVersion setRemark(String remark) {
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 快捷码。
      */
     private String fastCode;
@@ -505,7 +496,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：快捷码。
      */
-    public CcPrjStructNodeGuide setFastCode(String fastCode) {
+    public CcPrjStructNodeVersion setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -541,7 +532,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：图标。
      */
-    public CcPrjStructNodeGuide setIconFileGroupId(String iconFileGroupId) {
+    public CcPrjStructNodeVersion setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -563,150 +554,6 @@ public class CcPrjStructNodeGuide {
     }
 
     /**
-     * 项目。
-     */
-    private String ccPrjId;
-
-    /**
-     * 获取：项目。
-     */
-    public String getCcPrjId() {
-        return this.ccPrjId;
-    }
-
-    /**
-     * 设置：项目。
-     */
-    public CcPrjStructNodeGuide setCcPrjId(String ccPrjId) {
-        if (this.ccPrjId == null && ccPrjId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjId != null && ccPrjId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
-                this.ccPrjId = ccPrjId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjId = ccPrjId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 项目结构节点。
-     */
-    private String ccPrjStructNodeId;
-
-    /**
-     * 获取：项目结构节点。
-     */
-    public String getCcPrjStructNodeId() {
-        return this.ccPrjStructNodeId;
-    }
-
-    /**
-     * 设置：项目结构节点。
-     */
-    public CcPrjStructNodeGuide setCcPrjStructNodeId(String ccPrjStructNodeId) {
-        if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjStructNodeId != null && ccPrjStructNodeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjStructNodeId.compareTo(ccPrjStructNodeId) != 0) {
-                this.ccPrjStructNodeId = ccPrjStructNodeId;
-                if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjStructNodeId = ccPrjStructNodeId;
-            if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
-                this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 序号。
-     */
-    private BigDecimal seqNo;
-
-    /**
-     * 获取：序号。
-     */
-    public BigDecimal getSeqNo() {
-        return this.seqNo;
-    }
-
-    /**
-     * 设置：序号。
-     */
-    public CcPrjStructNodeGuide setSeqNo(BigDecimal seqNo) {
-        if (this.seqNo == null && seqNo == null) {
-            // 均为null，不做处理。
-        } else if (this.seqNo != null && seqNo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.seqNo.compareTo(seqNo) != 0) {
-                this.seqNo = seqNo;
-                if (!this.toUpdateCols.contains("SEQ_NO")) {
-                    this.toUpdateCols.add("SEQ_NO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.seqNo = seqNo;
-            if (!this.toUpdateCols.contains("SEQ_NO")) {
-                this.toUpdateCols.add("SEQ_NO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 代码。
-     */
-    private String code;
-
-    /**
-     * 获取：代码。
-     */
-    public String getCode() {
-        return this.code;
-    }
-
-    /**
-     * 设置：代码。
-     */
-    public CcPrjStructNodeGuide setCode(String code) {
-        if (this.code == null && code == null) {
-            // 均为null，不做处理。
-        } else if (this.code != null && code != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.code.compareTo(code) != 0) {
-                this.code = code;
-                if (!this.toUpdateCols.contains("CODE")) {
-                    this.toUpdateCols.add("CODE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.code = code;
-            if (!this.toUpdateCols.contains("CODE")) {
-                this.toUpdateCols.add("CODE");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 名称。
      */
     private String name;
@@ -721,7 +568,7 @@ public class CcPrjStructNodeGuide {
     /**
      * 设置：名称。
      */
-    public CcPrjStructNodeGuide setName(String name) {
+    public CcPrjStructNodeVersion setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -743,72 +590,144 @@ public class CcPrjStructNodeGuide {
     }
 
     /**
-     * 备注。
+     * 创建用户。
      */
-    private String remark;
+    private String crtUserId;
 
     /**
-     * 获取：备注。
+     * 获取：创建用户。
      */
-    public String getRemark() {
-        return this.remark;
+    public String getCrtUserId() {
+        return this.crtUserId;
     }
 
     /**
-     * 设置：备注。
+     * 设置：创建用户。
      */
-    public CcPrjStructNodeGuide setRemark(String remark) {
-        if (this.remark == null && remark == null) {
+    public CcPrjStructNodeVersion setCrtUserId(String crtUserId) {
+        if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
-        } else if (this.remark != null && remark != null) {
+        } else if (this.crtUserId != null && crtUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.remark.compareTo(remark) != 0) {
-                this.remark = remark;
-                if (!this.toUpdateCols.contains("REMARK")) {
-                    this.toUpdateCols.add("REMARK");
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.remark = remark;
-            if (!this.toUpdateCols.contains("REMARK")) {
-                this.toUpdateCols.add("REMARK");
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
             }
         }
         return this;
     }
 
     /**
-     * 附件。
+     * 创建日期时间。
      */
-    private String ccAttachments;
+    private LocalDateTime crtDt;
 
     /**
-     * 获取：附件。
+     * 获取：创建日期时间。
      */
-    public String getCcAttachments() {
-        return this.ccAttachments;
+    public LocalDateTime getCrtDt() {
+        return this.crtDt;
     }
 
     /**
-     * 设置：附件。
+     * 设置：创建日期时间。
      */
-    public CcPrjStructNodeGuide setCcAttachments(String ccAttachments) {
-        if (this.ccAttachments == null && ccAttachments == null) {
+    public CcPrjStructNodeVersion setCrtDt(LocalDateTime crtDt) {
+        if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
-        } else if (this.ccAttachments != null && ccAttachments != null) {
+        } else if (this.crtDt != null && crtDt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccAttachments.compareTo(ccAttachments) != 0) {
-                this.ccAttachments = ccAttachments;
-                if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                    this.toUpdateCols.add("CC_ATTACHMENTS");
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccAttachments = ccAttachments;
-            if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                this.toUpdateCols.add("CC_ATTACHMENTS");
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目。
+     */
+    private String ccPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getCcPrjId() {
+        return this.ccPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public CcPrjStructNodeVersion setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjId != null && ccPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 计划类型。
+     */
+    private String ccPrjWbsTypeId;
+
+    /**
+     * 获取：计划类型。
+     */
+    public String getCcPrjWbsTypeId() {
+        return this.ccPrjWbsTypeId;
+    }
+
+    /**
+     * 设置：计划类型。
+     */
+    public CcPrjStructNodeVersion setCcPrjWbsTypeId(String ccPrjWbsTypeId) {
+        if (this.ccPrjWbsTypeId == null && ccPrjWbsTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjWbsTypeId != null && ccPrjWbsTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjWbsTypeId.compareTo(ccPrjWbsTypeId) != 0) {
+                this.ccPrjWbsTypeId = ccPrjWbsTypeId;
+                if (!this.toUpdateCols.contains("CC_PRJ_WBS_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_WBS_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjWbsTypeId = ccPrjWbsTypeId;
+            if (!this.toUpdateCols.contains("CC_PRJ_WBS_TYPE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_WBS_TYPE_ID");
             }
         }
         return this;
@@ -901,8 +820,8 @@ public class CcPrjStructNodeGuide {
      *
      * @return
      */
-    public static CcPrjStructNodeGuide newData() {
-        CcPrjStructNodeGuide obj = modelHelper.newData();
+    public static CcPrjStructNodeVersion newData() {
+        CcPrjStructNodeVersion obj = modelHelper.newData();
         return obj;
     }
 
@@ -911,8 +830,8 @@ public class CcPrjStructNodeGuide {
      *
      * @return
      */
-    public static CcPrjStructNodeGuide insertData() {
-        CcPrjStructNodeGuide obj = modelHelper.insertData();
+    public static CcPrjStructNodeVersion insertData() {
+        CcPrjStructNodeVersion obj = modelHelper.insertData();
         return obj;
     }
 
@@ -924,8 +843,8 @@ public class CcPrjStructNodeGuide {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcPrjStructNodeGuide selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcPrjStructNodeGuide obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcPrjStructNodeVersion selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcPrjStructNodeVersion obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -935,7 +854,7 @@ public class CcPrjStructNodeGuide {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcPrjStructNodeGuide selectById(String id) {
+    public static CcPrjStructNodeVersion selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -947,8 +866,8 @@ public class CcPrjStructNodeGuide {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjStructNodeGuide> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcPrjStructNodeGuide> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcPrjStructNodeVersion> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcPrjStructNodeVersion> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -958,7 +877,7 @@ public class CcPrjStructNodeGuide {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjStructNodeGuide> selectByIds(List<String> ids) {
+    public static List<CcPrjStructNodeVersion> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -970,8 +889,8 @@ public class CcPrjStructNodeGuide {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjStructNodeGuide> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcPrjStructNodeGuide> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcPrjStructNodeVersion> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcPrjStructNodeVersion> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -981,7 +900,7 @@ public class CcPrjStructNodeGuide {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjStructNodeGuide> selectByWhere(Where where) {
+    public static List<CcPrjStructNodeVersion> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -993,10 +912,10 @@ public class CcPrjStructNodeGuide {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcPrjStructNodeGuide selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcPrjStructNodeGuide> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcPrjStructNodeVersion selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcPrjStructNodeVersion> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcPrjStructNodeGuide.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcPrjStructNodeVersion.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1008,7 +927,7 @@ public class CcPrjStructNodeGuide {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcPrjStructNodeGuide selectOneByWhere(Where where) {
+    public static CcPrjStructNodeVersion selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1122,7 +1041,7 @@ public class CcPrjStructNodeGuide {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcPrjStructNodeGuide fromModel, CcPrjStructNodeGuide toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcPrjStructNodeVersion fromModel, CcPrjStructNodeVersion toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1132,7 +1051,7 @@ public class CcPrjStructNodeGuide {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcPrjStructNodeGuide fromModel, CcPrjStructNodeGuide toModel) {
+    public static void copyCols(CcPrjStructNodeVersion fromModel, CcPrjStructNodeVersion toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

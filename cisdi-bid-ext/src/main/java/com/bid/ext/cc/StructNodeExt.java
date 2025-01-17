@@ -48,7 +48,7 @@ public class StructNodeExt {
             // 序号
             BigDecimal seqNo = BigDecimal.ZERO;
             // 对于每一个模板结构节点，将其作为子节点插入
-            for (Map<String, Object> node : templateStruct) {
+            for (Map<String, Object> node : list) {
                 insertWbsNode(node, entityRecord, seqNo, topNode);
                 seqNo = seqNo.add(BigDecimal.ONE);
             }
@@ -113,6 +113,18 @@ public class StructNodeExt {
                     "SELECT n.* FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
                     "SELECT * FROM Subtree";
             nodes = myJdbcTemplate.queryForList(sql, pWbsTemplateId);
+            // 设置直接子节点的父ID为null
+            //若不为根节点则将直接子节点的父ID设为null
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(pWbsTemplateId);
+            String ccPrjStructNodePid = ccPrjStructNode.getCcPrjStructNodePid();
+            if (!nodes.isEmpty() && ccPrjStructNodePid != null) {
+                String rootId = nodes.get(0).get("CC_PRJ_STRUCT_NODE_PID").toString();
+                for (Map<String, Object> node : nodes) {
+                    if (node.get("CC_PRJ_STRUCT_NODE_PID").equals(rootId)) {
+                        node.put("CC_PRJ_STRUCT_NODE_PID", null);
+                    }
+                }
+            }
         } else {
             // 不包含根节点，但需要将直接子节点的父ID设为null
             sql = "WITH RECURSIVE Subtree AS (" +
@@ -121,8 +133,6 @@ public class StructNodeExt {
                     "SELECT n.* FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
                     "SELECT * FROM Subtree";
             nodes = myJdbcTemplate.queryForList(sql, pWbsTemplateId);
-        }
-
             // 设置直接子节点的父ID为null
             if (!nodes.isEmpty()) {
                 String rootId = nodes.get(0).get("CC_PRJ_STRUCT_NODE_PID").toString();
@@ -132,6 +142,7 @@ public class StructNodeExt {
                     }
                 }
             }
+        }
 
 
         for (Map<String, Object> node : nodes) {
@@ -149,26 +160,52 @@ public class StructNodeExt {
      */
     private List<Map<String, Object>> replaceIdsAndInsert(List<Map<String, Object>> nodes) {
         Map<String, String> idMapping = new HashMap<>();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
-        // 第一步：为每个节点生成新的 ID 并更新映射表
-        for (Map<String, Object> node : nodes) {
-            String oldId = (String) node.get("ID");
-            String newId = IdUtil.getSnowflakeNextIdStr();
-            // 新ID与旧ID映射表
-            idMapping.put(oldId, newId);
-            node.put("ID", newId);
-            System.out.println("Node " + oldId + " updated to " + newId);
-        }
+        try {
+            // 第一步：为每个节点生成新的 ID 并更新映射表
+            for (Map<String, Object> node : nodes) {
+                String oldId = JdbcMapUtil.getString(node, "ID");
+                String newId = IdUtil.getSnowflakeNextIdStr();
+                //复制指引
+                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
+                List<CcPrjStructNodeGuide> ccPrjStructNodeGuideList = CcPrjStructNodeGuide.selectByWhere(new Where().eq(CcPrjStructNodeGuide.Cols.CC_PRJ_STRUCT_NODE_ID, oldId));
+                if (!SharedUtil.isEmpty(ccPrjStructNodeGuideList)) {
+                    for (CcPrjStructNodeGuide ccPrjStructNodeGuide : ccPrjStructNodeGuideList) {
+                        BigDecimal seqNo = ccPrjStructNodeGuide.getSeqNo();
+                        String name = ccPrjStructNodeGuide.getName();
+                        String remark = ccPrjStructNodeGuide.getRemark();
+                        String ccAttachments = ccPrjStructNodeGuide.getCcAttachments();
 
-        // 第二步：更新每个节点的父节点 ID
-        for (Map<String, Object> node : nodes) {
-            String oldParentId = (String) node.get("CC_PRJ_STRUCT_NODE_PID");
-            if (oldParentId != null) {
-                String newParentId = idMapping.get(oldParentId);
-                if (newParentId != null) {
-                    node.put("CC_PRJ_STRUCT_NODE_PID", newParentId);
+                        CcPrjStructNodeGuide newCcPrjStructNodeGuide = CcPrjStructNodeGuide.newData();
+                        newCcPrjStructNodeGuide.setCcPrjStructNodeId(newId);
+                        newCcPrjStructNodeGuide.setSeqNo(seqNo);
+                        newCcPrjStructNodeGuide.setName(name);
+                        newCcPrjStructNodeGuide.setRemark(remark);
+                        newCcPrjStructNodeGuide.setCcAttachments(ccAttachments);
+                        newCcPrjStructNodeGuide.insertById();
+                    }
+                }
+                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
+                // 新ID与旧ID映射表
+                idMapping.put(oldId, newId);
+                node.put("ID", newId);
+            }
+
+            // 第二步：更新每个节点的父节点 ID
+            for (Map<String, Object> node : nodes) {
+                String oldParentId = (String) node.get("CC_PRJ_STRUCT_NODE_PID");
+                if (oldParentId != null) {
+                    String newParentId = idMapping.get(oldParentId);
+                    if (newParentId != null) {
+                        node.put("CC_PRJ_STRUCT_NODE_PID", newParentId);
+                    }
                 }
             }
+        } catch (Exception e) {
+            throw new BaseException("数据插入失败：" + e.getMessage());
+        } finally {
+            myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
         }
         return nodes;
     }
@@ -216,7 +253,8 @@ public class StructNodeExt {
         boolean isWbs = isWbsInt != null && isWbsInt != 0;
         ccPrjStructNode.setIsWbs(isWbs);
 
-        ccPrjStructNode.setId(nodeData.get("ID").toString());
+        String ccPrjStructNodeId = JdbcMapUtil.getString(nodeData, "ID");
+        ccPrjStructNode.setId(ccPrjStructNodeId);
         ccPrjStructNode.setName(nodeData.get("NAME").toString());
         ccPrjStructNode.setWbsChiefUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setPlanFr(fromDate);
