@@ -10,12 +10,18 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import static com.bid.ext.cc.StructNodeExt.replaceIdsAndInsert;
+
 
 public class PlanExt {
 
@@ -113,5 +119,77 @@ public class PlanExt {
 
     }
 
+    /**
+     * 引用计划
+     */
+    public void referencePlan() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        // 获取历史版本
+        String pCcPrjStructNodeVersion = JdbcMapUtil.getString(varMap, "P_CC_PRJ_STRUCT_NODE_VERSION");
+        String sql = "select * from CC_PRJ_STRUCT_NODE_TO_VERSION t where t.CC_PRJ_STRUCT_NODE_VERSION_ID = ?";
+        List<Map<String, Object>> maps = myJdbcTemplate.queryForList(sql, pCcPrjStructNodeVersion);
+        List<Map<String, Object>> list = replaceIdsAndInsert(maps);
+        // 序号
+        BigDecimal seqNo = BigDecimal.ZERO;
+        // 对于每一个模板结构节点，将其作为子节点插入
+        for (Map<String, Object> node : list) {
+            insertWbsNode(node, seqNo);
+            seqNo = seqNo.add(BigDecimal.ONE);
+        }
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 插入WBS节点
+     *
+     * @param nodeData
+     */
+    public static void insertWbsNode(Map<String, Object> nodeData, BigDecimal seqNo) {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String ccPrjId = nodeData.get("CC_PRJ_ID").toString();
+        String ccPrjWbsTypeId = nodeData.get("CC_PRJ_WBS_TYPE_ID").toString();
+
+        LocalDate planFr = JdbcMapUtil.getLocalDate(nodeData, "PLAN_FR");
+        LocalDate planTo = JdbcMapUtil.getLocalDate(nodeData, "PLAN_TO");
+        BigDecimal planDays = JdbcMapUtil.getBigDecimal(nodeData, "PLAN_DAYS");
+
+
+        CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
+        ccPrjStructNode.setCrtDt(LocalDateTime.now());
+        ccPrjStructNode.setCrtUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setCcPrjId(ccPrjId);
+        ccPrjStructNode.setStatus("DR");
+
+        String remark = JdbcMapUtil.getString(nodeData, "REMARK");
+        ccPrjStructNode.setRemark(remark);
+
+        Integer isMileStoneInt = (Integer) nodeData.get("IS_MILE_STONE");
+        boolean isMileStone = isMileStoneInt != null && isMileStoneInt != 0;
+        ccPrjStructNode.setIsMileStone(isMileStone);
+
+        Integer isWbsInt = (Integer) nodeData.get("IS_WBS");
+        boolean isWbs = isWbsInt != null && isWbsInt != 0;
+        ccPrjStructNode.setIsWbs(isWbs);
+
+        String ccPrjStructNodeId = JdbcMapUtil.getString(nodeData, "ID");
+        ccPrjStructNode.setId(ccPrjStructNodeId);
+        ccPrjStructNode.setName(nodeData.get("NAME").toString());
+        ccPrjStructNode.setWbsChiefUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setPlanFr(planFr);
+        ccPrjStructNode.setPlanTo(planTo);
+        ccPrjStructNode.setPlanDays(planDays);
+        ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
+        ccPrjStructNode.setCcPrjWbsTypeId(ccPrjWbsTypeId);
+
+        String ccPrjStructNodePid = JdbcMapUtil.getString(nodeData, "CC_PRJ_STRUCT_NODE_PID");
+        ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
+
+        ccPrjStructNode.setIsTemplate(false);
+        ccPrjStructNode.insertById();
+    }
 
 }

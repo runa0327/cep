@@ -158,7 +158,7 @@ public class StructNodeExt {
      *
      * @param nodes
      */
-    private List<Map<String, Object>> replaceIdsAndInsert(List<Map<String, Object>> nodes) {
+    public static List<Map<String, Object>> replaceIdsAndInsert(List<Map<String, Object>> nodes) {
         Map<String, String> idMapping = new HashMap<>();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
@@ -217,7 +217,7 @@ public class StructNodeExt {
      * @param nodeData
      * @param parentRecord
      */
-    private void insertWbsNode(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo, Map<String, Object> topNode) {
+    public static void insertWbsNode(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo, Map<String, Object> topNode) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String ccPrjId = parentRecord.valueMap.get("CC_PRJ_ID").toString();
         String ccPrjWbsTypeId = nodeData.get("CC_PRJ_WBS_TYPE_ID").toString();
