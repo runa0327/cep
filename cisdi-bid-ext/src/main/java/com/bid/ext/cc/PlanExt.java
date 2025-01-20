@@ -1,7 +1,6 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.CcPrjStructNode;
-import com.bid.ext.model.CcPrjStructNodeGuide;
 import com.bid.ext.model.CcPrjStructNodeToVersion;
 import com.bid.ext.model.CcPrjStructNodeVersion;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -73,31 +72,31 @@ public class PlanExt {
 
         if (!SharedUtil.isEmpty(ccPrjStructNodesAp)) {
             for (CcPrjStructNode ccPrjStructNodeAp : ccPrjStructNodesAp) {
-                String ccPrjStructNodeDrId = ccPrjStructNodeAp.getId();
+                String ccPrjStructNodeApId = ccPrjStructNodeAp.getId();
                 ccPrjStructNodeAp.setStatus(String.valueOf(StatusE.VD));
                 ccPrjStructNodeAp.updateById();
 
 
-                //复制指引
-                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
-                List<CcPrjStructNodeGuide> ccPrjStructNodeGuideList = CcPrjStructNodeGuide.selectByWhere(new Where().eq(CcPrjStructNodeGuide.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeDrId));
-                if (!SharedUtil.isEmpty(ccPrjStructNodeGuideList)) {
-                    for (CcPrjStructNodeGuide ccPrjStructNodeGuide : ccPrjStructNodeGuideList) {
-                        BigDecimal seqNo = ccPrjStructNodeGuide.getSeqNo();
-                        String name = ccPrjStructNodeGuide.getName();
-                        String remark = ccPrjStructNodeGuide.getRemark();
-                        String ccAttachments = ccPrjStructNodeGuide.getCcAttachments();
-
-                        CcPrjStructNodeGuide newCcPrjStructNodeGuide = CcPrjStructNodeGuide.newData();
-                        newCcPrjStructNodeGuide.setCcPrjStructNodeId(ccPrjStructNodeDrId);
-                        newCcPrjStructNodeGuide.setSeqNo(seqNo);
-                        newCcPrjStructNodeGuide.setName(name);
-                        newCcPrjStructNodeGuide.setRemark(remark);
-                        newCcPrjStructNodeGuide.setCcAttachments(ccAttachments);
-                        newCcPrjStructNodeGuide.insertById();
-                    }
-                }
-                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
+//                //复制指引
+//                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
+//                List<CcPrjStructNodeGuide> ccPrjStructNodeGuideList = CcPrjStructNodeGuide.selectByWhere(new Where().eq(CcPrjStructNodeGuide.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeApId));
+//                if (!SharedUtil.isEmpty(ccPrjStructNodeGuideList)) {
+//                    for (CcPrjStructNodeGuide ccPrjStructNodeGuide : ccPrjStructNodeGuideList) {
+//                        BigDecimal seqNo = ccPrjStructNodeGuide.getSeqNo();
+//                        String name = ccPrjStructNodeGuide.getName();
+//                        String remark = ccPrjStructNodeGuide.getRemark();
+//                        String ccAttachments = ccPrjStructNodeGuide.getCcAttachments();
+//
+//                        CcPrjStructNodeGuide newCcPrjStructNodeGuide = CcPrjStructNodeGuide.newData();
+//                        newCcPrjStructNodeGuide.setCcPrjStructNodeId(ccPrjStructNodeApId);
+//                        newCcPrjStructNodeGuide.setSeqNo(seqNo);
+//                        newCcPrjStructNodeGuide.setName(name);
+//                        newCcPrjStructNodeGuide.setRemark(remark);
+//                        newCcPrjStructNodeGuide.setCcAttachments(ccAttachments);
+//                        newCcPrjStructNodeGuide.insertById();
+//                    }
+//                }
+//                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
             }
         }
 
@@ -225,4 +224,26 @@ public class PlanExt {
         ccPrjStructNode.insertById();
     }
 
+    /**
+     * 编制计划中是否有可提交计划
+     */
+    public void preCheckPlan() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        Map<String, Object> globalVarMap = loginInfo.globalVarMap;
+        String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
+        if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
+            throw new BaseException("仅允许在唯一项目存在的情况下提交计划");
+        }
+        String planType = "pre";
+        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(
+                new Where()
+                        .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
+                        .eq(CcPrjStructNode.Cols.IS_WBS, true)
+                        .eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType)
+                        .eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds)
+                        .eq(CcPrjStructNode.Cols.STATUS, "DR"));
+        if (SharedUtil.isEmpty(ccPrjStructNodesDr)) {
+            throw new BaseException("无可提交计划");
+        }
+    }
 }
