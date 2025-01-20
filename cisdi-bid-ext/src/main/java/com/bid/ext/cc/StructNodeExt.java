@@ -520,30 +520,15 @@ public class StructNodeExt {
     public void recalculationPrePlan() {
         InvokeActResult invokeActResult = new InvokeActResult();
         Set<String> updatedNodes = new HashSet<>();
-        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
-        if (!SharedUtil.isEmpty(entityRecordList)) {
-            for (EntityRecord entityRecord : entityRecordList) {
-                Map<String, Object> valueMap = entityRecord.valueMap;
-                String csCommId = entityRecord.csCommId;
-                String nodeId = (String) valueMap.get("ID");
-                CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
-                String ccPrjStructNodePid = ccPrjStructNode.getCcPrjStructNodePid();
 
-                if (ccPrjStructNodePid != null) {
-                    updateDateRange(ccPrjStructNodePid, updatedNodes);  // 从父节点开始更新
-                } else {
-                    updateDateRange(nodeId, updatedNodes);  // 如果没有父节点，直接从当前节点开始
-                }
-            }
-        } else {
-            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
-            Map<String, Object> globalVarMap = loginInfo.globalVarMap;
-            String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
-            List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, "pre").eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).eq(CcPrjStructNode.Cols.STATUS, "DR").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
-            for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodesDr) {
-                String ccPrjStructNodeId = ccPrjStructNode.getId();
-                updateDateRange(ccPrjStructNodeId, updatedNodes);
-            }
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        Map<String, Object> globalVarMap = loginInfo.globalVarMap;
+        String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
+        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, "pre").eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).eq(CcPrjStructNode.Cols.STATUS, "DR").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+        for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodesDr) {
+            String ccPrjStructNodeId = ccPrjStructNode.getId();
+            updateDateRange(ccPrjStructNodeId, updatedNodes);
+
         }
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
