@@ -908,6 +908,123 @@ public class DrawingExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 俄罗斯-压缩包上传图纸
+     */
+    public void ruUploadZipDrawingPlan() throws IOException {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+        String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
+        String pActDate = JdbcMapUtil.getString(varMap, "P_ACT_DATE");
+
+        List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+        int count1 = ccAttachmentList.size();
+        int count2 = 0;
+        int count3 = 0;
+        int count4 = 0;
+        List<String> idList = new ArrayList<>();
+
+        for (String attachmentId : ccAttachmentList) {
+            FlFile flFile = FlFile.selectById(attachmentId);
+            String dspName = flFile.getDspName(); // 获取文件名
+            String name = flFile.getName();
+            int index = dspName.indexOf('-');
+
+            if (index == -1) {
+                count3++;
+                continue; // 跳过命名不规范的文件
+            }
+
+            String ccConstructionDrawingId = dspName.substring(0, index);//施工图套图号
+            CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
+            if (SharedUtil.isEmpty(ccDrawingManagement)) {
+                count4++;
+                idList.add(ccConstructionDrawingId);
+                continue; // 跳过在图纸列表中未找到对应图纸套图号的文件
+            }
+
+            String csCommId = ccDrawingManagement.getId();
+            List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
+            if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
+                for (CcStructDrawingVersion ccStructDrawingVersion1 : ccStructDrawingVersions) {
+                    ccStructDrawingVersion1.setIsDefault(false);
+                    ccStructDrawingVersion1.updateById();
+                }
+            }
+
+            String[] versionOrder = {"A", "B", "C", "D", "E", "F", "G"};
+            String ccDrawingVersionId = null;
+
+            String  versionStr = dspName.substring(index+1, index+2);//施工图套图版本
+
+            for (String version : versionOrder) {
+
+                if(version.equals(versionStr)){
+                    List<CcStructDrawingVersion> ccStructDrawingVersions1 = CcStructDrawingVersion.selectByWhere(
+                        new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_VERSION_ID, version)
+                                .eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId)
+                    );
+
+                    if(SharedUtil.isEmpty(ccStructDrawingVersions1)){//不存在相同版本图纸
+                        ccDrawingVersionId = version;
+                    }
+                }
+            }
+            if (SharedUtil.isEmpty(ccDrawingVersionId)) {// 如果版本号错误
+                count4++;
+                idList.add(ccConstructionDrawingId);
+                continue; // 跳过在图纸列表中未找到对应图纸套图号的文件
+            }
+
+            String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
+            String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
+
+            CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
+            ccStructDrawingVersion.setCcDrawingVersionId(ccDrawingVersionId);
+            CcDrawingVersion ccDrawingVersion = CcDrawingVersion.selectById(ccDrawingVersionId);
+            String ccDrawingVersionName = ccDrawingVersion.getName();
+            ccStructDrawingVersion.setName(ccDrawingVersionName);
+            ccStructDrawingVersion.setCcDrawingManagementId(csCommId);
+            ccStructDrawingVersion.setCcPrjStructNodeId(ccPrjStructNodeId);
+            ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+            ccStructDrawingVersion.setIsDefault(true);
+
+            String zipFilePath = flFile.getOriginFilePhysicalLocation();
+            Where attWhere = new Where();
+            attWhere.eq(AdAtt.Cols.CODE, CcDrawingUpload.Cols.CC_ATTACHMENT);
+            AdAtt adAtt = AdAtt.selectOneByWhere(attWhere);
+
+            Where pathWhere = new Where();
+            pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
+            FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+
+            LocalDate now = LocalDate.now();
+            int year = now.getYear();
+            String month = String.format("%02d", now.getMonthValue());
+            String day = String.format("%02d", now.getDayOfMonth());
+
+            String outputDir = flPath.getDir() + year + "/" + month + "/" + day + "/" + name + ccDrawingVersionName;
+
+            File zipFile = FileUtil.file(zipFilePath);
+            File outputDirectory = FileUtil.mkdir(outputDir);
+
+            java.util.zip.ZipFile tempZipFile = new java.util.zip.ZipFile(zipFile, Charset.forName("GBK"));
+            ZipUtil.unzip(tempZipFile, outputDirectory);
+
+            ccStructDrawingVersion.insertById();
+            ruProcessUnzippedFiles(outputDirectory, flPath, year, month, day, loginInfo, ccStructDrawingVersion, pRemark, pActDate, ccDrawingManagement);
+            ccDrawingManagement.setCcDrawingStatusId("DONE");
+            ccDrawingManagement.updateById();
+            count2++;
+        }
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        invokeActResult.msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.uploadZipDrawingPlan", count1, count2, count3, count4, idList);
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+
     private void processUnzippedFiles(File file, FlPath flPath, int year, String month, String day, LoginInfo loginInfo, CcStructDrawingVersion ccStructDrawingVersion, String pRemark, String pActDate, CcDrawingManagement ccDrawingManagement) {
         if (file.isDirectory()) {
             for (File subFile : file.listFiles()) {
@@ -978,6 +1095,78 @@ public class DrawingExt {
             addWaterMark("(注:本平台所有图纸仅供湛江零碳项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)", path, faPath);
         }
     }
+
+    private void ruProcessUnzippedFiles(File file, FlPath flPath, int year, String month, String day, LoginInfo loginInfo, CcStructDrawingVersion ccStructDrawingVersion, String pRemark, String pActDate, CcDrawingManagement ccDrawingManagement) {
+        if (file.isDirectory()) {
+            for (File subFile : file.listFiles()) {
+                ruProcessUnzippedFiles(subFile, flPath, year, month, day, loginInfo, ccStructDrawingVersion, pRemark, pActDate, ccDrawingManagement);
+            }
+        } else {
+            String faPath = "";
+            String path = "";
+            // 处理文件
+            try (InputStream inputStream = Files.newInputStream(file.toPath());
+                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                IoUtil.copy(inputStream, outputStream);
+                byte[] fileBytes = outputStream.toByteArray();
+
+                FlFile newFile = FlFile.newData();
+                String fileId = newFile.getId();
+                faPath = flPath.getDir() + year + "/" + month + "/" + day + "/";
+                path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
+                saveWordToFile(fileBytes, path);
+                boolean fileExists = checkFileExists(path);
+                if (fileExists) {
+                    File file0 = new File(path);
+                    long bytes = file0.length();
+                    double kilobytes = bytes / 1024.0;
+                    String fileName = file.getName();
+
+                    BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
+                    String dspSize = String.format("%d KB", Math.round(kilobytes));
+                    newFile.setCrtUserId(loginInfo.userInfo.id);
+                    newFile.setLastModiUserId(loginInfo.userInfo.id);
+                    newFile.setFlPathId(flPath.getId());
+                    newFile.setCode(fileId);
+                    newFile.setName(fileName);
+                    newFile.setExt(fileName.substring(fileName.lastIndexOf('.') + 1));
+                    newFile.setDspName(fileName);
+                    newFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
+                    newFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    newFile.setSizeKb(sizeKb);
+                    newFile.setDspSize(dspSize);
+                    newFile.setUploadDttm(LocalDateTime.now());
+                    newFile.setPhysicalLocation(path);
+                    newFile.setOriginFilePhysicalLocation(path);
+                    newFile.setIsPublicRead(false);
+                    newFile.insertById();
+                    CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+                    ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
+                    ccDrawingUpload.setCcAttachment(fileId);
+                    ccDrawingUpload.setCcDrawingVersionId(ccStructDrawingVersion.getCcDrawingVersionId());
+                    ccDrawingUpload.setRemark(pRemark);
+                    ccDrawingUpload.setCcDrawingManagementId(ccDrawingManagement.getId());
+                    ccDrawingUpload.setName(fileName);
+                    ccDrawingUpload.insertById();
+
+                    if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
+                        ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
+                        ccDrawingManagement.setCcDrawingStatusId("DONE");
+                        ccDrawingManagement.updateById();
+                    }
+                } else {
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileNotFound", path);
+                    throw new BaseException(message);
+                }
+            } catch (Exception e) {
+                throw new BaseException(e);
+            }
+
+            // 加水印
+            addWaterMark("(注:本平台所有图纸仅供项目建设过程参考使用，施工应以设计单位正式提交的纸质图纸为准。)", path, faPath);
+        }
+    }
+
 
     /**
      * 同步文件名称
