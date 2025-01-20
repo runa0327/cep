@@ -49,7 +49,8 @@ public class PlanExt {
             newVersion = "V1";
         } else {
             // 提取最高版本号的数字部分并加1生成新的版本号
-            int versionNumber = Integer.parseInt(maxVersion.replace("V", ""));
+            String versionNumberStr = maxVersion.replaceAll("[^0-9]", "");
+            int versionNumber = Integer.parseInt(versionNumberStr);
             newVersion = "V" + (versionNumber + 1);
         }
 

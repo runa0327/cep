@@ -524,7 +524,7 @@ public class StructNodeExt {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         Map<String, Object> globalVarMap = loginInfo.globalVarMap;
         String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
-        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, "pre").eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).eq(CcPrjStructNode.Cols.STATUS, "DR").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, "pre").eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
         for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodesDr) {
             String ccPrjStructNodeId = ccPrjStructNode.getId();
             updateDateRange(ccPrjStructNodeId, updatedNodes);
