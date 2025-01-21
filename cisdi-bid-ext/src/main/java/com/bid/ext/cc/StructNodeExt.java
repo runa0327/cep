@@ -107,9 +107,12 @@ public class StructNodeExt {
         String planType = "PRE";
 
         // 查询当前项目的最高版本
-        String sql = "SELECT MAX(name) AS maxVersion " +
+        String sql = "SELECT name AS maxVersion " +
                 "FROM cc_prj_struct_node_version " +
-                "WHERE cc_prj_id = ? AND cc_prj_wbs_type_id = ?";
+                "WHERE cc_prj_id = ? " +
+                "  AND cc_prj_wbs_type_id = ? " +
+                "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
+                "LIMIT 1";
         Map<String, Object> map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType);
         String maxVersion = JdbcMapUtil.getString(map, "maxVersion");
 
@@ -119,7 +122,8 @@ public class StructNodeExt {
             newVersion = "V1";
         } else {
             // 提取最高版本号的数字部分并加1生成新的版本号
-            int versionNumber = Integer.parseInt(maxVersion.replace("V", ""));
+            String versionNumberStr = maxVersion.replaceAll("[^0-9]", "");
+            int versionNumber = Integer.parseInt(versionNumberStr);
             newVersion = "V" + (versionNumber + 1);
         }
 
