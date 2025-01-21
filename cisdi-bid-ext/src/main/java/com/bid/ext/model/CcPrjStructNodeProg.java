@@ -8,13 +8,14 @@ import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "EN：项目结构节点进度", "ZH_CN": "项目结构节点进展", "ZH_TW": "繁：项目结构节点进度"}。
+ * 项目结构节点进展。
  */
 public class CcPrjStructNodeProg {
 
@@ -48,99 +49,115 @@ public class CcPrjStructNodeProg {
 
     public static class Cols {
         /**
-         * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+         * ID。
          */
         public static final String ID = "ID";
         /**
-         * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+         * 版本。
          */
         public static final String VER = "VER";
         /**
-         * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+         * 时间戳。
          */
         public static final String TS = "TS";
         /**
-         * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+         * 是否预设。
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+         * 创建日期时间。
          */
         public static final String CRT_DT = "CRT_DT";
         /**
-         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+         * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+         * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
         /**
-         * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+         * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+         * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+         * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+         * 代码。
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         * 名称。
          */
         public static final String NAME = "NAME";
         /**
-         * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+         * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
         /**
-         * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+         * 图标。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+         * 项目。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+         * 项目结构节点。
          */
         public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
         /**
-         * {"EN": "填报人", "ZH_CN": "填报人", "ZH_TW": "填报人"}。
+         * 填报人。
          */
         public static final String SUMBIT_USER_ID = "SUMBIT_USER_ID";
         /**
-         * {"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+         * 实际从。
+         */
+        public static final String ACT_FR = "ACT_FR";
+        /**
+         * 进展时间。
          */
         public static final String PROG_TIME = "PROG_TIME";
         /**
-         * {"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+         * 实际进度比例（%）。
+         */
+        public static final String ACT_WBS_PCT = "ACT_WBS_PCT";
+        /**
+         * 进度状态。
          */
         public static final String CC_WBS_STATUS_ID = "CC_WBS_STATUS_ID";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         * 进展状态。
+         */
+        public static final String CC_WBS_PROGRESS_STATUS_ID = "CC_WBS_PROGRESS_STATUS_ID";
+        /**
+         * 备注。
          */
         public static final String REMARK = "REMARK";
         /**
-         * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+         * 附件。
          */
         public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
         /**
-         * {"EN": "ACT_QTY", "ZH_CN": "实际-数量", "ZH_TW": "繁：实际-数量"}。
+         * 附件2。
+         */
+        public static final String CC_ATTACHMENTS2 = "CC_ATTACHMENTS2";
+        /**
+         * 实际-数量。
          */
         public static final String ACT_QTY = "ACT_QTY";
         /**
-         * {"EN": "ACT_UNIT_COST", "ZH_CN": "实际-单位成本", "ZH_TW": "繁：实际-单位成本"}。
+         * 实际-单位成本。
          */
         public static final String ACT_UNIT_COST = "ACT_UNIT_COST";
         /**
-         * {"EN": "ACT_TOTAL_COST", "ZH_CN": "实际-总成本", "ZH_TW": "繁：实际-总成本"}。
+         * 实际-总成本。
          */
         public static final String ACT_TOTAL_COST = "ACT_TOTAL_COST";
     }
@@ -151,19 +168,19 @@ public class CcPrjStructNodeProg {
     // <editor-fold>
 
     /**
-     * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * ID。
      */
     private String id;
 
     /**
-     * 获取：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 获取：ID。
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 设置：ID。
      */
     public CcPrjStructNodeProg setId(String id) {
         if (this.id == null && id == null) {
@@ -187,19 +204,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 版本。
      */
     private Integer ver;
 
     /**
-     * 获取：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 获取：版本。
      */
     public Integer getVer() {
         return this.ver;
     }
 
     /**
-     * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 设置：版本。
      */
     public CcPrjStructNodeProg setVer(Integer ver) {
         if (this.ver == null && ver == null) {
@@ -223,19 +240,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 时间戳。
      */
     private LocalDateTime ts;
 
     /**
-     * 获取：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 获取：时间戳。
      */
     public LocalDateTime getTs() {
         return this.ts;
     }
 
     /**
-     * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 设置：时间戳。
      */
     public CcPrjStructNodeProg setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
@@ -259,19 +276,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 是否预设。
      */
     private Boolean isPreset;
 
     /**
-     * 获取：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 获取：是否预设。
      */
     public Boolean getIsPreset() {
         return this.isPreset;
     }
 
     /**
-     * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 设置：是否预设。
      */
     public CcPrjStructNodeProg setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
@@ -295,19 +312,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 创建日期时间。
      */
     private LocalDateTime crtDt;
 
     /**
-     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 获取：创建日期时间。
      */
     public LocalDateTime getCrtDt() {
         return this.crtDt;
     }
 
     /**
-     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 设置：创建日期时间。
      */
     public CcPrjStructNodeProg setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
@@ -331,19 +348,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 创建用户。
      */
     private String crtUserId;
 
     /**
-     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 获取：创建用户。
      */
     public String getCrtUserId() {
         return this.crtUserId;
     }
 
     /**
-     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 设置：创建用户。
      */
     public CcPrjStructNodeProg setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
@@ -367,19 +384,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
 
     /**
-     * 获取：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 获取：最后修改日期时间。
      */
     public LocalDateTime getLastModiDt() {
         return this.lastModiDt;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 设置：最后修改日期时间。
      */
     public CcPrjStructNodeProg setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
@@ -403,19 +420,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 最后修改用户。
      */
     private String lastModiUserId;
 
     /**
-     * 获取：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 获取：最后修改用户。
      */
     public String getLastModiUserId() {
         return this.lastModiUserId;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 设置：最后修改用户。
      */
     public CcPrjStructNodeProg setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
@@ -439,19 +456,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 记录状态。
      */
     private String status;
 
     /**
-     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 获取：记录状态。
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 设置：记录状态。
      */
     public CcPrjStructNodeProg setStatus(String status) {
         if (this.status == null && status == null) {
@@ -475,19 +492,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 锁定流程实例。
      */
     private String lkWfInstId;
 
     /**
-     * 获取：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 获取：锁定流程实例。
      */
     public String getLkWfInstId() {
         return this.lkWfInstId;
     }
 
     /**
-     * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 设置：锁定流程实例。
      */
     public CcPrjStructNodeProg setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
@@ -511,19 +528,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 代码。
      */
     private String code;
 
     /**
-     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 获取：代码。
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 设置：代码。
      */
     public CcPrjStructNodeProg setCode(String code) {
         if (this.code == null && code == null) {
@@ -547,19 +564,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 名称。
      */
     private String name;
 
     /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 获取：名称。
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 设置：名称。
      */
     public CcPrjStructNodeProg setName(String name) {
         if (this.name == null && name == null) {
@@ -583,19 +600,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 快捷码。
      */
     private String fastCode;
 
     /**
-     * 获取：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 获取：快捷码。
      */
     public String getFastCode() {
         return this.fastCode;
     }
 
     /**
-     * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 设置：快捷码。
      */
     public CcPrjStructNodeProg setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
@@ -619,19 +636,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 图标。
      */
     private String iconFileGroupId;
 
     /**
-     * 获取：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 获取：图标。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 设置：图标。
      */
     public CcPrjStructNodeProg setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
@@ -655,19 +672,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 项目。
      */
     private String ccPrjId;
 
     /**
-     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 获取：项目。
      */
     public String getCcPrjId() {
         return this.ccPrjId;
     }
 
     /**
-     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 设置：项目。
      */
     public CcPrjStructNodeProg setCcPrjId(String ccPrjId) {
         if (this.ccPrjId == null && ccPrjId == null) {
@@ -691,19 +708,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 项目结构节点。
      */
     private String ccPrjStructNodeId;
 
     /**
-     * 获取：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 获取：项目结构节点。
      */
     public String getCcPrjStructNodeId() {
         return this.ccPrjStructNodeId;
     }
 
     /**
-     * 设置：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 设置：项目结构节点。
      */
     public CcPrjStructNodeProg setCcPrjStructNodeId(String ccPrjStructNodeId) {
         if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
@@ -727,19 +744,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "填报人", "ZH_CN": "填报人", "ZH_TW": "填报人"}。
+     * 填报人。
      */
     private String sumbitUserId;
 
     /**
-     * 获取：{"EN": "填报人", "ZH_CN": "填报人", "ZH_TW": "填报人"}。
+     * 获取：填报人。
      */
     public String getSumbitUserId() {
         return this.sumbitUserId;
     }
 
     /**
-     * 设置：{"EN": "填报人", "ZH_CN": "填报人", "ZH_TW": "填报人"}。
+     * 设置：填报人。
      */
     public CcPrjStructNodeProg setSumbitUserId(String sumbitUserId) {
         if (this.sumbitUserId == null && sumbitUserId == null) {
@@ -763,19 +780,55 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+     * 实际从。
+     */
+    private LocalDate actFr;
+
+    /**
+     * 获取：实际从。
+     */
+    public LocalDate getActFr() {
+        return this.actFr;
+    }
+
+    /**
+     * 设置：实际从。
+     */
+    public CcPrjStructNodeProg setActFr(LocalDate actFr) {
+        if (this.actFr == null && actFr == null) {
+            // 均为null，不做处理。
+        } else if (this.actFr != null && actFr != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actFr.compareTo(actFr) != 0) {
+                this.actFr = actFr;
+                if (!this.toUpdateCols.contains("ACT_FR")) {
+                    this.toUpdateCols.add("ACT_FR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actFr = actFr;
+            if (!this.toUpdateCols.contains("ACT_FR")) {
+                this.toUpdateCols.add("ACT_FR");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 进展时间。
      */
     private LocalDateTime progTime;
 
     /**
-     * 获取：{"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+     * 获取：进展时间。
      */
     public LocalDateTime getProgTime() {
         return this.progTime;
     }
 
     /**
-     * 设置：{"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+     * 设置：进展时间。
      */
     public CcPrjStructNodeProg setProgTime(LocalDateTime progTime) {
         if (this.progTime == null && progTime == null) {
@@ -799,19 +852,55 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+     * 实际进度比例（%）。
+     */
+    private Integer actWbsPct;
+
+    /**
+     * 获取：实际进度比例（%）。
+     */
+    public Integer getActWbsPct() {
+        return this.actWbsPct;
+    }
+
+    /**
+     * 设置：实际进度比例（%）。
+     */
+    public CcPrjStructNodeProg setActWbsPct(Integer actWbsPct) {
+        if (this.actWbsPct == null && actWbsPct == null) {
+            // 均为null，不做处理。
+        } else if (this.actWbsPct != null && actWbsPct != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actWbsPct.compareTo(actWbsPct) != 0) {
+                this.actWbsPct = actWbsPct;
+                if (!this.toUpdateCols.contains("ACT_WBS_PCT")) {
+                    this.toUpdateCols.add("ACT_WBS_PCT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actWbsPct = actWbsPct;
+            if (!this.toUpdateCols.contains("ACT_WBS_PCT")) {
+                this.toUpdateCols.add("ACT_WBS_PCT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 进度状态。
      */
     private String ccWbsStatusId;
 
     /**
-     * 获取：{"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+     * 获取：进度状态。
      */
     public String getCcWbsStatusId() {
         return this.ccWbsStatusId;
     }
 
     /**
-     * 设置：{"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+     * 设置：进度状态。
      */
     public CcPrjStructNodeProg setCcWbsStatusId(String ccWbsStatusId) {
         if (this.ccWbsStatusId == null && ccWbsStatusId == null) {
@@ -835,19 +924,55 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 进展状态。
+     */
+    private String ccWbsProgressStatusId;
+
+    /**
+     * 获取：进展状态。
+     */
+    public String getCcWbsProgressStatusId() {
+        return this.ccWbsProgressStatusId;
+    }
+
+    /**
+     * 设置：进展状态。
+     */
+    public CcPrjStructNodeProg setCcWbsProgressStatusId(String ccWbsProgressStatusId) {
+        if (this.ccWbsProgressStatusId == null && ccWbsProgressStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccWbsProgressStatusId != null && ccWbsProgressStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccWbsProgressStatusId.compareTo(ccWbsProgressStatusId) != 0) {
+                this.ccWbsProgressStatusId = ccWbsProgressStatusId;
+                if (!this.toUpdateCols.contains("CC_WBS_PROGRESS_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_WBS_PROGRESS_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccWbsProgressStatusId = ccWbsProgressStatusId;
+            if (!this.toUpdateCols.contains("CC_WBS_PROGRESS_STATUS_ID")) {
+                this.toUpdateCols.add("CC_WBS_PROGRESS_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 备注。
      */
     private String remark;
 
     /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 获取：备注。
      */
     public String getRemark() {
         return this.remark;
     }
 
     /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 设置：备注。
      */
     public CcPrjStructNodeProg setRemark(String remark) {
         if (this.remark == null && remark == null) {
@@ -871,19 +996,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     * 附件。
      */
     private String ccAttachments;
 
     /**
-     * 获取：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     * 获取：附件。
      */
     public String getCcAttachments() {
         return this.ccAttachments;
     }
 
     /**
-     * 设置：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     * 设置：附件。
      */
     public CcPrjStructNodeProg setCcAttachments(String ccAttachments) {
         if (this.ccAttachments == null && ccAttachments == null) {
@@ -907,19 +1032,55 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "ACT_QTY", "ZH_CN": "实际-数量", "ZH_TW": "繁：实际-数量"}。
+     * 附件2。
+     */
+    private String ccAttachments2;
+
+    /**
+     * 获取：附件2。
+     */
+    public String getCcAttachments2() {
+        return this.ccAttachments2;
+    }
+
+    /**
+     * 设置：附件2。
+     */
+    public CcPrjStructNodeProg setCcAttachments2(String ccAttachments2) {
+        if (this.ccAttachments2 == null && ccAttachments2 == null) {
+            // 均为null，不做处理。
+        } else if (this.ccAttachments2 != null && ccAttachments2 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccAttachments2.compareTo(ccAttachments2) != 0) {
+                this.ccAttachments2 = ccAttachments2;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENTS2")) {
+                    this.toUpdateCols.add("CC_ATTACHMENTS2");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccAttachments2 = ccAttachments2;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENTS2")) {
+                this.toUpdateCols.add("CC_ATTACHMENTS2");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实际-数量。
      */
     private BigDecimal actQty;
 
     /**
-     * 获取：{"EN": "ACT_QTY", "ZH_CN": "实际-数量", "ZH_TW": "繁：实际-数量"}。
+     * 获取：实际-数量。
      */
     public BigDecimal getActQty() {
         return this.actQty;
     }
 
     /**
-     * 设置：{"EN": "ACT_QTY", "ZH_CN": "实际-数量", "ZH_TW": "繁：实际-数量"}。
+     * 设置：实际-数量。
      */
     public CcPrjStructNodeProg setActQty(BigDecimal actQty) {
         if (this.actQty == null && actQty == null) {
@@ -943,19 +1104,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "ACT_UNIT_COST", "ZH_CN": "实际-单位成本", "ZH_TW": "繁：实际-单位成本"}。
+     * 实际-单位成本。
      */
     private BigDecimal actUnitCost;
 
     /**
-     * 获取：{"EN": "ACT_UNIT_COST", "ZH_CN": "实际-单位成本", "ZH_TW": "繁：实际-单位成本"}。
+     * 获取：实际-单位成本。
      */
     public BigDecimal getActUnitCost() {
         return this.actUnitCost;
     }
 
     /**
-     * 设置：{"EN": "ACT_UNIT_COST", "ZH_CN": "实际-单位成本", "ZH_TW": "繁：实际-单位成本"}。
+     * 设置：实际-单位成本。
      */
     public CcPrjStructNodeProg setActUnitCost(BigDecimal actUnitCost) {
         if (this.actUnitCost == null && actUnitCost == null) {
@@ -979,19 +1140,19 @@ public class CcPrjStructNodeProg {
     }
 
     /**
-     * {"EN": "ACT_TOTAL_COST", "ZH_CN": "实际-总成本", "ZH_TW": "繁：实际-总成本"}。
+     * 实际-总成本。
      */
     private BigDecimal actTotalCost;
 
     /**
-     * 获取：{"EN": "ACT_TOTAL_COST", "ZH_CN": "实际-总成本", "ZH_TW": "繁：实际-总成本"}。
+     * 获取：实际-总成本。
      */
     public BigDecimal getActTotalCost() {
         return this.actTotalCost;
     }
 
     /**
-     * 设置：{"EN": "ACT_TOTAL_COST", "ZH_CN": "实际-总成本", "ZH_TW": "繁：实际-总成本"}。
+     * 设置：实际-总成本。
      */
     public CcPrjStructNodeProg setActTotalCost(BigDecimal actTotalCost) {
         if (this.actTotalCost == null && actTotalCost == null) {

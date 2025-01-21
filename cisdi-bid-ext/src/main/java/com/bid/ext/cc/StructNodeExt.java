@@ -926,6 +926,8 @@ public class StructNodeExt {
                     actDays = ChronoUnit.DAYS.between(ccPrjStructNode.getActFr(), ccPrjStructNode.getActTo()) + 1;
                     ccPrjStructNode.setActDays(BigDecimal.valueOf(actDays));
                 }
+                ccPrjStructNode.setCcAttachments(attachments);
+                ccPrjStructNode.setCcAttachments2(attachments2);
                 ccPrjStructNode.updateById();
             }
         }
