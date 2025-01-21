@@ -858,8 +858,9 @@ public class StructNodeExt {
         }
         String wbsStatusId = JdbcMapUtil.getString(varMap, "P_WBS_STATUS_ID");
         String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "P_WBS_PROGRESS_STATUS_ID");
-        String remark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : "";
-        String attachments = varMap.get("P_ATTACHMENTS") != null ? varMap.get("P_ATTACHMENTS").toString() : "";
+        String remark = JdbcMapUtil.getString(varMap, "P_REMARK");
+        String attachments = JdbcMapUtil.getString(varMap, "P_ATTACHMENTS");
+        String attachments2 = JdbcMapUtil.getString(varMap, "P_ATTACHMENTS2");
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String id = IdUtil.getSnowflakeNextIdStr();
@@ -870,8 +871,8 @@ public class StructNodeExt {
             List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
 
             if (children.isEmpty()) { // 如果是叶子节点
-                String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, ACT_FR, PROG_TIME, ACT_WBS_PCT, CC_WBS_STATUS_ID, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CRT_DT, LAST_MODI_DT,VER) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                myJdbcTemplate.update(insertSql, id, ccPrjId, nodeId, submitUserId, submitUserId, submitUserId, pActFr, now, actWbsPct, wbsStatusId, wbsProgressStatusId, remark, attachments, now, now, 1);
+                String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, ACT_FR, PROG_TIME, ACT_WBS_PCT, CC_WBS_STATUS_ID, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CC_ATTACHMENTS2, CRT_DT, LAST_MODI_DT,VER) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                myJdbcTemplate.update(insertSql, id, ccPrjId, nodeId, submitUserId, submitUserId, submitUserId, pActFr, now, actWbsPct, wbsStatusId, wbsProgressStatusId, remark, attachments, attachments2, now, now, 1);
 
                 CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(nodeId);
                 ccPrjStructNode.setProgTime(now);
