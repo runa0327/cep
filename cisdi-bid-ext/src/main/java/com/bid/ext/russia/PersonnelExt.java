@@ -186,6 +186,7 @@ public class PersonnelExt {
                     ruUserWorkType.setName(srt);
                     ruUserWorkType.insertById();
                     workTypeId = ruUserWorkType.getId();
+                    ruUserWorkTypes.add(ruUserWorkType);
                 }
 
                 //判断人员
