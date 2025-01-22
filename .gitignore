@@ -28,4 +28,3 @@ target/
 .classpath
 
 dependency-reduced-pom.xml
-application.yml
