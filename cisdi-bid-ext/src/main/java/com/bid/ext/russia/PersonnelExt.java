@@ -36,7 +36,7 @@ public class PersonnelExt {
 
 //            int frequency = getFrequency(userEntryInfo.getRuUserName(), userEntryInfo.getRuUserWorkTypeId());
             int frequency = getFrequency(userEntryInfo.getRuUserPhoneNumber());
-            userEntryInfo.setRuEntryFrequency(frequency+1);
+            userEntryInfo.setRuEntryFrequency(frequency);
 
             userEntryInfo.updateById();//更新频次
 
@@ -83,7 +83,7 @@ public class PersonnelExt {
         String prjId = varMap.get("PRJ_ID").toString();
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-//        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板.xlsx";
+        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板%2B(1).xlsx";
 
         if (!"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
