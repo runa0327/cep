@@ -83,7 +83,7 @@ public class PersonnelExt {
         String prjId = varMap.get("PRJ_ID").toString();
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-//        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板%2B(1).xlsx";
+//        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板%2B带备注.xlsx";
 
         if (!"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
@@ -165,7 +165,7 @@ public class PersonnelExt {
 
                 //出境时间
                 LocalDate  exitCountryDate = getLocalDateCellValue(row.getCell(11));
-
+                String  remark = getStringCellValue(row.getCell(12));
                 //判断工种
                 String  workTypeId = null;
                 boolean  workTypeExist= false;
@@ -238,10 +238,12 @@ public class PersonnelExt {
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, newUserEntryInfo);
                    //设置频次
 //                    newUserEntryInfo.setRuEntryFrequency(getFrequency(personName, workTypeId)+1);
+                    newUserEntryInfo.setRemark(remark);
                     newUserEntryInfo.setRuEntryFrequency(getFrequency(phoneNum)+1);
                     newUserEntryInfo.insertById();
                 }else{//有数据，修改
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, userEntryInfo);
+                    userEntryInfo.setRemark(remark);
                     userEntryInfo.updateById();
                 }
             }
