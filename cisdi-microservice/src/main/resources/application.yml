@@ -1,5 +1,5 @@
 server:
-  port: 21119
+  port: 21111
   servlet:
     context-path: /cisdi-microservice-test240511
 
@@ -98,3 +98,6 @@ mybatis:
   configuration:
     #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
+
+mq-config:
+  xMaxLength: 2000

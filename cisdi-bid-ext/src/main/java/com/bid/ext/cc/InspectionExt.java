@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.SysSettingUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -16,6 +17,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.JsonUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -24,6 +26,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import static com.bid.ext.utils.ImgUtils.img2base64;
 
 @Slf4j
 public class InspectionExt {
@@ -533,5 +537,74 @@ public class InspectionExt {
             ccSafeDutyUser.setName(userName);
             ccSafeDutyUser.updateById();
         }
+    }
+
+
+    public void aiRecognition() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
+            Map<String, Object> valueMap = entityRecord.valueMap;
+//            String ccQsIssuesImg = ccQsInspection.getCcQsIssuesImg();
+            String ccQsIssuesImg = JdbcMapUtil.getString(valueMap, "CC_QS_ISSUES_IMG");
+            String[] imgIds = ccQsIssuesImg.split(",");
+            for (String imgId : imgIds) {
+                FlFile flFile = FlFile.selectById(imgId);
+                String physicalLocation = flFile.getPhysicalLocation();
+                putImg2Mq(physicalLocation, imgId, csCommId);
+            }
+            int totalCnt = 0;
+            List<String> imgLst = new ArrayList<>();
+            StringBuilder remark;
+            remark = new StringBuilder();
+            for (String imgId : imgIds) {
+                while (totalCnt < 30) {
+                    List<CcAiInspectionResult> ccAiInspectionResults = CcAiInspectionResult.selectByWhere(
+                            new Where()
+                                    .eq(CcAiInspectionResult.Cols.CC_QS_INSPECTION_ID, ccQsInspection.getId())
+                                    .eq(CcAiInspectionResult.Cols.CC_ORIGIN_FILE_ID, imgId)
+                    );
+                    if (null != ccAiInspectionResults) {
+                        CcAiInspectionResult ccAiInspectionResult = ccAiInspectionResults.get(0);
+                        if (ccAiInspectionResult.getCcAiMarkedFileId() == null) {
+                            imgLst.add(imgId);
+                        } else {
+                            imgLst.add(ccAiInspectionResult.getCcAiMarkedFileId());
+                            remark.append(ccAiInspectionResult.getRemark());
+                        }
+                        break;
+                    }
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    totalCnt += 1;
+                }
+                if (totalCnt >= 30) {
+                    throw new BaseException("AI等待超时，请减少图片数量或稍后重试");
+                }
+            }
+            ccQsInspection.setCcQsIssuesImg(String.join(",", imgLst));
+            ccQsInspection.setRemark(remark.toString());
+        }
+    }
+
+    /**
+     * 将需要AI巡检的图像放到rabbitmq中本应用的巡检队列
+     * @param imgPhysicalLocation 需要放的图片的物理地址
+     * @param imgId 图片的文件ID
+     * @param aiInspectionReqId 质安巡检ID
+     */
+    public void putImg2Mq(String imgPhysicalLocation, String imgId, String aiInspectionReqId) {
+        RabbitTemplate rabbitTemplate = ExtJarHelper.getRabbitTemplate();
+        String orgId = ExtJarHelper.getLoginInfo().currentOrgInfo.id;
+        String base64 = img2base64(imgPhysicalLocation);
+        Map<String,Object> map = new HashMap<>();
+        map.put("inspection_img", base64);
+        map.put("file_id", imgId);
+        map.put("ai_inspection_req_id", aiInspectionReqId);
+        map.put("org_id", orgId);
+        rabbitTemplate.convertAndSend("inspection.req." + orgId, JSONObject.toJSONString(map));
     }
 }
