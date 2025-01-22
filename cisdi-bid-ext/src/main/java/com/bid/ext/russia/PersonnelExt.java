@@ -1,6 +1,9 @@
 package com.bid.ext.russia;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.bid.ext.model.*;
+import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
@@ -167,10 +170,11 @@ public class PersonnelExt {
                 String  workTypeId = null;
                 boolean  workTypeExist= false;
                 for (RuUserWorkType workType: ruUserWorkTypes) {
-//                    String nameJson = workType.getName();
-//                    JSONObject entries = JSONUtil.parseObj(nameJson);
-//                    String zh_cn = entries.getStr("ZH_CN");
-                    if (workType.getName().equals(workerTypeName)){
+                    String nameJson = workType.getName();
+                    JSONObject entries = JSONUtil.parseObj(nameJson);
+                    String zh_cn = entries.getStr("ZH_CN");
+
+                    if (zh_cn.equals(workerTypeName)){
                         workTypeId = workType.getId();
                         workTypeExist = true;
                     }
@@ -178,7 +182,8 @@ public class PersonnelExt {
                 if (!workTypeExist && !SharedUtil.isEmpty(workerTypeName)){//新增工种信息
                     RuUserWorkType ruUserWorkType = RuUserWorkType.newData();
                     ruUserWorkType.setCcPrjId(prjId);
-                    ruUserWorkType.setName(workerTypeName);
+                    String srt = JsonUtil.toJson(new Internationalization(null,workerTypeName,null));
+                    ruUserWorkType.setName(srt);
                     ruUserWorkType.insertById();
                     workTypeId = ruUserWorkType.getId();
                 }
