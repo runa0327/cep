@@ -40,16 +40,29 @@ public class StructNodeExt {
 //        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
         Boolean includeRootNode = JdbcMapUtil.getBoolean(varMap, "P_INCLUDE_ROOT_NODE");
 
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            Map<String, Object> topNode = getTopNode(entityRecord);
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        if (!SharedUtil.isEmpty(entityRecordList)) {
+            for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+                Map<String, Object> topNode = getTopNode(entityRecord);
 
+                List<Map<String, Object>> templateStruct = getTemplateStruct(pWbsTempateId, includeRootNode);
+                List<Map<String, Object>> list = replaceIdsAndInsert(templateStruct);
+                // 序号
+                BigDecimal seqNo = BigDecimal.ZERO;
+                // 对于每一个模板结构节点，将其作为子节点插入
+                for (Map<String, Object> node : list) {
+                    insertWbsNode(node, entityRecord, seqNo, topNode);
+                    seqNo = seqNo.add(BigDecimal.ONE);
+                }
+            }
+        } else {
             List<Map<String, Object>> templateStruct = getTemplateStruct(pWbsTempateId, includeRootNode);
             List<Map<String, Object>> list = replaceIdsAndInsert(templateStruct);
             // 序号
             BigDecimal seqNo = BigDecimal.ZERO;
             // 对于每一个模板结构节点，将其作为子节点插入
             for (Map<String, Object> node : list) {
-                insertWbsNode(node, entityRecord, seqNo, topNode);
+                PlanExt.insertWbsNode(node, seqNo, false);
                 seqNo = seqNo.add(BigDecimal.ONE);
             }
         }
