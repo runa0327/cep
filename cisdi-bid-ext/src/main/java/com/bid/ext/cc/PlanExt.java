@@ -79,7 +79,11 @@ public class PlanExt {
      */
     public static void insertWbsNode(Map<String, Object> nodeData, BigDecimal seqNo, Boolean isNewVersion) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
-        String ccPrjId = nodeData.get("CC_PRJ_ID").toString();
+        String ccPrjId = JdbcMapUtil.getString(nodeData, "CC_PRJ_ID");
+        if (ccPrjId == null) {
+            Map<String, Object> globalVarMap = loginInfo.globalVarMap;
+            ccPrjId = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
+        }
         String ccPrjWbsTypeId = nodeData.get("CC_PRJ_WBS_TYPE_ID").toString();
         String copyFromPrjStructNodeId = null;
         if (isNewVersion) {
