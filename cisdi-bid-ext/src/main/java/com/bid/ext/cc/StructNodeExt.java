@@ -926,14 +926,12 @@ public class StructNodeExt {
                     actDays = ChronoUnit.DAYS.between(ccPrjStructNode.getActFr(), ccPrjStructNode.getActTo()) + 1;
                     ccPrjStructNode.setActDays(BigDecimal.valueOf(actDays));
                 }
-                String ccAttachments = ccPrjStructNode.getCcAttachments() + "," + attachments;
-                String ccAttachments2 = ccPrjStructNode.getCcAttachments2() + "," + attachments2;
 
-                ccPrjStructNode.setCcAttachments(ccAttachments);
-                ccPrjStructNode.setCcAttachments2(ccAttachments2);
+                ccPrjStructNode.setCcAttachments(attachments);
+                ccPrjStructNode.setCcAttachments2(attachments2);
                 ccPrjStructNode.updateById();
                 if ("DONE".equals(wbsProgressStatusId)) {
-                    List<String> ccAttachmentList = Arrays.asList(ccAttachments.split(","));
+                    List<String> ccAttachmentList = Arrays.asList(attachments.split(","));
                     for (String ccAttachment : ccAttachmentList) {
                         CcProcedureLedger ccProcedureLedger = CcProcedureLedger.newData();
                         ccProcedureLedger.setCcPrjId(ccPrjId);
