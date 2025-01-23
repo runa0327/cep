@@ -122,6 +122,18 @@ public class PlanExt {
         ccPrjStructNode.setPlanDays(planDays);
         ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
         ccPrjStructNode.setCcPrjWbsTypeId(ccPrjWbsTypeId);
+        //进展
+        LocalDateTime progTime = JdbcMapUtil.getLocalDateTime(nodeData, "PROG_TIME");
+        String ccWbsProgressStatusId = JdbcMapUtil.getString(nodeData, "CC_WBS_PROGRESS_STATUS_ID");
+        Integer actWbsPct = JdbcMapUtil.getInt(nodeData, "ACT_WBS_PCT");
+        String ccAttachments = JdbcMapUtil.getString(nodeData, "CC_ATTACHMENTS");
+        String ccAttachments2 = JdbcMapUtil.getString(nodeData, "CC_ATTACHMENTS2");
+        ccPrjStructNode.setProgTime(progTime);
+        ccPrjStructNode.setCcWbsProgressStatusId(ccWbsProgressStatusId);
+        ccPrjStructNode.setActWbsPct(actWbsPct);
+        ccPrjStructNode.setCcAttachments(ccAttachments);
+        ccPrjStructNode.setCcAttachments2(ccAttachments2);
+
 
         String ccPrjStructNodePid = JdbcMapUtil.getString(nodeData, "CC_PRJ_STRUCT_NODE_PID");
         ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
