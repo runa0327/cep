@@ -112,6 +112,7 @@ public class StructNodeExt {
     public void commitPrePlan() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
         Map<String, Object> globalVarMap = loginInfo.globalVarMap;
         String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
         if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
@@ -192,7 +193,7 @@ public class StructNodeExt {
         }
 
         //编制的计划状态变更为已批准
-        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType).eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).eq(CcPrjStructNode.Cols.STATUS, "DR"));
+        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType).eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).eq(CcPrjStructNode.Cols.STATUS, "DR").eq(CcPrjStructNode.Cols.CRT_USER_ID, userId));
         if (!SharedUtil.isEmpty(ccPrjStructNodesDr)) {
             for (CcPrjStructNode ccPrjStructNodeDr : ccPrjStructNodesDr) {
                 ccPrjStructNodeDr.setStatus(String.valueOf(StatusE.AP));
