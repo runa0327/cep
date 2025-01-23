@@ -56,6 +56,7 @@ public class MqListener {
             generateQualifiedRecord(issueAreaDTO);
             return;
         }
+        generateUnqualifiedRecord(issueAreaDTO);
     }
 
     private void generateQualifiedRecord(IssueAreaDTO issueAreaDTO) {
@@ -72,8 +73,8 @@ public class MqListener {
     }
 
     private void generateUnqualifiedRecord(IssueAreaDTO issueAreaDTO) {
-        String ccOriginFileId = issueAreaDTO.getAiInspectionReqId();
-        String ccQsInspectionId = issueAreaDTO.getFileId();
+        String ccQsInspectionId = issueAreaDTO.getAiInspectionReqId();
+        String ccOriginFileId = issueAreaDTO.getFileId();
         String sql4Path = "SELECT p.DIR DIR, f.PHYSICAL_LOCATION LOC, f.FL_PATH_ID PATH, p.FILE_INLINE_URL FIU, p.FILE_ATTACHMENT_URL FAU FROM FL_FILE f LEFT JOIN FL_PATH p ON f.FL_PATH_ID = p.ID WHERE f.id = ?";
         Map<String, Object> map = jdbcTemplate.queryForMap(sql4Path, ccOriginFileId);
         String dir = JdbcMapUtil.getString(map, "DIR");
@@ -138,16 +139,16 @@ public class MqListener {
 //        flFile.setSizeKb(sizeKb);
 //        flFile.setDspSize(previewDspSize);
         String sql4File = "INSERT INTO FL_FILE" +
-                "(ID, NAME, VER, FL_PATH_ID, EXT, STATUS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, SIZE_KB" +
-                "FILE_INLINE_URL, FILE_ATTACHMENT_URL, TS, UPLOAD_DTTM, PHYSICAL_LOCATION, DSP_NAME, DPS_SIZE, IS_PUBLIC_READ, ORIGIN_PHYSICAL_LOCATION)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "(ID, NAME, VER, FL_PATH_ID, EXT, STATUS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, SIZE_KB, " +
+                "FILE_INLINE_URL, FILE_ATTACHMENT_URL, TS, UPLOAD_DTTM, PHYSICAL_LOCATION, DSP_NAME, DSP_SIZE, IS_PUBLIC_READ, ORIGIN_FILE_PHYSICAL_LOCATION)" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql4File,
                 Id, Id, 1, path, "jpg", "AP", now, userId, now, userId, sizeKb, fiu + "?fileId=" + Id,
                 fau + "?fileId=" + Id, now, now, previewFilePath, Id + ".jpg", previewDspSize, 1, previewFilePath);
 
         String sql = "INSERT INTO CC_AI_INSPECTION_RESULT" +
                 "(ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, CC_ORIGIN_FILE_ID, CC_QS_INSPECTION_ID, CC_AI_MARKED_FILE_ID, REMARK)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(
                 sql,
