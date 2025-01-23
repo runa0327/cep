@@ -16,6 +16,7 @@ import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.JsonUtil;
 import com.qygly.shared.util.SharedUtil;
+import com.tencentcloudapi.trp.v20210515.models.Ext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -561,7 +562,7 @@ public class InspectionExt {
                 while (totalCnt < 30) {
                     List<CcAiInspectionResult> ccAiInspectionResults = CcAiInspectionResult.selectByWhere(
                             new Where()
-                                    .eq(CcAiInspectionResult.Cols.CC_QS_INSPECTION_ID, ccQsInspection.getId())
+//                                    .eq(CcAiInspectionResult.Cols.CC_QS_INSPECTION_ID, ccQsInspection.getId())
                                     .eq(CcAiInspectionResult.Cols.CC_ORIGIN_FILE_ID, imgId)
                     );
                     if (null != ccAiInspectionResults) {
@@ -571,11 +572,13 @@ public class InspectionExt {
                         } else {
                             imgLst.add(ccAiInspectionResult.getCcAiMarkedFileId());
                             remark.append(ccAiInspectionResult.getRemark());
+                            ccQsInspection.setCcQsInitiationTypeId("1750796338488606720");
+                            ccAiInspectionResult.deleteById();
                         }
                         break;
                     }
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -587,6 +590,7 @@ public class InspectionExt {
             }
             ccQsInspection.setCcQsIssuesImg(String.join(",", imgLst));
             ccQsInspection.setRemark(remark.toString());
+            ccQsInspection.updateById();
         }
     }
 

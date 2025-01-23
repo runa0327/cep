@@ -53,10 +53,18 @@ spring:
     virtual-host: qygly
     listener:
       simple:
+        acknowledge-mode: auto
         # 单个队列的并发消费者的最小数量：
-        concurrency: 3
+        concurrency: 1
         # 单个队列的并发消费者的最大数量：
-        max-concurrency: 10
+        max-concurrency: 1
+        retry:
+          enabled: true
+          max-attempts: 1
+          max-interval: 50000   # 重试最大间隔时间
+          initial-interval: 10000  # 重试初始间隔时间
+          multiplier: 1 # 间隔时间乘子，间隔时间*乘子=下一次的间隔时间，最大不能超过设置的最大间隔时间
+        prefetch: 2
 
 
 qygly:

@@ -107,6 +107,13 @@
             <artifactId>thumbnailator</artifactId>
             <version>${thumbnailator.version}</version>
         </dependency>
+
+        <!-- 增强原生图像处理库使其支持webp格式存储的文件（后缀名仍为.jpg但实际存储格式为webp的） -->
+        <dependency>
+            <groupId>com.github</groupId>
+            <artifactId>webp-imageio-core</artifactId>
+            <version>0.1.3</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

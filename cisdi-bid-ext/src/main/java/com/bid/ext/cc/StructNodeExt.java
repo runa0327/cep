@@ -126,7 +126,13 @@ public class StructNodeExt {
                 "  AND cc_prj_wbs_type_id = ? " +
                 "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
                 "LIMIT 1";
-        Map<String, Object> map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType);
+        Map<String, Object> map = null;
+        try {
+            map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType);
+        } catch (EmptyResultDataAccessException e) {
+            // 处理没有结果的情况
+            map = null;
+        }
         String maxVersion = JdbcMapUtil.getString(map, "maxVersion");
 
         // 如果当前没有版本，则创建第一个版本
