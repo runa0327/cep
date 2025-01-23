@@ -950,7 +950,7 @@ public class StructNodeExt {
                 ccPrjStructNode.setCcAttachments(attachments);
                 ccPrjStructNode.setCcAttachments2(attachments2);
                 ccPrjStructNode.updateById();
-                if ("DONE".equals(wbsProgressStatusId)) {
+                if ("DONE".equals(wbsProgressStatusId) && attachments != null) {
                     List<String> ccAttachmentList = Arrays.asList(attachments.split(","));
                     for (String ccAttachment : ccAttachmentList) {
                         CcProcedureLedger ccProcedureLedger = CcProcedureLedger.newData();
@@ -964,6 +964,7 @@ public class StructNodeExt {
                         ccProcedureLedger.setUploadDttm(crtDt);
                         ccProcedureLedger.insertById();
                     }
+
                 }
             }
         }
