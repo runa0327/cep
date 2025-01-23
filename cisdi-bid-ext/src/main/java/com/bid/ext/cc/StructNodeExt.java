@@ -2984,61 +2984,89 @@ public class StructNodeExt {
     }
 
 
+    /**
+     * 新建编制中节点
+     */
     public void newEdittingNode() {
+        Map<String, Object> globalVarMap = ExtJarHelper.getLoginInfo().globalVarMap;
+        String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
-//        // 获取模板结构
-//        String pWbsTempateId = varMap.get("P_WBS_TEMPATE_ID").toString();
-//        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
 
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            Map<String, Object> valueMap = entityRecord.valueMap;
+        // 提取常用的变量
+        String name = JdbcMapUtil.getString(varMap, "P_NAME");
+        String remark = JdbcMapUtil.getString(varMap, "P_REMARK");
+        String wbsChiefUserId = JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID");
+        LocalDate pPlanFr = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_FR");
+        LocalDate pPlanTo = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_TO");
+        boolean isMileStone = Boolean.valueOf(JdbcMapUtil.getString(varMap, "P_IS_STONE"));
+        String wbsType = JdbcMapUtil.getString(varMap, "P_PLAN_TYPE");
 
-            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.newData();
-//            ccPrjStructNode.setCrtUserId("");
-            ccPrjStructNode.setCrtDt(LocalDateTime.now());
-            ccPrjStructNode.setStatus("DR");
-            ccPrjStructNode.setName(JdbcMapUtil.getString(varMap, "P_NAME"));
-            ccPrjStructNode.setRemark(JdbcMapUtil.getString(varMap, "P_REMARK"));
-            ccPrjStructNode.setCcPrjId(JdbcMapUtil.getString(valueMap, "CC_PRJ_ID"));
-            ccPrjStructNode.setCcPrjStructNodePid(JdbcMapUtil.getString(valueMap, "ID"));
+        // 校验日期
+        if (pPlanFr.isAfter(pPlanTo)) {
+            throw new BaseException("请检查并确保开始日期不晚于结束日期！");
+        }
 
-            ccPrjStructNode.setIsWbs(true);
-            ccPrjStructNode.setIsPbs(false);
-            ccPrjStructNode.setIsCbs(false);
-            ccPrjStructNode.setWbsChiefUserId(JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID"));
-            ccPrjStructNode.setPbsChiefUserId(JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID"));
-            ccPrjStructNode.setCbsChiefUserId(JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID"));
+        // 计算计划天数
+        long planDays = pPlanFr.until(pPlanTo).getDays();
 
-            LocalDate pPlanFr = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_FR");
-            LocalDate pPlanTo = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_TO");
+        // 创建基础的项目结构节点
+        CcPrjStructNode ccPrjStructNode = createProjectStructNode(name, remark, pCcPrjIds, wbsType, wbsChiefUserId, pPlanFr, pPlanTo, planDays, isMileStone);
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate from = LocalDate.parse(JdbcMapUtil.getString(varMap, "P_PLAN_FR"), formatter);
-            LocalDate to = LocalDate.parse(JdbcMapUtil.getString(varMap, "P_PLAN_TO"), formatter);
-            if (from.isAfter(to)) {
-                throw new BaseException("请检查并确保开始日期不晚于结束日期！");
+        // 获取实体记录并处理
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        if (!SharedUtil.isEmpty(entityRecordList)) {
+            for (EntityRecord entityRecord : entityRecordList) {
+                Map<String, Object> valueMap = entityRecord.valueMap;
+                String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+                String ccPrjStructNodePid = JdbcMapUtil.getString(valueMap, "ID");
+                ccPrjStructNode.setCcPrjId(ccPrjId);
+                ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
+                ccPrjStructNode.insertById();
             }
-
-            ccPrjStructNode.setPlanFr(pPlanFr);
-            ccPrjStructNode.setPlanTo(pPlanTo);
-            log.info(pPlanFr.toString());
-            log.info(pPlanTo.toString());
-
-            ccPrjStructNode.setPlanDays(BigDecimal.valueOf(pPlanFr.until(pPlanTo).getDays()));
-
-            log.info(JdbcMapUtil.getString(varMap, "P_IS_STONE"));
-
-            ccPrjStructNode.setIsMileStone(Boolean.valueOf(JdbcMapUtil.getString(varMap, "P_IS_STONE")));
-            ccPrjStructNode.setIsTemplate(false);
-            ccPrjStructNode.setCcPrjWbsTypeId(JdbcMapUtil.getString(valueMap, "CC_PRJ_WBS_TYPE_ID"));
-
-
+        } else {
             ccPrjStructNode.insertById();
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 创建并初始化CcPrjStructNode对象
+     *
+     * @param name
+     * @param remark
+     * @param pCcPrjIds
+     * @param wbsType
+     * @param wbsChiefUserId
+     * @param pPlanFr
+     * @param pPlanTo
+     * @param planDays
+     * @param isMileStone
+     * @return
+     */
+    private CcPrjStructNode createProjectStructNode(String name, String remark, String pCcPrjIds, String wbsType, String wbsChiefUserId,
+                                                    LocalDate pPlanFr, LocalDate pPlanTo, long planDays, boolean isMileStone) {
+        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.newData();
+        ccPrjStructNode.setStatus("DR");
+        ccPrjStructNode.setName(name);
+        ccPrjStructNode.setRemark(remark);
+        ccPrjStructNode.setCcPrjId(pCcPrjIds);
+        ccPrjStructNode.setIsWbs(true);
+        ccPrjStructNode.setIsPbs(false);
+        ccPrjStructNode.setIsCbs(false);
+        ccPrjStructNode.setWbsChiefUserId(wbsChiefUserId);
+        ccPrjStructNode.setPbsChiefUserId(wbsChiefUserId);
+        ccPrjStructNode.setCbsChiefUserId(wbsChiefUserId);
+        ccPrjStructNode.setPlanFr(pPlanFr);
+        ccPrjStructNode.setPlanTo(pPlanTo);
+        ccPrjStructNode.setPlanDays(BigDecimal.valueOf(planDays));
+        ccPrjStructNode.setIsMileStone(isMileStone);
+        ccPrjStructNode.setIsTemplate(false);
+        ccPrjStructNode.setCcPrjWbsTypeId(wbsType);
+        ccPrjStructNode.setCrtDt(LocalDateTime.now());
+        return ccPrjStructNode;
     }
 
     public void isEdittingNodeLegal() throws BaseException {
