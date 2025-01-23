@@ -152,7 +152,9 @@ public class MqListener {
 
         jdbcTemplate.update(
                 sql,
-                IdUtil.getSnowflakeNextIdStr(), 1, now, now, userId, now, userId, "AP",ccOriginFileId, ccQsInspectionId, Id, sb.toString());
+                IdUtil.getSnowflakeNextIdStr(), 1, now, now, userId, now, userId, "AP",ccOriginFileId,
+                null, //ccQsInspectionId
+                Id, sb.toString());
     }
 
     public static String getDir(String flPathDir) {
