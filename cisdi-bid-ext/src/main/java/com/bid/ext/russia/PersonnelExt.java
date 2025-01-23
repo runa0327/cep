@@ -11,12 +11,14 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.SharedUtil;
+import com.tencentcloudapi.ba.v20200720.BaErrorCode;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -94,12 +96,19 @@ public class PersonnelExt {
         Where where = new Where();
         where.sql("T.`STATUS`='AP'");
         List<RuUserWorkType> ruUserWorkTypes = RuUserWorkType.selectByWhere(where);
-
+        if (SharedUtil.isEmpty(ruUserWorkTypes)){
+            ruUserWorkTypes = new ArrayList<RuUserWorkType>();
+        }
         //所有人员信息
         List<RuUserInfo> ruUserInfos = RuUserInfo.selectByWhere(where);
-
+        if (SharedUtil.isEmpty(ruUserInfos)){
+            ruUserInfos = new ArrayList<RuUserInfo>();
+        }
         //所有住宿地
         List<RuUserAccommodation> ruUserAccommodations = RuUserAccommodation.selectByWhere(where);
+        if (SharedUtil.isEmpty(ruUserAccommodations)){
+            ruUserAccommodations = new ArrayList<RuUserAccommodation>();
+        }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = WorkbookFactory.create(file);
@@ -169,14 +178,16 @@ public class PersonnelExt {
                 //判断工种
                 String  workTypeId = null;
                 boolean  workTypeExist= false;
-                for (RuUserWorkType workType: ruUserWorkTypes) {
-                    String nameJson = workType.getName();
-                    JSONObject entries = JSONUtil.parseObj(nameJson);
-                    String zh_cn = entries.getStr("ZH_CN");
+                if (!SharedUtil.isEmpty(ruUserWorkTypes)) {
+                    for (RuUserWorkType workType : ruUserWorkTypes) {
+                        String nameJson = workType.getName();
+                        JSONObject entries = JSONUtil.parseObj(nameJson);
+                        String zh_cn = entries.getStr("ZH_CN");
 
-                    if (zh_cn.equals(workerTypeName)){
-                        workTypeId = workType.getId();
-                        workTypeExist = true;
+                        if (zh_cn.equals(workerTypeName)) {
+                            workTypeId = workType.getId();
+                            workTypeExist = true;
+                        }
                     }
                 }
                 if (!workTypeExist && !SharedUtil.isEmpty(workerTypeName)){//新增工种信息
@@ -189,31 +200,38 @@ public class PersonnelExt {
                     ruUserWorkTypes.add(ruUserWorkType);
                 }
 
+
                 //判断人员
                 String userInfoId =  null;
                 boolean  userInfoExist = false;
-                for(RuUserInfo ruUserInfo : ruUserInfos){
-                    if (ruUserInfo.getRuUserName().equals(personName)){
-                        userInfoId = ruUserInfo.getId();
-                        userInfoExist = true;
+                if (!SharedUtil.isEmpty(ruUserInfos)) {
+                    for (RuUserInfo ruUserInfo : ruUserInfos) {
+                        if (ruUserInfo.getRuUserName().equals(personName)) {
+                            userInfoId = ruUserInfo.getId();
+                            userInfoExist = true;
+                        }
                     }
                 }
+
                 if (!userInfoExist && !SharedUtil.isEmpty(personName)){//新增人员
                     RuUserInfo ruUserInfo = RuUserInfo.newData();
                     insertUserInfo(prjId,personName, age.intValue(), phoneNum, workTypeId, ruUserInfo);
                     userInfoId = ruUserInfo.getId();
+                    ruUserInfos.add(ruUserInfo);
                 }
 
                 //判断住宿
                 String  accommodationId =  null;
                 boolean accommodationExist = false;
-                for (RuUserAccommodation userAccommodation:ruUserAccommodations){
+                if (!SharedUtil.isEmpty(ruUserAccommodations)) {
+                    for (RuUserAccommodation userAccommodation : ruUserAccommodations) {
 //                    String nameJson = userAccommodation.getName();
 //                    JSONObject entries = JSONUtil.parseObj(nameJson);
 //                    String zh_cn = entries.getStr("ZH_CN");
-                    if (userAccommodation.getName().equals(accommodation)){
-                        accommodationExist=true;
-                        accommodationId=userAccommodation.getId();
+                        if (userAccommodation.getName().equals(accommodation)) {
+                            accommodationExist = true;
+                            accommodationId = userAccommodation.getId();
+                        }
                     }
                 }
                 if (!accommodationExist && !SharedUtil.isEmpty(accommodation)){
@@ -222,6 +240,7 @@ public class PersonnelExt {
                     userAccommodation.setName(accommodation);
                     userAccommodation.insertById();
                     accommodationId = userAccommodation.getId();
+                    ruUserAccommodations.add(userAccommodation);
                 }
 
                 //查询是否存在相同数据
