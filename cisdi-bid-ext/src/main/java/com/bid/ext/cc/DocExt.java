@@ -1,7 +1,6 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.*;
-import com.bid.ext.utils.TemplateUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -727,7 +726,6 @@ public class DocExt {
      */
     public void uploadDocFileAcceptance() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
-
         String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
         String ccPrjId = JdbcMapUtil.getString(varMap, "P_PRJ_ID");
         String ccDocDirId = JdbcMapUtil.getString(varMap, "P_DOC_DIR_ID");
@@ -762,7 +760,6 @@ public class DocExt {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
-
     }
 
     /**
@@ -850,4 +847,24 @@ public class DocExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 预检测竣工验收文件批量上传
+     */
+    public void preCheckUploadFile() {
+        Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
+        List<DrivenInfo> drivenInfos = drivenInfosMap.get(0);
+        String ccDocDirId = null;
+        for (DrivenInfo drivenInfo : drivenInfos) {
+            String code = drivenInfo.code;
+            if ("CC_DOC_DIR_ID".equals(code)) {
+                ccDocDirId = drivenInfo.value;
+            }
+        }
+        CcDocDir ccDocDir = CcDocDir.selectById(ccDocDirId);
+        String ccDocDirStatusId = ccDocDir.getCcDocDirStatusId();
+        if ("lock".equals(ccDocDirStatusId)) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.preCheckUploadFile");
+            throw new BaseException(message);
+        }
+    }
 }

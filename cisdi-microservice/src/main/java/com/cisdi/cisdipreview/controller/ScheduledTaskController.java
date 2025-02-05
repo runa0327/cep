@@ -34,6 +34,7 @@ public class ScheduledTaskController {
     @Scheduled(cron = "*/10 * * * * ?")
     public void scheduleTaskMeeting() {
         // 未自动登录前不要执行：
+        Map<String, Object> globalVarMap = LoginInfoManager.loginInfo.globalVarMap;
         if (LoginInfoManager.loginInfo == null) {
             return;
         }
@@ -61,6 +62,7 @@ public class ScheduledTaskController {
     public void scheduleTaskWorkSchedule() {
         // 未自动登录前不要执行：
         if (LoginInfoManager.loginInfo == null) {
+            log.info("未登录");
             return;
         }
         scheduleTask("CC_WORK_SCHEDULE", "CC_SCHEDULE_TIME", "1863482975577686016", "1868541052077420544");

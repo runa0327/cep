@@ -1,5 +1,5 @@
 server:
-  port: 21111
+  port: 21119
   servlet:
     context-path: /cisdi-microservice-test240511
 
