@@ -65,7 +65,7 @@ public class ScheduledTaskController {
             log.info("未登录");
             return;
         }
-        scheduleTask("CC_WORK_SCHEDULE", "CC_SCHEDULE_TIME", "1863482975577686016", "1868541052077420544");
+        scheduleTask("CC_WORK_SCHEDULE", "CC_SCHEDULE_TIME", "1887043444377198592", "1868541052077420544");
     }
 
     private void scheduleTask(String entity, String timeField, String sevId, String actId) {
@@ -110,6 +110,7 @@ public class ScheduledTaskController {
                             mapArrayList.add(map);
                             invokeActParam.valueMapList = mapArrayList;
 
+                            log.info("请求发送，记录ID: " + map.get("ID") + " 提醒方式ID: " + remindTypeId + "sevId:" + sevId);
                             RespBody<InvokeActResult> respBody = dataFeignClient.invokeAct(invokeActParam);
                             if (respBody.succ) {
                                 log.info("提醒成功，记录ID: " + map.get("ID") + " 提醒方式ID: " + remindTypeId);
