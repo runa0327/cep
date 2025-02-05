@@ -852,14 +852,17 @@ public class DocExt {
      */
     public void preCheckUploadFile() {
         Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
-        List<DrivenInfo> drivenInfos = drivenInfosMap.get(0);
         String ccDocDirId = null;
-        for (DrivenInfo drivenInfo : drivenInfos) {
-            String code = drivenInfo.code;
-            if ("CC_DOC_DIR_ID".equals(code)) {
-                ccDocDirId = drivenInfo.value;
+        for (Map.Entry<String, List<DrivenInfo>> entry : drivenInfosMap.entrySet()) {
+            List<DrivenInfo> drivenInfos = entry.getValue();
+            for (DrivenInfo drivenInfo : drivenInfos) {
+                String code = drivenInfo.code;
+                if ("CC_DOC_DIR_ID".equals(code)) {
+                    ccDocDirId = drivenInfo.value;
+                }
             }
         }
+
         CcDocDir ccDocDir = CcDocDir.selectById(ccDocDirId);
         String ccDocDirStatusId = ccDocDir.getCcDocDirStatusId();
         if ("lock".equals(ccDocDirStatusId)) {
