@@ -83,7 +83,7 @@ public class PrjExt {
     }
 
     /**
-     * 创建项目同步创建成本统览，项目四算，结算
+     * 创建项目根据科目模板同步创建投资科目，根据投资科目创建成本统览，项目四算，结算
      */
     public void creatCostTree() {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
@@ -93,18 +93,40 @@ public class PrjExt {
         // 获取成本模板树
         List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, 1).eq(CcPrjStructNode.Cols.IS_CBS, 1));
         if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
+            // 创建投资科目
+            List<CcPrjStructNode> cbsTreeSubject = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_SUBJECT");
             // 建立匡算，估算，概算，预算树
-            List<CcPrjStructNode> cbsTree0 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_0");
-            List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_1");
-            List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_2");
-            List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_3");
-            List<CcPrjStructNode> cbsTree11 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_11");
-            List<CcPrjStructNode> cbsTree12 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_12");
+            List<CcPrjStructNode> cbsTree0 = replaceIdsAndInsert(cbsTreeSubject, ccPrjId, "CBS_0");
+            List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(cbsTreeSubject, ccPrjId, "CBS_1");
+            List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(cbsTreeSubject, ccPrjId, "CBS_2");
+            List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(cbsTreeSubject, ccPrjId, "CBS_3");
+            List<CcPrjStructNode> cbsTree11 = replaceIdsAndInsert(cbsTreeSubject, ccPrjId, "CBS_11");
+            List<CcPrjStructNode> cbsTree12 = replaceIdsAndInsert(cbsTreeSubject, ccPrjId, "CBS_12");
             // 建立成本树
-            List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodes, ccPrjId);
+            List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(cbsTreeSubject, ccPrjId);
         }
+    }
 
-
+    /**
+     * 新增投资科目时同步项目四算及投资统览
+     */
+    public void syncSubjectToCostTree() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+            List<CcPrjStructNode> ccPrjStructNodeList = new ArrayList<>();
+            ccPrjStructNodeList.add(ccPrjStructNode);
+            String ccPrjId = ccPrjStructNode.getCcPrjId();
+            // 建立匡算，估算，概算，预算树
+            List<CcPrjStructNode> cbsTree0 = replaceIdsAndInsert(ccPrjStructNodeList, ccPrjId, "CBS_0");
+            List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(ccPrjStructNodeList, ccPrjId, "CBS_1");
+            List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(ccPrjStructNodeList, ccPrjId, "CBS_2");
+            List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(ccPrjStructNodeList, ccPrjId, "CBS_3");
+            List<CcPrjStructNode> cbsTree11 = replaceIdsAndInsert(ccPrjStructNodeList, ccPrjId, "CBS_11");
+            List<CcPrjStructNode> cbsTree12 = replaceIdsAndInsert(ccPrjStructNodeList, ccPrjId, "CBS_12");
+            // 建立成本树
+            List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodeList, ccPrjId);
+        }
     }
 
     /**
