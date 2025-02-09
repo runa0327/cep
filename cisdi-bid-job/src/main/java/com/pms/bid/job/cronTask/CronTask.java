@@ -39,7 +39,7 @@ public class CronTask {
     /**
      * 每天早上6点执行施工方案计划预警定时任务
      */
-    @Scheduled(cron = "0 0 6 * * ?")
+//    @Scheduled(cron = "0 0 6 * * ?")
     public void generateCreateConstructionPlan(){
         try {
             log.error("施工方案计划预警任务-开始");
@@ -54,7 +54,7 @@ public class CronTask {
     /**
      * 每天早上6点执行特种设备计划预警定时任务
      */
-    @Scheduled(cron = "0 0 6 * * ?")
+//    @Scheduled(cron = "0 0 6 * * ?")
     public void checkSpecialEquipPlan(){
         System.out.println("CronTask.checkSpecialEquipPlan");
         try {
@@ -66,18 +66,19 @@ public class CronTask {
         }
     }
 
-    @Scheduled(fixedRate = 1000*60*10)
+//    @Scheduled(fixedRate = 1000*60*10)
     public void checkIotStatus(){
         log.info("检查物联网设备在线状态");
         iotEquipService.checkOnlineStatus();
     }
 
 
-    @Scheduled(fixedRate = 1000*60*60)
+//    @Scheduled(fixedRate = 1000*60*60)
     public void checkHoistingMachineryTodo(){
         hoistingMachineryService.checkDate();
         elevatorService.checkDate();
         assemblingPressureVesselsService.checkDate();
     }
+
 
 }

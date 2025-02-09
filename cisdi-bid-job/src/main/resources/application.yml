@@ -11,7 +11,7 @@ spring:
     username: qygly
     password: Qygly@123456
     # 注意更改ip和db：
-    url: jdbc:mysql://121.5.65.165:3306/test240511?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    url: jdbc:mysql://8.137.116.250:3306/test240511?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -37,3 +37,21 @@ mybatis:
   mapperLocations: classpath*:mapper/**/*Mapper.xml
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#轻筑平台
+qz:
+  url:
+    baseUrl: https://open.qingzhuyun.com #轻筑平台地址
+    getNatureUrlInspectUrl: /api/inspect/getNatureInspect #获取巡检性质
+    getItemsNameInspectUrl: /api/inspect/getItemsNameInspect #获取巡检项
+    getSafetyListPage: /api/inspect/getSafetyListPage #获取安全巡检列表
+    getQualityListPage: /api/inspect/getQualityListPage #获取质量巡检列表
+    findQualityById: /api/inspect/info/findQualityById #获取巡检记录详情
+    findCriticalById: /api/inspect/info/findCriticalById #获取安全巡检记录详情
+    getToken: /api/platform/token #获取访问凭证
+  projectId: d16f0c99b8b54feb96b3b7422c3755a0 #轻筑平台中对应的项目ID
+  appConfig:
+    appId: a0658b6f47f443729e28eafcbfccfad6
+    secret: 958796e25fea43b2aa0574562ec0a3c1
+
+
