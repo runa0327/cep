@@ -1,7 +1,4 @@
 package com.cisdi.cisdipreview.controller;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import com.cisdi.cisdipreview.model.TranslateRequestBody;
 import com.qygly.shared.BaseException;
@@ -12,15 +9,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping(value = "/preview")
@@ -31,6 +31,7 @@ public class Preview {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private RestTemplate restTemplate;
+
     @GetMapping("/preview_callback")
     public ResponseEntity<Map<String, String>> callback(
             @RequestParam String fileId,
@@ -77,6 +78,8 @@ public class Preview {
             String uploadedFileId = null;
             try {
                 if (SharedUtil.isEmpty(modelFileId)) {
+                    // 先更新“转换中”状态
+                    jdbcTemplate.update("UPDATE CC_DOC_FILE SET CC_PREVIEW_CONVERSION_STATUS_ID = ? WHERE ID = ?", "DOING", ccDocFileId);
                     // 上传文件逻辑
                     uploadedFileId = uploadFileToBimface(filePath, fileName, parentId, token, uploadFileUrl);
                     // 上传成功，更新模型fileid
@@ -162,7 +165,7 @@ public class Preview {
 
         Map<String, Object> map = jdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
         String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
-        String callBackUrl = gateWayUrl + "cisdi-microservice-" + orgCode +"/preview/preview_callback";
+        String callBackUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/preview/preview_callback";
 
 //        callBackUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/preview_callback/";
 
