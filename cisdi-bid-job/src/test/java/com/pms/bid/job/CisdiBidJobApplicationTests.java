@@ -2,6 +2,7 @@ package com.pms.bid.job;
 
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.pms.bid.job.component.ru.RuQzPlatformUtil;
 import com.pms.bid.job.domain.AdAtt;
 import com.pms.bid.job.domain.FlFile;
 import com.pms.bid.job.domain.FlPath;
@@ -12,12 +13,18 @@ import com.pms.bid.job.mapper.file.FlPathMapper;
 import com.pms.bid.job.mapper.zhanJiang.PressurePipelineMapper;
 import com.pms.bid.job.service.ru.RuQzInspectionAttService;
 import com.pms.bid.job.service.ru.RuQzInspectionInfoService;
+import com.pms.bid.job.service.ru.RuQzInspectionItemService;
+import com.qygly.ext.jar.helper.ExtJarHelper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 class CisdiBidJobApplicationTests {
@@ -33,6 +40,8 @@ class CisdiBidJobApplicationTests {
     private RuQzInspectionInfoService inspectionInfoService;
 
     @Resource
+    private RuQzInspectionItemService inspectionItemService;
+    @Resource
     private AdAttMapper adAttMapper;
 
     @Resource
@@ -40,6 +49,12 @@ class CisdiBidJobApplicationTests {
 
     @Resource
     private FlFileMapper flFileMapper;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private RuQzPlatformUtil ruQzPlatformUtil;
 
     @Test
     void contextLoads() {
@@ -51,6 +66,11 @@ class CisdiBidJobApplicationTests {
     @Test
     void testGetInspection(){
         inspectionAttService.syncQzInspectionAtt();
+    }
+
+    @Test
+    void testGetInspectionItem(){
+        inspectionItemService.syncQzInspectionItem();
     }
 
     @Test
@@ -87,5 +107,27 @@ class CisdiBidJobApplicationTests {
 //        }
 //
 //    }
+
+    @Test
+    void testSyncInspectionInfo(){
+        inspectionInfoService.syncQzInspectionInfo();
+    }
+
+    @Test
+    void testRedis(){
+//        redisTemplate.opsForValue().set("QZ_AUTH_TOKEN","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoie1wiYXBwSWRcIjpcImEwNjU4YjZmNDdmNDQzNzI5ZTI4ZWFmY2JmY2NmYWQ2XCJ9IiwiZXhwIjoxNzM5MTc3NTYzfQ.MAfdzsnEO5yCb7dMMD1s3qrsv_cVgj9Jy_azZufFOnU",7200, TimeUnit.SECONDS);
+//        redisTemplate.delete("QZ_AUTH_TOKEN");
+        Object expire = redisTemplate.opsForValue().get("QZ_AUTH_TOKEN");
+        System.out.println(expire);
+
+    }
+
+    @Test
+    void testRedisToken(){
+
+        String qzToken = ruQzPlatformUtil.getQzToken();
+        System.out.println(qzToken);
+    }
+
 
 }
