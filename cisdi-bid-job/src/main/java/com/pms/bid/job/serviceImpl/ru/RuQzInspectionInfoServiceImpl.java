@@ -54,10 +54,10 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
     @Resource
     private RuQzInspectionInfoReplayMapper inspectionInfoReplayMapper;
 
-    @Autowired
+    @Resource
     private RuQzInspectionItemMapper inspectionItemMapper;
 
-    @Autowired
+    @Resource
     private RuQzInspectionAttMapper inspectionAttMapper;
 
     @Autowired
@@ -72,13 +72,13 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
     @Resource
     private FlPathMapper flPathMapper;
 
-    @Autowired
+    @Resource
     private FlFileMapper flFileMapper;
 
-    @Autowired
+    @Resource
     private RuQzInspectionResultMapper inspectionResultMapper;
 
-    @Autowired
+    @Resource
     private RuQzInspectionDangerLevelMapper inspectionDangerLevelMapper;
 
     @Override
@@ -273,7 +273,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                 String imgUrl = (String) imageIterator.next();
                                 //保存图片到本地
                                 try {
-                                    FlFile flFile = saveImg(imgUrl, "整改图片");
+                                    FlFile flFile = saveImg(imgUrl, "巡检图片");
 
                                     insImgs += flFile.getId();
                                     if (imageIterator.hasNext()) {
@@ -607,8 +607,8 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
 
 
         //获取项目路径
-//        File directory = new File(getBaseFilePath()+"/qzInspectionImg");
-        File directory = new File("/Users/hejialun/Documents/qzInspectionImg");
+        File directory = new File(getBaseFilePath()+"/qzInspectionImg");
+//        File directory = new File("/Users/hejialun/Documents/qzInspectionImg");
         String path = directory.getCanonicalPath();
         //如果没有文件夹则创建
         File file = new File(path);
