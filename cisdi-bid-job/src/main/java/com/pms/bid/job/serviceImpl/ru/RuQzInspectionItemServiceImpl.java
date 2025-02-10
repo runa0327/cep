@@ -5,6 +5,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.pms.bid.job.component.ru.RuQzPlatformUtil;
 import com.pms.bid.job.domain.qingZhu.RuQzInspectionAtt;
 import com.pms.bid.job.domain.qingZhu.RuQzInspectionItem;
 import com.pms.bid.job.mapper.ru.RuQzInspectionAttMapper;
@@ -38,10 +39,12 @@ public class RuQzInspectionItemServiceImpl implements RuQzInspectionItemService 
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private RuQzPlatformUtil ruQzPlatformUtil;
 
     @Override
     public void syncQzInspectionItem() {
-        String  token = getQzToken();
+        String  token = ruQzPlatformUtil.getQzToken();
 
         if (!StringUtils.hasLength(token)){
             throw new BaseException("token为空");
@@ -52,11 +55,11 @@ public class RuQzInspectionItemServiceImpl implements RuQzInspectionItemService 
     }
 
     private void syncSafeInspectionItem(String token){
-        String  requestUrl =  "https://open.qingzhuyun.com/api/inspect/getItemsNameInspect";
+        String  requestUrl =  "https://open.qingzhuyun.com/api/inspect/getItemsNameInspect?projectId=d16f0c99b8b54feb96b3b7422c3755a0&inspectType=2";
 
         Map<String, Object> requestMap = new HashMap<>();//请求参数，只包含
-        requestMap.put("projectId", "d16f0c99b8b54feb96b3b7422c3755a0");//轻筑项目ID
-        requestMap.put("inspectType",2);//巡检类型1质量，2安全
+//        requestMap.put("projectId", "d16f0c99b8b54feb96b3b7422c3755a0");//轻筑项目ID
+//        requestMap.put("inspectType",2);//巡检类型1质量，2安全
 
         HttpHeaders translateHeaders = new HttpHeaders();
         translateHeaders.set("auth-token", token);
@@ -69,7 +72,9 @@ public class RuQzInspectionItemServiceImpl implements RuQzInspectionItemService 
 
         if (response.getStatusCode() == HttpStatus.OK) {
             JSONObject body = JSONUtil.parseObj(response.getBody());
+            System.out.println(body);
             JSONObject data = body.getJSONObject("data");
+            System.out.println(data);
             JSONArray nature = data.getJSONArray("inspection");
             Iterator<Object> iterator = nature.iterator();
             while(iterator.hasNext()){
@@ -94,13 +99,11 @@ public class RuQzInspectionItemServiceImpl implements RuQzInspectionItemService 
     }
 
     private void syncQualityInspectionItem(String token){
-        String  requestUrl =  "https://open.qingzhuyun.com/api/inspect/getItemsNameInspect";
+        String  requestUrl =  "https://open.qingzhuyun.com/api/inspect/getItemsNameInspect?projectId=d16f0c99b8b54feb96b3b7422c3755a0&inspectType=1";
 
         Map<String, Object> requestMap = new HashMap<>();//请求参数，只包含
-        requestMap.put("projectId", "d16f0c99b8b54feb96b3b7422c3755a0");//轻筑项目ID
-        requestMap.put("inspectType",2);//巡检类型1质量，2安全
-
-
+//        requestMap.put("projectId", "d16f0c99b8b54feb96b3b7422c3755a0");//轻筑项目ID
+//        requestMap.put("inspectType",1);//巡检类型1质量，2安全
 
         HttpHeaders translateHeaders = new HttpHeaders();
         translateHeaders.set("auth-token", token);
@@ -109,13 +112,15 @@ public class RuQzInspectionItemServiceImpl implements RuQzInspectionItemService 
         // 设置请求体
         HttpEntity<Map> translateEntity = new HttpEntity<>(requestMap, translateHeaders);
 
-
-
         ResponseEntity<String> response = restTemplate.exchange(requestUrl, HttpMethod.GET, translateEntity, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             JSONObject body = JSONUtil.parseObj(response.getBody());
+            System.out.println(body);
             JSONObject data = body.getJSONObject("data");
+            if (data==null){
+                return;
+            }
             JSONArray nature = data.getJSONArray("inspection");
             Iterator<Object> iterator = nature.iterator();
             while(iterator.hasNext()){
@@ -123,53 +128,22 @@ public class RuQzInspectionItemServiceImpl implements RuQzInspectionItemService 
 
                 LambdaQueryWrapper<RuQzInspectionItem> wrapper = new LambdaQueryWrapper<>();
                 wrapper.eq(RuQzInspectionItem::getName,next);
-                wrapper.eq(RuQzInspectionItem::getRuQzInspectionType,2);
+                wrapper.eq(RuQzInspectionItem::getRuQzInspectionType,1);
                 RuQzInspectionItem selectOne = inspectionItemMapper.selectOne(wrapper);
                 if (SharedUtil.isEmpty(selectOne)){
                     RuQzInspectionItem ruQzInspectionItem = normalNewQzInspectionItem();
                     ruQzInspectionItem.setName(next);
-                    ruQzInspectionItem.setRuQzInspectionType(2);
+                    ruQzInspectionItem.setRuQzInspectionType(1);
                     inspectionItemMapper.insert(ruQzInspectionItem);
                 }
 
             }
 
         }else{
-            throw new BaseException("获取庆轻筑巡检项错误："+response);
+            throw new BaseException("获取轻筑巡检项错误："+response);
         }
     }
 
-
-    private  String getQzToken(){
-
-        String token = null;
-        String  requestUrl =  "https://open.qingzhuyun.com/api/platform/token?appId=a0658b6f47f443729e28eafcbfccfad6&secret=958796e25fea43b2aa0574562ec0a3c1";
-
-        Map<String, Object> requestMap = new HashMap<>();//请求参数，只包含
-        requestMap.put("appId", "a0658b6f47f443729e28eafcbfccfad6");//轻筑项目ID
-        requestMap.put("secret","958796e25fea43b2aa0574562ec0a3c1");//巡检类型1质量，2安全
-
-        HttpHeaders translateHeaders = new HttpHeaders();
-
-
-        // 设置请求体
-        HttpEntity<Map> translateEntity = new HttpEntity<>(requestMap, translateHeaders);
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(requestUrl, HttpMethod.GET, translateEntity, String.class);
-
-        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-
-            JSONObject entries = JSONUtil.parseObj(responseEntity.getBody());
-
-            JSONObject data = entries.getJSONObject("data");
-            token  = data.getStr("authToken");
-
-        }else{
-            throw new BaseException("token获取失败"+responseEntity);
-        }
-
-        return token;
-    }
 
     /**
      * 实体通用赋值

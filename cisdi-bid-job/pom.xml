@@ -93,6 +93,16 @@
             <version>2.0.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+
         <!-- 还有其它需要的jar包自由引入（注：fastjson不要使用低于1.2.60版本，会有安全漏洞） -->
         <dependency>
             <groupId>com.alibaba</groupId>

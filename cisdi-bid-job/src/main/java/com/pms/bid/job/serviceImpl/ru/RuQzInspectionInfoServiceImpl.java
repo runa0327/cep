@@ -6,27 +6,28 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.pms.bid.job.component.ru.RuQzPlatformUtil;
 import com.pms.bid.job.domain.AdAtt;
 import com.pms.bid.job.domain.FlFile;
 import com.pms.bid.job.domain.FlPath;
-import com.pms.bid.job.domain.qingZhu.RuQzInspectionAtt;
-import com.pms.bid.job.domain.qingZhu.RuQzInspectionInfo;
-import com.pms.bid.job.domain.qingZhu.RuQzInspectionInfoReplay;
+import com.pms.bid.job.domain.qingZhu.*;
 import com.pms.bid.job.mapper.file.AdAttMapper;
+import com.pms.bid.job.mapper.file.FlFileMapper;
 import com.pms.bid.job.mapper.file.FlPathMapper;
+import com.pms.bid.job.mapper.ru.*;
 import com.pms.bid.job.mapper.ru.RuQzInspectionInfoMapper;
-import com.pms.bid.job.mapper.ru.RuQzInspectionInfoMapper;
-import com.pms.bid.job.mapper.ru.RuQzInspectionInfoReplayMapper;
 import com.pms.bid.job.service.ru.RuQzInspectionInfoService;
 import com.pms.bid.job.service.ru.RuQzInspectionInfoService;
 import com.pms.bid.job.util.DateUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.QuerydslRepositoryInvokerAdapter;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,11 +39,13 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
 @Service
+@Transactional
 public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService {
 
     @Resource
@@ -52,7 +55,16 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
     private RuQzInspectionInfoReplayMapper inspectionInfoReplayMapper;
 
     @Autowired
+    private RuQzInspectionItemMapper inspectionItemMapper;
+
+    @Autowired
+    private RuQzInspectionAttMapper inspectionAttMapper;
+
+    @Autowired
     private  RestTemplate restTemplate;
+
+    @Autowired
+    private RuQzPlatformUtil ruQzPlatformUtil;
 
     @Resource
     private AdAttMapper adAttMapper;
@@ -60,10 +72,19 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
     @Resource
     private FlPathMapper flPathMapper;
 
+    @Autowired
+    private FlFileMapper flFileMapper;
+
+    @Autowired
+    private RuQzInspectionResultMapper inspectionResultMapper;
+
+    @Autowired
+    private RuQzInspectionDangerLevelMapper inspectionDangerLevelMapper;
+
     @Override
     public void syncQzInspectionInfo() {
 
-        String  token = getQzToken();
+        String  token = ruQzPlatformUtil.getQzToken();
 
         if (!StringUtils.hasLength(token)){
             throw new BaseException("token为空");
@@ -77,7 +98,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
      * 获取巡检列表
      * @param token
      */
-    private void syncSafeInspectionInfo(String token){
+    private void syncSafeInspectionInfo(String token)  {
         String  requestUrl =  "https://open.qingzhuyun.com/api/inspect/getSafetyListPage";
 
         Map<String, Object> requestMap = new HashMap<>();//请求参数，只包含
@@ -99,8 +120,11 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
             JSONObject data = res.getJSONObject("data");
             JSONArray dataList = data.getJSONArray("dataList");
 
+            if (dataList==null) {
+                log.error("获取数据列表失败");
+                return;
+            }
             Iterator<Object> iterator = dataList.iterator();
-
             while(iterator.hasNext()){//循环列表数据
                 Object next =  iterator.next();
                 JSONObject entries = JSONUtil.parseObj(next);
@@ -108,16 +132,14 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                 String rectTime = (String) entries.get("rectTime");//整改时间
                 String result = (String) entries.get("result");//巡检结果
 //                String noticePerson = (String) entries.get("noticePerson");
-//                String property = (String) entries.get("property");
+                String property = (String) entries.get("property");
                 String inspectPerson = (String) entries.get("inspectPerson");//巡检人
                 String remarks = (String) entries.get("remarks");//巡检描述
 //                String initiationTime = (String) entries.get("initiationTime");
-                String inspectItem = (String) entries.get("inspectItem");//巡检时间
+                String inspectItem = (String) entries.get("inspectItem");//巡检项
                 String status = (String) entries.get("status");//巡检状态
-                JSONArray images = entries.getJSONArray("image");//巡检图片
-
-
-
+//                JSONArray images = entries.getJSONArray("image");//巡检图片
+                String initiationTime = (String) entries.get("initiationTime");//巡检状态
 
                 //查询数据是否存在
                 LambdaQueryWrapper<RuQzInspectionInfo> wrapper = new LambdaQueryWrapper<>();
@@ -131,6 +153,11 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                     JSONObject inspectionDetail = getInspectionDetail(recordId, token);
 
                     JSONArray patrolList = inspectionDetail.getJSONArray("patrolList");//巡检内容
+                    if(patrolList==null){
+                        log.error("巡检内容获取错误");
+                        throw new BaseException("巡检内容获取错误");
+                    }
+
                     Iterator<Object> iterator1 = patrolList.iterator();
 
                     while(iterator1.hasNext()){
@@ -140,49 +167,135 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                         ruQzInspectionInfo.setRuQzInspectionType(1);//巡检类型，安全巡检
 
                         ruQzInspectionInfo.setRemark(remarks);//巡检描述
-                        ruQzInspectionInfo.setRuQzInspectionCheckItems(inspectItem);//巡检项
-                        ruQzInspectionInfo.setRuQzInspectionCheckResult(result);//巡检结果
+//                        ruQzInspectionInfo.setRuQzInspectionCheckItems(inspectItem);//巡检项
+//                        ruQzInspectionInfo.setRuQzInspectionCheckResult(result);//巡检结果
                         ruQzInspectionInfo.setRuQzInspectionChecker(inspectPerson);//巡检人
                         ruQzInspectionInfo.setRuQzInspectionStatus(status);//巡检状态
                         ruQzInspectionInfo.setRuQzInspectionRectTime(rectTime);//整改时间
-                        Iterator<Object> imageIterator = images.iterator(); //巡检图片迭代
-                        String  insImgs = "";
-                        while (imageIterator.hasNext()){ //整改图片列表
-                            String imgUrl = (String)imageIterator.next();
-                            //保存图片到本地
-                            try {
-                                FlFile flFile = saveImg(imgUrl, "整改图片");
-                                insImgs+=flFile.getId();
-                                if (imageIterator.hasNext()){
-                                    insImgs+=",";
-                                }
-                            } catch (IOException e) {
-                                log.error("巡检图片保存失败："+new Date());
-                            }
-                        }
-                        if(StringUtils.hasText(insImgs)) {
-                            ruQzInspectionInfo.setRuQzInspectionUrls(insImgs);//设置巡检图片
-                        }
+                        ruQzInspectionInfo.setRuQzInspectionCheckTime(initiationTime);
 
                         Object patro = iterator1.next();
                         JSONObject entries1 = JSONUtil.parseObj(patro);//巡检内容
                         String projectLocation = (String)entries1.get("projectLocation");//项目地址
                         ruQzInspectionInfo.setRuQzInspectionProjectLocation(projectLocation);
                         String dangerLevel = (String)entries1.get("dangerLevel");//隐患等级
+                        if (StringUtils.hasLength(dangerLevel)){ //隐患等级
+                            LambdaQueryWrapper<RuQzInspectionDangerLevel> levelLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                            levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getName,dangerLevel);
+                            levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getRuQzInspectionType,2);
+                            RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOne(levelLambdaQueryWrapper);
+
+                            if(ruQzInspectionDangerLevel==null){
+                                ruQzInspectionInfo.setRuQzInspectionDangerLevelId("1888887369215811584");
+                            }else{
+                                ruQzInspectionInfo.setRuQzInspectionDangerLevelId(ruQzInspectionDangerLevel.getId());
+                            }
+                        }else{
+                            ruQzInspectionInfo.setRuQzInspectionDangerLevelId("1888887369215811584");
+                        }
+
                         ruQzInspectionInfo.setRuQzInspectionDangerLevel(dangerLevel);
-//                        String checkItems = (String)entries1.get("checkItems");//巡检项
-//                        String checkResult = (String)entries1.get("checkResult");//巡检内容
+                        String checkItems = (String)entries1.get("checkItems");//巡检项
+                        String checkResult = (String)entries1.get("checkResult");//巡检内容
+                        ruQzInspectionInfo.setRuQzInspectionCheckResult(checkResult);//巡检结果
+                        if(StringUtils.hasLength(checkResult)) {
+                            LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                            resultLambdaQueryWrapper.eq(RuQzInspectionResult::getName,checkResult);
+                            RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
+                            if (ruQzInspectionResult!=null){
+                                System.out.println(ruQzInspectionResult);
+                                ruQzInspectionInfo.setRuQzInspectionResultId(ruQzInspectionResult.getId());
+                            }else{
+                                ruQzInspectionInfo.setRuQzInspectionResultId("3");//书面整改
+                            }
+                        }else {
+                            ruQzInspectionInfo.setRuQzInspectionResultId("3");//书面整改
+                        }
+
                         String outcomeMap = (String)entries1.get("outcomeMap");//可能后果
                         ruQzInspectionInfo.setRuQzInspectionOutcomeMap(outcomeMap);
                         String dangerMap = (String)entries1.get("dangerMap");//原因分析
                         ruQzInspectionInfo.setRuQzInspectionDangerMap(dangerMap);
                         String opinionMap = (String)entries1.get("opinionMap");//处理意见
                         ruQzInspectionInfo.setRuQzInspectionOpinionMap(opinionMap);
+                        JSONArray urls = entries1.getJSONArray("urls");//巡检图片
+
+                        if (StringUtils.hasLength(property)) {//巡检性质
+                            LambdaQueryWrapper<RuQzInspectionAtt> attWrapper = new LambdaQueryWrapper<>();
+                            attWrapper.eq(RuQzInspectionAtt::getName,property);
+                            attWrapper.eq(RuQzInspectionAtt::getRuQzInspectionType,2);
+                            RuQzInspectionAtt selectOne = inspectionAttMapper.selectOne(attWrapper);
+                            ruQzInspectionInfo.setRuQzInspectionAttId(selectOne.getId());//巡检性质
+                        }else{
+                            ruQzInspectionInfo.setRuQzInspectionAttId("1888069481003880448");//巡检性质
+                        }
+
+                        if(StringUtils.hasLength(checkItems)) {//巡检项
+                            ruQzInspectionInfo.setRuQzInspectionCheckItems(checkItems);
+                            String[] split = checkItems.split("/");
+                            String  temp = "";
+                            for (int i = 0; i < split.length ; i++){
+                                String str = split[i];
+
+                                LambdaQueryWrapper<RuQzInspectionItem> itemWrapper = new LambdaQueryWrapper<>();
+                                itemWrapper.eq(RuQzInspectionItem::getName,str);
+                                itemWrapper.eq(RuQzInspectionItem::getRuQzInspectionType,2);
+                                RuQzInspectionItem inspectionItem = inspectionItemMapper.selectOne(itemWrapper);
+
+                                if (inspectionItem==null){ //没有匹配的数据
+                                    System.out.println(str+";;");
+                                    break;
+
+                                }
+                                temp+=inspectionItem.getId();
+
+                                if (i== split.length-1){
+                                    break;
+                                } else{
+                                    temp+=",";
+                                }
+                            }
+                            if (StringUtils.hasLength(temp)){
+
+                                ruQzInspectionInfo.setRuQzInspectionItemIds(temp);
+                            }else{
+                                ruQzInspectionInfo.setRuQzInspectionItemIds("1888851802825105408");//巡检项
+                            }
+                        }else{
+                            ruQzInspectionInfo.setRuQzInspectionItemIds("1888851802825105408");//巡检项
+                        }
+
+                        if (urls!=null) {//判断图片列表是否存在
+                            Iterator<Object> imageIterator = urls.iterator(); //巡检图片迭代
+
+                            String insImgs = "";
+                            while (imageIterator.hasNext()) { //整改图片列表
+                                String imgUrl = (String) imageIterator.next();
+                                //保存图片到本地
+                                try {
+                                    FlFile flFile = saveImg(imgUrl, "整改图片");
+
+                                    insImgs += flFile.getId();
+                                    if (imageIterator.hasNext()) {
+                                        insImgs += ",";
+                                    }
+                                } catch (IOException e) {
+                                    log.error("巡检图片保存失败：" + new Date());
+                                }
+                            }
+                            if (StringUtils.hasText(insImgs)) {
+                                ruQzInspectionInfo.setRuQzInspectionUrls(insImgs);//设置巡检图片
+                            }
+                        }
 
                         inspectionInfoMapper.insert(ruQzInspectionInfo);
 
                         //整改记录
                         JSONArray replayList = entries1.getJSONArray("replayList");
+                        if(replayList == null){
+                            break;
+                        }
+
                         Iterator<Object> iterator2 = replayList.iterator();
                         //保存记录
                         while (iterator2.hasNext()){
@@ -194,8 +307,8 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
 
                             String replayRecordId = (String) replay.get("recordId");//记录id
                             ruQzInspectionInfoReplay.setRuQzInspectionRepRecordId(replayRecordId);
-                            String createTime = (String) replay.get("createTime");//创建时间
-                            ruQzInspectionInfoReplay.setRuQzInspectionRepCreateTime(DateUtil.convertTimestampToDateString(createTime,"yyyy-MM-dd HH:mm:ss"));
+                            Long createTime = (Long) replay.get("createTime");//创建时间
+                            ruQzInspectionInfoReplay.setRuQzInspectionRepCreateTime(DateUtil.convertTimestampToDateString(createTime.toString(),"yyyy-MM-dd HH:mm:ss"));
                             String replayType = (String) replay.get("replayType");//类型：0通知回复, 1整改回复(记录)，2回检回复(记录)，3审批(流程)，4整改(流程)，5复检(流程)
                             ruQzInspectionInfoReplay.setRuQzInspectionReplayType(replayType);
                             String recheckStatus = (String) replay.get("recheckStatus");//状态：0未通过，1整改回复-已确认，2整改回复-已处理，3复检-通过，4复检-退回，5审批-通过，6审批-退回
@@ -210,27 +323,29 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                             ruQzInspectionInfoReplay.setRuQzInspectionRepLaborName(laborName);
                             String replayContent = (String) replay.get("replayContent");//填写内容
                             ruQzInspectionInfoReplay.setRuQzInspectionReplayContent(replayContent);
-                            String replayTime = (String) replay.get("replayTime");//回复时间（可能是前端页面选择时间）
-                            ruQzInspectionInfoReplay.setRuQzInspectionRepReplayTime(replayTime);
+                            Long replayTime = (Long) replay.get("replayTime");//回复时间（可能是前端页面选择时间）
+                            ruQzInspectionInfoReplay.setRuQzInspectionRepReplayTime(DateUtil.convertTimestampToDateString(replayTime.toString(),"yyyy-MM-dd HH:mm:ss"));
 
                             JSONArray accessoryList = replay.getJSONArray("accessoryList");//整改图片
-                            Iterator<Object> iterator3 = accessoryList.iterator();
-                            String  replayImgs = "";
-                            while (iterator3.hasNext()){ //整改图片列表
-                                String imgUrl = (String)iterator3.next();
-                                //保存图片到本地
-                                try {
-                                    FlFile flFile = saveImg(imgUrl, "整改图片");
-                                    replayImgs+=flFile.getId();
-                                    if (iterator3.hasNext()){
-                                        replayImgs+=",";
+                            String replayImgs = "";
+                            if (accessoryList!=null) {
+                                Iterator<Object> iterator3 = accessoryList.iterator();
+                                while (iterator3.hasNext()) { //整改图片列表
+                                    String imgUrl = (String) iterator3.next();
+                                    //保存图片到本地
+                                    try {
+                                        FlFile flFile = saveImg(imgUrl, "整改图片");
+                                        replayImgs += flFile.getId();
+                                        if (iterator3.hasNext()) {
+                                            replayImgs += ",";
+                                        }
+                                    } catch (IOException e) {
+                                        log.error("巡检整改图片保存失败：" + new Date());
                                     }
-                                } catch (IOException e) {
-                                    log.error("巡检整改图片保存失败："+new Date());
                                 }
-                            }
-                            if(StringUtils.hasText(replayImgs)) {
-                                ruQzInspectionInfoReplay.setRuQzInspectionReplayImgs(replayImgs);
+                                if (StringUtils.hasText(replayImgs)) {
+                                    ruQzInspectionInfoReplay.setRuQzInspectionReplayImgs(replayImgs);
+                                }
                             }
                             inspectionInfoReplayMapper.insert(ruQzInspectionInfoReplay);
 
@@ -248,13 +363,215 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                         }
                     }
 
-
-
                 }else{
 
                     for (RuQzInspectionInfo info: ruQzInspectionInfos) {
 
+                        //查询详情
+                        JSONObject inspectionDetail = getInspectionDetail(recordId, token);
 
+                        JSONArray patrolList = inspectionDetail.getJSONArray("patrolList");//巡检内容
+
+                        if (patrolList == null){
+                            break;
+                        }
+                        Iterator<Object> iterator1 = patrolList.iterator();
+
+                        while(iterator1.hasNext()) {
+                            Object patro = iterator1.next();
+                            JSONObject entries1 = JSONUtil.parseObj(patro);//巡检内容
+                            String projectLocation = (String) entries1.get("projectLocation");//项目地址
+                            String dangerLevel = (String) entries1.get("dangerLevel");//隐患等级
+                            if (StringUtils.hasLength(dangerLevel)){ //隐患等级
+                                LambdaQueryWrapper<RuQzInspectionDangerLevel> levelLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                                levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getName,dangerLevel);
+                                levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getRuQzInspectionType,2);
+                                RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOne(levelLambdaQueryWrapper);
+
+                                if(ruQzInspectionDangerLevel==null){
+                                    info.setRuQzInspectionDangerLevelId("1888887369215811584");
+                                }else{
+                                    info.setRuQzInspectionDangerLevelId(ruQzInspectionDangerLevel.getId());
+                                }
+                            }else{
+                                info.setRuQzInspectionDangerLevelId("1888887369215811584");
+                            }
+                        String checkItems = (String)entries1.get("checkItems");//巡检项
+                        String checkResult = (String)entries1.get("checkResult");//巡检内容
+                            String outcomeMap = (String) entries1.get("outcomeMap");//可能后果
+                            String dangerMap = (String) entries1.get("dangerMap");//原因分析
+                            String opinionMap = (String) entries1.get("opinionMap");//处理意见
+
+                            if (info.getRuQzInspectionProjectLocation().equals(projectLocation)&& info.getRuQzInspectionDangerLevel().equals(dangerLevel)
+                            &&info.getRuQzInspectionCheckItems().equals(checkItems) && info.getRuQzInspectionCheckResult().equals(checkResult)) {
+
+                                info.setRuQzInspectionProjectLocation(projectLocation);//工程部位
+                                info.setRuQzInspectionDangerLevel(dangerLevel);//隐患等级
+                                info.setRuQzInspectionOutcomeMap(outcomeMap);//可能后果
+                                info.setRuQzInspectionDangerMap(dangerMap);//原因分析
+                                info.setRuQzInspectionOpinionMap(opinionMap);//处理意见
+//                                info.setRuQzInspectionRecordId(recordId); //记录id
+//                                info.setRemark(remarks);//巡检描述
+
+                                info.setRuQzInspectionCheckResult(checkResult);//巡检结果
+                                if(StringUtils.hasLength(checkResult)) {
+                                    LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                                    resultLambdaQueryWrapper.eq(RuQzInspectionResult::getName,checkResult);
+                                    RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
+                                    if (ruQzInspectionResult!=null){
+
+                                        info.setRuQzInspectionResultId(ruQzInspectionResult.getId());
+                                    }else{
+                                        info.setRuQzInspectionResultId("3");//书面整改
+                                    }
+                                }else {
+                                    info.setRuQzInspectionResultId("3");//书面整改
+                                }
+//                                info.setRuQzInspectionChecker(inspectPerson);//巡检人
+                                info.setRuQzInspectionStatus(status);//巡检状态
+                                info.setRuQzInspectionRectTime(rectTime);//整改时间
+                                info.setRuQzInspectionCheckTime(initiationTime);//巡检时间
+
+                                if (StringUtils.hasText(property)) {//巡检性质
+                                    LambdaQueryWrapper<RuQzInspectionAtt> attWrapper = new LambdaQueryWrapper<>();
+                                    attWrapper.eq(RuQzInspectionAtt::getName,property);
+                                    attWrapper.eq(RuQzInspectionAtt::getRuQzInspectionType,1);
+                                    RuQzInspectionAtt selectOne = inspectionAttMapper.selectOne(attWrapper);
+                                    info.setRuQzInspectionAttId(selectOne.getId());//巡检性质
+                                }else{
+                                    info.setRuQzInspectionAttId("1888069481003880448");//巡检性质
+                                }
+//                                inspectionInfoMapper.update(info);
+
+                                //整改记录
+                                JSONArray replayList = entries1.getJSONArray("replayList");
+                                if (replayList==null) {
+                                    break;
+                                }
+                                Iterator<Object> iterator2 = replayList.iterator();
+
+                                //保存记录
+                                while (iterator2.hasNext()) {
+                                    Object replayStr = iterator2.next();
+                                    JSONObject replay = JSONUtil.parseObj(replayStr);
+
+                                    String replayRecordId = (String) replay.get("recordId");//记录id
+                                    Long createTime = (Long) replay.get("createTime");//创建时间
+                                    String replayType = (String) replay.get("replayType");//类型：0通知回复, 1整改回复(记录)，2回检回复(记录)，3审批(流程)，4整改(流程)，5复检(流程)
+                                    String recheckStatus = (String) replay.get("recheckStatus");//状态：0未通过，1整改回复-已确认，2整改回复-已处理，3复检-通过，4复检-退回，5审批-通过，6审批-退回
+                                    String emergencyResponseMeasures = (String) replay.get("emergencyResponseMeasures");//应急处置措施
+                                    String laborOrgName = (String) replay.get("laborOrgName");//人员组织
+                                    String actualRectificationCompletionTime = (String) replay.get("actualRectificationCompletionTime");//实际整改完成时间
+                                    String laborName = (String) replay.get("laborName");//处理人姓名
+                                    String replayContent = (String) replay.get("replayContent");//填写内容
+                                    Long replayTime = (Long) replay.get("replayTime");//回复时间（可能是前端页面选择时间）
+
+                                    //查询整改流程记录是否存在
+                                    LambdaQueryWrapper<RuQzInspectionInfoReplay> queryReplayWrapper = new LambdaQueryWrapper();
+                                    queryReplayWrapper.eq(RuQzInspectionInfoReplay::getRuQzInspectionRepRecordId,replayRecordId);
+                                    queryReplayWrapper.eq(RuQzInspectionInfoReplay::getRuQzInspectionReplayType,replayType);
+                                    RuQzInspectionInfoReplay ruQzInspectionInfoReplay1 = inspectionInfoReplayMapper.selectOne(queryReplayWrapper);
+
+                                    if (ruQzInspectionInfoReplay1==null) {//记录不存在
+                                        RuQzInspectionInfoReplay ruQzInspectionInfoReplay = normalNewQzInspectionInfoReplay();
+                                        ruQzInspectionInfoReplay.setRuQzInspectionInfoId(info.getId());
+
+                                        ruQzInspectionInfoReplay.setRuQzInspectionRepRecordId(replayRecordId);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionRepCreateTime(DateUtil.convertTimestampToDateString(createTime.toString(), "yyyy-MM-dd HH:mm:ss"));
+                                        ruQzInspectionInfoReplay.setRuQzInspectionReplayType(replayType);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionRecheckStatus(recheckStatus);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionEmrRespMea(emergencyResponseMeasures);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionRepLaborOrgName(laborOrgName);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionActRectComTime(actualRectificationCompletionTime);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionRepLaborName(laborName);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionReplayContent(replayContent);
+                                        ruQzInspectionInfoReplay.setRuQzInspectionRepReplayTime(DateUtil.convertTimestampToDateString(replayTime.toString(),"yyyy-MM-dd HH:mm:ss"));
+
+                                        JSONArray accessoryList = replay.getJSONArray("accessoryList");//整改图片
+                                        String replayImgs = "";
+                                        if (accessoryList != null) {
+                                            Iterator<Object> iterator3 = accessoryList.iterator();
+                                            while (iterator3.hasNext()) { //整改图片列表
+                                                String imgUrl = (String) iterator3.next();
+                                                //保存图片到本地
+                                                try {
+                                                    FlFile flFile = saveImg(imgUrl, "整改图片");
+                                                    replayImgs += flFile.getId();
+                                                    if (iterator3.hasNext()) {
+                                                        replayImgs += ",";
+                                                    }
+                                                } catch (IOException e) {
+                                                    log.error("巡检整改图片保存失败：" + new Date());
+                                                }
+                                            }
+                                            if (StringUtils.hasText(replayImgs)) {
+                                                ruQzInspectionInfoReplay.setRuQzInspectionReplayImgs(replayImgs);
+                                            }
+                                        }
+                                        inspectionInfoReplayMapper.insert(ruQzInspectionInfoReplay);
+
+                                        //判断整改图片是否设置
+                                        if ("1".equals(replayType) && "2".equals(recheckStatus)) { //整改回复完成
+                                            info.setRuQzInspectionReplayContent(replayContent);//整改回复内容
+                                            if (StringUtils.hasText(replayImgs)) {
+                                                info.setRuQzInspectionReplayImgs(replayImgs);//整改图片
+                                            }
+                                        }
+                                    }else{
+
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionRepRecordId(replayRecordId);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionRepCreateTime(DateUtil.convertTimestampToDateString(createTime.toString(), "yyyy-MM-dd HH:mm:ss"));
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionReplayType(replayType);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionRecheckStatus(recheckStatus);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionEmrRespMea(emergencyResponseMeasures);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionRepLaborOrgName(laborOrgName);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionActRectComTime(actualRectificationCompletionTime);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionRepLaborName(laborName);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionReplayContent(replayContent);
+                                        ruQzInspectionInfoReplay1.setRuQzInspectionRepReplayTime(DateUtil.convertTimestampToDateString(replayTime.toString(), "yyyy-MM-dd HH:mm:ss"));
+
+                                        JSONArray accessoryList = replay.getJSONArray("accessoryList");//整改图片
+                                        String replayImgs = "";
+                                        if (accessoryList!=null) {
+                                            Iterator<Object> iterator3 = accessoryList.iterator();
+
+                                            if (recheckStatus != null && !recheckStatus.equals(ruQzInspectionInfoReplay1.getRuQzInspectionRecheckStatus())) {//如果流程状态发生改变
+                                                while (iterator3.hasNext()) { //整改图片列表
+                                                    String imgUrl = (String) iterator3.next();
+                                                    //保存图片到本地
+                                                    try {
+                                                        FlFile flFile = saveImg(imgUrl, "整改图片");
+                                                        replayImgs += flFile.getId();
+                                                        if (iterator3.hasNext()) {
+                                                            replayImgs += ",";
+                                                        }
+                                                    } catch (IOException e) {
+                                                        log.error("巡检整改图片保存失败：" + new Date());
+                                                    }
+                                                }
+                                                if (StringUtils.hasText(replayImgs)) {
+                                                    ruQzInspectionInfoReplay1.setRuQzInspectionReplayImgs(replayImgs);
+                                                }
+
+                                            }
+                                        }
+                                        inspectionInfoReplayMapper.updateById(ruQzInspectionInfoReplay1);
+
+                                        //判断整改图片是否设置,为整改，整改完成
+                                        if (recheckStatus!=null && !recheckStatus.equals(ruQzInspectionInfoReplay1.getRuQzInspectionRecheckStatus())
+                                                && ("1".equals(replayType) && "2".equals(recheckStatus))) { //整改回复完成
+                                            info.setRuQzInspectionReplayContent(replayContent);//整改回复内容
+                                            if (StringUtils.hasText(replayImgs)) {
+                                                info.setRuQzInspectionReplayImgs(replayImgs);//整改图片
+                                            }
+                                        }
+                                    }
+
+                                    inspectionInfoMapper.updateById(info);
+                                }
+                            }
+
+                        }
 
                     }
 
@@ -265,37 +582,6 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         }else{
             throw new BaseException("获取轻筑安全巡检性质错误："+response);
         }
-    }
-
-
-    private  String getQzToken(){
-
-        String token;
-        String  requestUrl =  "https://open.qingzhuyun.com/api/platform/token?appId=a0658b6f47f443729e28eafcbfccfad6&secret=958796e25fea43b2aa0574562ec0a3c1";
-
-        Map<String, Object> requestMap = new HashMap<>();//请求参数，只包含
-        requestMap.put("appId", "a0658b6f47f443729e28eafcbfccfad6");//轻筑项目ID
-        requestMap.put("secret","958796e25fea43b2aa0574562ec0a3c1");//巡检类型1质量，2安全
-
-        HttpHeaders translateHeaders = new HttpHeaders();
-
-        // 设置请求体
-        HttpEntity<Map> translateEntity = new HttpEntity<>(requestMap, translateHeaders);
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(requestUrl, HttpMethod.POST, translateEntity, String.class);
-
-        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-
-            JSONObject entries = JSONUtil.parseObj(responseEntity.getBody());
-
-            JSONObject data = entries.getJSONObject("data");
-             token  = data.getStr("authToken");
-
-        }else{
-            throw new BaseException("token获取失败"+responseEntity);
-        }
-
-        return token;
     }
 
     /**
@@ -321,8 +607,8 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
 
 
         //获取项目路径
-        File directory = new File(getBaseFilePath()+"/qzInspectionImg");
-//        File directory = new File("/Users/hejialun/Documents/qzInspectionImg");
+//        File directory = new File(getBaseFilePath()+"/qzInspectionImg");
+        File directory = new File("/Users/hejialun/Documents/qzInspectionImg");
         String path = directory.getCanonicalPath();
         //如果没有文件夹则创建
         File file = new File(path);
@@ -361,6 +647,8 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         flFile.setName(orgName);
         flFile.setFileInlineUrl("/qygly-gateway/qygly-file/viewImage?fileId="+ flFile.getId()+"");
         flFile.setFileAttachmentUrl("/qygly-gateway/qygly-file/downloadCommonFile?fileId="+flFile.getId()+"");
+
+        flFileMapper.insert(flFile);
 
         return flFile;
     }

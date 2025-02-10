@@ -44,6 +44,11 @@ public class RuQzInspectionInfo extends BaseDomain {
     @TableField("RU_QZ_INSPECTION_DANGER_LEVEL")
     private String  ruQzInspectionDangerLevel;
 
+    /**
+     * 隐患等级
+     */
+    @TableField("RU_QZ_INSPECTION_DANGER_LEVEL_ID")
+    private String  ruQzInspectionDangerLevelId;
 
     /**
      * 是否紧急
@@ -121,8 +126,8 @@ public class RuQzInspectionInfo extends BaseDomain {
     /**
      * 巡检项-ID
      */
-    @TableField("RU_QZ_INSPECTION_ITEM_ID")
-    private String  ruQzInspectionItemId;
+    @TableField("RU_QZ_INSPECTION_ITEM_IDS")
+    private String  ruQzInspectionItemIds;
 
     /**
      * 检查时间
