@@ -139,7 +139,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                 String inspectItem = (String) entries.get("inspectItem");//巡检项
                 String status = (String) entries.get("status");//巡检状态
 //                JSONArray images = entries.getJSONArray("image");//巡检图片
-                String initiationTime = (String) entries.get("initiationTime");//巡检状态
+                String initiationTime = (String) entries.get("initiationTime");//巡检时间
 
                 //查询数据是否存在
                 LambdaQueryWrapper<RuQzInspectionInfo> wrapper = new LambdaQueryWrapper<>();
@@ -172,7 +172,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                         ruQzInspectionInfo.setRuQzInspectionChecker(inspectPerson);//巡检人
                         ruQzInspectionInfo.setRuQzInspectionStatus(status);//巡检状态
                         ruQzInspectionInfo.setRuQzInspectionRectTime(rectTime);//整改时间
-                        ruQzInspectionInfo.setRuQzInspectionCheckTime(initiationTime);
+                        ruQzInspectionInfo.setRuQzInspectionCheckTime(initiationTime);// 检查时间
                         ruQzInspectionInfo.setRuQzInspectionReorganizer(noticePerson);//通知人
 
                         Object patro = iterator1.next();
@@ -234,9 +234,8 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                         if(StringUtils.hasLength(checkItems)) {//巡检项
                             ruQzInspectionInfo.setRuQzInspectionCheckItems(checkItems);
                             String[] split = checkItems.split("/");
-                            String  temp = "";
-                            for (int i = 0; i < split.length ; i++){
-                                String str = split[i];
+
+                                String str = split[0];
 
                                 LambdaQueryWrapper<RuQzInspectionItem> itemWrapper = new LambdaQueryWrapper<>();
                                 itemWrapper.eq(RuQzInspectionItem::getName,str);
@@ -246,19 +245,11 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                 if (inspectionItem==null){ //没有匹配的数据
                                     System.out.println(str+";;");
                                     break;
-
                                 }
-                                temp+=inspectionItem.getId();
 
-                                if (i== split.length-1){
-                                    break;
-                                } else{
-                                    temp+=",";
-                                }
-                            }
-                            if (StringUtils.hasLength(temp)){
+                            if (inspectionItem!=null){
 
-                                ruQzInspectionInfo.setRuQzInspectionItemIds(temp);
+                                ruQzInspectionInfo.setRuQzInspectionItemIds(inspectionItem.getId());
                             }else{
                                 ruQzInspectionInfo.setRuQzInspectionItemIds("1888851802825105408");//巡检项
                             }
@@ -274,7 +265,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                 String imgUrl = (String) imageIterator.next();
                                 //保存图片到本地
                                 try {
-                                    FlFile flFile = saveImg(imgUrl, "巡检图片");
+                                    FlFile flFile = saveImg(imgUrl, "巡检图片",initiationTime);
 
                                     insImgs += flFile.getId();
                                     if (imageIterator.hasNext()) {
@@ -335,7 +326,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                     String imgUrl = (String) iterator3.next();
                                     //保存图片到本地
                                     try {
-                                        FlFile flFile = saveImg(imgUrl, "整改图片");
+                                        FlFile flFile = saveImg(imgUrl, "整改图片",DateUtil.convertTimestampToDateString(replayTime.toString(),"yyyy-MM-dd HH:mm:ss"));
                                         replayImgs += flFile.getId();
                                         if (iterator3.hasNext()) {
                                             replayImgs += ",";
@@ -497,7 +488,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                                 String imgUrl = (String) iterator3.next();
                                                 //保存图片到本地
                                                 try {
-                                                    FlFile flFile = saveImg(imgUrl, "整改图片");
+                                                    FlFile flFile = saveImg(imgUrl, "整改图片",DateUtil.convertTimestampToDateString(replayTime.toString(),"yyyy-MM-dd HH:mm:ss"));
                                                     replayImgs += flFile.getId();
                                                     if (iterator3.hasNext()) {
                                                         replayImgs += ",";
@@ -542,7 +533,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                                     String imgUrl = (String) iterator3.next();
                                                     //保存图片到本地
                                                     try {
-                                                        FlFile flFile = saveImg(imgUrl, "整改图片");
+                                                        FlFile flFile = saveImg(imgUrl, "整改图片",DateUtil.convertTimestampToDateString(replayTime.toString(), "yyyy-MM-dd HH:mm:ss"));
                                                         replayImgs += flFile.getId();
                                                         if (iterator3.hasNext()) {
                                                             replayImgs += ",";
@@ -592,7 +583,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
      * @return
      * @throws IOException
      */
-    private FlFile saveImg(String imgUrl,String orgName) throws IOException {
+    private FlFile saveImg(String imgUrl,String orgName,String createDate) throws IOException {
         String pictureUrl = imgUrl;
         //建立图片连接
         URL url = new URL(pictureUrl);
@@ -640,7 +631,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         long fileSize = Files.size(Paths.get(filePath));//字节
         double size = Math.round(fileSize / 1024.0);//保留两位小鼠
 
-        FlFile flFile = normalNewFlFile();
+        FlFile flFile = normalNewFlFile(createDate);
         flFile.setDspName(orgName+".png");
         flFile.setDspSize(size+"KB");
         flFile.setSizeKb(size);
@@ -724,7 +715,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
      * 图片文件实体赋值
      * @return 实体
      */
-    private FlFile normalNewFlFile() {
+    private FlFile normalNewFlFile(String createDate) {
         String now = DateUtil.getNormalTimeStr(new Date());
 
         FlFile flFile = new FlFile();
@@ -733,7 +724,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         flFile.setTs(now);
         flFile.setCreateBy("0099250247095871681");
         flFile.setLastUpdateBy("0099250247095871681");
-        flFile.setCreateDate(now);
+        flFile.setCreateDate(createDate);
         flFile.setLastUpdateDate(now);
         flFile.setStatus("AP");
         flFile.setFlPathId("0099250247095872688");
