@@ -22,7 +22,7 @@ public class PipIngTask {
      * 每日六点检查是否需要推送代办消息
      */
 //    @Scheduled(cron = "0 0 6 * * ?")
-    @Scheduled(fixedRate = 30000)
+//    @Scheduled(fixedRate = 30000)
     public void pushMessage(){
         log.info("检查是否需要推送待办消息");
         pressurePipelineService.pushMessage();
