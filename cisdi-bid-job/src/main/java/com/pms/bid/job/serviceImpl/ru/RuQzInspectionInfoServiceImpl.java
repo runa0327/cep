@@ -249,12 +249,12 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
 
                             if (inspectionItem!=null){
 
-                                ruQzInspectionInfo.setRuQzInspectionItemIds(inspectionItem.getId());
+                                ruQzInspectionInfo.setRuQzInspectionItemId(inspectionItem.getId());
                             }else{
-                                ruQzInspectionInfo.setRuQzInspectionItemIds("1888851802825105408");//巡检项
+                                ruQzInspectionInfo.setRuQzInspectionItemId("1888851802825105408");//巡检项
                             }
                         }else{
-                            ruQzInspectionInfo.setRuQzInspectionItemIds("1888851802825105408");//巡检项
+                            ruQzInspectionInfo.setRuQzInspectionItemId("1888851802825105408");//巡检项
                         }
 
                         if (urls!=null) {//判断图片列表是否存在

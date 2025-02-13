@@ -126,8 +126,8 @@ public class RuQzInspectionInfo extends BaseDomain {
     /**
      * 巡检项-ID
      */
-    @TableField("RU_QZ_INSPECTION_ITEM_IDS")
-    private String  ruQzInspectionItemIds;
+    @TableField("RU_QZ_INSPECTION_ITEM_ID")
+    private String  ruQzInspectionItemId;
 
     /**
      * 检查时间

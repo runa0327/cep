@@ -26,10 +26,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 电梯扩展
@@ -37,12 +34,133 @@ import java.util.Map;
 @Slf4j
 public class RuQzInspectionExt {
 
+    /**
+     * 获取巡检责任人(预设)
+     */
+    public void getInspectionDutyUserPresets() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            RuQzInspectionInfo ruQzInspectionInfoInspection = RuQzInspectionInfo.selectById(csCommId);
+            String ccSafeDutyUserIds = ruQzInspectionInfoInspection.getCcSafeDutyUserIds();
+
+            if (ccSafeDutyUserIds != null && !ccSafeDutyUserIds.isEmpty()) {
+                String[] dutyUserIds = ccSafeDutyUserIds.split(",");
+
+                ArrayList<String> dutyUserIdList = new ArrayList<>(Arrays.asList(dutyUserIds));
+                ArrayList<String> userIdList = new ArrayList<>();
+                for (String dutyUserId : dutyUserIdList) {
+                    CcSafeDutyUser ccSafeDutyUser = CcSafeDutyUser.selectById(dutyUserId);
+                    String adUserId = ccSafeDutyUser.getAdUserId();
+                    userIdList.add(adUserId);
+                }
+                ExtJarHelper.setReturnValue(userIdList);
+            }
+        }
+    }
+
+    /**
+     * 更新巡检人名称
+     */
+    public void setInspectionDutyUser() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            RuQzInspectionInfo ruQzInspectionInfoInspection = RuQzInspectionInfo.selectById(csCommId);
+            String checkUserId = ruQzInspectionInfoInspection.getRuQzInspectionCheckUserId();
+            AdUser adUser = AdUser.selectById(checkUserId);
+            ruQzInspectionInfoInspection.setRuQzInspectionReorganizer(adUser.getName());
+
+            ruQzInspectionInfoInspection.updateById();
+        }
+    }
+
+    /**
+     * 获取巡检复核人(预设)
+     */
+    public void getInspectionReviewerUserPresets() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            RuQzInspectionInfo inspectionInfo = RuQzInspectionInfo.selectById(csCommId);
+
+            String checkUserId = inspectionInfo.getRuQzInspectionCheckUserId();
+
+            CcPrjMember member = CcPrjMember.selectById(checkUserId);
+
+            ArrayList<String> userIdList = new ArrayList<>();
+            userIdList.add(member.getAdUserId());
+
+            ExtJarHelper.setReturnValue(userIdList);
+
+        }
+    }
+    /**
+     * 获取巡检通知人(预设)
+     */
+    public void getInspectionNoticUserPresets() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            RuQzInspectionInfo inspectionInfo = RuQzInspectionInfo.selectById(csCommId);
+
+            String checkUserId = inspectionInfo.getRuQzInspectionCheckUserId();//检查人
+            String safeDutyUserIds = inspectionInfo.getCcSafeDutyUserIds();//责任人
+            ArrayList<String> userIdList = new ArrayList<>();
+
+            if(checkUserId!=null && !checkUserId.isEmpty()){
+                CcPrjMember member = CcPrjMember.selectById(checkUserId);
+                userIdList.add(member.getAdUserId());
+
+            }else{
+                userIdList.add("1787382018144423936");
+            }
+
+            if (safeDutyUserIds != null && !safeDutyUserIds.isEmpty()) {
+                String[] dutyUserIds = safeDutyUserIds.split(",");
+                ArrayList<String> dutyUserIdList = new ArrayList<>(Arrays.asList(dutyUserIds));
+                for (String dutyUserId : dutyUserIdList) {
+                    CcSafeDutyUser ccSafeDutyUser = CcSafeDutyUser.selectById(dutyUserId);
+                    String adUserId = ccSafeDutyUser.getAdUserId();
+                    userIdList.add(adUserId);
+                }
+            }
+
+            ExtJarHelper.setReturnValue(userIdList);
+
+        }
+    }
+
 
     /**
      * 启动节点修改数据状态
      */
     public void startNode(){
 
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            RuQzInspectionInfo inspectionInfo = RuQzInspectionInfo.selectById(csCommId);
+
+            inspectionInfo.setRuQzInspectionStatus("待整改");
+            inspectionInfo.updateById();
+        }
+    }
+
+    /**
+     * 启动节点修改数据状态
+     */
+    public void reviewNode(){
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            RuQzInspectionInfo inspectionInfo = RuQzInspectionInfo.selectById(csCommId);
+
+            inspectionInfo.setRuQzInspectionStatus("待审核");
+            inspectionInfo.updateById();
+        }
     }
 
     /**
@@ -55,9 +173,10 @@ public class RuQzInspectionExt {
         if (entityRecordList != null) {
             for (EntityRecord entityRecord : entityRecordList) {
                 String csCommId = entityRecord.csCommId;
-//                Map<String, Object> valueMap = entityRecord.valueMap;
-//                int update = myJdbcTemplate.update("update " + entityCode + " t set t.CC_QS_CURRENT_STATE_ID = ? where t.id=?", STATE_ID, csCommId);
-//                log.info("已更新：{}", update);
+                RuQzInspectionInfo inspectionInfo = RuQzInspectionInfo.selectById(csCommId);
+
+                inspectionInfo.setRuQzInspectionStatus("已完结");
+                inspectionInfo.updateById();
             }
         }
 
