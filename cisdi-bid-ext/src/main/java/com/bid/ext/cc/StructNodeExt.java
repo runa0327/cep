@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import cn.hutool.core.util.IdUtil;
 import com.bid.ext.model.*;
+import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -107,9 +108,9 @@ public class StructNodeExt {
     }
 
     /**
-     * 提交报批报建计划
+     * 提交计划
      */
-    public void commitPrePlan() {
+    public void commitPlan(String planType) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
@@ -118,7 +119,6 @@ public class StructNodeExt {
         if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
             throw new BaseException("仅允许在唯一项目存在的情况下提交计划");
         }
-        String planType = "PRE";
 
         // 查询当前项目的最高版本
         String sql = "SELECT name AS maxVersion " +
@@ -210,6 +210,20 @@ public class StructNodeExt {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 提交报批报建计划
+     */
+    public void commitPrePlan() {
+        this.commitPlan("PRE");
+    }
+
+    /**
+     * 提交设计计划
+     */
+    public void commitDesignPlan() {
+        this.commitPlan("DESIGN");
     }
 
     /**
@@ -2996,7 +3010,9 @@ public class StructNodeExt {
 
         // 提取常用的变量
         String name = JdbcMapUtil.getString(varMap, "P_NAME");
+        name = JsonUtil.toJson(new Internationalization(null, name, null));//国际化
         String remark = JdbcMapUtil.getString(varMap, "P_REMARK");
+        remark = JsonUtil.toJson(new Internationalization(null, remark, null));//国际化
         String wbsChiefUserId = JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID");
         LocalDate pPlanFr = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_FR");
         LocalDate pPlanTo = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_TO");

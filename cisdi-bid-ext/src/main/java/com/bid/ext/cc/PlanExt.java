@@ -146,14 +146,13 @@ public class PlanExt {
     /**
      * 编制计划中是否有可提交计划
      */
-    public void preCheckPlan() {
+    public void checkPlan(String planType) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         Map<String, Object> globalVarMap = loginInfo.globalVarMap;
         String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
         if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
             throw new BaseException("仅允许在唯一项目存在的情况下提交计划");
         }
-        String planType = "pre";
         List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(
                 new Where()
                         .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
@@ -164,5 +163,38 @@ public class PlanExt {
         if (SharedUtil.isEmpty(ccPrjStructNodesDr)) {
             throw new BaseException("无可提交计划");
         }
+    }
+
+    /**
+     * 报批报建
+     * 编制计划中是否有可提交计划
+     */
+    public void preCheckPlan() {
+        this.checkPlan("PRE");
+//        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+//        Map<String, Object> globalVarMap = loginInfo.globalVarMap;
+//        String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
+//        if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
+//            throw new BaseException("仅允许在唯一项目存在的情况下提交计划");
+//        }
+//        String planType = "pre";
+//        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(
+//                new Where()
+//                        .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
+//                        .eq(CcPrjStructNode.Cols.IS_WBS, true)
+//                        .eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType)
+//                        .eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds)
+//                        .eq(CcPrjStructNode.Cols.STATUS, "DR"));
+//        if (SharedUtil.isEmpty(ccPrjStructNodesDr)) {
+//            throw new BaseException("无可提交计划");
+//        }
+    }
+
+    /**
+     * 设计管理
+     * 编制计划中是否有可提交计划
+     */
+    public void designCheckPlan() {
+        this.checkPlan("DESIGN");
     }
 }
