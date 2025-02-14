@@ -55,7 +55,7 @@ public class RuQzInspectionSyncTask {
         }
     }
 
-        @Scheduled(cron = "0 0 4 ? * SUN")
+        @Scheduled(cron = "0 0 4 * * ?")
     public void syncInspectionInfo(){
         try {
             log.error(" 同步巡检列表-开始");
