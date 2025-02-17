@@ -135,7 +135,7 @@ public class PrjExt {
      * @param ccPrjStructNodes
      * @return
      */
-    private List<CcPrjStructNode> replaceIdsAndInsert(List<CcPrjStructNode> ccPrjStructNodes, String ccPrjId, String ccPrjStructUsageId) {
+    public static List<CcPrjStructNode> replaceIdsAndInsert(List<CcPrjStructNode> ccPrjStructNodes, String ccPrjId, String ccPrjStructUsageId) {
         List<CcPrjStructNode> ccPrjStructNodes0 = new ArrayList<>();
         Map<String, String> idMapping = new HashMap<>();
 //        BigDecimal seqNo = BigDecimal.ZERO;
@@ -188,7 +188,7 @@ public class PrjExt {
      * @param ccPrjStructNodes
      * @return
      */
-    private List<CcPrjCostOverview> replaceIdsAndInsertCost(List<CcPrjStructNode> ccPrjStructNodes, String ccPrjId) {
+    public static List<CcPrjCostOverview> replaceIdsAndInsertCost(List<CcPrjStructNode> ccPrjStructNodes, String ccPrjId) {
         List<CcPrjCostOverview> ccPrjCostOverviews = new ArrayList<>();
         Map<String, String> idMapping = new HashMap<>();
         BigDecimal seqNo = BigDecimal.ZERO;

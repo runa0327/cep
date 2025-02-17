@@ -578,7 +578,7 @@ public class StructNodeExt {
      * @param parentId
      * @return
      */
-    public List<Map<String, Object>> getChildNodes(String parentId) {
+    public static List<Map<String, Object>> getChildNodes(String parentId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         // 示例SQL查询，获取所有子节点
         String sql = "SELECT * FROM cc_prj_struct_node WHERE CC_PRJ_STRUCT_NODE_PID = ?";
@@ -817,7 +817,7 @@ public class StructNodeExt {
      * @param nodeId
      * @return
      */
-    private String getParentNodeId(String nodeId) {
+    public static String getParentNodeId(String nodeId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         try {
             String sql = "SELECT CC_PRJ_STRUCT_NODE_PID FROM cc_prj_struct_node WHERE ID = ?";
@@ -1254,7 +1254,7 @@ public class StructNodeExt {
      *
      * @param nodeId 当前节点ID
      */
-    private void recalculatePlanCostEstimation(String nodeId) {
+    public static void recalculatePlanCostEstimation(String nodeId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         // 获取当前节点的直接子节点的PLAN_TOTAL_COST总和
         BigDecimal totalSum = BigDecimal.ZERO;

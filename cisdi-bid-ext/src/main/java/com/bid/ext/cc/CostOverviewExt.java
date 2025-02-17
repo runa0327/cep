@@ -14,7 +14,7 @@ public class CostOverviewExt {
     /**
      * 重算成本统览
      */
-    public void recalculationCostOverview(String ccPrjCostOverviewId) {
+    public static void recalculationCostOverview(String ccPrjCostOverviewId) {
 
         String parentNodeId = getParentNodeId(ccPrjCostOverviewId);
 
@@ -29,7 +29,7 @@ public class CostOverviewExt {
      * @param nodeId
      * @return
      */
-    private String getParentNodeId(String nodeId) {
+    public static String getParentNodeId(String nodeId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         try {
             String sql = "SELECT CC_PRJ_COST_OVERVIEW_PID FROM CC_PRJ_COST_OVERVIEW WHERE ID = ?";
@@ -46,7 +46,7 @@ public class CostOverviewExt {
      * @param parentId
      * @return
      */
-    public List<Map<String, Object>> getChildNodes(String parentId) {
+    public static List<Map<String, Object>> getChildNodes(String parentId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         // 示例SQL查询，获取所有子节点
         String sql = "SELECT * FROM CC_PRJ_COST_OVERVIEW WHERE CC_PRJ_COST_OVERVIEW_PID = ?";
@@ -60,7 +60,7 @@ public class CostOverviewExt {
      * @param nodeId
      * @param amtIndex
      */
-    private void recalculatePlanTotalCost(String nodeId, int amtIndex) {
+    public static void recalculatePlanTotalCost(String nodeId, int amtIndex) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         // 获取当前节点的直接子节点的PLAN_TOTAL_COST总和
         BigDecimal totalSum = BigDecimal.ZERO;
