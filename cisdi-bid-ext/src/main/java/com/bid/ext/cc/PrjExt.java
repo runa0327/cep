@@ -227,6 +227,8 @@ public class PrjExt {
                 String newPid = idMapping.get(oldPId);
                 if (newPid != null) {
                     ccPrjCostOverview.setCcPrjCostOverviewPid(newPid);
+                } else {
+                    ccPrjCostOverview.setCcPrjCostOverviewPid(null);
                 }
             }
             ccPrjCostOverview.insertById();

@@ -5,6 +5,7 @@ import com.bid.ext.model.CcPrjStructNode;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.bid.ext.cc.CostOverviewExt.recalculationCostOverview;
 import static com.bid.ext.cc.PrjExt.replaceIdsAndInsert;
 import static com.bid.ext.cc.PrjExt.replaceIdsAndInsertCost;
 import static com.bid.ext.cc.StructNodeExt.recalculatePlanCostEstimation;
@@ -43,6 +43,7 @@ public class CbsSubjectExt {
         ccPrjStructNode.setRemark(remark);
         ccPrjStructNode.setIsCbs(true);
         ccPrjStructNode.setIsTemplate(false);
+        ccPrjStructNode.setCcPrjStructUsageId("CBS_SUBJECT");
         ccPrjStructNode.insertById();
 
         //新增投资科目时同步项目四算及投资统览
@@ -96,7 +97,9 @@ public class CbsSubjectExt {
             // 处理全局成本概览
             replaceIdsAndInsertCost(ccPrjStructNodeList, ccPrjId);
         }
-
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 
@@ -145,10 +148,10 @@ public class CbsSubjectExt {
             String ccPrjId = ccPrjStructNode.getCcPrjId();
             //引用此节点的四算和统览
             List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, csCommId).eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId));
-            List<CcPrjCostOverview> ccPrjCostOverviews = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodes).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
-            //更新前父节点
+            List<CcPrjCostOverview> ccPrjCostOverviews = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, csCommId).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
+            //科目更新前父节点
             String ccPrjStructNodePidB = ccPrjStructNode.getCcPrjStructNodePid();
-            //更新后父节点
+            //科目更新后父节点
             String ccPrjStructNodePidA = JdbcMapUtil.getString(valueMap, "CC_PRJ_STRUCT_NODE_PID");
             //未变更层级
             if (ccPrjStructNodePidB.equals(ccPrjStructNodePidA)) {
@@ -165,12 +168,23 @@ public class CbsSubjectExt {
                 //四算
                 for (CcPrjStructNode node : ccPrjStructNodes) {
                     node.setName(name);
+
                     String ccPrjStructUsageId = node.getCcPrjStructUsageId();
-                    //
+
+                    //此用途下科目改变层级前的父节点
+                    CcPrjStructNode ccPrjStructPNodeOld = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidB).eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_USAGE_ID, ccPrjStructUsageId));
+                    String ccPrjStructPNodeOldId = ccPrjStructPNodeOld.getId();
+
+
+                    //此用途下科目改变层级后的父节点
                     CcPrjStructNode ccPrjStructPNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidA).eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_USAGE_ID, ccPrjStructUsageId));
-                    node.setCcPrjStructNodePid(ccPrjStructPNode.getId());
+                    String ccPrjStructNodeNewPid = ccPrjStructPNode.getId();
+                    node.setCcPrjStructNodePid(ccPrjStructNodeNewPid);
                     node.updateById();
-                    recalculatePlanCostEstimation(node.getId());
+
+
+                    recalculatePlanCostEstimation(ccPrjStructNodeNewPid);
+                    recalculatePlanCostEstimation(ccPrjStructPNodeOldId);
                 }
                 //统览
                 for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
@@ -178,7 +192,6 @@ public class CbsSubjectExt {
                     CcPrjCostOverview ccPrjCostOverviewP = CcPrjCostOverview.selectOneByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidA).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
                     ccPrjCostOverview.setCcPrjCostOverviewPid(ccPrjCostOverviewP.getId());
                     ccPrjCostOverview.updateById();
-                    recalculationCostOverview(ccPrjCostOverviewP.getCcPrjId());
                 }
             }
         }
