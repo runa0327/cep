@@ -16,6 +16,7 @@ import java.util.Map;
 import static com.bid.ext.cc.PrjExt.replaceIdsAndInsert;
 import static com.bid.ext.cc.PrjExt.replaceIdsAndInsertCost;
 import static com.bid.ext.cc.StructNodeExt.recalculatePlanCostEstimation;
+import static com.bid.ext.cc.StructNodeExt.recalculatePlanTotalCost;
 
 public class CbsSubjectExt {
 
@@ -189,13 +190,28 @@ public class CbsSubjectExt {
                 //统览
                 for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
                     ccPrjCostOverview.setName(name);
+
+                    CcPrjCostOverview ccPrjCostOverviewPOld = CcPrjCostOverview.selectOneByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidB).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
+                    String ccPrjCostOverviewPOldId = ccPrjCostOverviewPOld.getId();
+
+                    //科目改变层级后统览的父节点
                     CcPrjCostOverview ccPrjCostOverviewP = CcPrjCostOverview.selectOneByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidA).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
-                    ccPrjCostOverview.setCcPrjCostOverviewPid(ccPrjCostOverviewP.getId());
+                    String ccPrjCostOverviewPId = ccPrjCostOverviewP.getId();
+                    ccPrjCostOverview.setCcPrjCostOverviewPid(ccPrjCostOverviewPId);
                     ccPrjCostOverview.updateById();
+
+                    recalculatePlanTotalCost(ccPrjCostOverviewPId, "CBS_0_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPId, "CBS_1_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPId, "CBS_2_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPId, "CBS_3_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_0_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_1_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_2_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_3_AMT");
+
                 }
             }
         }
     }
-
-
+    
 }
