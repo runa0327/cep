@@ -84,6 +84,10 @@ public class CbsSubjectExt {
                 for (CcPrjCostOverview costNode : costTree) {
                     costNode.setCcPrjCostOverviewPid(parentNodeId);
                     costNode.updateById();
+                    recalculatePlanTotalCost(parentNodeId, "CBS_0_AMT");
+                    recalculatePlanTotalCost(parentNodeId, "CBS_1_AMT");
+                    recalculatePlanTotalCost(parentNodeId, "CBS_2_AMT");
+                    recalculatePlanTotalCost(parentNodeId, "CBS_3_AMT");
                 }
             }
 
@@ -132,6 +136,7 @@ public class CbsSubjectExt {
             for (CcPrjStructNode node : newNodes) {
                 node.setCcPrjStructNodePid(parentId);
                 node.updateById();
+                recalculatePlanCostEstimation(parentId);
             }
         }
     }
