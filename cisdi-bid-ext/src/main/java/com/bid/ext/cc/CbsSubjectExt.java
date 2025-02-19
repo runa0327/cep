@@ -213,5 +213,31 @@ public class CbsSubjectExt {
             }
         }
     }
-    
+
+    /**
+     * 删除后投资科目
+     */
+    public void deleteInvestmentSubject() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccPrjStructNodePid = JdbcMapUtil.getString(valueMap, "CC_PRJ_STRUCT_NODE_PID");
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+
+            List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePid).eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId));
+            List<CcPrjCostOverview> ccPrjCostOverviews = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePid).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
+            for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
+                String ccPrjStructNodeId = ccPrjStructNode.getId();
+                recalculatePlanCostEstimation(ccPrjStructNodeId);
+            }
+            for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
+                String ccPrjCostOverviewId = ccPrjCostOverview.getId();
+                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_0_AMT");
+                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_1_AMT");
+                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_2_AMT");
+                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_3_AMT");
+            }
+
+        }
+    }
 }
