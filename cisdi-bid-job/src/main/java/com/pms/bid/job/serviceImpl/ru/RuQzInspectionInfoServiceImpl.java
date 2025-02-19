@@ -201,7 +201,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                         ruQzInspectionInfo.setRuQzInspectionCheckResult(checkResult);//巡检结果
                         if(StringUtils.hasLength(checkResult)) {
                             LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                            resultLambdaQueryWrapper.eq(RuQzInspectionResult::getName,checkResult);
+                            resultLambdaQueryWrapper.eq(RuQzInspectionResult::getRemark,checkResult);
                             RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
                             if (ruQzInspectionResult!=null){
                                 System.out.println(ruQzInspectionResult);
@@ -261,7 +261,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                             Iterator<Object> imageIterator = urls.iterator(); //巡检图片迭代
 
                             String insImgs = "";
-                            while (imageIterator.hasNext()) { //整改图片列表
+                            while (imageIterator.hasNext()) { //巡检图片列表
                                 String imgUrl = (String) imageIterator.next();
                                 //保存图片到本地
                                 try {
@@ -359,6 +359,11 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
 
                     for (RuQzInspectionInfo info: ruQzInspectionInfos) {
 
+                        boolean isReplay = false;
+                        if (StringUtils.hasText(info.getRuQzInspectionReplayImgs())){
+                            isReplay=true;
+                        }
+
                         //查询详情
                         JSONObject inspectionDetail = getInspectionDetail(recordId, token);
 
@@ -409,7 +414,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                 info.setRuQzInspectionCheckResult(checkResult);//巡检结果
                                 if(StringUtils.hasLength(checkResult)) {
                                     LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                                    resultLambdaQueryWrapper.eq(RuQzInspectionResult::getName,checkResult);
+                                    resultLambdaQueryWrapper.eq(RuQzInspectionResult::getRemark,checkResult);
                                     RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
                                     if (ruQzInspectionResult!=null){
 
@@ -551,7 +556,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                         inspectionInfoReplayMapper.updateById(ruQzInspectionInfoReplay1);
 
                                         //判断整改图片是否设置,为整改，整改完成
-                                        if (recheckStatus!=null && !recheckStatus.equals(ruQzInspectionInfoReplay1.getRuQzInspectionRecheckStatus())
+                                        if (!isReplay && recheckStatus!=null && !recheckStatus.equals(ruQzInspectionInfoReplay1.getRuQzInspectionRecheckStatus())
                                                 && ("1".equals(replayType) && "2".equals(recheckStatus))) { //整改回复完成
                                             info.setRuQzInspectionReplayContent(replayContent);//整改回复内容
                                             if (StringUtils.hasText(replayImgs)) {
@@ -598,7 +603,6 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         int len = 0;
         byte[] test = new byte[1024];
 
-
         //获取项目路径
         File directory = new File(getBaseFilePath()+"/qzInspectionImg");
 //        File directory = new File("/Users/hejialun/Documents/qzInspectionImg");
@@ -609,10 +613,11 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
             file.mkdirs();
         }
 
-        //设置图片名称，这个随意，我是用的当前时间命名
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
+        //设置图片名称
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        Long tm = System.currentTimeMillis();
         String date = dateFormat.format(new Date());
-        String fileName = date + ".png";
+        String fileName = tm+date + ".png";
 
         String filePath = path +"/" + fileName;
         //输出流，图片输出的目的文件
@@ -627,7 +632,6 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         stream.close();
         fos.close();
 
-
         long fileSize = Files.size(Paths.get(filePath));//字节
         double size = Math.round(fileSize / 1024.0);//保留两位小鼠
 
@@ -638,6 +642,7 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         flFile.setPhysicalLocation(filePath);
         flFile.setOriginFilePhysicalLocation(filePath);
         flFile.setName(orgName);
+
         flFile.setFileInlineUrl("/qygly-gateway/qygly-file/viewImage?fileId="+ flFile.getId()+"");
         flFile.setFileAttachmentUrl("/qygly-gateway/qygly-file/downloadCommonFile?fileId="+flFile.getId()+"");
 
@@ -728,8 +733,9 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
         flFile.setLastUpdateDate(now);
         flFile.setStatus("AP");
         flFile.setFlPathId("0099250247095872688");
-        flFile.setUploadDttm(now);
+        flFile.setUploadDttm(createDate);
         flFile.setIsPublicRead(1);
+        flFile.setExt("png");
 
         return flFile;
     }

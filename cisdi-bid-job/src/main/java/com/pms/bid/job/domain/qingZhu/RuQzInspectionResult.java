@@ -19,4 +19,5 @@ public class RuQzInspectionResult extends BaseDomain {
 
     private String remark;
 
+
 }

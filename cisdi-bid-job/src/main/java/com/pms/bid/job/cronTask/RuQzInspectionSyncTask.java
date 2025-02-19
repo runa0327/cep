@@ -44,27 +44,27 @@ public class RuQzInspectionSyncTask {
     }
 
 
-        @Scheduled(cron = "0 0 4 ? * SUN")
-    public void syncInspectionItem(){
-        try {
-            log.error(" 同步巡检项-开始");
-            inspectionItemService.syncQzInspectionItem();
-            log.error("同步巡检项-结束");
-        } catch (Exception e) {
-            log.error("同步巡检项");
-        }
-    }
+//        @Scheduled(cron = "0 0 4 ? * SUN")
+//    public void syncInspectionItem(){
+//        try {
+//            log.error(" 同步巡检项-开始");
+//            inspectionItemService.syncQzInspectionItem();
+//            log.error("同步巡检项-结束");
+//        } catch (Exception e) {
+//            log.error("同步巡检项");
+//        }
+//    }
 
         @Scheduled(cron = "0 0 4 * * ?")
+//@Scheduled(fixedRate = 1000*60*60*3)
     public void syncInspectionInfo(){
         try {
             log.error(" 同步巡检列表-开始");
             inspectionInfoService.syncQzInspectionInfo();
             log.error("同步巡检列表-结束");
         } catch (Exception e) {
-            log.error("同步巡检列表");
+            log.error("同步巡检列表失败");
         }
     }
-
 
 }

@@ -44,4 +44,7 @@ public class FlFile extends  BaseDomain{
     @TableField("DSP_SIZE")
     private String dspSize;
 
+    @TableField("EXT")
+    private String ext;
+
 }
