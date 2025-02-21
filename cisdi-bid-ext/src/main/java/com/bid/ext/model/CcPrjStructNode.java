@@ -117,6 +117,10 @@ public class CcPrjStructNode {
          */
         public static final String CC_PRJ_STRUCT_NODE_DIR_ID = "CC_PRJ_STRUCT_NODE_DIR_ID";
         /**
+         * 是否项目。
+         */
+        public static final String IS_PRJ = "IS_PRJ";
+        /**
          * 产品负责人。
          */
         public static final String PBS_CHIEF_USER_ID = "PBS_CHIEF_USER_ID";
@@ -886,6 +890,42 @@ public class CcPrjStructNode {
             this.ccPrjStructNodeDirId = ccPrjStructNodeDirId;
             if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_DIR_ID")) {
                 this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_DIR_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否项目。
+     */
+    private Boolean isPrj;
+
+    /**
+     * 获取：是否项目。
+     */
+    public Boolean getIsPrj() {
+        return this.isPrj;
+    }
+
+    /**
+     * 设置：是否项目。
+     */
+    public CcPrjStructNode setIsPrj(Boolean isPrj) {
+        if (this.isPrj == null && isPrj == null) {
+            // 均为null，不做处理。
+        } else if (this.isPrj != null && isPrj != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPrj.compareTo(isPrj) != 0) {
+                this.isPrj = isPrj;
+                if (!this.toUpdateCols.contains("IS_PRJ")) {
+                    this.toUpdateCols.add("IS_PRJ");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPrj = isPrj;
+            if (!this.toUpdateCols.contains("IS_PRJ")) {
+                this.toUpdateCols.add("IS_PRJ");
             }
         }
         return this;

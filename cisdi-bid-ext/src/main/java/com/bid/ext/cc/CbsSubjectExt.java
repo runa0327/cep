@@ -45,6 +45,7 @@ public class CbsSubjectExt {
         ccPrjStructNode.setIsCbs(true);
         ccPrjStructNode.setIsTemplate(false);
         ccPrjStructNode.setCcPrjStructUsageId("CBS_SUBJECT");
+        ccPrjStructNode.setIsPrj(true);
         ccPrjStructNode.insertById();
 
         //新增投资科目时同步项目四算及投资统览
