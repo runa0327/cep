@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import cn.hutool.core.util.BooleanUtil;
 import com.bid.ext.model.CcPrjCostOverview;
 import com.bid.ext.model.CcPrjStructNode;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -150,8 +151,8 @@ public class CbsSubjectExt {
     public void updateInvestmentSubject() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            Boolean isPrj = JdbcMapUtil.getBoolean(valueMap, "IS_PRJ");
-            if (!Boolean.FALSE.equals(isPrj)) {
+            boolean isPrj = BooleanUtil.toBoolean(JdbcMapUtil.getString(valueMap, "IS_PRJ"));
+            if (Boolean.FALSE.equals(isPrj)) {
                 String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isPrj");
                 throw new BaseException(msg);
             }
@@ -168,7 +169,8 @@ public class CbsSubjectExt {
             //科目更新后父节点
             String ccPrjStructNodePidA = JdbcMapUtil.getString(valueMap, "CC_PRJ_STRUCT_NODE_PID");
             //未变更层级
-            if (ccPrjStructNodePidB.equals(ccPrjStructNodePidA)) {
+            if ((ccPrjStructNodePidB == null && ccPrjStructNodePidA == null) ||
+                    (ccPrjStructNodePidB != null && ccPrjStructNodePidB.equals(ccPrjStructNodePidA))) {
                 for (CcPrjStructNode node : ccPrjStructNodes) {
                     node.setName(name);
                     node.updateById();
@@ -186,16 +188,20 @@ public class CbsSubjectExt {
                     String ccPrjStructUsageId = node.getCcPrjStructUsageId();
 
                     //此用途下科目改变层级前的父节点
+                    String ccPrjStructPNodeOldId = null;
                     CcPrjStructNode ccPrjStructPNodeOld = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidB).eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_USAGE_ID, ccPrjStructUsageId));
-                    String ccPrjStructPNodeOldId = ccPrjStructPNodeOld.getId();
-
+                    if (ccPrjStructPNodeOld != null) {
+                        ccPrjStructPNodeOldId = ccPrjStructPNodeOld.getId();
+                    }
 
                     //此用途下科目改变层级后的父节点
+                    String ccPrjStructNodeNewPid = null;
                     CcPrjStructNode ccPrjStructPNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidA).eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_USAGE_ID, ccPrjStructUsageId));
-                    String ccPrjStructNodeNewPid = ccPrjStructPNode.getId();
+                    if (ccPrjStructPNode != null) {
+                        ccPrjStructNodeNewPid = ccPrjStructPNode.getId();
+                    }
                     node.setCcPrjStructNodePid(ccPrjStructNodeNewPid);
                     node.updateById();
-
 
                     recalculatePlanCostEstimation(ccPrjStructNodeNewPid);
                     recalculatePlanCostEstimation(ccPrjStructPNodeOldId);
@@ -204,12 +210,23 @@ public class CbsSubjectExt {
                 for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
                     ccPrjCostOverview.setName(name);
 
+                    String ccPrjCostOverviewPOldId = null;
                     CcPrjCostOverview ccPrjCostOverviewPOld = CcPrjCostOverview.selectOneByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidB).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
-                    String ccPrjCostOverviewPOldId = ccPrjCostOverviewPOld.getId();
+                    if (ccPrjCostOverviewPOld != null) {
+                        ccPrjCostOverviewPOldId = ccPrjCostOverviewPOld.getId();
+                    }
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_0_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_1_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_2_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_3_AMT");
+
 
                     //科目改变层级后统览的父节点
+                    String ccPrjCostOverviewPId = null;
                     CcPrjCostOverview ccPrjCostOverviewP = CcPrjCostOverview.selectOneByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjStructNodePidA).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
-                    String ccPrjCostOverviewPId = ccPrjCostOverviewP.getId();
+                    if (ccPrjCostOverviewP != null) {
+                        ccPrjCostOverviewPId = ccPrjCostOverviewP.getId();
+                    }
                     ccPrjCostOverview.setCcPrjCostOverviewPid(ccPrjCostOverviewPId);
                     ccPrjCostOverview.updateById();
 
@@ -217,10 +234,6 @@ public class CbsSubjectExt {
                     recalculatePlanTotalCost(ccPrjCostOverviewPId, "CBS_1_AMT");
                     recalculatePlanTotalCost(ccPrjCostOverviewPId, "CBS_2_AMT");
                     recalculatePlanTotalCost(ccPrjCostOverviewPId, "CBS_3_AMT");
-                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_0_AMT");
-                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_1_AMT");
-                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_2_AMT");
-                    recalculatePlanTotalCost(ccPrjCostOverviewPOldId, "CBS_3_AMT");
 
                 }
             }
