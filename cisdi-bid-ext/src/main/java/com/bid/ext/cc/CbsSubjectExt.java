@@ -4,6 +4,8 @@ import com.bid.ext.model.CcPrjCostOverview;
 import com.bid.ext.model.CcPrjStructNode;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -148,6 +150,11 @@ public class CbsSubjectExt {
     public void updateInvestmentSubject() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
+            Boolean isPrj = JdbcMapUtil.getBoolean(valueMap, "IS_PRJ");
+            if (!Boolean.FALSE.equals(isPrj)) {
+                String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.isPrj");
+                throw new BaseException(msg);
+            }
             String csCommId = entityRecord.csCommId;
             String name = JdbcMapUtil.getString(valueMap, "NAME");
             //变更前节点
