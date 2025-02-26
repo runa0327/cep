@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.bid.ext.cc.StructNodeExt.recalculatePlanCostEstimation;
 import static com.bid.ext.cc.StructNodeExt.recalculatePlanTotalCost;
 import static org.apache.poi.ss.usermodel.CellType.BLANK;
 
@@ -78,7 +79,8 @@ public class CBSExcelFileImportExt {
                 if (row.getRowNum() == 1) {
                     for (Cell cell : row) {
                         String cellValue = getCellValueAsString(cell);
-                        if ("名称".equals(cellValue)) {
+//                        if ("名称".equals(cellValue)) {
+                        if ("科目".equals(cellValue)) {
                             nameIndex = cell.getColumnIndex();
                         } else if ("金额（元）".equals(cellValue)) {
                             costIndex = cell.getColumnIndex();
@@ -104,14 +106,14 @@ public class CBSExcelFileImportExt {
                 if (row.getRowNum() > 1) {
                     Cell nameCell = row.getCell(nameIndex);
                     if (nameCell.getCellType() == BLANK) {
-                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.rowNameCellIsNull",row.getRowNum()+1);
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.rowNameCellIsNull", row.getRowNum() + 1);
                         throw new BaseException(msg);
 //                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，科目名称不能为空");
                     }
 
                     Cell costCell = row.getCell(costIndex);
                     if (costCell.getCellType() == BLANK) {
-                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.rowAmountCellIsNull",row.getRowNum()+1);
+                        String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.CBSExcelFileImport.rowAmountCellIsNull", row.getRowNum() + 1);
                         throw new BaseException(msg);
 //                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，金额不能为空");
                     }
@@ -126,6 +128,9 @@ public class CBSExcelFileImportExt {
                                 node.setPlanTotalCost(new BigDecimal(costValue));
                             }
                             node.updateById();
+                            //重算项目四算
+                            String ccPrjStructNodePid = node.getCcPrjStructNodePid();
+                            recalculatePlanCostEstimation(ccPrjStructNodePid);
 
                             BigDecimal planTotalCost = node.getPlanTotalCost();
                             String copyFromPrjStructNodeId = node.getCopyFromPrjStructNodeId();
