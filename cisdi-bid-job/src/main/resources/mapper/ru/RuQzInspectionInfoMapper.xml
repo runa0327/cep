@@ -5,4 +5,5 @@
 <mapper namespace="com.pms.bid.job.mapper.ru.RuQzInspectionInfoMapper">
 
 
+
 </mapper>

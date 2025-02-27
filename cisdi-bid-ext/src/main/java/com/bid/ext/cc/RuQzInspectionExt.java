@@ -1,6 +1,9 @@
 package com.bid.ext.cc;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.bid.ext.model.*;
+import com.bid.ext.utils.JsonUtil;
 import com.bid.ext.utils.ProcessCommon;
 import com.pms.bid.job.util.CcSpecialEquipConstant;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -68,9 +71,31 @@ public class RuQzInspectionExt {
 
             String csCommId = entityRecord.csCommId;
             RuQzInspectionInfo ruQzInspectionInfoInspection = RuQzInspectionInfo.selectById(csCommId);
+
+            //巡检人
             String checkUserId = ruQzInspectionInfoInspection.getRuQzInspectionCheckUserId();
-            AdUser adUser = AdUser.selectById(checkUserId);
-            ruQzInspectionInfoInspection.setRuQzInspectionReorganizer(adUser.getName());
+            CcPrjMember member = CcPrjMember.selectById(checkUserId);
+            AdUser adUser = AdUser.selectById(member.getAdUserId());
+            JSONObject jsonObject = JSONUtil.parseObj(adUser.getName());
+
+            ruQzInspectionInfoInspection.setRuQzInspectionChecker(jsonObject.get("ZH_CN",String.class));
+
+            String ccSafeDutyUserIds = ruQzInspectionInfoInspection.getCcSafeDutyUserIds();
+            if (ccSafeDutyUserIds != null && !ccSafeDutyUserIds.isEmpty()) {
+                String[] dutyUserIds = ccSafeDutyUserIds.split(",");
+                ArrayList<String> dutyUserIdList = new ArrayList<>(Arrays.asList(dutyUserIds));
+                String userNames = "";
+                for (int i = 0 ; i< dutyUserIdList.size() ;i++) {
+                    CcSafeDutyUser ccSafeDutyUser = CcSafeDutyUser.selectById(dutyUserIdList.get(i));
+                    userNames+=ccSafeDutyUser.getName();
+                    if (i<dutyUserIdList.size()-1){
+                        userNames+=",";
+                    }
+                }
+                //整改人名称
+                ruQzInspectionInfoInspection.setRuQzInspectionReorganizer(userNames);
+
+            }
 
             ruQzInspectionInfoInspection.updateById();
         }
