@@ -1,7 +1,7 @@
 package com.bid.ext.utils;
 
 import com.qygly.shared.BaseException;
-import sun.misc.BASE64Encoder;
+import java.util.Base64;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,7 +30,6 @@ public class ImgUtils {
             throw new BaseException(e);
         }
         // 加密
-        BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(data);
+        return Base64.getEncoder().encodeToString(data);
     }
 }
