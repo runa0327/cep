@@ -11,6 +11,7 @@ import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.interaction.DrivenInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -3004,6 +3005,20 @@ public class StructNodeExt {
      * 新建编制中节点
      */
     public void newEdittingNode() {
+        Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
+        String ccConstructProgressPlanId = null;
+        for (Map.Entry<String, List<DrivenInfo>> entry : drivenInfosMap.entrySet()) {
+            List<DrivenInfo> drivenInfos = entry.getValue();
+            Optional<String> value = drivenInfos.stream()
+                    .filter(info -> "CC_CONSTRUCT_PROGRESS_PLAN_ID".equals(info.code))
+                    .map(info -> info.value)
+                    .findFirst();
+            if (value.isPresent()) {
+                ccConstructProgressPlanId = value.get();
+            }
+            
+        }
+
         Map<String, Object> globalVarMap = ExtJarHelper.getLoginInfo().globalVarMap;
         String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
@@ -3029,7 +3044,7 @@ public class StructNodeExt {
 
         // 创建基础的项目结构节点
         CcPrjStructNode ccPrjStructNode = createProjectStructNode(name, remark, pCcPrjIds, wbsType, wbsChiefUserId, pPlanFr, pPlanTo, planDays, isMileStone);
-
+        ccPrjStructNode.setCcConstructProgressPlanId(ccConstructProgressPlanId);
         // 获取实体记录并处理
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         if (!SharedUtil.isEmpty(entityRecordList)) {
@@ -3039,6 +3054,7 @@ public class StructNodeExt {
                 String ccPrjStructNodePid = JdbcMapUtil.getString(valueMap, "ID");
                 ccPrjStructNode.setCcPrjId(ccPrjId);
                 ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
+
                 ccPrjStructNode.insertById();
             }
         } else {
