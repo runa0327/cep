@@ -7,21 +7,20 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 资料目录。
+ * 图纸更新记录。
  */
-public class CcDocDir {
+public class CcDrawingUpdateRecord {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcDocDir> modelHelper = new ModelHelper<>("CC_DOC_DIR", new CcDocDir());
+    private static final ModelHelper<CcDrawingUpdateRecord> modelHelper = new ModelHelper<>("CC_DRAWING_UPDATE_RECORD", new CcDrawingUpdateRecord());
 
     /**
      * 待更新的列。
@@ -38,7 +37,7 @@ public class CcDocDir {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_DOC_DIR";
+    public static final String ENT_CODE = "CC_DRAWING_UPDATE_RECORD";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -92,6 +91,10 @@ public class CcDocDir {
          */
         public static final String CODE = "CODE";
         /**
+         * 名称。
+         */
+        public static final String NAME = "NAME";
+        /**
          * 备注。
          */
         public static final String REMARK = "REMARK";
@@ -104,49 +107,29 @@ public class CcDocDir {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 是否模板。
-         */
-        public static final String IS_TEMPLATE = "IS_TEMPLATE";
-        /**
-         * 资料文件夹类型。
-         */
-        public static final String CC_DOC_FOLDER_TYPE_ID = "CC_DOC_FOLDER_TYPE_ID";
-        /**
-         * 拷贝自。
-         */
-        public static final String COPY_FROM_ID = "COPY_FROM_ID";
-        /**
-         * 竣工资料目录模板类型。
-         */
-        public static final String CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = "CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID";
-        /**
-         * 名称。
-         */
-        public static final String NAME = "NAME";
-        /**
          * 项目。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
-        /**
-         * 序号。
-         */
-        public static final String SEQ_NO = "SEQ_NO";
-        /**
-         * 资料目录状态。
-         */
-        public static final String CC_DOC_DIR_STATUS_ID = "CC_DOC_DIR_STATUS_ID";
         /**
          * 附件。
          */
         public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
         /**
-         * 资料父目录。
+         * 设计咨询。
          */
-        public static final String CC_DOC_DIR_PID = "CC_DOC_DIR_PID";
+        public static final String CC_DESIGN_INQUI_ID = "CC_DESIGN_INQUI_ID";
         /**
-         * 图纸更新记录。
+         * 手续台账。
          */
-        public static final String CC_DRAWING_UPDATE_RECORD_ID = "CC_DRAWING_UPDATE_RECORD_ID";
+        public static final String CC_PROCEDURE_LEDGER_ID = "CC_PROCEDURE_LEDGER_ID";
+        /**
+         * 版本号。
+         */
+        public static final String CC_VER_NUM = "CC_VER_NUM";
+        /**
+         * 指派人员。
+         */
+        public static final String ASSIGN_PERSONNEL = "ASSIGN_PERSONNEL";
     }
 
     // </editor-fold>
@@ -169,7 +152,7 @@ public class CcDocDir {
     /**
      * 设置：ID。
      */
-    public CcDocDir setId(String id) {
+    public CcDrawingUpdateRecord setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -205,7 +188,7 @@ public class CcDocDir {
     /**
      * 设置：版本。
      */
-    public CcDocDir setVer(Integer ver) {
+    public CcDrawingUpdateRecord setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -241,7 +224,7 @@ public class CcDocDir {
     /**
      * 设置：时间戳。
      */
-    public CcDocDir setTs(LocalDateTime ts) {
+    public CcDrawingUpdateRecord setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -277,7 +260,7 @@ public class CcDocDir {
     /**
      * 设置：是否预设。
      */
-    public CcDocDir setIsPreset(Boolean isPreset) {
+    public CcDrawingUpdateRecord setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -313,7 +296,7 @@ public class CcDocDir {
     /**
      * 设置：创建日期时间。
      */
-    public CcDocDir setCrtDt(LocalDateTime crtDt) {
+    public CcDrawingUpdateRecord setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -349,7 +332,7 @@ public class CcDocDir {
     /**
      * 设置：创建用户。
      */
-    public CcDocDir setCrtUserId(String crtUserId) {
+    public CcDrawingUpdateRecord setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -385,7 +368,7 @@ public class CcDocDir {
     /**
      * 设置：最后修改日期时间。
      */
-    public CcDocDir setLastModiDt(LocalDateTime lastModiDt) {
+    public CcDrawingUpdateRecord setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -421,7 +404,7 @@ public class CcDocDir {
     /**
      * 设置：最后修改用户。
      */
-    public CcDocDir setLastModiUserId(String lastModiUserId) {
+    public CcDrawingUpdateRecord setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -457,7 +440,7 @@ public class CcDocDir {
     /**
      * 设置：记录状态。
      */
-    public CcDocDir setStatus(String status) {
+    public CcDrawingUpdateRecord setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -493,7 +476,7 @@ public class CcDocDir {
     /**
      * 设置：锁定流程实例。
      */
-    public CcDocDir setLkWfInstId(String lkWfInstId) {
+    public CcDrawingUpdateRecord setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -529,7 +512,7 @@ public class CcDocDir {
     /**
      * 设置：代码。
      */
-    public CcDocDir setCode(String code) {
+    public CcDrawingUpdateRecord setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -551,6 +534,42 @@ public class CcDocDir {
     }
 
     /**
+     * 名称。
+     */
+    private String name;
+
+    /**
+     * 获取：名称。
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * 设置：名称。
+     */
+    public CcDrawingUpdateRecord setName(String name) {
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 备注。
      */
     private String remark;
@@ -565,7 +584,7 @@ public class CcDocDir {
     /**
      * 设置：备注。
      */
-    public CcDocDir setRemark(String remark) {
+    public CcDrawingUpdateRecord setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -601,7 +620,7 @@ public class CcDocDir {
     /**
      * 设置：快捷码。
      */
-    public CcDocDir setFastCode(String fastCode) {
+    public CcDrawingUpdateRecord setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -637,7 +656,7 @@ public class CcDocDir {
     /**
      * 设置：图标。
      */
-    public CcDocDir setIconFileGroupId(String iconFileGroupId) {
+    public CcDrawingUpdateRecord setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -659,186 +678,6 @@ public class CcDocDir {
     }
 
     /**
-     * 是否模板。
-     */
-    private Boolean isTemplate;
-
-    /**
-     * 获取：是否模板。
-     */
-    public Boolean getIsTemplate() {
-        return this.isTemplate;
-    }
-
-    /**
-     * 设置：是否模板。
-     */
-    public CcDocDir setIsTemplate(Boolean isTemplate) {
-        if (this.isTemplate == null && isTemplate == null) {
-            // 均为null，不做处理。
-        } else if (this.isTemplate != null && isTemplate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.isTemplate.compareTo(isTemplate) != 0) {
-                this.isTemplate = isTemplate;
-                if (!this.toUpdateCols.contains("IS_TEMPLATE")) {
-                    this.toUpdateCols.add("IS_TEMPLATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.isTemplate = isTemplate;
-            if (!this.toUpdateCols.contains("IS_TEMPLATE")) {
-                this.toUpdateCols.add("IS_TEMPLATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 资料文件夹类型。
-     */
-    private String ccDocFolderTypeId;
-
-    /**
-     * 获取：资料文件夹类型。
-     */
-    public String getCcDocFolderTypeId() {
-        return this.ccDocFolderTypeId;
-    }
-
-    /**
-     * 设置：资料文件夹类型。
-     */
-    public CcDocDir setCcDocFolderTypeId(String ccDocFolderTypeId) {
-        if (this.ccDocFolderTypeId == null && ccDocFolderTypeId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccDocFolderTypeId != null && ccDocFolderTypeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccDocFolderTypeId.compareTo(ccDocFolderTypeId) != 0) {
-                this.ccDocFolderTypeId = ccDocFolderTypeId;
-                if (!this.toUpdateCols.contains("CC_DOC_FOLDER_TYPE_ID")) {
-                    this.toUpdateCols.add("CC_DOC_FOLDER_TYPE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccDocFolderTypeId = ccDocFolderTypeId;
-            if (!this.toUpdateCols.contains("CC_DOC_FOLDER_TYPE_ID")) {
-                this.toUpdateCols.add("CC_DOC_FOLDER_TYPE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 拷贝自。
-     */
-    private String copyFromId;
-
-    /**
-     * 获取：拷贝自。
-     */
-    public String getCopyFromId() {
-        return this.copyFromId;
-    }
-
-    /**
-     * 设置：拷贝自。
-     */
-    public CcDocDir setCopyFromId(String copyFromId) {
-        if (this.copyFromId == null && copyFromId == null) {
-            // 均为null，不做处理。
-        } else if (this.copyFromId != null && copyFromId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.copyFromId.compareTo(copyFromId) != 0) {
-                this.copyFromId = copyFromId;
-                if (!this.toUpdateCols.contains("COPY_FROM_ID")) {
-                    this.toUpdateCols.add("COPY_FROM_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.copyFromId = copyFromId;
-            if (!this.toUpdateCols.contains("COPY_FROM_ID")) {
-                this.toUpdateCols.add("COPY_FROM_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 竣工资料目录模板类型。
-     */
-    private String ccDocDirAcceptanceTemplateTypeId;
-
-    /**
-     * 获取：竣工资料目录模板类型。
-     */
-    public String getCcDocDirAcceptanceTemplateTypeId() {
-        return this.ccDocDirAcceptanceTemplateTypeId;
-    }
-
-    /**
-     * 设置：竣工资料目录模板类型。
-     */
-    public CcDocDir setCcDocDirAcceptanceTemplateTypeId(String ccDocDirAcceptanceTemplateTypeId) {
-        if (this.ccDocDirAcceptanceTemplateTypeId == null && ccDocDirAcceptanceTemplateTypeId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccDocDirAcceptanceTemplateTypeId != null && ccDocDirAcceptanceTemplateTypeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccDocDirAcceptanceTemplateTypeId.compareTo(ccDocDirAcceptanceTemplateTypeId) != 0) {
-                this.ccDocDirAcceptanceTemplateTypeId = ccDocDirAcceptanceTemplateTypeId;
-                if (!this.toUpdateCols.contains("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID")) {
-                    this.toUpdateCols.add("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccDocDirAcceptanceTemplateTypeId = ccDocDirAcceptanceTemplateTypeId;
-            if (!this.toUpdateCols.contains("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID")) {
-                this.toUpdateCols.add("CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 名称。
-     */
-    private String name;
-
-    /**
-     * 获取：名称。
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * 设置：名称。
-     */
-    public CcDocDir setName(String name) {
-        if (this.name == null && name == null) {
-            // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 项目。
      */
     private String ccPrjId;
@@ -853,7 +692,7 @@ public class CcDocDir {
     /**
      * 设置：项目。
      */
-    public CcDocDir setCcPrjId(String ccPrjId) {
+    public CcDrawingUpdateRecord setCcPrjId(String ccPrjId) {
         if (this.ccPrjId == null && ccPrjId == null) {
             // 均为null，不做处理。
         } else if (this.ccPrjId != null && ccPrjId != null) {
@@ -875,78 +714,6 @@ public class CcDocDir {
     }
 
     /**
-     * 序号。
-     */
-    private BigDecimal seqNo;
-
-    /**
-     * 获取：序号。
-     */
-    public BigDecimal getSeqNo() {
-        return this.seqNo;
-    }
-
-    /**
-     * 设置：序号。
-     */
-    public CcDocDir setSeqNo(BigDecimal seqNo) {
-        if (this.seqNo == null && seqNo == null) {
-            // 均为null，不做处理。
-        } else if (this.seqNo != null && seqNo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.seqNo.compareTo(seqNo) != 0) {
-                this.seqNo = seqNo;
-                if (!this.toUpdateCols.contains("SEQ_NO")) {
-                    this.toUpdateCols.add("SEQ_NO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.seqNo = seqNo;
-            if (!this.toUpdateCols.contains("SEQ_NO")) {
-                this.toUpdateCols.add("SEQ_NO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 资料目录状态。
-     */
-    private String ccDocDirStatusId;
-
-    /**
-     * 获取：资料目录状态。
-     */
-    public String getCcDocDirStatusId() {
-        return this.ccDocDirStatusId;
-    }
-
-    /**
-     * 设置：资料目录状态。
-     */
-    public CcDocDir setCcDocDirStatusId(String ccDocDirStatusId) {
-        if (this.ccDocDirStatusId == null && ccDocDirStatusId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccDocDirStatusId != null && ccDocDirStatusId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccDocDirStatusId.compareTo(ccDocDirStatusId) != 0) {
-                this.ccDocDirStatusId = ccDocDirStatusId;
-                if (!this.toUpdateCols.contains("CC_DOC_DIR_STATUS_ID")) {
-                    this.toUpdateCols.add("CC_DOC_DIR_STATUS_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccDocDirStatusId = ccDocDirStatusId;
-            if (!this.toUpdateCols.contains("CC_DOC_DIR_STATUS_ID")) {
-                this.toUpdateCols.add("CC_DOC_DIR_STATUS_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 附件。
      */
     private String ccAttachment;
@@ -961,7 +728,7 @@ public class CcDocDir {
     /**
      * 设置：附件。
      */
-    public CcDocDir setCcAttachment(String ccAttachment) {
+    public CcDrawingUpdateRecord setCcAttachment(String ccAttachment) {
         if (this.ccAttachment == null && ccAttachment == null) {
             // 均为null，不做处理。
         } else if (this.ccAttachment != null && ccAttachment != null) {
@@ -983,72 +750,144 @@ public class CcDocDir {
     }
 
     /**
-     * 资料父目录。
+     * 设计咨询。
      */
-    private String ccDocDirPid;
+    private String ccDesignInquiId;
 
     /**
-     * 获取：资料父目录。
+     * 获取：设计咨询。
      */
-    public String getCcDocDirPid() {
-        return this.ccDocDirPid;
+    public String getCcDesignInquiId() {
+        return this.ccDesignInquiId;
     }
 
     /**
-     * 设置：资料父目录。
+     * 设置：设计咨询。
      */
-    public CcDocDir setCcDocDirPid(String ccDocDirPid) {
-        if (this.ccDocDirPid == null && ccDocDirPid == null) {
+    public CcDrawingUpdateRecord setCcDesignInquiId(String ccDesignInquiId) {
+        if (this.ccDesignInquiId == null && ccDesignInquiId == null) {
             // 均为null，不做处理。
-        } else if (this.ccDocDirPid != null && ccDocDirPid != null) {
+        } else if (this.ccDesignInquiId != null && ccDesignInquiId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccDocDirPid.compareTo(ccDocDirPid) != 0) {
-                this.ccDocDirPid = ccDocDirPid;
-                if (!this.toUpdateCols.contains("CC_DOC_DIR_PID")) {
-                    this.toUpdateCols.add("CC_DOC_DIR_PID");
+            if (this.ccDesignInquiId.compareTo(ccDesignInquiId) != 0) {
+                this.ccDesignInquiId = ccDesignInquiId;
+                if (!this.toUpdateCols.contains("CC_DESIGN_INQUI_ID")) {
+                    this.toUpdateCols.add("CC_DESIGN_INQUI_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccDocDirPid = ccDocDirPid;
-            if (!this.toUpdateCols.contains("CC_DOC_DIR_PID")) {
-                this.toUpdateCols.add("CC_DOC_DIR_PID");
+            this.ccDesignInquiId = ccDesignInquiId;
+            if (!this.toUpdateCols.contains("CC_DESIGN_INQUI_ID")) {
+                this.toUpdateCols.add("CC_DESIGN_INQUI_ID");
             }
         }
         return this;
     }
 
     /**
-     * 图纸更新记录。
+     * 手续台账。
      */
-    private String ccDrawingUpdateRecordId;
+    private String ccProcedureLedgerId;
 
     /**
-     * 获取：图纸更新记录。
+     * 获取：手续台账。
      */
-    public String getCcDrawingUpdateRecordId() {
-        return this.ccDrawingUpdateRecordId;
+    public String getCcProcedureLedgerId() {
+        return this.ccProcedureLedgerId;
     }
 
     /**
-     * 设置：图纸更新记录。
+     * 设置：手续台账。
      */
-    public CcDocDir setCcDrawingUpdateRecordId(String ccDrawingUpdateRecordId) {
-        if (this.ccDrawingUpdateRecordId == null && ccDrawingUpdateRecordId == null) {
+    public CcDrawingUpdateRecord setCcProcedureLedgerId(String ccProcedureLedgerId) {
+        if (this.ccProcedureLedgerId == null && ccProcedureLedgerId == null) {
             // 均为null，不做处理。
-        } else if (this.ccDrawingUpdateRecordId != null && ccDrawingUpdateRecordId != null) {
+        } else if (this.ccProcedureLedgerId != null && ccProcedureLedgerId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccDrawingUpdateRecordId.compareTo(ccDrawingUpdateRecordId) != 0) {
-                this.ccDrawingUpdateRecordId = ccDrawingUpdateRecordId;
-                if (!this.toUpdateCols.contains("CC_DRAWING_UPDATE_RECORD_ID")) {
-                    this.toUpdateCols.add("CC_DRAWING_UPDATE_RECORD_ID");
+            if (this.ccProcedureLedgerId.compareTo(ccProcedureLedgerId) != 0) {
+                this.ccProcedureLedgerId = ccProcedureLedgerId;
+                if (!this.toUpdateCols.contains("CC_PROCEDURE_LEDGER_ID")) {
+                    this.toUpdateCols.add("CC_PROCEDURE_LEDGER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccDrawingUpdateRecordId = ccDrawingUpdateRecordId;
-            if (!this.toUpdateCols.contains("CC_DRAWING_UPDATE_RECORD_ID")) {
-                this.toUpdateCols.add("CC_DRAWING_UPDATE_RECORD_ID");
+            this.ccProcedureLedgerId = ccProcedureLedgerId;
+            if (!this.toUpdateCols.contains("CC_PROCEDURE_LEDGER_ID")) {
+                this.toUpdateCols.add("CC_PROCEDURE_LEDGER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 版本号。
+     */
+    private String ccVerNum;
+
+    /**
+     * 获取：版本号。
+     */
+    public String getCcVerNum() {
+        return this.ccVerNum;
+    }
+
+    /**
+     * 设置：版本号。
+     */
+    public CcDrawingUpdateRecord setCcVerNum(String ccVerNum) {
+        if (this.ccVerNum == null && ccVerNum == null) {
+            // 均为null，不做处理。
+        } else if (this.ccVerNum != null && ccVerNum != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccVerNum.compareTo(ccVerNum) != 0) {
+                this.ccVerNum = ccVerNum;
+                if (!this.toUpdateCols.contains("CC_VER_NUM")) {
+                    this.toUpdateCols.add("CC_VER_NUM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccVerNum = ccVerNum;
+            if (!this.toUpdateCols.contains("CC_VER_NUM")) {
+                this.toUpdateCols.add("CC_VER_NUM");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 指派人员。
+     */
+    private String assignPersonnel;
+
+    /**
+     * 获取：指派人员。
+     */
+    public String getAssignPersonnel() {
+        return this.assignPersonnel;
+    }
+
+    /**
+     * 设置：指派人员。
+     */
+    public CcDrawingUpdateRecord setAssignPersonnel(String assignPersonnel) {
+        if (this.assignPersonnel == null && assignPersonnel == null) {
+            // 均为null，不做处理。
+        } else if (this.assignPersonnel != null && assignPersonnel != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.assignPersonnel.compareTo(assignPersonnel) != 0) {
+                this.assignPersonnel = assignPersonnel;
+                if (!this.toUpdateCols.contains("ASSIGN_PERSONNEL")) {
+                    this.toUpdateCols.add("ASSIGN_PERSONNEL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.assignPersonnel = assignPersonnel;
+            if (!this.toUpdateCols.contains("ASSIGN_PERSONNEL")) {
+                this.toUpdateCols.add("ASSIGN_PERSONNEL");
             }
         }
         return this;
@@ -1141,8 +980,8 @@ public class CcDocDir {
      *
      * @return
      */
-    public static CcDocDir newData() {
-        CcDocDir obj = modelHelper.newData();
+    public static CcDrawingUpdateRecord newData() {
+        CcDrawingUpdateRecord obj = modelHelper.newData();
         return obj;
     }
 
@@ -1151,8 +990,8 @@ public class CcDocDir {
      *
      * @return
      */
-    public static CcDocDir insertData() {
-        CcDocDir obj = modelHelper.insertData();
+    public static CcDrawingUpdateRecord insertData() {
+        CcDrawingUpdateRecord obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1164,8 +1003,8 @@ public class CcDocDir {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcDocDir selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcDocDir obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcDrawingUpdateRecord selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcDrawingUpdateRecord obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1175,7 +1014,7 @@ public class CcDocDir {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcDocDir selectById(String id) {
+    public static CcDrawingUpdateRecord selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1187,8 +1026,8 @@ public class CcDocDir {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcDocDir> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcDocDir> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcDrawingUpdateRecord> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcDrawingUpdateRecord> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1198,7 +1037,7 @@ public class CcDocDir {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcDocDir> selectByIds(List<String> ids) {
+    public static List<CcDrawingUpdateRecord> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1210,8 +1049,8 @@ public class CcDocDir {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcDocDir> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcDocDir> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcDrawingUpdateRecord> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcDrawingUpdateRecord> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1221,7 +1060,7 @@ public class CcDocDir {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcDocDir> selectByWhere(Where where) {
+    public static List<CcDrawingUpdateRecord> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1233,10 +1072,10 @@ public class CcDocDir {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcDocDir selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcDocDir> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcDrawingUpdateRecord selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcDrawingUpdateRecord> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcDocDir.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcDrawingUpdateRecord.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1248,7 +1087,7 @@ public class CcDocDir {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcDocDir selectOneByWhere(Where where) {
+    public static CcDrawingUpdateRecord selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1362,7 +1201,7 @@ public class CcDocDir {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcDocDir fromModel, CcDocDir toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcDrawingUpdateRecord fromModel, CcDrawingUpdateRecord toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1372,7 +1211,7 @@ public class CcDocDir {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcDocDir fromModel, CcDocDir toModel) {
+    public static void copyCols(CcDrawingUpdateRecord fromModel, CcDrawingUpdateRecord toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

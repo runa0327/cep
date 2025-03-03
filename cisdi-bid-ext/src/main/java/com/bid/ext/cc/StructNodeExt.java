@@ -977,7 +977,29 @@ public class StructNodeExt {
                         LocalDateTime crtDt = flFile.getCrtDt();
                         ccProcedureLedger.setCcUploadUserId(crtUserId);
                         ccProcedureLedger.setUploadDttm(crtDt);
+                        ccProcedureLedger.setName(flFile.getDspName());
                         ccProcedureLedger.insertById();
+
+                        //目前只处理设计管理的成果文件，后续可根据需求扩展其他类型的处理逻辑
+                        String type = ccPrjStructNode.getCcPrjWbsTypeId();
+                        if(type != null && type.equals("DESIGN")){
+                            //将第一次保存的成果文件存储到cc_drawing_update_record(图纸更新记录)
+                            CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.newData();
+                            ccDrawingUpdateRecord.setCcPrjId(ccPrjId);
+                            ccDrawingUpdateRecord.setRemark(remark);
+                            ccDrawingUpdateRecord.setCcAttachment(ccAttachment);
+                            ccDrawingUpdateRecord.setTs(crtDt);
+                            ccDrawingUpdateRecord.setCrtDt(crtDt);
+                            ccDrawingUpdateRecord.setCrtUserId(crtUserId);
+                            ccDrawingUpdateRecord.setLastModiDt(crtDt);
+                            ccDrawingUpdateRecord.setLastModiUserId(crtUserId);
+                            ccDrawingUpdateRecord.setCcProcedureLedgerId(ccProcedureLedger.getId());//前期手续ID
+                            //  ccDrawingUpdateRecord.setCcDesignInquiId(ccDesignInquiId);//设计咨询ID
+                            ccDrawingUpdateRecord.setCcVerNum("1");//新建的手续台账，图纸更新记录默认为第一版
+                            ccDrawingUpdateRecord.insertById();
+                            //处理设计管理的zip包
+                            handleDesignManagement(attachments, ccProcedureLedger.getId(), ccDrawingUpdateRecord.getId());
+                        }
                     }
 
                 }
@@ -987,6 +1009,20 @@ public class StructNodeExt {
         recalculationPlan();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 处理设计管理的zip包
+     *
+     * @param attachments         文件ID
+     * @param ccProcedureLedgerId 手续台账ID
+     * @param ccDrawingUpdateRecordId 图纸更新记录ID
+     */
+    private void handleDesignManagement(String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
+        //当状态为“已完成”时，解压文件，保存相关文件
+        ZipProcessorExt zipProcessor = new ZipProcessorExt();
+        zipProcessor.decompressPackageAndStore(attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
+
     }
 
     /**
