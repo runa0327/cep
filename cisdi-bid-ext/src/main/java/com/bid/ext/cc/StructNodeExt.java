@@ -147,7 +147,6 @@ public class StructNodeExt {
             int versionNumber = Integer.parseInt(versionNumberStr);
             newVersion = "V" + (versionNumber + 1);
         }
-
         // 创建新的历史版本
         CcPrjStructNodeVersion ccPrjStructNodeVersion = CcPrjStructNodeVersion.newData();
         ccPrjStructNodeVersion.setCcPrjId(pCcPrjIds);
@@ -164,7 +163,6 @@ public class StructNodeExt {
                         .eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds)
                         .eq(CcPrjStructNode.Cols.STATUS, "AP")
         );
-
         if (!SharedUtil.isEmpty(ccPrjStructNodesAp)) {
             for (CcPrjStructNode ccPrjStructNodeAp : ccPrjStructNodesAp) {
                 String ccPrjStructNodeApId = ccPrjStructNodeAp.getId();
@@ -193,6 +191,7 @@ public class StructNodeExt {
             }
         }
 
+
         //编制的计划状态变更为已批准
         List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType).eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).eq(CcPrjStructNode.Cols.STATUS, "DR").eq(CcPrjStructNode.Cols.CRT_USER_ID, userId));
         if (!SharedUtil.isEmpty(ccPrjStructNodesDr)) {
@@ -207,7 +206,7 @@ public class StructNodeExt {
                 ccPrjStructNodeToVersion.insertById();
             }
         }
-        recalculationPrePlan();
+        recalculationPrePlan(planType);
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
@@ -556,14 +555,14 @@ public class StructNodeExt {
     /**
      * 重算前期计划
      */
-    public void recalculationPrePlan() {
+    public void recalculationPrePlan(String planType) {
         InvokeActResult invokeActResult = new InvokeActResult();
         Set<String> updatedNodes = new HashSet<>();
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         Map<String, Object> globalVarMap = loginInfo.globalVarMap;
         String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
-        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, "pre").eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).in(CcPrjStructNode.Cols.STATUS, "AP", "DR").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType).eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).in(CcPrjStructNode.Cols.STATUS, "AP", "DR").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
         for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodesDr) {
             String ccPrjStructNodeId = ccPrjStructNode.getId();
             updateDateRange(ccPrjStructNodeId, updatedNodes);
