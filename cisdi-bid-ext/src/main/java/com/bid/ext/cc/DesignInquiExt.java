@@ -77,14 +77,20 @@ public class DesignInquiExt {
             String ccProcedureLedgerId = ccDesignInqui.getAssociateDrawings();//手续台账ID
             if (ccProcedureLedgerId != null && !ccProcedureLedgerId.isEmpty()) {
                 Where attWhere = new Where();
-                attWhere.eq(CcDrawingUpdateRecord.Cols.CC_PROCEDURE_LEDGER_ID, ccProcedureLedgerId);
-                CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectOneByWhere(attWhere);
-                if (ccDrawingUpdateRecord != null) {
-                    if(ccDrawingUpdateRecord.getCcDesignInquiId() == null || ccDrawingUpdateRecord.getCcDesignInquiId().isEmpty()){
-                        ccDrawingUpdateRecord.setCcDesignInquiId(valueMap.get("ID").toString());
-                        ccDrawingUpdateRecord.updateById();
+                attWhere.eq(CcDrawingUpdateRecord.Cols.CC_PROCEDURE_LEDGER_ID, ccProcedureLedgerId).eq(CcDrawingUpdateRecord.Cols.CC_DESIGN_INQUI_ID, null);
+                List<CcDrawingUpdateRecord> ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectByWhere(attWhere);
+                if(!ccDrawingUpdateRecord.isEmpty()){
+                    for (CcDrawingUpdateRecord record : ccDrawingUpdateRecord) {
+                        record.setCcDesignInquiId(valueMap.get("ID").toString());
+                        record.updateById();
                     }
                 }
+//                if (ccDrawingUpdateRecord != null) {
+//                    if(ccDrawingUpdateRecord.getCcDesignInquiId() == null || ccDrawingUpdateRecord.getCcDesignInquiId().isEmpty()){
+//                        ccDrawingUpdateRecord.setCcDesignInquiId(valueMap.get("ID").toString());
+//                        ccDrawingUpdateRecord.updateById();
+//                    }
+//                }
             }
 
         }

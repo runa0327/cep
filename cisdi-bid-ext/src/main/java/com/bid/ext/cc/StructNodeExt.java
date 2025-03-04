@@ -206,7 +206,8 @@ public class StructNodeExt {
                 ccPrjStructNodeToVersion.insertById();
             }
         }
-        recalculationPrePlan(planType);
+        //重算计划
+        recalculationPublicPlan(planType);
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
@@ -553,23 +554,46 @@ public class StructNodeExt {
     }
 
     /**
-     * 重算前期计划
+     * 重算计划(公共方法)
      */
-    public void recalculationPrePlan(String planType) {
+    public void recalculationPublicPlan(String planType) {
         InvokeActResult invokeActResult = new InvokeActResult();
         Set<String> updatedNodes = new HashSet<>();
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         Map<String, Object> globalVarMap = loginInfo.globalVarMap;
         String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
-        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false).eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType).eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).in(CcPrjStructNode.Cols.STATUS, "AP", "DR").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
-        for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodesDr) {
-            String ccPrjStructNodeId = ccPrjStructNode.getId();
-            updateDateRange(ccPrjStructNodeId, updatedNodes);
+        log.info("pCcPrjIds:{}", pCcPrjIds);
+        List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
+                .eq(CcPrjStructNode.Cols.IS_WBS, true).eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType)
+                .eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds).in(CcPrjStructNode.Cols.STATUS, "AP", "DR")
+                .eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+        if(ccPrjStructNodesDr != null && ccPrjStructNodesDr.size() > 0) {
+            for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodesDr) {
+                log.info("ccPrjStructNode:{}", ccPrjStructNode);
+                String ccPrjStructNodeId = ccPrjStructNode.getId();
+                log.info("ccPrjStructNodeId:{}", ccPrjStructNodeId);
+                updateDateRange(ccPrjStructNodeId, updatedNodes);
 
+            }
         }
+
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 重算前期计划
+     */
+    public void recalculationPrePlan() {
+        recalculationPublicPlan("PRE");
+    }
+
+    /**
+     * 重算设计计划
+     */
+    public void recalculationDesignPlan() {
+        recalculationPublicPlan("DESIGN");
     }
 
     /**
@@ -1021,6 +1045,7 @@ public class StructNodeExt {
         //当状态为“已完成”时，解压文件，保存相关文件
         ZipProcessorExt zipProcessor = new ZipProcessorExt();
         zipProcessor.decompressPackageAndStore(attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
+        log.info("处理设计管理的zip包完成！");
 
     }
 

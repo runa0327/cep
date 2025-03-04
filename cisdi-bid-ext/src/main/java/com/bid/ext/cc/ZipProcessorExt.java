@@ -6,6 +6,9 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.core.io.FileSystemResource;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -17,6 +20,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+@Slf4j
 public class ZipProcessorExt {
 
 //    private final ExecutorService executorService = Executors.newFixedThreadPool(5); // 创建一个固定大小为 5 的线程池
@@ -66,13 +70,31 @@ public class ZipProcessorExt {
      */
     private String getFilePath(String attachments) throws IOException {
         // 资源文件的相对路径，相对于 resources 目录
+        log.info("附件ID：{}", attachments);
         FlFile flFile = FlFile.selectById(attachments); // 获取文件对象
+        log.info("文件对象：{}", flFile);
         if (flFile != null) {
             String resourcePath = flFile.getPhysicalLocation(); // 获取文件的物理路径
+            log.info("文件路径：{}", resourcePath);
 //            String resourcePath = "/data/qygly/file3/prod/FileStore/2025/02/20/1895388916898254848.zip";
+//        filePath = "/Users/hejialun/Pictures/hjl-face.jpg";
+            FileSystemResource fileSystemResource = new FileSystemResource(resourcePath);
+
+            InputStream inputStream = null;
+            try {
+                inputStream = fileSystemResource.getInputStream();
+//                byte[] imageBytes = new byte[inputStream.available()];
+//                inputStream.read(imageBytes);
+//                inputStream.close();
+//                img = Base64.encodeBase64String(imageBytes);
+//            } catch (IOException e) {
+//                throw new BaseException("人脸图片未找到！");
+//            }
             // 获取类加载器
-            ClassLoader classLoader = StructNodeExt.class.getClassLoader();
-            try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath.substring(1))) {
+//            ClassLoader classLoader = StructNodeExt.class.getClassLoader();
+//            log.info("类加载器：{}", classLoader);
+//            try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath)) {
+                log.info("输入流：{}", inputStream);
                 if (inputStream != null) {
                     // 创建临时文件
                     File tempFile = File.createTempFile("temp", ".zip");
@@ -95,6 +117,8 @@ public class ZipProcessorExt {
                 } else {
                     throw new BaseException("未找到资源文件");
                 }
+            }catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return null;
