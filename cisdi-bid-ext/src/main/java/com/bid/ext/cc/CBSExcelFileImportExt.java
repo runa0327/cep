@@ -233,7 +233,7 @@ public class CBSExcelFileImportExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-        filePath = "/Users/hejialun/Downloads/投资简览.xlsx";
+//        filePath = "/Users/hejialun/Downloads/投资简览.xlsx";
 
 //        filePath = "C:\\Users\\34451\\Downloads\\test.xlsx";
 

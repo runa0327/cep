@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -241,10 +242,13 @@ public class RuQzInspectionExt {
                             String openid = map.get("openid").toString();
                             String taskId = JdbcMapUtil.getString(item, "task_id");
                             String viewId = JdbcMapUtil.getString(item, "AD_VIEW_ID");
-                            String pbsNodeName = JdbcMapUtil.getString(item, "pbs_node_name");
-                            String rectificationPeriod = JdbcMapUtil.getString(item, "RU_QZ_INSPECTION_CHECK_TIME");
+//                            String projectName = JdbcMapUtil.getString(item, "pbs_node_name");
+
+//                            String checkTime = JdbcMapUtil.getString(item, "RU_QZ_INSPECTION_CHECK_TIME");
+                            LocalDateTime checkTime = JdbcMapUtil.getLocalDateTime(item, "RU_QZ_INSPECTION_CHECK_TIME");
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
                             String currentStateName = JdbcMapUtil.getString(item, "current_state_name");
-                            sendTemplateMessage(openid, taskId, viewId, csCommId, pbsNodeName, rectificationPeriod, currentStateName);
+                            sendTemplateMessage(openid, taskId, viewId, csCommId, "NLMK", checkTime.format(formatter), currentStateName);
                             log.error(msg + "成功。");
                         }
                     }
@@ -266,7 +270,7 @@ public class RuQzInspectionExt {
 
         // 获取当前
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select t.id task_id,t.WF_PROCESS_INSTANCE_ID,t.WF_NODE_INSTANCE_ID,n.id node_id,n.code node_code,n.name->>'$.ZH_CN' node_name,t.WF_TASK_TYPE_ID,u.id user_id,u.name->>'$.ZH_CN' user_name,u.EXTRA_INFO user_EXTRA_INFO,state.code current_state_code,state.name->>'$.ZH_CN' current_state_name,n.AD_VIEW_ID,sn.name pbs_node_name,i.RECTIFICATION_PERIOD from wf_task t join ad_user u on t.WF_NODE_INSTANCE_ID=? and t.WF_TASK_TYPE_ID='TODO' and t.ad_user_id=u.id join ru_qz_inspection_info i on i.id=? join cc_qs_current_state state on i.CC_QS_CURRENT_STATE_ID=state.id join wf_node n on t.WF_NODE_ID=n.id join CC_PRJ_STRUCT_NODE sn on sn.id=i.CC_PRJ_STRUCT_NODE_ID", nodeInstId, csCommId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select t.id task_id,t.WF_PROCESS_INSTANCE_ID,t.WF_NODE_INSTANCE_ID,n.id node_id,n.code node_code,n.name->>'$.ZH_CN' node_name,t.WF_TASK_TYPE_ID,u.id user_id,u.name->>'$.ZH_CN' user_name,u.EXTRA_INFO user_EXTRA_INFO,i.RU_QZ_INSPECTION_STATUS current_state_name,n.AD_VIEW_ID,i.RU_QZ_INSPECTION_CHECK_TIME from wf_task t join ad_user u on t.WF_NODE_INSTANCE_ID=?  and t.ad_user_id=u.id join ru_qz_inspection_info i on i.id=?  join wf_node n on t.WF_NODE_ID=n.id ", nodeInstId, csCommId);
         return list;
     }
 
@@ -314,7 +318,7 @@ public class RuQzInspectionExt {
      */
     public static final String TEMPLATE_ID = ((Supplier<String>) () -> "pQQNri9f70e1I6YOH_oNQLo7TLpdjUWeOrNwqiKCBwc").get();
 
-    private void sendTemplateMessage(String openId, String taskId, String viewId, String entityRecordId, String pbsNodeName, String rectificationPeriod, String currentStateName) {
+    private void sendTemplateMessage(String openId, String taskId, String viewId, String entityRecordId, String projectName, String checkTime, String currentStateName) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String currentOrgId = loginInfo.currentOrgInfo.id;
         String fileDownloadUrl = SysSettingUtil.getValue("FILE_DOWNLOAD_URL");
@@ -346,11 +350,11 @@ public class RuQzInspectionExt {
 
         HashMap<Object, Object> thing2Map = new HashMap<>();
         data.put("thing2", thing2Map);
-        thing2Map.put("value", pbsNodeName);
+        thing2Map.put("value", projectName);
 
         HashMap<Object, Object> thing10Map = new HashMap<>();
         data.put("time4", thing10Map);
-        thing10Map.put("value", rectificationPeriod);
+        thing10Map.put("value", checkTime);
 
         HashMap<Object, Object> thing5Map = new HashMap<>();
         data.put("thing5", thing5Map);
