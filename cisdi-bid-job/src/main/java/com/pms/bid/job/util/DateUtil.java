@@ -19,6 +19,29 @@ public class DateUtil {
         return sdf.format(date);
     }
 
+    /**
+     * @param date 日期
+     * @return 获取"yyyy年MM月dd日"形式日期字符串
+     */
+    public static String getDateStr(Date date){
+        if (date == null){
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+        return sdf.format(date);
+    }
+
+    /**
+     * @param date 日期
+     * @return 获取"yyyy年MM月dd日"形式日期字符串
+     */
+    public static String getDateStr(Date date,String  patten){
+        if (date == null){
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(patten);
+        return sdf.format(date);
+    }
 
     /**
      * 根据字符串获取日期

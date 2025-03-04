@@ -233,7 +233,7 @@ public class CBSExcelFileImportExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-//       String filePath = "/Users/hejialun/Downloads/成本统览.xlsx";
+        filePath = "/Users/hejialun/Downloads/投资简览.xlsx";
 
 //        filePath = "C:\\Users\\34451\\Downloads\\test.xlsx";
 
@@ -266,7 +266,7 @@ public class CBSExcelFileImportExt {
         try {
             Map<String, Integer> indexMap = ExcelUtils.analyzeExcel(filePath, flFile.getExt(), true);
             //成本科目列下标
-            cbkmIndex = indexMap.getOrDefault("成本科目", -1);
+            cbkmIndex = indexMap.getOrDefault("科目", -1);
             //立项匡算列下标
             lxksIndex = indexMap.getOrDefault("立项匡算", -1);
             //可研估算

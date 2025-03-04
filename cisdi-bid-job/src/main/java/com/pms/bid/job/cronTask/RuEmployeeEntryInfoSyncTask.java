@@ -21,14 +21,15 @@ public class RuEmployeeEntryInfoSyncTask {
 
 
 //        @Scheduled(cron = "0 0 4 * * ?")
-@Scheduled(fixedRate = 1000*60*60*3)
+@Scheduled(fixedRate = 1000*60*60*24)
     public void syncInspectionInfo(){
         try {
             log.error(" 俄罗斯检查员工签证-开始");
             employeeEntryInfoService.checkUserVisaExpire();
             log.error("俄罗斯检查员工签证-结束");
         } catch (Exception e) {
-            log.error("俄罗斯检查员工签证");
+            log.error(e.getMessage());
+            log.error("俄罗斯检查员工签证-错误");
         }
     }
 

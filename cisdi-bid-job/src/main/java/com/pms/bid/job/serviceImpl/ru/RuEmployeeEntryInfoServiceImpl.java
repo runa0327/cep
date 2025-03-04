@@ -17,6 +17,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.util.JsonUtil;
 import com.qygly.shared.util.SharedUtil;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -108,6 +109,7 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
         instance.set(Calendar.HOUR,0);
         instance.set(Calendar.MINUTE,0);
         instance.set(Calendar.SECOND,0);
+        instance.set(Calendar.MILLISECOND,0);
         Date  now  = instance.getTime();
         instance.add(Calendar.DATE,redDays);
         Date redDate = instance.getTime();
@@ -131,23 +133,49 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
         employeeQuery2.gt(RuEmployeeEntryInfo::getVisaExpirationDate,redDate);
         List<RuEmployeeEntryInfo> yellowInfos = employeeEntryInfoMapper.selectList(employeeQuery2);
 
-        String noticeName = "签证到期预警";
-        if (redInfos!=null && redInfos.size()>0) {
-            String redWarningName = "有" + redInfos.size() + "人签证不足" + redDays + "日到期";
-            String redExpireDate = redInfos.get(0).getVisaExpirationDate().toString();
+        String  pageUrl = "https://ceecip.com/vue/#/main-view?type=ACCESS&orgId=zj&hideTitleBar=true&hideMenu=true&viewId=1895363459146502144&viewComponent=DEFAULT_VIEW&title=%E4%BA%BA%E5%91%98%E7%AE%A1%E7%90%86";
+//        String noticeName = "签证到期预警";
+        Calendar calendar1 = Calendar.getInstance();
 
-            //红色预警
-            sendTemplateMessage(redUser.getExtraInfo(), IdUtil.getSnowflakeNextIdStr(), noticeName, redWarningName, redExpireDate);
+        for(int i = 1 ; i<= yellowDays ; i++){
+            String dateStr = DateUtil.getDateStr(calendar1.getTime(), "yyyy-MM-dd");
+            ArrayList<RuEmployeeEntryInfo> ruEmployeeEntryInfos = new ArrayList<>();
 
+            if(i<=redDays) {//红色预警
+                for (RuEmployeeEntryInfo info: redInfos ) {
+                    if (dateStr.equals(DateUtil.getDateStr(info.getVisaExpirationDate(), "yyyy-MM-dd"))){
+                        ruEmployeeEntryInfos.add(info);
+                    }
+                }
+                notice(pageUrl,ruEmployeeEntryInfos, redDays, redUser.getExtraInfo(), "签证到期红色预警");
+            }
+
+            if(i>redDays){//黄色预警
+                for (RuEmployeeEntryInfo info: yellowInfos ) {
+                    if (dateStr.equals(DateUtil.getDateStr(info.getVisaExpirationDate(), "yyyy-MM-dd"))){
+                        ruEmployeeEntryInfos.add(info);
+                    }
+                }
+                notice(pageUrl,ruEmployeeEntryInfos, yellowDays, yellowUser.getExtraInfo(), "签证到期黄色预警");
+            }
+
+            calendar1.add(Calendar.DATE,1);
         }
 
-        if(yellowInfos!=null &&yellowInfos.size()>0) {
-            String yellowWarningName = "有" + yellowInfos.size() + "人签证不足" + yellowDays + "日到期";
-            String yellowExpireDate = yellowInfos.get(0).getVisaExpirationDate().toString();
+    }
+
+    /**
+     * 预警通知
+     */
+    private void  notice(String pageUrl,List<RuEmployeeEntryInfo> infos,Integer warningDays,String  openId,String noticeName){
+
+        if(infos!=null &&infos.size()>0) {
+            String warningName = "有" + infos.size() + "人签证不足" + warningDays + "日到期";
+            Date expireDate = infos.get(0).getVisaExpirationDate();
             //黄色预警
-            sendTemplateMessage(yellowUser.getExtraInfo(), IdUtil.getSnowflakeNextIdStr(), noticeName, yellowWarningName, yellowExpireDate);
-
+            sendTemplateMessage(pageUrl,openId, IdUtil.getSnowflakeNextIdStr(), noticeName, warningName, expireDate);
         }
+
     }
 
 
@@ -181,13 +209,17 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
         }
     }
 
-    private void sendTemplateMessage(String openId, String client_msg_id, String noticeName, String warningName, String expireDate) {
+    private void sendTemplateMessage(String pageUrl,String openId, String client_msg_id, String noticeName, String warningName, Date expireDate) {
+        if(!StringUtils.hasLength(openId)){
+            throw new BaseException("通知人openid不能为空");
+        }
 
         Map<String, Object> requestMap = new HashMap<>();
 
         requestMap.put("touser", openId);
         requestMap.put("template_id", TEMPLATE_ID);
         requestMap.put("client_msg_id", client_msg_id);
+        requestMap.put("url",pageUrl);
 
 
         // 模板详情：
@@ -203,12 +235,13 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
         thing4Map.put("value", noticeName);
 
         HashMap<Object, Object> thing9Map = new HashMap<>();
-        data.put("time9", thing9Map);
+        data.put("thing9", thing9Map);
         thing9Map.put("value", warningName);
 
         HashMap<Object, Object> thing3Map = new HashMap<>();
-        data.put("thing3", thing3Map);
-        thing3Map.put("value", expireDate);
+        data.put("time3", thing3Map);
+        thing3Map.put("value", DateUtil.getDateStr(expireDate));
+
 
         String accessToken = getAccessToken();
 //        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
@@ -216,8 +249,9 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
         String responseBody = response.getBody();
         Map map = JsonUtil.fromJson(responseBody, Map.class);
         if (map == null || !"ok".equals(map.get("errmsg"))) {
-            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.sendTemplateMessageFailed");
-            throw new BaseException(message + responseBody);
+//            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.sendTemplateMessageFailed");
+
+            throw new BaseException("微信消息发送失败：" + responseBody);
         }
     }
 
