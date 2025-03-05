@@ -140,6 +140,10 @@ public class PlanExt {
 
         ccPrjStructNode.setIsTemplate(false);
         ccPrjStructNode.setCopyFromPrjStructNodeId(copyFromPrjStructNodeId);
+
+        //进度计划ID
+        String ccConstructProgressPlanId = StructNodeExt.getConstructProgressPlanId();
+        ccPrjStructNode.setCcConstructProgressPlanId(ccConstructProgressPlanId);
         ccPrjStructNode.insertById();
     }
 
@@ -196,5 +200,13 @@ public class PlanExt {
      */
     public void designCheckPlan() {
         this.checkPlan("DESIGN");
+    }
+
+    /**
+     * 施工进度
+     * 编制计划中是否有可提交计划
+     */
+    public void constructCheckPlan() {
+        this.checkPlan("construct");
     }
 }

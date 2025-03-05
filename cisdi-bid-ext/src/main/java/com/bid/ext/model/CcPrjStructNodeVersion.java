@@ -99,6 +99,10 @@ public class CcPrjStructNodeVersion {
          */
         public static final String NAME = "NAME";
         /**
+         * 施工进度计划。
+         */
+        public static final String CC_CONSTRUCT_PROGRESS_PLAN_ID = "CC_CONSTRUCT_PROGRESS_PLAN_ID";
+        /**
          * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
@@ -584,6 +588,42 @@ public class CcPrjStructNodeVersion {
             this.name = name;
             if (!this.toUpdateCols.contains("NAME")) {
                 this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 施工进度计划。
+     */
+    private String ccConstructProgressPlanId;
+
+    /**
+     * 获取：施工进度计划。
+     */
+    public String getCcConstructProgressPlanId() {
+        return this.ccConstructProgressPlanId;
+    }
+
+    /**
+     * 设置：施工进度计划。
+     */
+    public CcPrjStructNodeVersion setCcConstructProgressPlanId(String ccConstructProgressPlanId) {
+        if (this.ccConstructProgressPlanId == null && ccConstructProgressPlanId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccConstructProgressPlanId != null && ccConstructProgressPlanId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccConstructProgressPlanId.compareTo(ccConstructProgressPlanId) != 0) {
+                this.ccConstructProgressPlanId = ccConstructProgressPlanId;
+                if (!this.toUpdateCols.contains("CC_CONSTRUCT_PROGRESS_PLAN_ID")) {
+                    this.toUpdateCols.add("CC_CONSTRUCT_PROGRESS_PLAN_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccConstructProgressPlanId = ccConstructProgressPlanId;
+            if (!this.toUpdateCols.contains("CC_CONSTRUCT_PROGRESS_PLAN_ID")) {
+                this.toUpdateCols.add("CC_CONSTRUCT_PROGRESS_PLAN_ID");
             }
         }
         return this;
