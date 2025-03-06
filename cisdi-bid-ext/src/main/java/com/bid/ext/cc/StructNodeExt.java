@@ -133,8 +133,8 @@ public class StructNodeExt {
         String sql = "SELECT name AS maxVersion " +
                 "FROM cc_prj_struct_node_version " +
                 "WHERE cc_prj_id = ? " +
-                "  AND cc_prj_wbs_type_id = ? " +
-                "CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
+                "AND cc_prj_wbs_type_id = ? " +
+                "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
                 "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
                 "LIMIT 1";
         Map<String, Object> map = null;
@@ -272,93 +272,7 @@ public class StructNodeExt {
      * 提交施工进度计划
      */
     public void commitConstructPlan() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
-        String userId = loginInfo.userInfo.id;
-        Map<String, Object> globalVarMap = loginInfo.globalVarMap;
-        String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
-        if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
-            throw new BaseException("仅允许在唯一项目存在的情况下提交计划");
-        }
-
-        String planType = "CONSTRUCT";
-        //进度计划ID
-        String ccConstructProgressPlanId = getConstructProgressPlanId();
-
-        // 查询当前项目此施工计划的最高版本
-        String sql = "SELECT name AS maxVersion " +
-                "FROM cc_prj_struct_node_version v " +
-                "JOIN CC_PRJ_STRUCT_NODE_TO_VERSION ntv " +
-                "ON v.id = ntv.cc_prj_struct_node_version_id " +
-                "WHERE v.cc_prj_id = ? " +
-                "  AND v.cc_prj_wbs_type_id = ? " +
-                "  AND ntv.CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " +
-                "ORDER BY CAST(REPLACE(v.name, 'V', '') AS UNSIGNED) DESC " +
-                "LIMIT 1";
-        Map<String, Object> map = null;
-        try {
-            map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType, ccConstructProgressPlanId);
-        } catch (EmptyResultDataAccessException e) {
-            // 处理没有结果的情况
-            map = null;
-        }
-        String maxVersion = JdbcMapUtil.getString(map, "maxVersion");
-
-        // 如果当前没有版本，则创建第一个版本
-        String newVersion;
-        if (SharedUtil.isEmpty(maxVersion)) {
-            newVersion = "V1";
-        } else {
-            // 提取最高版本号的数字部分并加1生成新的版本号
-            String versionNumberStr = maxVersion.replaceAll("[^0-9]", "");
-            int versionNumber = Integer.parseInt(versionNumberStr);
-            newVersion = "V" + (versionNumber + 1);
-        }
-
-        // 创建新的历史版本
-        CcPrjStructNodeVersion ccPrjStructNodeVersion = CcPrjStructNodeVersion.newData();
-        ccPrjStructNodeVersion.setCcPrjId(pCcPrjIds);
-        ccPrjStructNodeVersion.setCcPrjWbsTypeId(planType);
-        ccPrjStructNodeVersion.setName(newVersion);
-        ccPrjStructNodeVersion.insertById();
-
-        //现行计划状态变更为已作废
-        List<CcPrjStructNode> ccPrjStructNodesAp = CcPrjStructNode.selectByWhere(
-                new Where()
-                        .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
-                        .eq(CcPrjStructNode.Cols.IS_WBS, true)
-                        .eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType)
-                        .eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds)
-                        .eq(CcPrjStructNode.Cols.STATUS, "AP")
-        );
-
-        if (!SharedUtil.isEmpty(ccPrjStructNodesAp)) {
-            for (CcPrjStructNode ccPrjStructNodeAp : ccPrjStructNodesAp) {
-                String ccPrjStructNodeApId = ccPrjStructNodeAp.getId();
-                ccPrjStructNodeAp.setStatus(String.valueOf(StatusE.VD));
-                ccPrjStructNodeAp.updateById();
-//                //复制指引
-//                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
-//                List<CcPrjStructNodeGuide> ccPrjStructNodeGuideList = CcPrjStructNodeGuide.selectByWhere(new Where().eq(CcPrjStructNodeGuide.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeApId));
-//                if (!SharedUtil.isEmpty(ccPrjStructNodeGuideList)) {
-//                    for (CcPrjStructNodeGuide ccPrjStructNodeGuide : ccPrjStructNodeGuideList) {
-//                        BigDecimal seqNo = ccPrjStructNodeGuide.getSeqNo();
-//                        String name = ccPrjStructNodeGuide.getName();
-//                        String remark = ccPrjStructNodeGuide.getRemark();
-//                        String ccAttachments = ccPrjStructNodeGuide.getCcAttachments();
-//
-//                        CcPrjStructNodeGuide newCcPrjStructNodeGuide = CcPrjStructNodeGuide.newData();
-//                        newCcPrjStructNodeGuide.setCcPrjStructNodeId(ccPrjStructNodeApId);
-//                        newCcPrjStructNodeGuide.setSeqNo(seqNo);
-//                        newCcPrjStructNodeGuide.setName(name);
-//                        newCcPrjStructNodeGuide.setRemark(remark);
-//                        newCcPrjStructNodeGuide.setCcAttachments(ccAttachments);
-//                        newCcPrjStructNodeGuide.insertById();
-//                    }
-//                }
-//                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
-            }
-        }
+        this.commitPlan("CONSTRUCT");
     }
 
     /**
