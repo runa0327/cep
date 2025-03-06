@@ -9,6 +9,7 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.BaseInfo;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.DrivenInfo;
@@ -18,6 +19,11 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -1072,7 +1078,7 @@ public class StructNodeExt {
                             ccDrawingUpdateRecord.setCcVerNum("1");//新建的手续台账，图纸更新记录默认为第一版
                             ccDrawingUpdateRecord.insertById();
                             //处理设计管理的zip包
-                            handleDesignManagement(attachments, ccProcedureLedger.getId(), ccDrawingUpdateRecord.getId());
+                            handleDesignResultFile(myJdbcTemplate, attachments, ccProcedureLedger.getId(), ccDrawingUpdateRecord.getId());
                         }
                     }
 
@@ -1086,18 +1092,40 @@ public class StructNodeExt {
     }
 
     /**
-     * 处理设计管理的zip包
-     *
-     * @param attachments             文件ID
-     * @param ccProcedureLedgerId     手续台账ID
-     * @param ccDrawingUpdateRecordId 图纸更新记录ID
+     * 进展填报之后，对设计额外的操作，解压zip文件，并存储在cc_doc_file和cc_doc_dir表中
      */
-    private void handleDesignManagement(String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
-        //当状态为“已完成”时，解压文件，保存相关文件
-        ZipProcessorExt zipProcessor = new ZipProcessorExt();
-        zipProcessor.decompressPackageAndStore(attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
-        log.info("处理设计管理的zip包完成！");
-
+    private void handleDesignResultFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
+        // 处理设计结果的逻辑
+        //处理设计管理的zip包
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        BaseInfo currentOrgInfo = loginInfo.currentOrgInfo;
+        String orgCode = currentOrgInfo.code;
+        Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
+        String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
+        String uploadAndConvertUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/handleZip/decompress-and-store";
+        //http://8.137.116.250/qygly/qygly-gateway/cisdi-microservice-test240511/handleZip/decompress-and-store
+//        String uploadAndConvertUrl = "http://127.0.0.1:21119/cisdi-microservice-test240511/handleZip/decompress-and-store";
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("cc_attachment", attachments);
+        body.add("cc_procedure_ledger_id", ccProcedureLedgerId);
+        body.add("cc_drawing_update_record_id", ccDrawingUpdateRecordId);
+        body.add("user_id", loginInfo.userInfo.id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+        try{
+            ResponseEntity<String> response = restTemplate.exchange(uploadAndConvertUrl, HttpMethod.POST, entity, String.class);
+            log.info(response.toString());
+        } catch (HttpServerErrorException e) {
+            if (e.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
+                // 处理503错误，例如重试或记录日志
+                log.error("Service unavailable, retrying...");
+                // 可加入重试逻辑
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**

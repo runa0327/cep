@@ -4,11 +4,17 @@ import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -208,8 +214,9 @@ public class DesignInquiExt {
         if(Objects.equals(flFile.getExt(), "zip")){
             //解压包。更新文件到表cc_doc_dir和cc_doc_file
             //当状态为“已完成”时，解压文件，保存相关文件
-            ZipProcessorExt zipProcessor = new ZipProcessorExt();
-            zipProcessor.decompressPackageAndStore(ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId());//这里的ID需要考虑是否改变，涉及到表的更改
+//            ZipProcessorExt zipProcessor = new ZipProcessorExt();
+//            zipProcessor.decompressPackageAndStore(ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId());//这里的ID需要考虑是否改变，涉及到表的更改
+            handleDesignResultFile(myJdbcTemplate, ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId());
         }else{
             //不是zip格式，暂不做处理
         }
@@ -220,4 +227,39 @@ public class DesignInquiExt {
 //        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    private void handleDesignResultFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
+        // 处理设计结果的逻辑
+        //处理设计管理的zip包
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        BaseInfo currentOrgInfo = loginInfo.currentOrgInfo;
+        String orgCode = currentOrgInfo.code;
+        Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
+        String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
+        String uploadAndConvertUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/handleZip/decompress-and-store";
+        //http://8.137.116.250/qygly/qygly-gateway/cisdi-microservice-test240511/handleZip/decompress-and-store
+//        String uploadAndConvertUrl = "http://127.0.0.1:21119/cisdi-microservice-test240511/handleZip/decompress-and-store";
+
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("cc_attachment", attachments);
+        body.add("cc_procedure_ledger_id", ccProcedureLedgerId);
+        body.add("cc_drawing_update_record_id", ccDrawingUpdateRecordId);
+        body.add("user_id", loginInfo.userInfo.id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+        try{
+            ResponseEntity<String> response = restTemplate.exchange(uploadAndConvertUrl, HttpMethod.POST, entity, String.class);
+            log.info(response.toString());
+        } catch (HttpServerErrorException e) {
+            if (e.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
+                // 处理503错误，例如重试或记录日志
+                log.error("Service unavailable, retrying...");
+                // 可加入重试逻辑
+            } else {
+                throw e;
+            }
+        }
+    }
 }
