@@ -75,7 +75,7 @@ public class MqListener {
     private void generateUnqualifiedRecord(IssueAreaDTO issueAreaDTO) {
         String ccQsInspectionId = issueAreaDTO.getAiInspectionReqId();
         String ccOriginFileId = issueAreaDTO.getFileId();
-        String sql4Path = "SELECT p.DIR DIR, f.PHYSICAL_LOCATION LOC, f.FL_PATH_ID PATH, p.FILE_INLINE_URL FIU, p.FILE_ATTACHMENT_URL FAU FROM FL_FILE f LEFT JOIN FL_PATH p ON f.FL_PATH_ID = p.ID WHERE f.id = ?";
+        String sql4Path = "SELECT p.DIR DIR, f.ORIGIN_FILE_PHYSICAL_LOCATION LOC, f.FL_PATH_ID PATH, p.FILE_INLINE_URL FIU, p.FILE_ATTACHMENT_URL FAU FROM FL_FILE f LEFT JOIN FL_PATH p ON f.FL_PATH_ID = p.ID WHERE f.id = ?";
         Map<String, Object> map = jdbcTemplate.queryForMap(sql4Path, ccOriginFileId);
         String dir = JdbcMapUtil.getString(map, "DIR");
         String loc = JdbcMapUtil.getString(map, "LOC");
@@ -144,7 +144,7 @@ public class MqListener {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql4File,
                 Id, Id, 1, path, "jpg", "AP", now, userId, now, userId, sizeKb, fiu + "?fileId=" + Id,
-                fau + "?fileId=" + Id, now, now, previewFilePath, Id + ".jpg", previewDspSize, 1, previewFilePath);
+                fau + "?fileId=" + Id, now, now, previewFilePath, Id + ".jpg", previewDspSize, 1, loc);
 
         String sql = "INSERT INTO CC_AI_INSPECTION_RESULT" +
                 "(ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, CC_ORIGIN_FILE_ID, CC_QS_INSPECTION_ID, CC_AI_MARKED_FILE_ID, REMARK)" +

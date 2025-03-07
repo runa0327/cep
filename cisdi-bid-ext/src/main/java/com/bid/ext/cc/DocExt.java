@@ -370,7 +370,7 @@ public class DocExt {
     /**
      * 批量上传VR全景，格式要求jpg和png
      */
-    public void uploadVrFileBatch() throws IOException {
+    public void uploadVrFileBatch() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
         String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
@@ -405,18 +405,7 @@ public class DocExt {
 //            String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
 
 //            BufferedImage originalImage = ImageIO.read(new URL(url));
-
             String originFilePhysicalLocation = flFile.getOriginFilePhysicalLocation();
-            BufferedImage originalImage = ImageIO.read(new File(originFilePhysicalLocation));
-//            String flPathId = flFile.getFlPathId();
-
-
-            int targetWidth = 300; // 目标宽度
-            int targetHeight = 300; // 目标高度
-            Image resizedImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-            BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-            outputImage.getGraphics().drawImage(resizedImage, 0, 0, null);
-
             Where pathWhere = new Where();
             pathWhere.eq(FlPath.Cols.ID, flPathId);
             FlPath flPath = FlPath.selectOneByWhere(pathWhere);
@@ -425,10 +414,32 @@ public class DocExt {
             int year = now.getYear();
             String month = String.format("%02d", now.getMonthValue());
             String day = String.format("%02d", now.getDayOfMonth());
-
             String previewPath = flPath.getDir() + year + "/" + month + "/" + day + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
-            File outputFile = new File(previewPath); // 输出图片文件
-            ImageIO.write(outputImage, flFile.getExt(), outputFile);
+            BufferedImage originalImage = null;
+            BufferedImage outputImage = null;
+            try {
+                originalImage = ImageIO.read(new File(originFilePhysicalLocation));
+
+                int targetWidth = 300; // 目标宽度
+                int targetHeight = 300; // 目标高度
+                Image resizedImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+                outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+                outputImage.getGraphics().drawImage(resizedImage, 0, 0, null);
+
+                File outputFile = new File(previewPath); // 输出图片文件
+                ImageIO.write(outputImage, flFile.getExt(), outputFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (originalImage != null) {
+                    originalImage.getGraphics().dispose();
+                }
+                if (outputImage != null) {
+                    outputImage.getGraphics().dispose();
+                }
+            }
+//            String flPathId = flFile.getFlPathId();
+
 
             if (checkFileExists(previewPath)) {
                 FlFile attachmentPreview = FlFile.newData();

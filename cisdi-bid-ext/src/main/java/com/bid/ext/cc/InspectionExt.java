@@ -551,7 +551,8 @@ public class InspectionExt {
             String[] imgIds = ccQsIssuesImg.split(",");
             for (String imgId : imgIds) {
                 FlFile flFile = FlFile.selectById(imgId);
-                String physicalLocation = flFile.getPhysicalLocation();
+//                String physicalLocation = flFile.getPhysicalLocation();
+                String physicalLocation = flFile.getOriginFilePhysicalLocation(); // 用原始地址，因为物理地址可能对应标记过框的图
                 putImg2Mq(physicalLocation, imgId, csCommId);
             }
             int totalCnt = 0;
@@ -572,7 +573,7 @@ public class InspectionExt {
                         } else {
                             imgLst.add(ccAiInspectionResult.getCcAiMarkedFileId());
                             remark.append(ccAiInspectionResult.getRemark());
-                            ccQsInspection.setCcQsInitiationTypeId("1750796338488606720");
+//                            ccQsInspection.setCcQsInitiationTypeId("1750796338488606720");
                             ccAiInspectionResult.deleteById();
                         }
                         break;
