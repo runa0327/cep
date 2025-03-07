@@ -109,6 +109,10 @@ public class CcConstructProgressPlan {
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
+         * 是否提交。
+         */
+        public static final String CC_CONSTRUCT_IS_COMMIT = "CC_CONSTRUCT_IS_COMMIT";
+        /**
          * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
@@ -694,6 +698,42 @@ public class CcConstructProgressPlan {
             this.ccPrjId = ccPrjId;
             if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
                 this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否提交。
+     */
+    private Boolean ccConstructIsCommit;
+
+    /**
+     * 获取：是否提交。
+     */
+    public Boolean getCcConstructIsCommit() {
+        return this.ccConstructIsCommit;
+    }
+
+    /**
+     * 设置：是否提交。
+     */
+    public CcConstructProgressPlan setCcConstructIsCommit(Boolean ccConstructIsCommit) {
+        if (this.ccConstructIsCommit == null && ccConstructIsCommit == null) {
+            // 均为null，不做处理。
+        } else if (this.ccConstructIsCommit != null && ccConstructIsCommit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccConstructIsCommit.compareTo(ccConstructIsCommit) != 0) {
+                this.ccConstructIsCommit = ccConstructIsCommit;
+                if (!this.toUpdateCols.contains("CC_CONSTRUCT_IS_COMMIT")) {
+                    this.toUpdateCols.add("CC_CONSTRUCT_IS_COMMIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccConstructIsCommit = ccConstructIsCommit;
+            if (!this.toUpdateCols.contains("CC_CONSTRUCT_IS_COMMIT")) {
+                this.toUpdateCols.add("CC_CONSTRUCT_IS_COMMIT");
             }
         }
         return this;

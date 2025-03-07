@@ -171,19 +171,19 @@ public class StructNodeExt {
         ccPrjStructNodeVersion.insertById();
 
         //现行施工进度计划状态变为已作废
-        if (ccConstructProgressPlanId != null) {
-            List<CcConstructProgressPlan> ccConstructProgressPlansAp = CcConstructProgressPlan.selectByWhere(
-                    new Where()
-                            .eq(CcConstructProgressPlan.Cols.CC_PRJ_ID, pCcPrjIds)
-                            .eq(CcConstructProgressPlan.Cols.STATUS, String.valueOf(StatusE.AP))
-            );
-            if (!SharedUtil.isEmpty(ccConstructProgressPlansAp)) {
-                for (CcConstructProgressPlan ccConstructProgressPlan : ccConstructProgressPlansAp) {
-                    ccConstructProgressPlan.setStatus(String.valueOf(StatusE.VD));
-                    ccConstructProgressPlan.updateById();
-                }
-            }
-        }
+//        if (ccConstructProgressPlanId != null) {
+//            List<CcConstructProgressPlan> ccConstructProgressPlansAp = CcConstructProgressPlan.selectByWhere(
+//                    new Where()
+//                            .eq(CcConstructProgressPlan.Cols.CC_PRJ_ID, pCcPrjIds)
+//                            .eq(CcConstructProgressPlan.Cols.STATUS, String.valueOf(StatusE.AP))
+//            );
+//            if (!SharedUtil.isEmpty(ccConstructProgressPlansAp)) {
+//                for (CcConstructProgressPlan ccConstructProgressPlan : ccConstructProgressPlansAp) {
+//                    ccConstructProgressPlan.setStatus(String.valueOf(StatusE.VD));
+//                    ccConstructProgressPlan.updateById();
+//                }
+//            }
+//        }
 
         //现行计划状态变更为已作废
         List<CcPrjStructNode> ccPrjStructNodesAp = CcPrjStructNode.selectByWhere(
@@ -227,6 +227,7 @@ public class StructNodeExt {
         if (ccConstructProgressPlanId != null) {
             CcConstructProgressPlan ccConstructProgressPlan = CcConstructProgressPlan.selectById(ccConstructProgressPlanId);
             ccConstructProgressPlan.setStatus(String.valueOf(StatusE.AP));
+            ccConstructProgressPlan.setCcConstructIsCommit(true);
             ccConstructProgressPlan.updateById();
         }
         //编制的计划状态变更为已批准
