@@ -1,9 +1,14 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.CcConstructProgressPlan;
+import com.bid.ext.model.CcPrjStructNode;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.SharedUtil;
+
+import java.util.List;
 
 public class ConstructProgressExt {
 
@@ -28,6 +33,13 @@ public class ConstructProgressExt {
             CcConstructProgressPlan ccConstructProgressPlan = CcConstructProgressPlan.selectById(csCommId);
             ccConstructProgressPlan.setStatus(String.valueOf(StatusE.DN));
             ccConstructProgressPlan.updateById();
+            List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_CONSTRUCT_PROGRESS_PLAN_ID, ccConstructProgressPlan.getId()).eq(CcPrjStructNode.Cols.STATUS, StatusE.AP));
+            if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
+                for (CcPrjStructNode ccPrjStructNode: ccPrjStructNodes) {
+                    ccPrjStructNode.setStatus(String.valueOf(StatusE.DN));
+                    ccPrjStructNode.updateById();
+                }
+            }
         }
     }
 
