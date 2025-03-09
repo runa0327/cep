@@ -283,6 +283,149 @@ public class StructNodeExt {
     }
 
     /**
+     * 提交施工进度计划1
+     */
+    public void commitConstructPlan1() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String ccConstructProgressPlanId = entityRecord.csCommId;
+            String planType = "CONSTRUCT";
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+            String userId = loginInfo.userInfo.id;
+            Map<String, Object> globalVarMap = loginInfo.globalVarMap;
+            String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
+            if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
+                throw new BaseException("仅允许在唯一项目存在的情况下提交计划");
+            }
+
+            // 查询当前项目的最高版本
+            String sql = "SELECT name AS maxVersion " +
+                    "FROM cc_prj_struct_node_version " +
+                    "WHERE cc_prj_id = ? " +
+                    "AND cc_prj_wbs_type_id = ? " +
+                    "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
+                    "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
+                    "LIMIT 1";
+            Map<String, Object> map = null;
+            try {
+                map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType, ccConstructProgressPlanId);
+            } catch (EmptyResultDataAccessException e) {
+                // 处理没有结果的情况
+                map = null;
+            }
+            String maxVersion = JdbcMapUtil.getString(map, "maxVersion");
+
+            // 如果当前没有版本，则创建第一个版本
+            String newVersion;
+            if (SharedUtil.isEmpty(maxVersion)) {
+                newVersion = "V1";
+            } else {
+                // 提取最高版本号的数字部分并加1生成新的版本号
+                String versionNumberStr = maxVersion.replaceAll("[^0-9]", "");
+                int versionNumber = Integer.parseInt(versionNumberStr);
+                newVersion = "V" + (versionNumber + 1);
+            }
+            // 创建新的历史版本
+            CcPrjStructNodeVersion ccPrjStructNodeVersion = CcPrjStructNodeVersion.newData();
+            ccPrjStructNodeVersion.setCcPrjId(pCcPrjIds);
+            ccPrjStructNodeVersion.setCcPrjWbsTypeId(planType);
+            ccPrjStructNodeVersion.setName(newVersion);
+            ccPrjStructNodeVersion.setCcConstructProgressPlanId(ccConstructProgressPlanId);
+            ccPrjStructNodeVersion.insertById();
+
+            //现行施工进度计划状态变为已作废
+//        if (ccConstructProgressPlanId != null) {
+//            List<CcConstructProgressPlan> ccConstructProgressPlansAp = CcConstructProgressPlan.selectByWhere(
+//                    new Where()
+//                            .eq(CcConstructProgressPlan.Cols.CC_PRJ_ID, pCcPrjIds)
+//                            .eq(CcConstructProgressPlan.Cols.STATUS, String.valueOf(StatusE.AP))
+//            );
+//            if (!SharedUtil.isEmpty(ccConstructProgressPlansAp)) {
+//                for (CcConstructProgressPlan ccConstructProgressPlan : ccConstructProgressPlansAp) {
+//                    ccConstructProgressPlan.setStatus(String.valueOf(StatusE.VD));
+//                    ccConstructProgressPlan.updateById();
+//                }
+//            }
+//        }
+
+            //现行计划状态变更为已作废
+            List<CcPrjStructNode> ccPrjStructNodesAp = CcPrjStructNode.selectByWhere(
+                    new Where()
+                            .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
+                            .eq(CcPrjStructNode.Cols.IS_WBS, true)
+                            .eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType)
+                            .eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds)
+                            .eq(CcPrjStructNode.Cols.STATUS, String.valueOf(StatusE.AP))
+                            .eq(CcPrjStructNode.Cols.CC_CONSTRUCT_PROGRESS_PLAN_ID, ccConstructProgressPlanId)
+            );
+            if (!SharedUtil.isEmpty(ccPrjStructNodesAp)) {
+                for (CcPrjStructNode ccPrjStructNodeAp : ccPrjStructNodesAp) {
+                    String ccPrjStructNodeApId = ccPrjStructNodeAp.getId();
+                    ccPrjStructNodeAp.setStatus(String.valueOf(StatusE.VD));
+                    ccPrjStructNodeAp.updateById();
+//                //复制指引
+//                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
+//                List<CcPrjStructNodeGuide> ccPrjStructNodeGuideList = CcPrjStructNodeGuide.selectByWhere(new Where().eq(CcPrjStructNodeGuide.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeApId));
+//                if (!SharedUtil.isEmpty(ccPrjStructNodeGuideList)) {
+//                    for (CcPrjStructNodeGuide ccPrjStructNodeGuide : ccPrjStructNodeGuideList) {
+//                        BigDecimal seqNo = ccPrjStructNodeGuide.getSeqNo();
+//                        String name = ccPrjStructNodeGuide.getName();
+//                        String remark = ccPrjStructNodeGuide.getRemark();
+//                        String ccAttachments = ccPrjStructNodeGuide.getCcAttachments();
+//
+//                        CcPrjStructNodeGuide newCcPrjStructNodeGuide = CcPrjStructNodeGuide.newData();
+//                        newCcPrjStructNodeGuide.setCcPrjStructNodeId(ccPrjStructNodeApId);
+//                        newCcPrjStructNodeGuide.setSeqNo(seqNo);
+//                        newCcPrjStructNodeGuide.setName(name);
+//                        newCcPrjStructNodeGuide.setRemark(remark);
+//                        newCcPrjStructNodeGuide.setCcAttachments(ccAttachments);
+//                        newCcPrjStructNodeGuide.insertById();
+//                    }
+//                }
+//                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
+                }
+            }
+
+            //待提交计划状态变为已批准
+            if (ccConstructProgressPlanId != null) {
+                CcConstructProgressPlan ccConstructProgressPlan = CcConstructProgressPlan.selectById(ccConstructProgressPlanId);
+                ccConstructProgressPlan.setStatus(String.valueOf(StatusE.AP));
+                ccConstructProgressPlan.setCcConstructIsCommit(true);
+                ccConstructProgressPlan.updateById();
+            }
+            //编制的计划状态变更为已批准
+            List<CcPrjStructNode> ccPrjStructNodesDr = CcPrjStructNode.selectByWhere(
+                    new Where()
+                            .eq(CcPrjStructNode.Cols.IS_TEMPLATE, false)
+                            .eq(CcPrjStructNode.Cols.IS_WBS, true)
+                            .eq(CcPrjStructNode.Cols.CC_PRJ_WBS_TYPE_ID, planType)
+                            .eq(CcPrjStructNode.Cols.CC_PRJ_ID, pCcPrjIds)
+                            .eq(CcPrjStructNode.Cols.STATUS, String.valueOf(StatusE.DR))
+                            .eq(CcPrjStructNode.Cols.CRT_USER_ID, userId)
+                            .eq(CcPrjStructNode.Cols.CC_CONSTRUCT_PROGRESS_PLAN_ID, ccConstructProgressPlanId)
+            );
+            if (!SharedUtil.isEmpty(ccPrjStructNodesDr)) {
+                for (CcPrjStructNode ccPrjStructNodeDr : ccPrjStructNodesDr) {
+                    ccPrjStructNodeDr.setStatus(String.valueOf(StatusE.AP));
+                    ccPrjStructNodeDr.updateById();
+
+                    //历史版本关联计划
+                    CcPrjStructNodeToVersion ccPrjStructNodeToVersion = CcPrjStructNodeToVersion.newData();
+                    ccPrjStructNodeToVersion.setCcPrjStructNodeId(ccPrjStructNodeDr.getId());
+                    ccPrjStructNodeToVersion.setCcPrjStructNodeVersionId(ccPrjStructNodeVersion.getId());
+                    ccPrjStructNodeToVersion.setCcConstructProgressPlanId(ccConstructProgressPlanId);
+                    ccPrjStructNodeToVersion.insertById();
+                }
+            }
+            //重算计划
+            recalculationPublicPlan(planType);
+            InvokeActResult invokeActResult = new InvokeActResult();
+            invokeActResult.reFetchData = true;
+            ExtJarHelper.setReturnValue(invokeActResult);
+        }
+    }
+
+    /**
      * 获取模板结构
      *
      * @param pWbsTemplateId
