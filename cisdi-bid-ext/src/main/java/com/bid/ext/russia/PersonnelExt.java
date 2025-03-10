@@ -13,6 +13,8 @@ import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.SharedUtil;
 import com.tencentcloudapi.ba.v20200720.BaErrorCode;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,22 +84,22 @@ public class PersonnelExt {
      */
     private   void   importPersonnelEntryInfoPreCheck(String filePath) {
 
+
+
         boolean   isExist  = false;
         int personNumber = 0;
-
-        //所有工种
-        Where where = new Where();
-        where.sql("T.`STATUS`='AP'");
 
         StringBuilder noticeBuilder = new StringBuilder();
         noticeBuilder.append("（");
 
-        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+        try {
+            FileInputStream file = new FileInputStream(new File(filePath));
             Workbook workbook = WorkbookFactory.create(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
 
             // 遍历每一行
             for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
+
                 Row row = sheet.getRow(i);
                 // 检查行是否为空
                 if (row == null) {
@@ -135,10 +137,9 @@ public class PersonnelExt {
                 selectEntryInfo.eq("RU_USER_AGE",age.intValue());
                 List<RuUserEntryInfo> ruUserEntryInfos = RuUserEntryInfo.selectByWhere(selectEntryInfo);
 
-                if (SharedUtil.notEmpty(ruUserEntryInfos)) {
+                if (ruUserEntryInfos!=null && ruUserEntryInfos.size()>0 ) {
                         boolean  curUserExist =  false;
                     for (RuUserEntryInfo entryInfo : ruUserEntryInfos) { //当前有未出场的数据
-                         entryInfo = ruUserEntryInfos.get(0);
                         if (entryInfo.getRuUserExitDate() == null) {
                             curUserExist = true;
                         }
@@ -151,6 +152,7 @@ public class PersonnelExt {
                     }
                 }
             }
+
         } catch (IOException e) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
             throw new BaseException(message, e);
@@ -176,12 +178,13 @@ public class PersonnelExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-
 //        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板%2B带备注.xlsx";
 
 //        filePath = "/Users/hejialun/Documents/Russia/人员管理模板%2B带备注.xlsx";
 
         importPersonnelEntryInfoPreCheck(filePath);//检查是否存在未退出的人员数据
+
+
 
         if (!"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
@@ -207,8 +210,11 @@ public class PersonnelExt {
         }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
-            Workbook workbook = WorkbookFactory.create(file);
-            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+//            Workbook workbook = WorkbookFactory.create(file);
+//            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+            XSSFWorkbook sheets = new XSSFWorkbook(file);
+            XSSFSheet sheet = sheets.getSheetAt(0);
 
             // 遍历每一行
             for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
@@ -246,9 +252,7 @@ public class PersonnelExt {
 
                 //签证到期日期
                 LocalDate  visaExpirationDate = getLocalDateCellValue(row.getCell(5));
-//                if (SharedUtil.isEmpty(visaExpirationDate)) {
-//                    break;
-//                }
+
 
                 //入境时间
                 LocalDate  intoCountryDate = getLocalDateCellValue(row.getCell(6));
@@ -264,13 +268,11 @@ public class PersonnelExt {
 
                 //出场时间
                 LocalDate  exitDate = getLocalDateCellValue(row.getCell(10));
-//                if (SharedUtil.isEmpty(intoCountryDate)) {
-//                    break;
-//                }
 
                 //出境时间
                 LocalDate  exitCountryDate = getLocalDateCellValue(row.getCell(11));
                 String  remark = getStringCellValue(row.getCell(12));
+
                 //判断工种
                 String  workTypeId = null;
                 boolean  workTypeExist= false;
