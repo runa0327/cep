@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.pms.bid.job.domain.ru.AdUser;
 import com.pms.bid.job.domain.ru.RuEmployeeEntryInfo;
 import com.pms.bid.job.domain.ru.RuVisaExpireWarning;
+import com.pms.bid.job.domain.zhanJiang.YjwInstallProgress;
 import com.pms.bid.job.mapper.ru.AdUserMapper;
 import com.pms.bid.job.mapper.ru.CcPrjMemberMapper;
 import com.pms.bid.job.mapper.ru.RuEmployeeEntryInfoMapper;
@@ -83,27 +84,40 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
 
         int  yellowDays  = 10; //黄色预警天数
         int  redDays = 7; //红色预警天数
-        String yellowNoticeMember = "";
-        String redNoticeMember = "";
+        String yellowNoticeMembers = "";
+        String redNoticeMembers = "";
         for (RuVisaExpireWarning warning: ruVisaExpireWarnings ) {
             if ("yellow".equals(warning.getLevelOfRiskId())){
                 yellowDays = warning.getAdvanceWarningDays();
-                yellowNoticeMember = warning.getPrjMemberId();;
+                yellowNoticeMembers = warning.getPrjMemberIds();;
             }else if("red".equals(warning.getLevelOfRiskId())){
                 redDays = warning.getAdvanceWarningDays();
-                redNoticeMember = warning.getPrjMemberId();
+                redNoticeMembers = warning.getPrjMemberIds();
             }
         }
 
-        if(!StringUtils.hasLength(yellowNoticeMember) || !StringUtils.hasLength(redNoticeMember)){
+        if(!StringUtils.hasLength(yellowNoticeMembers) || !StringUtils.hasLength(redNoticeMembers)){
             log.error("预警通知未设置！");
          throw new BaseException("预警通知未设置");
         }
 
-        //获取用户
-        AdUser yellowUser = adUserMapper.selectUserByPrjMemberId(yellowNoticeMember);
-        AdUser redUser = adUserMapper.selectUserByPrjMemberId(redNoticeMember);
 
+        //获取用户
+        String[] yMemberIds = yellowNoticeMembers.split(",");
+        List<String>  yellowNoticeMemberIds = new ArrayList<>();
+        for (int i = 0; i < yMemberIds.length; i++) {
+            yellowNoticeMemberIds.add(yMemberIds[i]);
+        }
+//        AdUser yellowUser = adUserMapper.selectUserByPrjMemberId(yellowNoticeMember);
+        List<AdUser> yellowUsers = adUserMapper.selectUserByPrjMemberIds(yellowNoticeMemberIds);
+
+        String[] redMemberIds = redNoticeMembers.split(",");
+        List<String>  redNoticeMemberIds = new ArrayList<>();
+        for (int i = 0; i < redMemberIds.length; i++) {
+            redNoticeMemberIds.add(redMemberIds[i]);
+        }
+//        AdUser redUser = adUserMapper.selectUserByPrjMemberId(redNoticeMember);
+        List<AdUser> redUsers = adUserMapper.selectUserByPrjMemberIds(redNoticeMemberIds);
         //
         Calendar instance = Calendar.getInstance();
         instance.set(Calendar.HOUR,0);
@@ -147,7 +161,7 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
                         ruEmployeeEntryInfos.add(info);
                     }
                 }
-                notice(pageUrl,ruEmployeeEntryInfos, redDays, redUser.getExtraInfo(), "签证到期红色预警");
+                notice(pageUrl,ruEmployeeEntryInfos, redDays, redUsers, "签证到期红色预警");
             }
 
             if(i>redDays){//黄色预警
@@ -156,7 +170,7 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
                         ruEmployeeEntryInfos.add(info);
                     }
                 }
-                notice(pageUrl,ruEmployeeEntryInfos, yellowDays, yellowUser.getExtraInfo(), "签证到期黄色预警");
+                notice(pageUrl,ruEmployeeEntryInfos, yellowDays, yellowUsers, "签证到期黄色预警");
             }
 
             calendar1.add(Calendar.DATE,1);
@@ -167,13 +181,16 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
     /**
      * 预警通知
      */
-    private void  notice(String pageUrl,List<RuEmployeeEntryInfo> infos,Integer warningDays,String  openId,String noticeName){
+    private void  notice(String pageUrl,List<RuEmployeeEntryInfo> infos,Integer warningDays,List<AdUser> users,String noticeName){
 
         if(infos!=null &&infos.size()>0) {
             String warningName = "有" + infos.size() + "人签证不足" + warningDays + "日到期";
             Date expireDate = infos.get(0).getVisaExpirationDate();
             //黄色预警
-            sendTemplateMessage(pageUrl,openId, IdUtil.getSnowflakeNextIdStr(), noticeName, warningName, expireDate);
+
+            for (AdUser user:  users) {
+                sendTemplateMessage(pageUrl, user.getExtraInfo(), IdUtil.getSnowflakeNextIdStr(), noticeName, warningName, expireDate);
+            }
         }
 
     }
@@ -211,7 +228,9 @@ public class RuEmployeeEntryInfoServiceImpl implements RuEmployeeEntryInfoServic
 
     private void sendTemplateMessage(String pageUrl,String openId, String client_msg_id, String noticeName, String warningName, Date expireDate) {
         if(!StringUtils.hasLength(openId)){
-            throw new BaseException("通知人openid不能为空");
+//            throw new BaseException("通知人openid不能为空");
+            log.error("通知人openid不能为空");
+            return;
         }
 
         Map<String, Object> requestMap = new HashMap<>();

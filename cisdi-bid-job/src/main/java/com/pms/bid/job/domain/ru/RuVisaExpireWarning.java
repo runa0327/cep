@@ -20,7 +20,7 @@ public class RuVisaExpireWarning extends BaseDomain {
     @TableField("RU_ADVANCE_WARNING_DAYS")
     private Integer  advanceWarningDays;
 
-    @TableField("CC_PRJ_MEMBER_ID")
-    private String  prjMemberId;
+    @TableField("CC_PRJ_MEMBER_IDS")
+    private String  prjMemberIds;
 
 }

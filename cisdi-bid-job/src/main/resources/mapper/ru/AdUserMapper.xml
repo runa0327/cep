@@ -8,5 +8,13 @@
         SELECT  u.id,u.`NAME`,u.EXTRA_INFO->>'$.openid' EXTRA_INFO from ad_user u,cc_prj_member m where m.id = #{memberId} and u.id  = m.AD_USER_ID
     </select>
 
+    <select id="selectUserByPrjMemberIds" resultType="com.pms.bid.job.domain.ru.AdUser" parameterType="list">
+        SELECT  u.id,u.`NAME`,u.EXTRA_INFO->>'$.openid' EXTRA_INFO
+        from ad_user u,cc_prj_member m
+        where  u.id  = m.AD_USER_ID
+          and   m.id in <foreach collection="memberIds" open="(" item="memberId" close=")" separator=",">
+            #{memberId}
+        </foreach>
+    </select>
 
 </mapper>

@@ -37,7 +37,8 @@ public class PersonnelExt {
             RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectById(csCommId);
 
 //            int frequency = getFrequency(userEntryInfo.getRuUserName(), userEntryInfo.getRuUserWorkTypeId());
-            int frequency = getFrequency(userEntryInfo.getRuUserPhoneNumber());
+//            int frequency = getFrequency(userEntryInfo.getRuUserPhoneNumber());
+            int frequency = getFrequency(userEntryInfo.getRuUserName(),userEntryInfo.getRuUserAge());
             userEntryInfo.setRuEntryFrequency(frequency);
 
             userEntryInfo.updateById();//更新频次
@@ -47,7 +48,8 @@ public class PersonnelExt {
             selectPerson.eq("RU_USER_NAME",userEntryInfo.getRuUserName());
             RuUserInfo ruUserInfo = RuUserInfo.selectOneByWhere(selectPerson);
 
-            if (SharedUtil.isEmpty(ruUserInfo)){
+
+            if (SharedUtil.isEmpty(ruUserInfo)){//未查询到人员信息
                 RuUserInfo ruUserInfo1 = RuUserInfo.newData();
                 insertUserInfo(userEntryInfo.getCcPrjId(),userEntryInfo.getRuUserName(),userEntryInfo.getRuUserAge(),userEntryInfo.getRuUserPhoneNumber(),userEntryInfo.getRuUserWorkTypeId(),ruUserInfo1);
                 userEntryInfo.setRuUserInfoId(ruUserInfo1.getId());
@@ -75,6 +77,84 @@ public class PersonnelExt {
             userEntryInfo.updateById();
         }
     }
+    /**
+     * 人员进场记录插入前检查人员是否存在未出场记录
+     */
+    private   void   importPersonnelEntryInfoPreCheck(String filePath) {
+
+        boolean   isExist  = false;
+        int personNumber = 0;
+
+        //所有工种
+        Where where = new Where();
+        where.sql("T.`STATUS`='AP'");
+
+        StringBuilder noticeBuilder = new StringBuilder();
+        noticeBuilder.append("（");
+
+        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+            Workbook workbook = WorkbookFactory.create(file);
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+            // 遍历每一行
+            for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                // 检查行是否为空
+                if (row == null) {
+                    break; // 如果为空，直接跳出。
+                }
+                Cell cell = row.getCell(1);
+                if (cell == null) {
+                    break;
+                }
+                //获取人员姓名
+                String  personName  = getStringCellValue(cell);
+                if (SharedUtil.isEmpty(personName)) {
+                    break;
+                }
+
+                //获取年龄
+                Double   age  =  getNumericCellValue(row.getCell(2));
+                if (SharedUtil.isEmpty(age)) {
+                    break;
+                }
+                //获取工种
+                String  workerTypeName  = getStringCellValue(row.getCell(3));
+                if (SharedUtil.isEmpty(workerTypeName)) {
+                    break;
+                }
+                //获取手机号
+                String  phoneNum  = getStringCellValue(row.getCell(4));
+                if (SharedUtil.isEmpty(phoneNum)) {
+                    break;
+                }
+
+                //查询是否存在相同数据
+                Where selectEntryInfo =  new Where();
+                selectEntryInfo.eq("RU_USER_NAME",personName);
+                selectEntryInfo.eq("RU_USER_AGE",age.intValue());
+                RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
+                if (userEntryInfo!=null &&  (userEntryInfo.getRuUserExitDate()==null || userEntryInfo.getRuUserExitACountryDate()==null)){
+
+                    noticeBuilder.append( userEntryInfo.getRuUserName()+",");
+                    isExist = true;
+                    personNumber+=1;
+                }
+            }
+        } catch (IOException e) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message, e);
+        }
+
+        if (isExist){
+            int index = noticeBuilder.lastIndexOf(",");
+            noticeBuilder.replace(index,index+1,"）");
+            noticeBuilder.append("共"+personNumber+"人存在未出场或未离境数据");
+
+            throw  new BaseException(noticeBuilder.toString());
+        }
+
+    }
 
     /**
      * 导入人员入场信息，新增入场，通过人员和入境时间判断是否为更新数据
@@ -85,7 +165,13 @@ public class PersonnelExt {
         String prjId = varMap.get("PRJ_ID").toString();
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
+
+
 //        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板%2B带备注.xlsx";
+
+//        filePath = "/Users/hejialun/Documents/Russia/人员管理模板%2B带备注.xlsx";
+
+        importPersonnelEntryInfoPreCheck(filePath);//检查是否存在未退出的人员数据
 
         if (!"xlsx".equals(flFile.getExt())) {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
@@ -248,7 +334,8 @@ public class PersonnelExt {
 //                selectEntryInfo.eq("RU_USER_NAME",personName);
 //                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
 
-                selectEntryInfo.eq("RU_USER_PHONE_NUMBER",phoneNum);
+                selectEntryInfo.eq("RU_USER_NAME",personName);
+                selectEntryInfo.eq("RU_USER_AGE",age.intValue());
                 selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
 
                 RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
@@ -258,7 +345,7 @@ public class PersonnelExt {
                    //设置频次
 //                    newUserEntryInfo.setRuEntryFrequency(getFrequency(personName, workTypeId)+1);
                     newUserEntryInfo.setRemark(remark);
-                    newUserEntryInfo.setRuEntryFrequency(getFrequency(phoneNum)+1);
+                    newUserEntryInfo.setRuEntryFrequency(getFrequency(personName,age.intValue())+1);
                     newUserEntryInfo.insertById();
                 }else{//有数据，修改
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, userEntryInfo);
@@ -277,11 +364,12 @@ public class PersonnelExt {
     }
 
     //获取入场频次
-    private int getFrequency(String phoneNum) {
+    private int getFrequency(String personName,Integer personAge) {
         //查询入场情况
         Where selectEntryInfoList =  new Where();
-        selectEntryInfoList.eq("RU_USER_PHONE_NUMBER",phoneNum);
-//        selectEntryInfoList.eq("RU_USER_NAME",personName);
+//        selectEntryInfoList.eq("RU_USER_PHONE_NUMBER",phoneNum);
+        selectEntryInfoList.eq("RU_USER_NAME",personName);
+        selectEntryInfoList.eq("RU_USER_AGE",personAge);
 //        selectEntryInfoList.eq("RU_USER_WORK_TYPE_ID",workTypeId);
         List<RuUserEntryInfo> ruUserEntryInfos = RuUserEntryInfo.selectByWhere(selectEntryInfoList);
         if (SharedUtil.isEmpty(ruUserEntryInfos)){
