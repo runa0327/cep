@@ -228,6 +228,7 @@ public class StructNodeExt {
             CcConstructProgressPlan ccConstructProgressPlan = CcConstructProgressPlan.selectById(ccConstructProgressPlanId);
             ccConstructProgressPlan.setStatus(String.valueOf(StatusE.AP));
             ccConstructProgressPlan.setCcConstructIsCommit(true);
+            ccConstructProgressPlan.setEffectiveTime(LocalDateTime.now());
             ccConstructProgressPlan.updateById();
         }
         //编制的计划状态变更为已批准
@@ -1260,7 +1261,7 @@ public class StructNodeExt {
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
         //提交事务
         myJdbcTemplate.update("commit");
-        try{
+        try {
             ResponseEntity<String> response = restTemplate.exchange(uploadAndConvertUrl, HttpMethod.POST, entity, String.class);
             log.info(response.toString());
         } catch (HttpServerErrorException e) {
