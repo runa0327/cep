@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.SQLException;
@@ -43,9 +44,11 @@ public class HandleZipController {
             String userId = getFirstValue(fileData, "user_id");
 
             if (ccAttachment != null && !ccAttachment.isEmpty()) {
+                //
                 // 获取文件地址
                 String filePath = getFilePath(ccAttachment);
                 if (filePath != null && !filePath.isEmpty()) {
+                    //解压并存储文件
                     unzipAndStoreFiles(filePath, ccProcedureLedgerId, ccAttachment, ccDrawingUpdateRecordId, userId);
                 }
             }
@@ -138,7 +141,13 @@ public class HandleZipController {
 
         // 创建 ZIP 文件根目录
         String rootDirId = createRootDirectory(zipFileName, ccProcedureLedgerId, ccDrawingUpdateRecordId, userId);
-        try (ZipFile zipFile = new ZipFile(filePath, StandardCharsets.UTF_8)) {
+
+//        String encoding = detectEncoding(filePath);
+//        if (encoding == null) {
+//            encoding = "UTF-8"; // 默认使用 UTF-8
+//        }
+
+        try (ZipFile zipFile = new ZipFile(filePath,  Charset.forName("GB2312"))) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             Map<String, String> dirPathToIdMap = new HashMap<>();
             dirPathToIdMap.put(zipFileName, rootDirId);
@@ -150,6 +159,8 @@ public class HandleZipController {
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 String entryName = entry.getName();
+                // 过滤非法字符
+                entryName = entryName.replaceAll("[^a-zA-Z0-9./_-]", "");
                 if (!entryName.contains("MACOSX") && !entryName.contains(".DS_Store")) {
                     //苹果电脑会默认存放带有MACOSX的目录，进行排除
                     if (entry.isDirectory()) {
@@ -161,13 +172,13 @@ public class HandleZipController {
             }
             // 按路径长度排序，确保先处理父目录
             directoryEntries.sort(Comparator.comparingInt(e -> e.getName().split("/").length));
-
+            log.info("处理目录");
             for (ZipEntry directoryEntry : directoryEntries) {
                 String entryName = directoryEntry.getName();
                 String fullPath = zipFileName + "/" + entryName;
                 storeDirectory(fullPath, dirPathToIdMap, ccProcedureLedgerId, rootDirId, ccDrawingUpdateRecordId, userId);
             }
-
+            log.info("处理文件");
             for (ZipEntry fileEntry : fileEntries) {
                 String entryName = fileEntry.getName();
                 String fullPath = zipFileName + "/" + entryName;
@@ -539,4 +550,5 @@ public class HandleZipController {
                 docFileId, 1, LocalDateTime.now(), LocalDateTime.now(), userId, LocalDateTime.now(), userId,
                 parentDirId, null, firstFileName, projectId, fileType, previewDspSize, "AP");
     }
+
 }

@@ -1258,6 +1258,8 @@ public class StructNodeExt {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+        //提交事务
+        myJdbcTemplate.update("commit");
         try{
             ResponseEntity<String> response = restTemplate.exchange(uploadAndConvertUrl, HttpMethod.POST, entity, String.class);
             log.info(response.toString());
