@@ -133,12 +133,22 @@ public class PersonnelExt {
                 Where selectEntryInfo =  new Where();
                 selectEntryInfo.eq("RU_USER_NAME",personName);
                 selectEntryInfo.eq("RU_USER_AGE",age.intValue());
-                RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
-                if (userEntryInfo!=null &&  (userEntryInfo.getRuUserExitDate()==null || userEntryInfo.getRuUserExitACountryDate()==null)){
+                List<RuUserEntryInfo> ruUserEntryInfos = RuUserEntryInfo.selectByWhere(selectEntryInfo);
 
-                    noticeBuilder.append( userEntryInfo.getRuUserName()+",");
-                    isExist = true;
-                    personNumber+=1;
+                if (SharedUtil.notEmpty(ruUserEntryInfos)) {
+                        boolean  curUserExist =  false;
+                    for (RuUserEntryInfo entryInfo : ruUserEntryInfos) { //当前有未出场的数据
+                         entryInfo = ruUserEntryInfos.get(0);
+                        if (entryInfo.getRuUserExitDate() == null) {
+                            curUserExist = true;
+                        }
+                    }
+
+                    if (curUserExist){//记录未出场的数据
+                        noticeBuilder.append(ruUserEntryInfos.get(0).getRuUserName() + ",");
+                        isExist = true;
+                        personNumber += 1;
+                    }
                 }
             }
         } catch (IOException e) {
@@ -149,7 +159,7 @@ public class PersonnelExt {
         if (isExist){
             int index = noticeBuilder.lastIndexOf(",");
             noticeBuilder.replace(index,index+1,"）");
-            noticeBuilder.append("共"+personNumber+"人存在未出场或未离境数据");
+            noticeBuilder.append("共"+personNumber+"人上次出场数据未填写，请完成上次出场数据填写闭环后再导入本次数据。");
 
             throw  new BaseException(noticeBuilder.toString());
         }
