@@ -52,6 +52,11 @@ public class SmartMatchExt {
             throw new BaseException("巡检描述为空");
         }
 
+        // 正则表达式判断是否仅包含字母、数字或空格
+        if (remark.matches("^[a-zA-Z0-9 ]+$")) {
+            throw new BaseException("巡检描述有误");
+        }
+
         String prjTypeId = getPrjTypeId(ccPrjId);
         if (!StringUtils.hasText(prjTypeId)) {
             throw new BaseException("项目类型错误");
@@ -102,6 +107,7 @@ public class SmartMatchExt {
     public void postAIPaas(String data, String scenario) {
 
         log.info("调用大模型");
+        String csCommId = ExtJarHelper.getEntityRecordList().get(0).csCommId;
         RestTemplate restTemplate = new RestTemplate();
 
         // 目标URL
@@ -123,10 +129,13 @@ public class SmartMatchExt {
             ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
             System.out.println("响应状态码: " + response.getStatusCode());
             String body = response.getBody();
-            if(showAIresults(body) == 1){
-                throw new BaseException("巡检描述不规范，请重新填写!");
-            }
+            showAIresults(body);
         } catch (RestClientException e) {
+            Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
+                    .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
+                    .set("CC_QS_ISSUE_POINT_IDS", null)
+                    .set("REMARK", "未解析到质安要点")
+                    .exec();
             System.err.println("请求发生异常: " + e.getMessage());
             e.printStackTrace();
         }
@@ -134,7 +143,7 @@ public class SmartMatchExt {
 
     }
 
-    private int showAIresults(String body) {
+    private void showAIresults(String body) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String csCommId = ExtJarHelper.getEntityRecordList().get(0).csCommId;
 
@@ -149,31 +158,23 @@ public class SmartMatchExt {
         }
 
         if (!jsonMap.containsKey("result")) {
+            Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
+                    .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
+                    .set("CC_QS_ISSUE_POINT_IDS", null)
+                    .set("REMARK", "服务器繁忙，请稍后尝试")
+                    .exec();
             throw new BaseException("服务器繁忙，请稍后尝试");
         }
 
         String resultValue = jsonMap.get("result");
         String[] entries = resultValue.split("\n");
 
-        if (entries.length == 0) {
-            throw new BaseException("未解析到质安要点分类");
-        }
-
         String firstEntry = entries[0].trim();
-        if (!firstEntry.startsWith("[") || !firstEntry.endsWith("]")) {
-            throw new BaseException("巡检描述不规范");
-        }
 
         String content = firstEntry.substring(1, firstEntry.length() - 1);
         String[] idParts = content.split("&&", 2);
-        if (idParts.length != 2) {
-            throw new BaseException("分类ID有误");
-        }
 
         String[] id2AndScore = idParts[1].split(":", 2);
-        if (id2AndScore.length < 1) {
-            throw new BaseException("要点ID有误");
-        }
 
         String score = id2AndScore[1];
 
@@ -184,9 +185,9 @@ public class SmartMatchExt {
             Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
                     .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
                     .set("CC_QS_ISSUE_POINT_IDS", null)
-                    .set("REMARK", "巡检描述不规范，请重新填写")
+                    .set("REMARK", "未解析到质安要点")
                     .exec();
-            return 1;
+            return ;
         }
 
         // SQL查询语句
@@ -209,7 +210,6 @@ public class SmartMatchExt {
                 .set("CC_QS_ISSUE_POINT_TYPE_ID",idParts[0])
                 .set("CC_QS_ISSUE_POINT_IDS",id2AndScore[0])
                 .exec();
-        return 0;
 
     }
 
