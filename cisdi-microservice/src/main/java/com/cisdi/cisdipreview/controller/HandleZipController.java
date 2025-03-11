@@ -205,10 +205,10 @@ public class HandleZipController {
 
         // cc_doc_dir 表中插入数据
         String docDirId = IdUtil.getSnowflakeNextIdStr();
-        String insertSql = "INSERT INTO CC_DOC_DIR (ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, CC_DOC_DIR_PID, NAME, STATUS, CC_PRJ_ID, CC_DRAWING_UPDATE_RECORD_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertSql = "INSERT INTO CC_DOC_DIR (ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, CC_DOC_DIR_PID, NAME, STATUS, CC_PRJ_ID, CC_DRAWING_UPDATE_RECORD_ID, CC_DOC_FOLDER_TYPE_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         jdbcTemplate.update(insertSql,
                 docDirId, 1, LocalDateTime.now(), LocalDateTime.now(), userId,
-                LocalDateTime.now(), userId, null, zipFileName, "AP", ccPrjId, ccDrawingUpdateRecordId);
+                LocalDateTime.now(), userId, null, zipFileName, "AP", ccPrjId, ccDrawingUpdateRecordId, "CAD");//相关的文件和文件夹都属于CAD管理
 
         // cc_package_file 表中插入数据
         String packageFileId = IdUtil.getSnowflakeNextIdStr();
@@ -309,10 +309,10 @@ public class HandleZipController {
 
         // 插入目录到 cc_doc_dir 表
         String dirId = IdUtil.getSnowflakeNextIdStr();
-        String insertSql = "INSERT INTO CC_DOC_DIR (ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, CC_DOC_DIR_PID, NAME, STATUS, CC_PRJ_ID, CC_DRAWING_UPDATE_RECORD_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertSql = "INSERT INTO CC_DOC_DIR (ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, CC_DOC_DIR_PID, NAME, STATUS, CC_PRJ_ID, CC_DRAWING_UPDATE_RECORD_ID, CC_DOC_FOLDER_TYPE_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         jdbcTemplate.update(insertSql,
                 dirId, 1, LocalDateTime.now(), LocalDateTime.now(), userId,
-                LocalDateTime.now(), userId, parentDirId, dirName, "AP", ccPrjId, ccDrawingUpdateRecordId);
+                LocalDateTime.now(), userId, parentDirId, dirName, "AP", ccPrjId, ccDrawingUpdateRecordId, "CAD");
 
         // cc_package_file 表中插入数据
         String id = IdUtil.getSnowflakeNextIdStr();

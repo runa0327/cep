@@ -1139,7 +1139,7 @@ public class StructNodeExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
             String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
             String nodeId = entityRecord.csCommId;
-            List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
+           List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
 
             if (children.isEmpty()) { // 如果是叶子节点
                 String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, ACT_FR, PROG_TIME, ACT_WBS_PCT, CC_WBS_STATUS_ID, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CC_ATTACHMENTS2, CRT_DT, LAST_MODI_DT,VER,CC_PROGRESS_UNIT_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -1234,7 +1234,7 @@ public class StructNodeExt {
                             ccDrawingUpdateRecord.setCcVerNum("1");//新建的手续台账，图纸更新记录默认为第一版
                             ccDrawingUpdateRecord.insertById();
                             //处理设计管理的zip包
-                            handleDesignResultFile(myJdbcTemplate, attachments, ccProcedureLedger.getId(), ccDrawingUpdateRecord.getId());
+                            handleDesignResultFile(myJdbcTemplate, attachments, ccProcedureLedger.getId(), ccDrawingUpdateRecord.getId(), ccPrjId);
                         }
                     }
 
@@ -1250,7 +1250,89 @@ public class StructNodeExt {
     /**
      * 进展填报之后，对设计额外的操作，解压zip文件，并存储在cc_doc_file和cc_doc_dir表中
      */
-    private void handleDesignResultFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
+    private void handleDesignResultFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId, String ccPrjId) {
+        // 处理设计结果的逻辑
+        FlFile file = FlFile.selectById(attachments);
+        String ext = file.getExt();//文件后缀
+        if(ext.equals("zip")){
+            handleDesignZipFile(myJdbcTemplate, attachments, ccProcedureLedgerId,ccDrawingUpdateRecordId);
+        }else{
+            handleDesignOtherFile(file, ccPrjId, attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
+        }
+
+    }
+    /**
+     * 处理设计结果的其他类型的文件，如pdf,dwg等
+     */
+    private void handleDesignOtherFile(FlFile file, String ccPrjId, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        // 插入目录到 cc_doc_dir 表
+        CcDocDir myCcDocDir = CcDocDir.newData();
+        myCcDocDir.setTs(LocalDateTime.now());
+        myCcDocDir.setCrtDt(LocalDateTime.now());
+        myCcDocDir.setCrtUserId(userId);
+        myCcDocDir.setLastModiDt(LocalDateTime.now());
+        myCcDocDir.setLastModiUserId(userId);
+        myCcDocDir.setCcDocDirPid(null);//当文件没有父级目录，自己就是目录
+        myCcDocDir.setName(file.getName());//对于单文件，将文件名作为目录
+        myCcDocDir.setStatus("AP");
+        myCcDocDir.setCcPrjId(ccPrjId);
+        myCcDocDir.setCcDrawingUpdateRecordId(ccDrawingUpdateRecordId);
+        myCcDocDir.setCcDocFolderTypeId("CAD");
+        myCcDocDir.insertById();
+
+        // cc_package_file 表中插入数据
+        CcPackageFile ccPackageFile = CcPackageFile.newData();
+        ccPackageFile.setTs(LocalDateTime.now());
+        ccPackageFile.setCrtDt(LocalDateTime.now());
+        ccPackageFile.setCrtUserId(userId);
+        ccPackageFile.setLastModiDt(LocalDateTime.now());
+        ccPackageFile.setLastModiUserId(userId);
+        ccPackageFile.setStatus("AP");
+        ccPackageFile.setCcDocDirId(myCcDocDir.getId());
+        ccPackageFile.setCcProcedureLedgerId(ccProcedureLedgerId);
+        ccPackageFile.insertById();
+
+        // 存储文件到 cc_doc_file 表
+        String ext = file.getExt();
+        String fileType = "OTHER";
+        // 根据不同的文件扩展名判断文件类型
+        if (ext.equals("dwg") || ext.equals("dwf") || ext.equals("dxf") || ext.equals("dxg")) {
+            fileType = "CAD";
+        } else if (ext.equals("jpg") || ext.equals("png") || ext.equals("jpeg")) {
+            fileType = "VR";
+        } else if (ext.equals("txt") || ext.equals("doc") || ext.equals("docx") || ext.equals("xls") || ext.equals("xlsx") || ext.equals("ppt") || ext.equals("pptx") || ext.equals("pdf")) {
+            fileType = "DOC";
+        } else if (ext.equals("mp4") || ext.equals("avi") || ext.equals("mov") || ext.equals("mpg")) {
+            fileType = "MEDIA";
+        } else if (ext.equals("zip") || ext.equals("rar")) {
+            fileType = "ARCHIVE";
+        } else if (ext.equals("rvt") || ext.equals("dgn") || ext.equals("ifc") || ext.equals("nwd")) {
+            fileType = "BIM";
+        }
+        CcDocFile myCcDocFile = CcDocFile.newData();
+        myCcDocFile.setTs(LocalDateTime.now());
+        myCcDocFile.setCrtDt(LocalDateTime.now());
+        myCcDocFile.setCrtUserId(userId);
+        myCcDocFile.setLastModiDt(LocalDateTime.now());
+        myCcDocFile.setLastModiUserId(userId);
+        myCcDocFile.setCcDocDirId(myCcDocDir.getId());
+        myCcDocFile.setCcAttachment(attachments);
+        myCcDocFile.setName(file.getName());
+        myCcDocFile.setCcPrjId(ccPrjId);
+        myCcDocFile.setCcDocFileTypeId(fileType);
+        myCcDocFile.setCcPreviewDspSize(file.getDspSize());
+        myCcDocFile.setStatus("AP");
+        myCcDocFile.insertById();
+    }
+
+    /**
+     * 解压zip包，并存储在cc_doc_file和cc_doc_dir表中
+     */
+    private void handleDesignZipFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
         // 处理设计结果的逻辑
         //处理设计管理的zip包
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
