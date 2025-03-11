@@ -165,7 +165,8 @@ public class DesignInquiExt {
         //项目ID
         String ccPrjId = varMap.get("P_CC_PRJ_ID").toString();
         //更新说明
-        String remark = varMap.get("P_REMARK").toString();
+//        String remark = varMap.get("P_REMARK").toString();
+        String remark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : "";
         //通知人员
         String assignPersonnel = varMap.get("P_ASSIGN_PERSONNEL").toString();
         //设计成果图纸
