@@ -136,11 +136,21 @@ public class StructNodeExt {
         }
 
         // 查询当前项目的最高版本
+//        String sql = "SELECT name AS maxVersion " +
+//                "FROM cc_prj_struct_node_version " +
+//                "WHERE cc_prj_id = ? " +
+//                "AND cc_prj_wbs_type_id = ? " +
+//                "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
+//                "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
+//                "LIMIT 1";
         String sql = "SELECT name AS maxVersion " +
                 "FROM cc_prj_struct_node_version " +
                 "WHERE cc_prj_id = ? " +
                 "AND cc_prj_wbs_type_id = ? " +
-                "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
+                "AND (" +
+                " (CC_CONSTRUCT_PROGRESS_PLAN_ID IS NULL OR CC_CONSTRUCT_PROGRESS_PLAN_ID = '')" +
+                " OR CC_CONSTRUCT_PROGRESS_PLAN_ID = ?" +
+                " )" +
                 "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
                 "LIMIT 1";
         Map<String, Object> map = null;
