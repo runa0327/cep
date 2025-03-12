@@ -210,17 +210,19 @@ public class DesignInquiExt {
 
         ccDrawingUpdateRecord.insertById();
 
+        handleDesignResultFile(myJdbcTemplate, ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId(), ccPrjId);
+
         //判断更新的文件是不是zip格式
-        FlFile flFile = FlFile.selectById(ccAttachment);
-        if(Objects.equals(flFile.getExt(), "zip")){
-            //解压包。更新文件到表cc_doc_dir和cc_doc_file
-            //当状态为“已完成”时，解压文件，保存相关文件
-//            ZipProcessorExt zipProcessor = new ZipProcessorExt();
-//            zipProcessor.decompressPackageAndStore(ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId());//这里的ID需要考虑是否改变，涉及到表的更改
-            handleDesignResultFile(myJdbcTemplate, ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId());
-        }else{
-            //不是zip格式，暂不做处理
-        }
+//        FlFile flFile = FlFile.selectById(ccAttachment);
+//        if(Objects.equals(flFile.getExt(), "zip")){
+//            //解压包。更新文件到表cc_doc_dir和cc_doc_file
+//            //当状态为“已完成”时，解压文件，保存相关文件
+////            ZipProcessorExt zipProcessor = new ZipProcessorExt();
+////            zipProcessor.decompressPackageAndStore(ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId());//这里的ID需要考虑是否改变，涉及到表的更改
+//            handleDesignResultFile(myJdbcTemplate, ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId());
+//        }else{
+//            //不是zip格式，暂不做处理
+//        }
 
         //刷新页面
 //        InvokeActResult invokeActResult = new InvokeActResult();
@@ -228,7 +230,93 @@ public class DesignInquiExt {
 //        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
-    private void handleDesignResultFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
+    /**
+     * 进展填报之后，对设计额外的操作，解压zip文件，并存储在cc_doc_file和cc_doc_dir表中
+     */
+    private void handleDesignResultFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId, String ccPrjId) {
+        // 处理设计结果的逻辑
+        FlFile file = FlFile.selectById(attachments);
+        String ext = file.getExt();//文件后缀
+        if(ext.equals("zip")){
+            handleDesignZipFile(myJdbcTemplate, attachments, ccProcedureLedgerId,ccDrawingUpdateRecordId);
+        }else{
+            handleDesignOtherFile(file, ccPrjId, attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
+        }
+
+    }
+
+    /**
+     * 处理设计结果的其他类型的文件，如pdf,dwg等
+     */
+    private void handleDesignOtherFile(FlFile file, String ccPrjId, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        // 插入目录到 cc_doc_dir 表
+        CcDocDir myCcDocDir = CcDocDir.newData();
+        myCcDocDir.setTs(LocalDateTime.now());
+        myCcDocDir.setCrtDt(LocalDateTime.now());
+        myCcDocDir.setCrtUserId(userId);
+        myCcDocDir.setLastModiDt(LocalDateTime.now());
+        myCcDocDir.setLastModiUserId(userId);
+        myCcDocDir.setCcDocDirPid(null);//当文件没有父级目录，自己就是目录
+        myCcDocDir.setName(file.getName());//对于单文件，将文件名作为目录
+        myCcDocDir.setStatus("AP");
+        myCcDocDir.setCcPrjId(ccPrjId);
+        myCcDocDir.setCcDrawingUpdateRecordId(ccDrawingUpdateRecordId);
+        myCcDocDir.setCcDocFolderTypeId("CAD");
+        myCcDocDir.insertById();
+
+        // cc_package_file 表中插入数据
+        CcPackageFile ccPackageFile = CcPackageFile.newData();
+        ccPackageFile.setTs(LocalDateTime.now());
+        ccPackageFile.setCrtDt(LocalDateTime.now());
+        ccPackageFile.setCrtUserId(userId);
+        ccPackageFile.setLastModiDt(LocalDateTime.now());
+        ccPackageFile.setLastModiUserId(userId);
+        ccPackageFile.setStatus("AP");
+        ccPackageFile.setCcDocDirId(myCcDocDir.getId());
+        ccPackageFile.setCcProcedureLedgerId(ccProcedureLedgerId);
+        ccPackageFile.insertById();
+
+        // 存储文件到 cc_doc_file 表
+        String ext = file.getExt();
+        String fileType = "OTHER";
+        // 根据不同的文件扩展名判断文件类型
+        if (ext.equals("dwg") || ext.equals("dwf") || ext.equals("dxf") || ext.equals("dxg")) {
+            fileType = "CAD";
+        } else if (ext.equals("jpg") || ext.equals("png") || ext.equals("jpeg")) {
+            fileType = "VR";
+        } else if (ext.equals("txt") || ext.equals("doc") || ext.equals("docx") || ext.equals("xls") || ext.equals("xlsx") || ext.equals("ppt") || ext.equals("pptx") || ext.equals("pdf")) {
+            fileType = "DOC";
+        } else if (ext.equals("mp4") || ext.equals("avi") || ext.equals("mov") || ext.equals("mpg")) {
+            fileType = "MEDIA";
+        } else if (ext.equals("zip") || ext.equals("rar")) {
+            fileType = "ARCHIVE";
+        } else if (ext.equals("rvt") || ext.equals("dgn") || ext.equals("ifc") || ext.equals("nwd")) {
+            fileType = "BIM";
+        }
+        CcDocFile myCcDocFile = CcDocFile.newData();
+        myCcDocFile.setTs(LocalDateTime.now());
+        myCcDocFile.setCrtDt(LocalDateTime.now());
+        myCcDocFile.setCrtUserId(userId);
+        myCcDocFile.setLastModiDt(LocalDateTime.now());
+        myCcDocFile.setLastModiUserId(userId);
+        myCcDocFile.setCcDocDirId(myCcDocDir.getId());
+        myCcDocFile.setCcAttachment(attachments);
+        myCcDocFile.setName(file.getName());
+        myCcDocFile.setCcPrjId(ccPrjId);
+        myCcDocFile.setCcDocFileTypeId(fileType);
+        myCcDocFile.setCcPreviewDspSize(file.getDspSize());
+        myCcDocFile.setStatus("AP");
+        myCcDocFile.insertById();
+    }
+
+    /**
+     * 解压zip包，并存储在cc_doc_file和cc_doc_dir表中
+     */
+    private void handleDesignZipFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
         // 处理设计结果的逻辑
         //处理设计管理的zip包
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
@@ -238,10 +326,8 @@ public class DesignInquiExt {
         Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
         String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
         String uploadAndConvertUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/handleZip/decompress-and-store";
-        //http://8.137.116.250/qygly/qygly-gateway/cisdi-microservice-test240511/handleZip/decompress-and-store
-//        String uploadAndConvertUrl = "http://127.0.0.1:21119/cisdi-microservice-test240511/handleZip/decompress-and-store";
-
-
+//        uploadAndConvertUrl = "http://8.137.116.250/qygly/qygly-gateway/cisdi-microservice-test240511/handleZip/decompress-and-store";
+//        uploadAndConvertUrl = "http://127.0.0.1:21119/cisdi-microservice-test240511/handleZip/decompress-and-store";
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("cc_attachment", attachments);
         body.add("cc_procedure_ledger_id", ccProcedureLedgerId);
@@ -250,7 +336,9 @@ public class DesignInquiExt {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
-        try{
+        //提交事务
+        myJdbcTemplate.update("commit");
+        try {
             ResponseEntity<String> response = restTemplate.exchange(uploadAndConvertUrl, HttpMethod.POST, entity, String.class);
             log.info(response.toString());
         } catch (HttpServerErrorException e) {

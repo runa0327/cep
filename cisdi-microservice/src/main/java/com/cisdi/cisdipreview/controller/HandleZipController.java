@@ -83,7 +83,7 @@ public class HandleZipController {
 //        FlFile flFile = FlFile.selectById(attachments); // 获取文件对象
         if (flFile != null) {
             String resourcePath = (String) flFile.get("PHYSICAL_LOCATION"); // 获取文件的物理路径
-//            resourcePath =  "/Users/zzq/www/ceecip/2025/03/05/归档6.zip";
+//            resourcePath =  "E:\\data\\qygly\\file3\\prod\\FileStore\\2025\\03\\12\\1111112.zip";
             FileSystemResource fileSystemResource = new FileSystemResource(resourcePath);
 
             try (InputStream inputStream = fileSystemResource.getInputStream()) {
@@ -399,7 +399,7 @@ public class HandleZipController {
         String previewDspSize = FileUtils.formatFileSize(fileSize);
 
         // 将文件信息插入到 fl_file 表中
-        insertFlFile(sizeKb, previewDspSize, flPathId, firstFileName, lastFileExt, userId, previewPath, fileName, fileInlineUrl, fileAttachmentUrl);
+        insertFlFile(fileId, sizeKb, previewDspSize, flPathId, firstFileName, lastFileExt, userId, previewPath, fileName, fileInlineUrl, fileAttachmentUrl);
 
         // 根据 parentDirId 得到项目 ID
         String projectId = getProjectId(parentDirId);
@@ -408,7 +408,7 @@ public class HandleZipController {
         String fileType = getFileType(lastFileExt);
 
         // 将文件信息插入到 cc_doc_file 表中
-        insertCcDocFile(projectId, fileType, previewDspSize, parentDirId, firstFileName, userId);
+        insertCcDocFile(fileId, projectId, fileType, previewDspSize, parentDirId, firstFileName, userId);
     }
 
     /**
@@ -468,9 +468,9 @@ public class HandleZipController {
      * @param fileName        文件名
      * @throws SQLException 如果数据库操作出现错误
      */
-    private void insertFlFile(BigDecimal sizeKb, String previewDspSize, String flPathId, String firstFileName, String lastFileExt, String userId, String previewPath, String fileName,  String fileInlineUrl, String fileAttachmentUrl) throws SQLException {
+    public void insertFlFile(String fileId, BigDecimal sizeKb, String previewDspSize, String flPathId, String firstFileName, String lastFileExt, String userId, String previewPath, String fileName, String fileInlineUrl, String fileAttachmentUrl) throws SQLException {
         // 生成唯一的文件 ID
-        String fileId = IdUtil.getSnowflakeNextIdStr();
+//        String fileId = IdUtil.getSnowflakeNextIdStr();
         // 插入文件信息到 fl_file 表的 SQL 语句
         String insertFlFileSql = "INSERT INTO FL_FILE (ID, CODE, NAME, VER, FL_PATH_ID, EXT, STATUS, CRT_DT, CRT_USER_ID, " +
                 "LAST_MODI_DT, LAST_MODI_USER_ID, SIZE_KB, FILE_INLINE_URL, FILE_ATTACHMENT_URL, TS, UPLOAD_DTTM, " +
@@ -538,7 +538,7 @@ public class HandleZipController {
      * @param userId              用户 ID
      * @throws SQLException 如果数据库操作出现错误
      */
-    private void insertCcDocFile(String projectId, String fileType, String previewDspSize, String parentDirId, String firstFileName, String userId) throws SQLException {
+    private void insertCcDocFile(String fileId, String projectId, String fileType, String previewDspSize, String parentDirId, String firstFileName, String userId) throws SQLException {
         // 生成唯一的文档文件 ID
         String docFileId = IdUtil.getSnowflakeNextIdStr();
         // 插入文件信息到 cc_doc_file 表的 SQL 语句
@@ -548,7 +548,7 @@ public class HandleZipController {
         // 执行 SQL 插入操作
         jdbcTemplate.update(insertCcDocFileSql,
                 docFileId, 1, LocalDateTime.now(), LocalDateTime.now(), userId, LocalDateTime.now(), userId,
-                parentDirId, null, firstFileName, projectId, fileType, previewDspSize, "AP");
+                parentDirId, fileId, firstFileName, projectId, fileType, previewDspSize, "AP");
     }
 
 }
