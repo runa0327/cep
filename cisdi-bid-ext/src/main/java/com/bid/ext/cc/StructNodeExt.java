@@ -1326,6 +1326,8 @@ public class StructNodeExt {
         myCcDocFile.setCcDocFileTypeId(fileType);
         myCcDocFile.setCcPreviewDspSize(file.getDspSize());
         myCcDocFile.setStatus("AP");
+        myCcDocFile.setCcPreviewConversionStatusId("TODO");
+        myCcDocFile.setIsDefault(false);
         myCcDocFile.insertById();
     }
 

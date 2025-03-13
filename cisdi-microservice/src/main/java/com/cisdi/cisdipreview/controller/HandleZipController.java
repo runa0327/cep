@@ -541,14 +541,16 @@ public class HandleZipController {
     private void insertCcDocFile(String fileId, String projectId, String fileType, String previewDspSize, String parentDirId, String firstFileName, String userId) throws SQLException {
         // 生成唯一的文档文件 ID
         String docFileId = IdUtil.getSnowflakeNextIdStr();
+        
+
         // 插入文件信息到 cc_doc_file 表的 SQL 语句
         String insertCcDocFileSql = "INSERT INTO CC_DOC_FILE (ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, " +
-                "CC_DOC_DIR_ID, CC_ATTACHMENT, NAME, CC_PRJ_ID, CC_DOC_FILE_TYPE_ID, CC_PREVIEW_DSP_SIZE, STATUS) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "CC_DOC_DIR_ID, CC_ATTACHMENT, NAME, CC_PRJ_ID, CC_DOC_FILE_TYPE_ID, CC_PREVIEW_DSP_SIZE, STATUS, CC_PREVIEW_CONVERSION_STATUS_ID, IS_DEFAULT) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         // 执行 SQL 插入操作
         jdbcTemplate.update(insertCcDocFileSql,
                 docFileId, 1, LocalDateTime.now(), LocalDateTime.now(), userId, LocalDateTime.now(), userId,
-                parentDirId, fileId, firstFileName, projectId, fileType, previewDspSize, "AP");
+                parentDirId, fileId, firstFileName, projectId, fileType, previewDspSize, "AP", "TODO", 0);
     }
 
 }

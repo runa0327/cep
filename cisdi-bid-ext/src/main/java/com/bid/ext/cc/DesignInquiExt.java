@@ -225,9 +225,9 @@ public class DesignInquiExt {
 //        }
 
         //刷新页面
-//        InvokeActResult invokeActResult = new InvokeActResult();
-//        invokeActResult.reFetchData = true;
-//        ExtJarHelper.setReturnValue(invokeActResult);
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**
@@ -310,6 +310,8 @@ public class DesignInquiExt {
         myCcDocFile.setCcDocFileTypeId(fileType);
         myCcDocFile.setCcPreviewDspSize(file.getDspSize());
         myCcDocFile.setStatus("AP");
+        myCcDocFile.setCcPreviewConversionStatusId("TODO");
+        myCcDocFile.setIsDefault(false);
         myCcDocFile.insertById();
     }
 
