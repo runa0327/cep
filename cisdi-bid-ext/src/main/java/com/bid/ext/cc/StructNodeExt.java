@@ -809,6 +809,13 @@ public class StructNodeExt {
     }
 
     /**
+     * 重算施工计划
+     */
+    public void recalculationConstructPlan() {
+        recalculationPublicPlan("CONSTRUCT");
+    }
+
+    /**
      * 获取子节点
      *
      * @param parentId
@@ -1139,7 +1146,7 @@ public class StructNodeExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
             String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
             String nodeId = entityRecord.csCommId;
-           List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
+            List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
 
             if (children.isEmpty()) { // 如果是叶子节点
                 String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, ACT_FR, PROG_TIME, ACT_WBS_PCT, CC_WBS_STATUS_ID, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CC_ATTACHMENTS2, CRT_DT, LAST_MODI_DT,VER,CC_PROGRESS_UNIT_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -1254,17 +1261,18 @@ public class StructNodeExt {
         // 处理设计结果的逻辑
         FlFile file = FlFile.selectById(attachments);
         String ext = file.getExt();//文件后缀
-        if(ext.equals("zip")){
-            handleDesignZipFile(myJdbcTemplate, attachments, ccProcedureLedgerId,ccDrawingUpdateRecordId);
-        }else{
+        if (ext.equals("zip")) {
+            handleDesignZipFile(myJdbcTemplate, attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
+        } else {
             handleDesignOtherFile(file, ccPrjId, attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
         }
 
     }
+
     /**
      * 处理设计结果的其他类型的文件，如pdf,dwg等
      */
-    private void handleDesignOtherFile(FlFile file, String ccPrjId, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
+    private void handleDesignOtherFile(FlFile file, String ccPrjId, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
@@ -1334,7 +1342,7 @@ public class StructNodeExt {
     /**
      * 解压zip包，并存储在cc_doc_file和cc_doc_dir表中
      */
-    private void handleDesignZipFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
+    private void handleDesignZipFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
         // 处理设计结果的逻辑
         //处理设计管理的zip包
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
