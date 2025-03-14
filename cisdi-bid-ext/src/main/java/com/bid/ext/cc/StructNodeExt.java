@@ -3417,7 +3417,8 @@ public class StructNodeExt {
         }
 
         // 计算计划天数
-        long planDays = pPlanFr.until(pPlanTo).getDays();
+        long planDays = ChronoUnit.DAYS.between(pPlanFr, pPlanTo) + 1;//+1表示第一个日期那天也包含在内
+//        long planDays = pPlanFr.until(pPlanTo).getDays();//该方法存在误差，参考2023-09-08到2023-10-15结果为5
 
         // 创建基础的项目结构节点
         CcPrjStructNode ccPrjStructNode = createProjectStructNode(name, remark, pCcPrjIds, wbsType, wbsChiefUserId, pPlanFr, pPlanTo, planDays, isMileStone);
