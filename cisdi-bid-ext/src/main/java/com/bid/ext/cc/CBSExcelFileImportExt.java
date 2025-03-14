@@ -1,5 +1,7 @@
 package com.bid.ext.cc;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.bid.ext.model.CcPrjCostOverview;
 import com.bid.ext.model.CcPrjCostOverviewSimple;
 import com.bid.ext.model.CcPrjStructNode;
@@ -124,7 +126,7 @@ public class CBSExcelFileImportExt {
 
                         for (CcPrjStructNode node : ccPrjStructNodes) {
 
-                            if (costName.equals(node.getName())) {
+                            if (costName.equals(getValue(node.getName()))) {
                                 node.setPlanTotalCost(new BigDecimal(costValue));
                             }
                             node.updateById();
@@ -546,5 +548,23 @@ public class CBSExcelFileImportExt {
                 cellValue = "";
         }
         return cellValue;
+    }
+
+    /**
+     * 国际化获取值
+     *
+     * @param input
+     * @return
+     */
+    public static String getValue(String input) {
+        try {
+            // 尝试将输入解析为 JSON
+            JSONObject jsonObject = JSONUtil.parseObj(input);
+            // 获取 ZH_CN 的值，如果没有找到则返回输入的字符串
+            return jsonObject.getStr("ZH_CN", input);
+        } catch (Exception e) {
+            // 如果解析失败，直接返回原始字符串
+            return input;
+        }
     }
 }
