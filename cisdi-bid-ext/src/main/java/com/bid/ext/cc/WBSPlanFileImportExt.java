@@ -17,30 +17,32 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.bid.ext.cc.StructNodeExt.getConstructProgressPlanId;
+
 public class WBSPlanFileImportExt {
 
 
-    public void planNodeAnalyzing(){
+    public void planNodeAnalyzing() {
 
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         Map<String, Object> valueMap = entityRecord.valueMap;
 
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
-        String  wbsChiefUserId = (String) valueMap.get("WBS_CHIEF_USER_ID");
+        String wbsChiefUserId = (String) valueMap.get("WBS_CHIEF_USER_ID");
 //        String  status= (String) valueMap.get("STATUS");
 //        String  planFr = (String) valueMap.get("PLAN_FR");
 //        String  planTo = (String) valueMap.get("PLAN_to");
 //        String  pName= (String) valueMap.get("PLAN_to");
 //        String  wbsRiskId = (String) valueMap.get("CC_WBS_RISK_ID");
 //        String  progressStatusId = (String) valueMap.get("CC_WBS_PROGRESS_STATUS_ID");
-        String  prjId = (String) valueMap.get("CC_PRJ_ID");
+        String prjId = (String) valueMap.get("CC_PRJ_ID");
 //        String  nodePid = (String) valueMap.get("CC_PRJ_STRUCT_NODE_PID");
-        String  nodePid = (String) valueMap.get("ID"); //选中节点的id
-        BigDecimal  seqNo = (BigDecimal) valueMap.get("SEQ_NO");
-        String  wbsTypeId = (String) valueMap.get("CC_PRJ_WBS_TYPE_ID");
+        String nodePid = (String) valueMap.get("ID"); //选中节点的id
+        BigDecimal seqNo = (BigDecimal) valueMap.get("SEQ_NO");
+        String wbsTypeId = (String) valueMap.get("CC_PRJ_WBS_TYPE_ID");
 
-        if(nodePid != null && nodePid.isEmpty()){
+        if (nodePid != null && nodePid.isEmpty()) {
             String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.nodeNotSelected");
             throw new BaseException(msg);
 //           throw new BaseException("未选中节点");
@@ -49,7 +51,7 @@ public class WBSPlanFileImportExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-        if (!"mpp".equals(flFile.getExt())){
+        if (!"mpp".equals(flFile.getExt())) {
             String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.fileTypeError");
             throw new BaseException(msg);
 //            throw new BaseException("非mpp文件格式");
@@ -75,7 +77,7 @@ public class WBSPlanFileImportExt {
         //根节点
         Task topTask = taskList.get(0);
 
-        insertNode(topTask,nodePid,wbsTypeId,seqNo,prjId,wbsChiefUserId,0);
+        insertNode(topTask, nodePid, wbsTypeId, seqNo, prjId, wbsChiefUserId, 0, null);
 
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
@@ -85,16 +87,17 @@ public class WBSPlanFileImportExt {
     }
 
     //节点插入，根节点不插入
-    private   void   insertNode(Task task,String parentId,String typeId,BigDecimal serialNum,String  projectId,String wbsChiefUserId ,Integer level ){
+    //2025/3/14 判断是否有施工进度计划，若有则插入计划
+    private void insertNode(Task task, String parentId, String typeId, BigDecimal serialNum, String projectId, String wbsChiefUserId, Integer level, String ccConstructProgressPlanId) {
         level++;
 
         //判断是否为顶层叶子节点
-        if (task.getResourceAssignments().size() == 0){
+        if (task.getResourceAssignments().size() == 0) {
 
             List<Task> childTasks = task.getChildTasks();
 
 
-            for (int i = 0; i < childTasks.size() ; i++) {
+            for (int i = 0; i < childTasks.size(); i++) {
 
                 Task t = childTasks.get(i);
 
@@ -118,9 +121,12 @@ public class WBSPlanFileImportExt {
                 ccPrjStructNode.setActUnitCost(null);
                 ccPrjStructNode.setCbsChiefUserId(null);
                 ccPrjStructNode.setPbsChiefUserId(null);
+                if (ccConstructProgressPlanId != null) {
+                    ccPrjStructNode.setCcConstructProgressPlanId(ccConstructProgressPlanId);
+                }
                 ccPrjStructNode.insertById();
 
-                insertNode(t,ccPrjStructNode.getId(),typeId,new BigDecimal(0),projectId,wbsChiefUserId,level);
+                insertNode(t, ccPrjStructNode.getId(), typeId, new BigDecimal(0), projectId, wbsChiefUserId, level, ccConstructProgressPlanId);
 
             }
 
@@ -128,5 +134,72 @@ public class WBSPlanFileImportExt {
 
     }
 
+
+    /**
+     * 施工进度计划project导入
+     */
+    public void planNodeAnalyzingConstruct() {
+
+        String ccConstructProgressPlanId = getConstructProgressPlanId();
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        String wbsChiefUserId = (String) valueMap.get("WBS_CHIEF_USER_ID");
+//        String  status= (String) valueMap.get("STATUS");
+//        String  planFr = (String) valueMap.get("PLAN_FR");
+//        String  planTo = (String) valueMap.get("PLAN_to");
+//        String  pName= (String) valueMap.get("PLAN_to");
+//        String  wbsRiskId = (String) valueMap.get("CC_WBS_RISK_ID");
+//        String  progressStatusId = (String) valueMap.get("CC_WBS_PROGRESS_STATUS_ID");
+        String prjId = (String) valueMap.get("CC_PRJ_ID");
+//        String  nodePid = (String) valueMap.get("CC_PRJ_STRUCT_NODE_PID");
+        String nodePid = (String) valueMap.get("ID"); //选中节点的id
+        BigDecimal seqNo = (BigDecimal) valueMap.get("SEQ_NO");
+        String wbsTypeId = (String) valueMap.get("CC_PRJ_WBS_TYPE_ID");
+
+        if (nodePid != null && nodePid.isEmpty()) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.nodeNotSelected");
+            throw new BaseException(msg);
+//           throw new BaseException("未选中节点");
+        }
+        //获取上传的图片
+        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
+        String filePath = flFile.getPhysicalLocation();
+
+        if (!"mpp".equals(flFile.getExt())) {
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.fileTypeError");
+            throw new BaseException(msg);
+//            throw new BaseException("非mpp文件格式");
+        }
+
+//        filePath = "C:\\Users\\xx\\Desktop\\test-import.mpp";
+
+        File file = new File(filePath);
+
+        MPPReader mppReader = new MPPReader();
+        ProjectFile pf = null;
+        try {
+            pf = mppReader.read(file);
+        } catch (MPXJException e) {
+            e.printStackTrace();
+            String msg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.WBSPlan.import.fileAnalyze");
+            throw new BaseException(msg);
+//            throw  new BaseException("mpp文件解析失败");
+        }
+        // 获取mpp文件数据集合
+        List<Task> taskList = pf.getTasks(); //pf.getAllTasks();
+
+        //根节点
+        Task topTask = taskList.get(0);
+
+        insertNode(topTask, nodePid, wbsTypeId, seqNo, prjId, wbsChiefUserId, 0, ccConstructProgressPlanId);
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+
+    }
 
 }
