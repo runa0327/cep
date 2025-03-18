@@ -84,7 +84,7 @@ public class CcLogisticsPurchaseExt {
 
     /**
      * 数据库没数据时，初始化所有状态
-   * 数据库有数据，则查询需要的物流状态
+     * 数据库有数据，则查询需要的物流状态
      * 返回状态ID
      */
     private String insertStatusAndReturnId(String statusName) {
@@ -97,14 +97,16 @@ public class CcLogisticsPurchaseExt {
             List<String> approveStatusList = Arrays.asList("未提交审核", "待审核", "审核中", "审核通过", "审核不通过");
             for (String approveStatus : approveStatusList) {
                 CcApproveStatusSetting status = CcApproveStatusSetting.newData();
-                status.setName(approveStatus);
+                status.setName(JsonUtil.toJson(new Internationalization(null, approveStatus, null)));
                 status.insertById();
                 if (approveStatus.equals(statusName)) {
                     statusId = status.getId();
                 }
             }
         } else {
-            statusWhere.eq(CcApproveStatusSetting.Cols.NAME, statusName);
+            Map map = JsonUtil.fromJson(statusName, Map.class);
+            String name = map.get("ZH_CN").toString();
+            statusWhere.eq(CcApproveStatusSetting.Cols.NAME, name);
             CcApproveStatusSetting approveStatusSetting = CcApproveStatusSetting.selectOneByWhere(statusWhere);
             statusId = approveStatusSetting.getId();
         }
@@ -155,9 +157,11 @@ public class CcLogisticsPurchaseExt {
         if(result == null){
             initChooseData();
         }
-        if(result.getName().equals("通过")){
+        Map map = JsonUtil.fromJson(result.getName(), Map.class);
+        String name = map.get("ZH_CN").toString();
+        if(name.equals("通过")){
             return insertStatusAndReturnId("审核通过");
-        } else if(result.getName().equals("不通过")){
+        } else if(name.equals("不通过")){
             return insertStatusAndReturnId("审核不通过");
         }
         return insertStatusAndReturnId("审核中");
@@ -175,9 +179,72 @@ public class CcLogisticsPurchaseExt {
             List<String> approveResultsList = Arrays.asList("通过", "不通过");
             for (String approveResult : approveResultsList) {
                 CcApproveResult result = CcApproveResult.newData();
-                result.setName(approveResult);
+                result.setName(JsonUtil.toJson(new Internationalization(null, approveResult, null)));
                 result.insertById();
             }
         }
     }
+
+    /**
+     * 初始化“拆分状态”的选项
+     */
+    public void initSplitData(){
+        //判断审核状态是否有数据
+        Where statusWhere = new Where();
+        List<CcSplitStatus> splitStatuses = CcSplitStatus.selectByWhere(statusWhere);
+        if (splitStatuses == null || splitStatuses.isEmpty()) {
+            List<String> splitStatusList = Arrays.asList("未拆分", "已拆分");
+            for (String splitStatus : splitStatusList) {
+                CcSplitStatus status = CcSplitStatus.newData();
+                status.setName(JsonUtil.toJson(new Internationalization(null, splitStatus, null)));
+                status.insertById();
+            }
+        }
+        //主体/配件数据新增
+        List<CcMainOrPart> mainOrParts = CcMainOrPart.selectByWhere(statusWhere);
+        if (mainOrParts == null || mainOrParts.isEmpty()) {
+            List<String> mainOrPartList = Arrays.asList("主体", "配件", "备件");
+            for (String mainOrPart : mainOrPartList) {
+                CcMainOrPart status = CcMainOrPart.newData();
+                status.setName(JsonUtil.toJson(new Internationalization(null, mainOrPart, null)));
+                status.insertById();
+            }
+        }
+    }
+
+    /**
+     * 新增零部件信息
+     */
+//    public void creatSparePartsInfo(){
+//        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+//
+//        //操作用户
+//        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+//        String userId = loginInfo.userInfo.id;
+//
+//        //插入数据
+//        CcSparePartsInfo sparePartsInfo = CcSparePartsInfo.newData();
+//        sparePartsInfo.setTs(LocalDateTime.now());
+//        sparePartsInfo.setCrtDt(LocalDateTime.now());
+//        sparePartsInfo.setCrtUserId(userId);
+//        sparePartsInfo.setLastModiDt(LocalDateTime.now());
+//        sparePartsInfo.setLastModiUserId(userId);
+//        sparePartsInfo.setStatus("AP");
+//        String name = JsonUtil.toJson(new Internationalization(null, JdbcMapUtil.getString(varMap, "P_NAME"), null));
+//        sparePartsInfo.setName(name);
+//        String funcSpecs = JsonUtil.toJson(new Internationalization(null, JdbcMapUtil.getString(varMap, "P_CC_FUNC_SPECS"), null));
+//        sparePartsInfo.setCcFuncSpecs(funcSpecs);
+//        sparePartsInfo.setCcOrderQty(JdbcMapUtil.getString(varMap, "P_CC_ORDER_QTY"));
+//        String productUnit = JsonUtil.toJson(new Internationalization(null, JdbcMapUtil.getString(varMap, "P_CC_PRODUCT_UNIT"), null));
+//        sparePartsInfo.setCcProductUnit(productUnit);
+//        sparePartsInfo.setCcMainOrPartId(JdbcMapUtil.getString(varMap, "P_CC_MAIN_OR_PART_ID"));
+//        sparePartsInfo.setCcUnitWeight(JdbcMapUtil.getBigDecimal(varMap, "P_CC_UNIT_WEIGHT"));
+//        sparePartsInfo.setCcTotalWeight(JdbcMapUtil.getBigDecimal(varMap, "P_CC_TOTAL_WEIGHT"));
+//        sparePartsInfo.insertById();
+//
+//        //刷新页面
+//        InvokeActResult invokeActResult = new InvokeActResult();
+//        invokeActResult.reFetchData = true;
+//        ExtJarHelper.setReturnValue(invokeActResult);
+//    }
 }
