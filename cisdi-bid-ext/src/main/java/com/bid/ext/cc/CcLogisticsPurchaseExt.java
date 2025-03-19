@@ -9,7 +9,11 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,32 +28,49 @@ public class CcLogisticsPurchaseExt {
     public void initStatusData() {
         Where statusWhere = new Where();
         // 审核通过状态
-        List<String> approveResultsList = Arrays.asList("通过", "不通过");
+        Map<String, String> approveResultsList = new LinkedHashMap<>();
+        approveResultsList.put("PASS", "通过");
+        approveResultsList.put("NOT_PASS", "不通过");
         initStatus(CcApproveResult.class, approveResultsList, statusWhere);
+
         // 合同审核状态
-        List<String> approveStatusList = Arrays.asList("未提交审核", "待审核", "审核中", "审核通过", "审核不通过");
+        Map<String, String> approveStatusList = new LinkedHashMap<>();
+        approveStatusList.put("NOT_SUBMITTED", "未提交审核");
+        approveStatusList.put("PENDING", "待审核");
+        approveStatusList.put("IN_REVIEW", "审核中");
+        approveStatusList.put("APPROVED", "审核通过");
+        approveStatusList.put("REJECTED", "审核不通过");
         initStatus(CcApproveStatusSetting.class, approveStatusList, statusWhere);
+
         // 拆分状态
-        List<String> splitStatusList = Arrays.asList("未拆分", "已拆分");
+        Map<String, String> splitStatusList = new LinkedHashMap<>();
+        splitStatusList.put("NOT_SPLIT", "未拆分");
+        splitStatusList.put("SPLIT", "已拆分");
         initStatus(CcSplitStatus.class, splitStatusList, statusWhere);
+
         // 主体/配件/备件
-        List<String> mainOrPartsList = Arrays.asList("主体", "配件", "备件");
+        Map<String, String> mainOrPartsList = new LinkedHashMap<>();
+        mainOrPartsList.put("MAIN", "主体");
+        mainOrPartsList.put("ACCESSORY", "配件");
+        mainOrPartsList.put("SPARE_PART", "备件");
         initStatus(CcMainOrPart.class, mainOrPartsList, statusWhere);
     }
 
     // 通用的初始化状态数据方法
-    private <T> void initStatus(Class<T> clazz, List<String> statusList, Where where) {
+    private <T> void initStatus(Class<T> clazz, Map<String, String> statusMap, Where where) {
         try {
-            java.lang.reflect.Method selectByWhereMethod = clazz.getMethod("selectByWhere", Where.class);
+            Method selectByWhereMethod = clazz.getMethod("selectByWhere", Where.class);
             List<?> results = (List<?>) selectByWhereMethod.invoke(null, where);
             if (results == null || results.isEmpty()) {
-                java.lang.reflect.Method newDataMethod = clazz.getMethod("newData");
-                java.lang.reflect.Method setNameMethod = clazz.getMethod("setName", String.class);
-                java.lang.reflect.Method insertByIdMethod = clazz.getMethod("insertById");
-                for (String status : statusList) {
+                Method newDataMethod = clazz.getMethod("newData");
+                Method setNameMethod = clazz.getMethod("setName", String.class);
+                Method setCodeMethod = clazz.getMethod("setCode", String.class);
+                Method insertByIdMethod = clazz.getMethod("insertById");
+                for (Map.Entry<String, String> entry : statusMap.entrySet()) {
                     Object instance = newDataMethod.invoke(null);
-                    String json = JsonUtil.toJson(new Internationalization(null, status, null));
+                    String json = JsonUtil.toJson(new Internationalization(null, entry.getValue(), null));
                     setNameMethod.invoke(instance, json);
+                    setCodeMethod.invoke(instance, entry.getKey());
                     insertByIdMethod.invoke(instance);
                 }
             }
@@ -79,14 +100,14 @@ public class CcLogisticsPurchaseExt {
             }
 
             // 更新审批状态
-            CcApproveStatusSetting statusSetting = getStatusRecordByStatusName(CcApproveStatusSetting.class, "未提交审核");
+            CcApproveStatusSetting statusSetting = getStatusRecordByStatusCode(CcApproveStatusSetting.class, "NOT_SUBMITTED");
             if (statusSetting != null) {
                 String status = statusSetting.getId();
                 contract.setCcApproveStatusSettingId(status);
             }
 
             // 更新拆分状态
-            CcSplitStatus splitStatus = getStatusRecordByStatusName(CcSplitStatus.class, "未拆分");
+            CcSplitStatus splitStatus = getStatusRecordByStatusCode(CcSplitStatus.class, "NOT_SPLIT");
             if (splitStatus != null) {
                 String status2 = splitStatus.getId();
                 contract.setCcSplitStatusId(status2);
@@ -102,22 +123,24 @@ public class CcLogisticsPurchaseExt {
     }
 
     /**
-     * 根据状态名称查询对应的状态记录
+     * 根据状态代码查询对应的状态记录
      *
      * @param clazz      状态类的 Class 对象
-     * @param statusName 状态名称
+     * @param statusCode 状态代码
      * @param <T>        状态类的泛型类型
      * @return 状态记录对象，如果未找到则返回 null
      */
-    private <T> T getStatusRecordByStatusName(Class<T> clazz, String statusName) {
+    private <T> T getStatusRecordByStatusCode(Class<T> clazz, String statusCode) {
         Where where = new Where();
         if (clazz == CcApproveStatusSetting.class) {
-            where.contain(CcApproveStatusSetting.Cols.NAME, statusName);
+            where.eq(CcApproveStatusSetting.Cols.CODE, statusCode);
         } else if (clazz == CcSplitStatus.class) {
-            where.contain(CcSplitStatus.Cols.NAME, statusName);
+            where.eq(CcSplitStatus.Cols.CODE, statusCode);
+        } else if (clazz == CcMainOrPart.class) {
+            where.eq(CcMainOrPart.Cols.CODE, statusCode);
         }
         try {
-            java.lang.reflect.Method selectOneByWhereMethod = clazz.getMethod("selectOneByWhere", Where.class);
+            Method selectOneByWhereMethod = clazz.getMethod("selectOneByWhere", Where.class);
             return (T) selectOneByWhereMethod.invoke(null, where);
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,7 +157,7 @@ public class CcLogisticsPurchaseExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
             CcLogisticsContract contract = CcLogisticsContract.selectById(valueMap.get("ID").toString());
 
-            CcApproveStatusSetting statusSetting = getStatusRecordByStatusName(CcApproveStatusSetting.class, "待审核");
+            CcApproveStatusSetting statusSetting = getStatusRecordByStatusCode(CcApproveStatusSetting.class, "PENDING");
             if (statusSetting != null) {
                 String status = statusSetting.getId();
                 contract.setCcApproveStatusSettingId(status);
@@ -142,7 +165,7 @@ public class CcLogisticsPurchaseExt {
             contract.updateById();
         }
 
-        //刷新页面
+        // 刷新页面
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
@@ -151,37 +174,35 @@ public class CcLogisticsPurchaseExt {
     /**
      * 物流合同审批开始
      */
-    public void startApprove(){
-        //表单提交信息
+    public void startApprove() {
+        // 表单提交信息
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
-        //选中数据信息
+        // 选中数据信息
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            //更新合同数据
+            // 更新合同数据
             try {
                 CcLogisticsContract contract = CcLogisticsContract.selectById(JdbcMapUtil.getString(valueMap, "ID"));
-                //判断审核结果的选择，选择通过，状态改成审核通过，选择不通过，状态改成审核不通过
-                String result = JdbcMapUtil.getString(varMap, "P_CC_APPROVE_RESULT_ID");//选择的状态
-                //查询状态对应的NAME
+                // 判断审核结果的选择，选择通过，状态改成审核通过，选择不通过，状态改成审核不通过
+                String result = JdbcMapUtil.getString(varMap, "P_CC_APPROVE_RESULT_ID");// 选择的状态
+                // 查询状态对应的NAME
                 CcApproveResult ccApproveResult = CcApproveResult.selectById(result);
                 Map map = JsonUtil.fromJson(ccApproveResult.getName(), Map.class);
                 String name = map.get("ZH_CN").toString();
-                if(name.equals("通过")){
-                    // 更新审批状态
-                    CcApproveStatusSetting statusSetting = getStatusRecordByStatusName(CcApproveStatusSetting.class, "审核通过");
-                    if (statusSetting != null) {
-                        String status = statusSetting.getId();
-                        contract.setCcApproveStatusSettingId(status);
-                    }
-                }else{
-                    CcApproveStatusSetting statusSetting = getStatusRecordByStatusName(CcApproveStatusSetting.class, "审核不通过");
-                    if (statusSetting != null) {
-                        String status = statusSetting.getId();
-                        contract.setCcApproveStatusSettingId(status);
-                    }
+                String targetStatusCode;
+                if (name.equals("通过")) {
+                    targetStatusCode = "APPROVED";
+                } else {
+                    targetStatusCode = "REJECTED";
                 }
-                if(JdbcMapUtil.getString(varMap, "P_CC_APPROVE_OPINION") != null){
+                // 更新审批状态
+                CcApproveStatusSetting statusSetting = getStatusRecordByStatusCode(CcApproveStatusSetting.class, targetStatusCode);
+                if (statusSetting != null) {
+                    String status = statusSetting.getId();
+                    contract.setCcApproveStatusSettingId(status);
+                }
+                if (JdbcMapUtil.getString(varMap, "P_CC_APPROVE_OPINION") != null) {
                     contract.setCcApproveOpinion(JdbcMapUtil.getString(varMap, "P_CC_APPROVE_OPINION"));
                 }
                 contract.updateById();
@@ -190,7 +211,7 @@ public class CcLogisticsPurchaseExt {
             }
         }
 
-        //刷新页面
+        // 刷新页面
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
@@ -199,24 +220,78 @@ public class CcLogisticsPurchaseExt {
     /**
      * 更新合同信息的拆分状态，只要是新增了零部件信息或者选择无需拆分，都默认是已拆分的行为
      */
-    public void updateSplitData(){
+    public void updateSplitData() {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
             CcLogisticsContract contract = CcLogisticsContract.selectById(valueMap.get("CC_LOGISTICS_CONTRACT_ID").toString());
 
-            CcSplitStatus splitStatus = getStatusRecordByStatusName(CcSplitStatus.class, "已拆分");
+            CcSplitStatus splitStatus = getStatusRecordByStatusCode(CcSplitStatus.class, "SPLIT");
             if (splitStatus != null) {
                 String status = splitStatus.getId();
-                //判断拆分状态是否已经更新过，更新过就不必在更新
-                String latestSplitStatus = contract.getCcSplitStatusId();//数据库中的拆分状态
-                if(latestSplitStatus.equals(status)){
+                // 判断拆分状态是否已经更新过，更新过就不必在更新
+                String latestSplitStatus = contract.getCcSplitStatusId();// 数据库中的拆分状态
+                if (latestSplitStatus != null && latestSplitStatus.equals(status)) {
                     continue;
                 }
                 contract.setCcSplitStatusId(status);
             }
             contract.updateById();
         }
+    }
 
+    /**
+     * 合同物料无需拆分的情况下，更新合同数据和插入零部件信息
+     */
+    public void updateNotSplitData(){
+
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            //新增零部件信息
+            CcSparePartsInfo sparePartsInfo = CcSparePartsInfo.newData();
+            sparePartsInfo.setTs(LocalDateTime.now());
+            sparePartsInfo.setCrtDt(LocalDateTime.now());
+            sparePartsInfo.setCrtUserId(userId);
+            sparePartsInfo.setLastModiDt(LocalDateTime.now());
+            sparePartsInfo.setLastModiUserId(userId);
+            sparePartsInfo.setStatus("AP");
+            sparePartsInfo.setName(JsonUtil.toJson(new Internationalization(null, varMap.get("P_NAME").toString(), null)));
+            sparePartsInfo.setCcFuncSpecs(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_FUNC_SPECS").toString(), null)));
+            sparePartsInfo.setCcOrderQty(varMap.get("P_CC_ORDER_QTY").toString());
+            sparePartsInfo.setCcProductUnit(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_PRODUCT_UNIT").toString(), null)));
+            BigDecimal unitWeight = new BigDecimal(varMap.get("P_CC_UNIT_WEIGHT").toString());
+            sparePartsInfo.setCcUnitWeight(unitWeight);
+            BigDecimal totalWeight = new BigDecimal(varMap.get("P_CC_TOTAL_WEIGHT").toString());
+            sparePartsInfo.setCcTotalWeight(totalWeight);
+            sparePartsInfo.setCcLogisticsContractId(valueMap.get("ID").toString());
+            //主体/配件
+            CcMainOrPart mainOrPart = getStatusRecordByStatusCode(CcMainOrPart.class, "MAIN");
+            if (mainOrPart != null) {
+                String status = mainOrPart.getId();
+                sparePartsInfo.setCcMainOrPartId(status);
+            }
+            sparePartsInfo.insertById();
+
+            //更新合同的拆分状态
+            CcLogisticsContract contract = CcLogisticsContract.selectById(valueMap.get("ID").toString());
+            CcSplitStatus splitStatus = getStatusRecordByStatusCode(CcSplitStatus.class, "SPLIT");
+            if (splitStatus != null) {
+                String status = splitStatus.getId();
+                contract.setCcSplitStatusId(status);
+            }
+            contract.updateById();
+        }
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 }
