@@ -50,7 +50,7 @@ public class PreViewExt {
         ExtJarHelper.setReturnValue(retMap);
     }
 
-    private String doGetStringStringMap() {
+    public static String doGetStringStringMap() {
         StringRedisTemplate stringRedisTemplate = ExtJarHelper.getStringRedisTemplate();
         String value = stringRedisTemplate.opsForValue().get(bimface_access_token_key);
 

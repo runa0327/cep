@@ -31,8 +31,8 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -107,7 +107,9 @@ public class DocExt {
         outputMap.put("fileInlineUrl", fileInlineUrl);
         String ccPreviewFileId = ccDocFile.getCcPreviewFileId();
         outputMap.put("ccPreviewFileId", ccPreviewFileId);
-        outputMap.put("name", ccDocFile.getName());
+        String ccDocFileName = ccDocFile.getName();
+        String tryGetInCurrentLang = I18nUtil.tryGetInCurrentLang(ccDocFileName);
+        outputMap.put("name", tryGetInCurrentLang);
         ExtJarHelper.setReturnValue(outputMap);
     }
 
