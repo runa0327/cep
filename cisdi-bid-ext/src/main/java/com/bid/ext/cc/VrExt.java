@@ -1,6 +1,8 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.*;
+import com.bid.ext.model.CcVr;
+import com.bid.ext.model.FlFile;
+import com.bid.ext.model.FlPath;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -12,16 +14,18 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.awt.Image;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -147,12 +151,45 @@ public class VrExt {
         String ccPrjId = JdbcMapUtil.getString(inputMap, "ccPrjId");
         String sqlPanoMonth;
         String sqlPanoLst;
+        //国际化去掉中文
+//        if (SharedUtil.isEmpty(ccPrjId)) {
+//            sqlPanoMonth = "SELECT DISTINCT (DATE_FORMAT( CC_DOC_DATE, '%Y-%m' )) CC_PANO_MONTH, CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_PANO_RET_MONTH FROM CC_DOC_FILE WHERE CC_DOC_DATE IS NOT NULL AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_PANO_MONTH DESC";
+//            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE,  CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_YEAR_MONTH, CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT FROM CC_DOC_FILE WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_DOC_DATE DESC";
+//        } else {
+//            sqlPanoMonth = "SELECT DISTINCT (DATE_FORMAT( CC_DOC_DATE, '%Y-%m' )) CC_PANO_MONTH, CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_PANO_RET_MONTH FROM CC_DOC_FILE WHERE CC_DOC_DATE IS NOT NULL AND CC_PRJ_ID = ? ORDER BY CC_PANO_MONTH DESC";
+//            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE,  CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_YEAR_MONTH, CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT FROM CC_DOC_FILE WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? AND CC_PRJ_ID = ? ORDER BY CC_DOC_DATE DESC";
+//        }
         if (SharedUtil.isEmpty(ccPrjId)) {
-            sqlPanoMonth = "SELECT DISTINCT (DATE_FORMAT( CC_DOC_DATE, '%Y-%m' )) CC_PANO_MONTH, CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_PANO_RET_MONTH FROM CC_DOC_FILE WHERE CC_DOC_DATE IS NOT NULL AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_PANO_MONTH DESC";
-            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE,  CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_YEAR_MONTH, CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT FROM CC_DOC_FILE WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_DOC_DATE DESC";
+            // 去掉中文，改成纯数字格式
+            sqlPanoMonth = "SELECT DISTINCT DATE_FORMAT(CC_DOC_DATE, '%Y-%m') AS CC_PANO_MONTH, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_PANO_RET_MONTH "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE CC_DOC_DATE IS NOT NULL "
+                    + "  AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) "
+                    + "ORDER BY CC_PANO_MONTH DESC";
+
+            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_YEAR_MONTH, "
+                    + "CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? "
+                    + "  AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) "
+                    + "ORDER BY CC_DOC_DATE DESC";
         } else {
-            sqlPanoMonth = "SELECT DISTINCT (DATE_FORMAT( CC_DOC_DATE, '%Y-%m' )) CC_PANO_MONTH, CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_PANO_RET_MONTH FROM CC_DOC_FILE WHERE CC_DOC_DATE IS NOT NULL AND CC_PRJ_ID = ? ORDER BY CC_PANO_MONTH DESC";
-            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE,  CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_YEAR_MONTH, CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT FROM CC_DOC_FILE WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? AND CC_PRJ_ID = ? ORDER BY CC_DOC_DATE DESC";
+            // 同理，去掉中文
+            sqlPanoMonth = "SELECT DISTINCT DATE_FORMAT(CC_DOC_DATE, '%Y-%m') AS CC_PANO_MONTH, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_PANO_RET_MONTH "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE CC_DOC_DATE IS NOT NULL AND CC_PRJ_ID = ? "
+                    + "ORDER BY CC_PANO_MONTH DESC";
+
+            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_YEAR_MONTH, "
+                    + "CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? "
+                    + "  AND CC_PRJ_ID = ? "
+                    + "ORDER BY CC_DOC_DATE DESC";
         }
 
         List<Map<String, Object>> ccPanoMonths;
@@ -209,15 +246,15 @@ public class VrExt {
             }
 
             if (!panoLst.isEmpty()) {
-                Map<String, Object> ccPano= new HashMap<>();
-                ccPano.put("pano-month", JdbcMapUtil.getString(mapPanoMonth,"CC_PANO_RET_MONTH"));
+                Map<String, Object> ccPano = new HashMap<>();
+                ccPano.put("pano-month", JdbcMapUtil.getString(mapPanoMonth, "CC_PANO_RET_MONTH"));
                 ccPano.put("pano-list", panoLst);
                 vrLst.add(ccPano);
             }
         }
 
-        Map<String,Object> result = new HashMap<>();
-        result.put("data",vrLst);
+        Map<String, Object> result = new HashMap<>();
+        result.put("data", vrLst);
         result.put("fileIdList", fileIdList);
 //        result.put("filePreviewIdList", filePreviewIdLst);
         ExtJarHelper.setReturnValue(result);
