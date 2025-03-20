@@ -33,7 +33,9 @@ public class RuQzPlatformUtil {
 
         String token = null;
 
-        Object qz_auth_token = redisTemplate.opsForValue().get("QZ_AUTH_TOKEN");
+//        Object qz_auth_token = redisTemplate.opsForValue().get("QZ_AUTH_TOKEN");
+
+        Object qz_auth_token =null;
 
         if(qz_auth_token==null) {
             String requestUrl = "https://open.qingzhuyun.com/api/platform/token?appId=a0658b6f47f443729e28eafcbfccfad6&secret=958796e25fea43b2aa0574562ec0a3c1";
@@ -60,7 +62,7 @@ public class RuQzPlatformUtil {
                 throw new BaseException("token获取失败" + responseEntity);
             }
 
-            redisTemplate.opsForValue().set("QZ_AUTH_TOKEN",token,7200, TimeUnit.SECONDS);
+//            redisTemplate.opsForValue().set("QZ_AUTH_TOKEN",token,7200, TimeUnit.SECONDS);
 
         }else{
             token = qz_auth_token.toString();
