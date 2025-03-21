@@ -1,6 +1,7 @@
 package com.bid.ext.cc;
 
 import cn.hutool.core.util.IdUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -130,12 +131,28 @@ public class StructNodeExt {
         //施工进度计划
         String ccConstructProgressPlanId = null;
 
+        String sql = "";
+        Map<String, Object> map = null;
         //若计划类型为施工计划，则先处理施工进度计划
         if ("CONSTRUCT".equals(planType)) {
             ccConstructProgressPlanId = getConstructProgressPlanId();
-        }
+            // 查询当前项目的最高版本
+            sql = "SELECT name AS maxVersion " +
+                    "FROM cc_prj_struct_node_version " +
+                    "WHERE cc_prj_id = ? " +
+                    "AND cc_prj_wbs_type_id = ? " +
+                    "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
+                    "ORDER BY CAST(REPLACE(name->>'$.ZH_CN', 'V', '') AS UNSIGNED) DESC " +
+                    "LIMIT 1";
+            try {
+                map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType, ccConstructProgressPlanId);
+            } catch (EmptyResultDataAccessException e) {
+                // 处理没有结果的情况
+                map = null;
+            }
+        } else {
 
-        // 查询当前项目的最高版本
+            // 查询当前项目的最高版本
 //        String sql = "SELECT name AS maxVersion " +
 //                "FROM cc_prj_struct_node_version " +
 //                "WHERE cc_prj_id = ? " +
@@ -143,24 +160,22 @@ public class StructNodeExt {
 //                "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
 //                "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
 //                "LIMIT 1";
-        String sql = "SELECT name AS maxVersion " +
-                "FROM cc_prj_struct_node_version " +
-                "WHERE cc_prj_id = ? " +
-                "AND cc_prj_wbs_type_id = ? " +
-                "AND (" +
-                " (CC_CONSTRUCT_PROGRESS_PLAN_ID IS NULL OR CC_CONSTRUCT_PROGRESS_PLAN_ID = '')" +
-                " OR CC_CONSTRUCT_PROGRESS_PLAN_ID = ?" +
-                " )" +
-                "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
-                "LIMIT 1";
-        Map<String, Object> map = null;
-        try {
-            map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType, ccConstructProgressPlanId);
-        } catch (EmptyResultDataAccessException e) {
-            // 处理没有结果的情况
-            map = null;
+            sql = "SELECT name AS maxVersion " +
+                    "FROM cc_prj_struct_node_version " +
+                    "WHERE cc_prj_id = ? " +
+                    "AND cc_prj_wbs_type_id = ? " +
+                    "ORDER BY CAST(REPLACE(name->>'$.ZH_CN', 'V', '') AS UNSIGNED) DESC " +
+                    "LIMIT 1";
+            try {
+                map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType);
+            } catch (EmptyResultDataAccessException e) {
+                // 处理没有结果的情况
+                map = null;
+            }
         }
-        String maxVersion = JdbcMapUtil.getString(map, "maxVersion");
+
+
+        String maxVersion = I18nUtil.tryGetInCurrentLang(JdbcMapUtil.getString(map, "maxVersion"));
 
         // 如果当前没有版本，则创建第一个版本
         String newVersion;
@@ -172,11 +187,18 @@ public class StructNodeExt {
             int versionNumber = Integer.parseInt(versionNumberStr);
             newVersion = "V" + (versionNumber + 1);
         }
+        // 创建包含ZH_CN和EN版本的JSON格式
+        JSONObject versionJson = new JSONObject();
+        versionJson.put("ZH_CN", newVersion);
+        versionJson.put("EN", newVersion);
+
+        // 获取最终的JSON格式字符串
+        String resultVersion = versionJson.toString();
         // 创建新的历史版本
         CcPrjStructNodeVersion ccPrjStructNodeVersion = CcPrjStructNodeVersion.newData();
         ccPrjStructNodeVersion.setCcPrjId(pCcPrjIds);
         ccPrjStructNodeVersion.setCcPrjWbsTypeId(planType);
-        ccPrjStructNodeVersion.setName(newVersion);
+        ccPrjStructNodeVersion.setName(resultVersion);
         ccPrjStructNodeVersion.setCcConstructProgressPlanId(ccConstructProgressPlanId);
         ccPrjStructNodeVersion.insertById();
 

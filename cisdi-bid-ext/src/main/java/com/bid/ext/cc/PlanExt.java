@@ -93,6 +93,8 @@ public class PlanExt {
 
         LocalDate planFr = JdbcMapUtil.getLocalDate(nodeData, "PLAN_FR");
         LocalDate planTo = JdbcMapUtil.getLocalDate(nodeData, "PLAN_TO");
+        LocalDate actFr = JdbcMapUtil.getLocalDate(nodeData, "ACT_FR");
+        LocalDate actTo = JdbcMapUtil.getLocalDate(nodeData, "ACT_TO");
         BigDecimal planDays = JdbcMapUtil.getBigDecimal(nodeData, "PLAN_DAYS");
 
 
@@ -120,6 +122,8 @@ public class PlanExt {
         ccPrjStructNode.setWbsChiefUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setPlanFr(planFr);
         ccPrjStructNode.setPlanTo(planTo);
+        ccPrjStructNode.setActFr(actFr);
+        ccPrjStructNode.setActTo(actTo);
         ccPrjStructNode.setPlanDays(planDays);
         ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
         ccPrjStructNode.setCcPrjWbsTypeId(ccPrjWbsTypeId);
