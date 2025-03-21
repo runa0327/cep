@@ -224,7 +224,24 @@ public class CcLogisticsPurchaseExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcSparePartsInfo sparePartsInfo = CcSparePartsInfo.selectById(valueMap.get("ID").toString());
+
             CcLogisticsContract contract = CcLogisticsContract.selectById(valueMap.get("CC_LOGISTICS_CONTRACT_ID").toString());
+
+            //零部件编号
+            Where where = new Where();
+            where.eq("CC_LOGISTICS_CONTRACT_ID", valueMap.get("ID").toString());
+            List<CcSparePartsInfo> ccSparePartsInfos = CcSparePartsInfo.selectByWhere(where);
+            int count = 0;
+            if(ccSparePartsInfos != null && ccSparePartsInfos.size() > 0){
+                count = ccSparePartsInfos.size() + 1;
+            }else{
+                count = count + 1;
+            }
+            String countStr = String.format("%04d", count);
+            sparePartsInfo.setCcSparePartsNum(contract.getCcEquipmentNum() + '-' + countStr);//编号 = 合同设备编号 + 0001（根据拆分数量）
+            sparePartsInfo.updateById();
 
             CcSplitStatus splitStatus = getStatusRecordByStatusCode(CcSplitStatus.class, "SPLIT");
             if (splitStatus != null) {
@@ -277,10 +294,23 @@ public class CcLogisticsPurchaseExt {
                 String status = mainOrPart.getId();
                 sparePartsInfo.setCcMainOrPartId(status);
             }
+            //零部件编号
+            CcLogisticsContract contract = CcLogisticsContract.selectById(valueMap.get("ID").toString());
+            //判断该合同下的零部件数据条数
+            Where where = new Where();
+            where.eq("CC_LOGISTICS_CONTRACT_ID", valueMap.get("ID").toString());
+            List<CcSparePartsInfo> ccSparePartsInfos = CcSparePartsInfo.selectByWhere(where);
+            int count = 0;
+            if(ccSparePartsInfos != null && ccSparePartsInfos.size() > 0){
+                count = ccSparePartsInfos.size() + 1;
+            }else{
+                count = count + 1;
+            }
+            String countStr = String.format("%04d", count);
+            sparePartsInfo.setCcSparePartsNum(contract.getCcEquipmentNum() + '-' + countStr);//编号 = 合同设备编号 + 0001（根据拆分数量）
             sparePartsInfo.insertById();
 
             //更新合同的拆分状态
-            CcLogisticsContract contract = CcLogisticsContract.selectById(valueMap.get("ID").toString());
             CcSplitStatus splitStatus = getStatusRecordByStatusCode(CcSplitStatus.class, "SPLIT");
             if (splitStatus != null) {
                 String status = splitStatus.getId();

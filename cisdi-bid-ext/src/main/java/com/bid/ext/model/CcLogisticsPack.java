@@ -8,20 +8,21 @@ import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 零部件信息。
+ * 物流装箱。
  */
-public class CcSparePartsInfo {
+public class CcLogisticsPack {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcSparePartsInfo> modelHelper = new ModelHelper<>("CC_SPARE_PARTS_INFO", new CcSparePartsInfo());
+    private static final ModelHelper<CcLogisticsPack> modelHelper = new ModelHelper<>("CC_LOGISTICS_PACK", new CcLogisticsPack());
 
     /**
      * 待更新的列。
@@ -38,7 +39,7 @@ public class CcSparePartsInfo {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_SPARE_PARTS_INFO";
+    public static final String ENT_CODE = "CC_LOGISTICS_PACK";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -108,37 +109,89 @@ public class CcSparePartsInfo {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 功能规格。
+         * 联系人名称。
          */
-        public static final String CC_FUNC_SPECS = "CC_FUNC_SPECS";
+        public static final String CONTACT_NAME = "CONTACT_NAME";
         /**
-         * 订单数量。
+         * 联系人手机。
          */
-        public static final String CC_ORDER_QTY = "CC_ORDER_QTY";
-        /**
-         * 产品单位。
-         */
-        public static final String CC_PRODUCT_UNIT = "CC_PRODUCT_UNIT";
+        public static final String CONTACT_MOBILE = "CONTACT_MOBILE";
         /**
          * 物流采购合同。
          */
         public static final String CC_LOGISTICS_CONTRACT_ID = "CC_LOGISTICS_CONTRACT_ID";
         /**
-         * 主体/配件。
+         * 零部件信息。
          */
-        public static final String CC_MAIN_OR_PART_ID = "CC_MAIN_OR_PART_ID";
+        public static final String CC_SPARE_PARTS_INFO_ID = "CC_SPARE_PARTS_INFO_ID";
         /**
-         * 单位重量。
+         * 运输类型。
          */
-        public static final String CC_UNIT_WEIGHT = "CC_UNIT_WEIGHT";
+        public static final String CC_SHIP_TYPE_ID = "CC_SHIP_TYPE_ID";
         /**
-         * 总重量。
+         * 包装形式。
          */
-        public static final String CC_TOTAL_WEIGHT = "CC_TOTAL_WEIGHT";
+        public static final String CC_PACKAGING_TYPE_ID = "CC_PACKAGING_TYPE_ID";
         /**
-         * 零部件编号。
+         * 装箱号。
          */
-        public static final String CC_SPARE_PARTS_NUM = "CC_SPARE_PARTS_NUM";
+        public static final String CC_PACK_NUM = "CC_PACK_NUM";
+        /**
+         * 有无随箱资料。
+         */
+        public static final String CC_HAVE_ENCLOSED_DOCS = "CC_HAVE_ENCLOSED_DOCS";
+        /**
+         * 有无备品备件。
+         */
+        public static final String CC_HAVE_REPAIR_PARTS = "CC_HAVE_REPAIR_PARTS";
+        /**
+         * 有无特殊工具。
+         */
+        public static final String CC_HAVE_SPECIAL_TOOLS = "CC_HAVE_SPECIAL_TOOLS";
+        /**
+         * 是否解体。
+         */
+        public static final String CC_IS_BREAK_UP = "CC_IS_BREAK_UP";
+        /**
+         * 包装重量。
+         */
+        public static final String CC_PACKGING_WEIGHT = "CC_PACKGING_WEIGHT";
+        /**
+         * 承运属性。
+         */
+        public static final String CC_CARRY_TYPE_ID = "CC_CARRY_TYPE_ID";
+        /**
+         * 集港装箱时间。
+         */
+        public static final String CC_PACK_DATE = "CC_PACK_DATE";
+        /**
+         * 出口报关时间。
+         */
+        public static final String CC_EXPORT_DECLARE_DATE = "CC_EXPORT_DECLARE_DATE";
+        /**
+         * 进口报关时间。
+         */
+        public static final String CC_IMPORT_DECLARE_DATE = "CC_IMPORT_DECLARE_DATE";
+        /**
+         * 航运周期。
+         */
+        public static final String CC_SHIPPING_CYCLE = "CC_SHIPPING_CYCLE";
+        /**
+         * 装箱状态。
+         */
+        public static final String CC_PACK_STATUS_ID = "CC_PACK_STATUS_ID";
+        /**
+         * 产品最大件长。
+         */
+        public static final String CC_PRODUCT_MAX_LENGTH = "CC_PRODUCT_MAX_LENGTH";
+        /**
+         * 产品最大件宽。
+         */
+        public static final String CC_PRODUCT_MAX_WIDTH = "CC_PRODUCT_MAX_WIDTH";
+        /**
+         * 产品最大件高。
+         */
+        public static final String CC_PRODUCT_MAX_HEIGHT = "CC_PRODUCT_MAX_HEIGHT";
     }
 
     // </editor-fold>
@@ -161,7 +214,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：ID。
      */
-    public CcSparePartsInfo setId(String id) {
+    public CcLogisticsPack setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -197,7 +250,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：版本。
      */
-    public CcSparePartsInfo setVer(Integer ver) {
+    public CcLogisticsPack setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -233,7 +286,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：时间戳。
      */
-    public CcSparePartsInfo setTs(LocalDateTime ts) {
+    public CcLogisticsPack setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -269,7 +322,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：是否预设。
      */
-    public CcSparePartsInfo setIsPreset(Boolean isPreset) {
+    public CcLogisticsPack setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -305,7 +358,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：创建日期时间。
      */
-    public CcSparePartsInfo setCrtDt(LocalDateTime crtDt) {
+    public CcLogisticsPack setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -341,7 +394,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：创建用户。
      */
-    public CcSparePartsInfo setCrtUserId(String crtUserId) {
+    public CcLogisticsPack setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -377,7 +430,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：最后修改日期时间。
      */
-    public CcSparePartsInfo setLastModiDt(LocalDateTime lastModiDt) {
+    public CcLogisticsPack setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -413,7 +466,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：最后修改用户。
      */
-    public CcSparePartsInfo setLastModiUserId(String lastModiUserId) {
+    public CcLogisticsPack setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -449,7 +502,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：记录状态。
      */
-    public CcSparePartsInfo setStatus(String status) {
+    public CcLogisticsPack setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -485,7 +538,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：锁定流程实例。
      */
-    public CcSparePartsInfo setLkWfInstId(String lkWfInstId) {
+    public CcLogisticsPack setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -521,7 +574,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：代码。
      */
-    public CcSparePartsInfo setCode(String code) {
+    public CcLogisticsPack setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -557,7 +610,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：名称。
      */
-    public CcSparePartsInfo setName(String name) {
+    public CcLogisticsPack setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -593,7 +646,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：备注。
      */
-    public CcSparePartsInfo setRemark(String remark) {
+    public CcLogisticsPack setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -629,7 +682,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：快捷码。
      */
-    public CcSparePartsInfo setFastCode(String fastCode) {
+    public CcLogisticsPack setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -665,7 +718,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：图标。
      */
-    public CcSparePartsInfo setIconFileGroupId(String iconFileGroupId) {
+    public CcLogisticsPack setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -687,108 +740,72 @@ public class CcSparePartsInfo {
     }
 
     /**
-     * 功能规格。
+     * 联系人名称。
      */
-    private String ccFuncSpecs;
+    private String contactName;
 
     /**
-     * 获取：功能规格。
+     * 获取：联系人名称。
      */
-    public String getCcFuncSpecs() {
-        return this.ccFuncSpecs;
+    public String getContactName() {
+        return this.contactName;
     }
 
     /**
-     * 设置：功能规格。
+     * 设置：联系人名称。
      */
-    public CcSparePartsInfo setCcFuncSpecs(String ccFuncSpecs) {
-        if (this.ccFuncSpecs == null && ccFuncSpecs == null) {
+    public CcLogisticsPack setContactName(String contactName) {
+        if (this.contactName == null && contactName == null) {
             // 均为null，不做处理。
-        } else if (this.ccFuncSpecs != null && ccFuncSpecs != null) {
+        } else if (this.contactName != null && contactName != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccFuncSpecs.compareTo(ccFuncSpecs) != 0) {
-                this.ccFuncSpecs = ccFuncSpecs;
-                if (!this.toUpdateCols.contains("CC_FUNC_SPECS")) {
-                    this.toUpdateCols.add("CC_FUNC_SPECS");
+            if (this.contactName.compareTo(contactName) != 0) {
+                this.contactName = contactName;
+                if (!this.toUpdateCols.contains("CONTACT_NAME")) {
+                    this.toUpdateCols.add("CONTACT_NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccFuncSpecs = ccFuncSpecs;
-            if (!this.toUpdateCols.contains("CC_FUNC_SPECS")) {
-                this.toUpdateCols.add("CC_FUNC_SPECS");
+            this.contactName = contactName;
+            if (!this.toUpdateCols.contains("CONTACT_NAME")) {
+                this.toUpdateCols.add("CONTACT_NAME");
             }
         }
         return this;
     }
 
     /**
-     * 订单数量。
+     * 联系人手机。
      */
-    private String ccOrderQty;
+    private String contactMobile;
 
     /**
-     * 获取：订单数量。
+     * 获取：联系人手机。
      */
-    public String getCcOrderQty() {
-        return this.ccOrderQty;
+    public String getContactMobile() {
+        return this.contactMobile;
     }
 
     /**
-     * 设置：订单数量。
+     * 设置：联系人手机。
      */
-    public CcSparePartsInfo setCcOrderQty(String ccOrderQty) {
-        if (this.ccOrderQty == null && ccOrderQty == null) {
+    public CcLogisticsPack setContactMobile(String contactMobile) {
+        if (this.contactMobile == null && contactMobile == null) {
             // 均为null，不做处理。
-        } else if (this.ccOrderQty != null && ccOrderQty != null) {
+        } else if (this.contactMobile != null && contactMobile != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccOrderQty.compareTo(ccOrderQty) != 0) {
-                this.ccOrderQty = ccOrderQty;
-                if (!this.toUpdateCols.contains("CC_ORDER_QTY")) {
-                    this.toUpdateCols.add("CC_ORDER_QTY");
+            if (this.contactMobile.compareTo(contactMobile) != 0) {
+                this.contactMobile = contactMobile;
+                if (!this.toUpdateCols.contains("CONTACT_MOBILE")) {
+                    this.toUpdateCols.add("CONTACT_MOBILE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccOrderQty = ccOrderQty;
-            if (!this.toUpdateCols.contains("CC_ORDER_QTY")) {
-                this.toUpdateCols.add("CC_ORDER_QTY");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 产品单位。
-     */
-    private String ccProductUnit;
-
-    /**
-     * 获取：产品单位。
-     */
-    public String getCcProductUnit() {
-        return this.ccProductUnit;
-    }
-
-    /**
-     * 设置：产品单位。
-     */
-    public CcSparePartsInfo setCcProductUnit(String ccProductUnit) {
-        if (this.ccProductUnit == null && ccProductUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.ccProductUnit != null && ccProductUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccProductUnit.compareTo(ccProductUnit) != 0) {
-                this.ccProductUnit = ccProductUnit;
-                if (!this.toUpdateCols.contains("CC_PRODUCT_UNIT")) {
-                    this.toUpdateCols.add("CC_PRODUCT_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccProductUnit = ccProductUnit;
-            if (!this.toUpdateCols.contains("CC_PRODUCT_UNIT")) {
-                this.toUpdateCols.add("CC_PRODUCT_UNIT");
+            this.contactMobile = contactMobile;
+            if (!this.toUpdateCols.contains("CONTACT_MOBILE")) {
+                this.toUpdateCols.add("CONTACT_MOBILE");
             }
         }
         return this;
@@ -809,7 +826,7 @@ public class CcSparePartsInfo {
     /**
      * 设置：物流采购合同。
      */
-    public CcSparePartsInfo setCcLogisticsContractId(String ccLogisticsContractId) {
+    public CcLogisticsPack setCcLogisticsContractId(String ccLogisticsContractId) {
         if (this.ccLogisticsContractId == null && ccLogisticsContractId == null) {
             // 均为null，不做处理。
         } else if (this.ccLogisticsContractId != null && ccLogisticsContractId != null) {
@@ -831,144 +848,648 @@ public class CcSparePartsInfo {
     }
 
     /**
-     * 主体/配件。
+     * 零部件信息。
      */
-    private String ccMainOrPartId;
+    private String ccSparePartsInfoId;
 
     /**
-     * 获取：主体/配件。
+     * 获取：零部件信息。
      */
-    public String getCcMainOrPartId() {
-        return this.ccMainOrPartId;
+    public String getCcSparePartsInfoId() {
+        return this.ccSparePartsInfoId;
     }
 
     /**
-     * 设置：主体/配件。
+     * 设置：零部件信息。
      */
-    public CcSparePartsInfo setCcMainOrPartId(String ccMainOrPartId) {
-        if (this.ccMainOrPartId == null && ccMainOrPartId == null) {
+    public CcLogisticsPack setCcSparePartsInfoId(String ccSparePartsInfoId) {
+        if (this.ccSparePartsInfoId == null && ccSparePartsInfoId == null) {
             // 均为null，不做处理。
-        } else if (this.ccMainOrPartId != null && ccMainOrPartId != null) {
+        } else if (this.ccSparePartsInfoId != null && ccSparePartsInfoId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccMainOrPartId.compareTo(ccMainOrPartId) != 0) {
-                this.ccMainOrPartId = ccMainOrPartId;
-                if (!this.toUpdateCols.contains("CC_MAIN_OR_PART_ID")) {
-                    this.toUpdateCols.add("CC_MAIN_OR_PART_ID");
+            if (this.ccSparePartsInfoId.compareTo(ccSparePartsInfoId) != 0) {
+                this.ccSparePartsInfoId = ccSparePartsInfoId;
+                if (!this.toUpdateCols.contains("CC_SPARE_PARTS_INFO_ID")) {
+                    this.toUpdateCols.add("CC_SPARE_PARTS_INFO_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccMainOrPartId = ccMainOrPartId;
-            if (!this.toUpdateCols.contains("CC_MAIN_OR_PART_ID")) {
-                this.toUpdateCols.add("CC_MAIN_OR_PART_ID");
+            this.ccSparePartsInfoId = ccSparePartsInfoId;
+            if (!this.toUpdateCols.contains("CC_SPARE_PARTS_INFO_ID")) {
+                this.toUpdateCols.add("CC_SPARE_PARTS_INFO_ID");
             }
         }
         return this;
     }
 
     /**
-     * 单位重量。
+     * 运输类型。
      */
-    private BigDecimal ccUnitWeight;
+    private String ccShipTypeId;
 
     /**
-     * 获取：单位重量。
+     * 获取：运输类型。
      */
-    public BigDecimal getCcUnitWeight() {
-        return this.ccUnitWeight;
+    public String getCcShipTypeId() {
+        return this.ccShipTypeId;
     }
 
     /**
-     * 设置：单位重量。
+     * 设置：运输类型。
      */
-    public CcSparePartsInfo setCcUnitWeight(BigDecimal ccUnitWeight) {
-        if (this.ccUnitWeight == null && ccUnitWeight == null) {
+    public CcLogisticsPack setCcShipTypeId(String ccShipTypeId) {
+        if (this.ccShipTypeId == null && ccShipTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.ccUnitWeight != null && ccUnitWeight != null) {
+        } else if (this.ccShipTypeId != null && ccShipTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccUnitWeight.compareTo(ccUnitWeight) != 0) {
-                this.ccUnitWeight = ccUnitWeight;
-                if (!this.toUpdateCols.contains("CC_UNIT_WEIGHT")) {
-                    this.toUpdateCols.add("CC_UNIT_WEIGHT");
+            if (this.ccShipTypeId.compareTo(ccShipTypeId) != 0) {
+                this.ccShipTypeId = ccShipTypeId;
+                if (!this.toUpdateCols.contains("CC_SHIP_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_SHIP_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccUnitWeight = ccUnitWeight;
-            if (!this.toUpdateCols.contains("CC_UNIT_WEIGHT")) {
-                this.toUpdateCols.add("CC_UNIT_WEIGHT");
+            this.ccShipTypeId = ccShipTypeId;
+            if (!this.toUpdateCols.contains("CC_SHIP_TYPE_ID")) {
+                this.toUpdateCols.add("CC_SHIP_TYPE_ID");
             }
         }
         return this;
     }
 
     /**
-     * 总重量。
+     * 包装形式。
      */
-    private BigDecimal ccTotalWeight;
+    private String ccPackagingTypeId;
 
     /**
-     * 获取：总重量。
+     * 获取：包装形式。
      */
-    public BigDecimal getCcTotalWeight() {
-        return this.ccTotalWeight;
+    public String getCcPackagingTypeId() {
+        return this.ccPackagingTypeId;
     }
 
     /**
-     * 设置：总重量。
+     * 设置：包装形式。
      */
-    public CcSparePartsInfo setCcTotalWeight(BigDecimal ccTotalWeight) {
-        if (this.ccTotalWeight == null && ccTotalWeight == null) {
+    public CcLogisticsPack setCcPackagingTypeId(String ccPackagingTypeId) {
+        if (this.ccPackagingTypeId == null && ccPackagingTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.ccTotalWeight != null && ccTotalWeight != null) {
+        } else if (this.ccPackagingTypeId != null && ccPackagingTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccTotalWeight.compareTo(ccTotalWeight) != 0) {
-                this.ccTotalWeight = ccTotalWeight;
-                if (!this.toUpdateCols.contains("CC_TOTAL_WEIGHT")) {
-                    this.toUpdateCols.add("CC_TOTAL_WEIGHT");
+            if (this.ccPackagingTypeId.compareTo(ccPackagingTypeId) != 0) {
+                this.ccPackagingTypeId = ccPackagingTypeId;
+                if (!this.toUpdateCols.contains("CC_PACKAGING_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_PACKAGING_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccTotalWeight = ccTotalWeight;
-            if (!this.toUpdateCols.contains("CC_TOTAL_WEIGHT")) {
-                this.toUpdateCols.add("CC_TOTAL_WEIGHT");
+            this.ccPackagingTypeId = ccPackagingTypeId;
+            if (!this.toUpdateCols.contains("CC_PACKAGING_TYPE_ID")) {
+                this.toUpdateCols.add("CC_PACKAGING_TYPE_ID");
             }
         }
         return this;
     }
 
     /**
-     * 零部件编号。
+     * 装箱号。
      */
-    private String ccSparePartsNum;
+    private String ccPackNum;
 
     /**
-     * 获取：零部件编号。
+     * 获取：装箱号。
      */
-    public String getCcSparePartsNum() {
-        return this.ccSparePartsNum;
+    public String getCcPackNum() {
+        return this.ccPackNum;
     }
 
     /**
-     * 设置：零部件编号。
+     * 设置：装箱号。
      */
-    public CcSparePartsInfo setCcSparePartsNum(String ccSparePartsNum) {
-        if (this.ccSparePartsNum == null && ccSparePartsNum == null) {
+    public CcLogisticsPack setCcPackNum(String ccPackNum) {
+        if (this.ccPackNum == null && ccPackNum == null) {
             // 均为null，不做处理。
-        } else if (this.ccSparePartsNum != null && ccSparePartsNum != null) {
+        } else if (this.ccPackNum != null && ccPackNum != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccSparePartsNum.compareTo(ccSparePartsNum) != 0) {
-                this.ccSparePartsNum = ccSparePartsNum;
-                if (!this.toUpdateCols.contains("CC_SPARE_PARTS_NUM")) {
-                    this.toUpdateCols.add("CC_SPARE_PARTS_NUM");
+            if (this.ccPackNum.compareTo(ccPackNum) != 0) {
+                this.ccPackNum = ccPackNum;
+                if (!this.toUpdateCols.contains("CC_PACK_NUM")) {
+                    this.toUpdateCols.add("CC_PACK_NUM");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccSparePartsNum = ccSparePartsNum;
-            if (!this.toUpdateCols.contains("CC_SPARE_PARTS_NUM")) {
-                this.toUpdateCols.add("CC_SPARE_PARTS_NUM");
+            this.ccPackNum = ccPackNum;
+            if (!this.toUpdateCols.contains("CC_PACK_NUM")) {
+                this.toUpdateCols.add("CC_PACK_NUM");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 有无随箱资料。
+     */
+    private Boolean ccHaveEnclosedDocs;
+
+    /**
+     * 获取：有无随箱资料。
+     */
+    public Boolean getCcHaveEnclosedDocs() {
+        return this.ccHaveEnclosedDocs;
+    }
+
+    /**
+     * 设置：有无随箱资料。
+     */
+    public CcLogisticsPack setCcHaveEnclosedDocs(Boolean ccHaveEnclosedDocs) {
+        if (this.ccHaveEnclosedDocs == null && ccHaveEnclosedDocs == null) {
+            // 均为null，不做处理。
+        } else if (this.ccHaveEnclosedDocs != null && ccHaveEnclosedDocs != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccHaveEnclosedDocs.compareTo(ccHaveEnclosedDocs) != 0) {
+                this.ccHaveEnclosedDocs = ccHaveEnclosedDocs;
+                if (!this.toUpdateCols.contains("CC_HAVE_ENCLOSED_DOCS")) {
+                    this.toUpdateCols.add("CC_HAVE_ENCLOSED_DOCS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccHaveEnclosedDocs = ccHaveEnclosedDocs;
+            if (!this.toUpdateCols.contains("CC_HAVE_ENCLOSED_DOCS")) {
+                this.toUpdateCols.add("CC_HAVE_ENCLOSED_DOCS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 有无备品备件。
+     */
+    private Boolean ccHaveRepairParts;
+
+    /**
+     * 获取：有无备品备件。
+     */
+    public Boolean getCcHaveRepairParts() {
+        return this.ccHaveRepairParts;
+    }
+
+    /**
+     * 设置：有无备品备件。
+     */
+    public CcLogisticsPack setCcHaveRepairParts(Boolean ccHaveRepairParts) {
+        if (this.ccHaveRepairParts == null && ccHaveRepairParts == null) {
+            // 均为null，不做处理。
+        } else if (this.ccHaveRepairParts != null && ccHaveRepairParts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccHaveRepairParts.compareTo(ccHaveRepairParts) != 0) {
+                this.ccHaveRepairParts = ccHaveRepairParts;
+                if (!this.toUpdateCols.contains("CC_HAVE_REPAIR_PARTS")) {
+                    this.toUpdateCols.add("CC_HAVE_REPAIR_PARTS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccHaveRepairParts = ccHaveRepairParts;
+            if (!this.toUpdateCols.contains("CC_HAVE_REPAIR_PARTS")) {
+                this.toUpdateCols.add("CC_HAVE_REPAIR_PARTS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 有无特殊工具。
+     */
+    private Boolean ccHaveSpecialTools;
+
+    /**
+     * 获取：有无特殊工具。
+     */
+    public Boolean getCcHaveSpecialTools() {
+        return this.ccHaveSpecialTools;
+    }
+
+    /**
+     * 设置：有无特殊工具。
+     */
+    public CcLogisticsPack setCcHaveSpecialTools(Boolean ccHaveSpecialTools) {
+        if (this.ccHaveSpecialTools == null && ccHaveSpecialTools == null) {
+            // 均为null，不做处理。
+        } else if (this.ccHaveSpecialTools != null && ccHaveSpecialTools != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccHaveSpecialTools.compareTo(ccHaveSpecialTools) != 0) {
+                this.ccHaveSpecialTools = ccHaveSpecialTools;
+                if (!this.toUpdateCols.contains("CC_HAVE_SPECIAL_TOOLS")) {
+                    this.toUpdateCols.add("CC_HAVE_SPECIAL_TOOLS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccHaveSpecialTools = ccHaveSpecialTools;
+            if (!this.toUpdateCols.contains("CC_HAVE_SPECIAL_TOOLS")) {
+                this.toUpdateCols.add("CC_HAVE_SPECIAL_TOOLS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否解体。
+     */
+    private Boolean ccIsBreakUp;
+
+    /**
+     * 获取：是否解体。
+     */
+    public Boolean getCcIsBreakUp() {
+        return this.ccIsBreakUp;
+    }
+
+    /**
+     * 设置：是否解体。
+     */
+    public CcLogisticsPack setCcIsBreakUp(Boolean ccIsBreakUp) {
+        if (this.ccIsBreakUp == null && ccIsBreakUp == null) {
+            // 均为null，不做处理。
+        } else if (this.ccIsBreakUp != null && ccIsBreakUp != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccIsBreakUp.compareTo(ccIsBreakUp) != 0) {
+                this.ccIsBreakUp = ccIsBreakUp;
+                if (!this.toUpdateCols.contains("CC_IS_BREAK_UP")) {
+                    this.toUpdateCols.add("CC_IS_BREAK_UP");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccIsBreakUp = ccIsBreakUp;
+            if (!this.toUpdateCols.contains("CC_IS_BREAK_UP")) {
+                this.toUpdateCols.add("CC_IS_BREAK_UP");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 包装重量。
+     */
+    private BigDecimal ccPackgingWeight;
+
+    /**
+     * 获取：包装重量。
+     */
+    public BigDecimal getCcPackgingWeight() {
+        return this.ccPackgingWeight;
+    }
+
+    /**
+     * 设置：包装重量。
+     */
+    public CcLogisticsPack setCcPackgingWeight(BigDecimal ccPackgingWeight) {
+        if (this.ccPackgingWeight == null && ccPackgingWeight == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPackgingWeight != null && ccPackgingWeight != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPackgingWeight.compareTo(ccPackgingWeight) != 0) {
+                this.ccPackgingWeight = ccPackgingWeight;
+                if (!this.toUpdateCols.contains("CC_PACKGING_WEIGHT")) {
+                    this.toUpdateCols.add("CC_PACKGING_WEIGHT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPackgingWeight = ccPackgingWeight;
+            if (!this.toUpdateCols.contains("CC_PACKGING_WEIGHT")) {
+                this.toUpdateCols.add("CC_PACKGING_WEIGHT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 承运属性。
+     */
+    private String ccCarryTypeId;
+
+    /**
+     * 获取：承运属性。
+     */
+    public String getCcCarryTypeId() {
+        return this.ccCarryTypeId;
+    }
+
+    /**
+     * 设置：承运属性。
+     */
+    public CcLogisticsPack setCcCarryTypeId(String ccCarryTypeId) {
+        if (this.ccCarryTypeId == null && ccCarryTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccCarryTypeId != null && ccCarryTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccCarryTypeId.compareTo(ccCarryTypeId) != 0) {
+                this.ccCarryTypeId = ccCarryTypeId;
+                if (!this.toUpdateCols.contains("CC_CARRY_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_CARRY_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccCarryTypeId = ccCarryTypeId;
+            if (!this.toUpdateCols.contains("CC_CARRY_TYPE_ID")) {
+                this.toUpdateCols.add("CC_CARRY_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 集港装箱时间。
+     */
+    private LocalDate ccPackDate;
+
+    /**
+     * 获取：集港装箱时间。
+     */
+    public LocalDate getCcPackDate() {
+        return this.ccPackDate;
+    }
+
+    /**
+     * 设置：集港装箱时间。
+     */
+    public CcLogisticsPack setCcPackDate(LocalDate ccPackDate) {
+        if (this.ccPackDate == null && ccPackDate == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPackDate != null && ccPackDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPackDate.compareTo(ccPackDate) != 0) {
+                this.ccPackDate = ccPackDate;
+                if (!this.toUpdateCols.contains("CC_PACK_DATE")) {
+                    this.toUpdateCols.add("CC_PACK_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPackDate = ccPackDate;
+            if (!this.toUpdateCols.contains("CC_PACK_DATE")) {
+                this.toUpdateCols.add("CC_PACK_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 出口报关时间。
+     */
+    private LocalDate ccExportDeclareDate;
+
+    /**
+     * 获取：出口报关时间。
+     */
+    public LocalDate getCcExportDeclareDate() {
+        return this.ccExportDeclareDate;
+    }
+
+    /**
+     * 设置：出口报关时间。
+     */
+    public CcLogisticsPack setCcExportDeclareDate(LocalDate ccExportDeclareDate) {
+        if (this.ccExportDeclareDate == null && ccExportDeclareDate == null) {
+            // 均为null，不做处理。
+        } else if (this.ccExportDeclareDate != null && ccExportDeclareDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccExportDeclareDate.compareTo(ccExportDeclareDate) != 0) {
+                this.ccExportDeclareDate = ccExportDeclareDate;
+                if (!this.toUpdateCols.contains("CC_EXPORT_DECLARE_DATE")) {
+                    this.toUpdateCols.add("CC_EXPORT_DECLARE_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccExportDeclareDate = ccExportDeclareDate;
+            if (!this.toUpdateCols.contains("CC_EXPORT_DECLARE_DATE")) {
+                this.toUpdateCols.add("CC_EXPORT_DECLARE_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 进口报关时间。
+     */
+    private LocalDate ccImportDeclareDate;
+
+    /**
+     * 获取：进口报关时间。
+     */
+    public LocalDate getCcImportDeclareDate() {
+        return this.ccImportDeclareDate;
+    }
+
+    /**
+     * 设置：进口报关时间。
+     */
+    public CcLogisticsPack setCcImportDeclareDate(LocalDate ccImportDeclareDate) {
+        if (this.ccImportDeclareDate == null && ccImportDeclareDate == null) {
+            // 均为null，不做处理。
+        } else if (this.ccImportDeclareDate != null && ccImportDeclareDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccImportDeclareDate.compareTo(ccImportDeclareDate) != 0) {
+                this.ccImportDeclareDate = ccImportDeclareDate;
+                if (!this.toUpdateCols.contains("CC_IMPORT_DECLARE_DATE")) {
+                    this.toUpdateCols.add("CC_IMPORT_DECLARE_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccImportDeclareDate = ccImportDeclareDate;
+            if (!this.toUpdateCols.contains("CC_IMPORT_DECLARE_DATE")) {
+                this.toUpdateCols.add("CC_IMPORT_DECLARE_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 航运周期。
+     */
+    private BigDecimal ccShippingCycle;
+
+    /**
+     * 获取：航运周期。
+     */
+    public BigDecimal getCcShippingCycle() {
+        return this.ccShippingCycle;
+    }
+
+    /**
+     * 设置：航运周期。
+     */
+    public CcLogisticsPack setCcShippingCycle(BigDecimal ccShippingCycle) {
+        if (this.ccShippingCycle == null && ccShippingCycle == null) {
+            // 均为null，不做处理。
+        } else if (this.ccShippingCycle != null && ccShippingCycle != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccShippingCycle.compareTo(ccShippingCycle) != 0) {
+                this.ccShippingCycle = ccShippingCycle;
+                if (!this.toUpdateCols.contains("CC_SHIPPING_CYCLE")) {
+                    this.toUpdateCols.add("CC_SHIPPING_CYCLE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccShippingCycle = ccShippingCycle;
+            if (!this.toUpdateCols.contains("CC_SHIPPING_CYCLE")) {
+                this.toUpdateCols.add("CC_SHIPPING_CYCLE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 装箱状态。
+     */
+    private String ccPackStatusId;
+
+    /**
+     * 获取：装箱状态。
+     */
+    public String getCcPackStatusId() {
+        return this.ccPackStatusId;
+    }
+
+    /**
+     * 设置：装箱状态。
+     */
+    public CcLogisticsPack setCcPackStatusId(String ccPackStatusId) {
+        if (this.ccPackStatusId == null && ccPackStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPackStatusId != null && ccPackStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPackStatusId.compareTo(ccPackStatusId) != 0) {
+                this.ccPackStatusId = ccPackStatusId;
+                if (!this.toUpdateCols.contains("CC_PACK_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_PACK_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPackStatusId = ccPackStatusId;
+            if (!this.toUpdateCols.contains("CC_PACK_STATUS_ID")) {
+                this.toUpdateCols.add("CC_PACK_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 产品最大件长。
+     */
+    private BigDecimal ccProductMaxLength;
+
+    /**
+     * 获取：产品最大件长。
+     */
+    public BigDecimal getCcProductMaxLength() {
+        return this.ccProductMaxLength;
+    }
+
+    /**
+     * 设置：产品最大件长。
+     */
+    public CcLogisticsPack setCcProductMaxLength(BigDecimal ccProductMaxLength) {
+        if (this.ccProductMaxLength == null && ccProductMaxLength == null) {
+            // 均为null，不做处理。
+        } else if (this.ccProductMaxLength != null && ccProductMaxLength != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccProductMaxLength.compareTo(ccProductMaxLength) != 0) {
+                this.ccProductMaxLength = ccProductMaxLength;
+                if (!this.toUpdateCols.contains("CC_PRODUCT_MAX_LENGTH")) {
+                    this.toUpdateCols.add("CC_PRODUCT_MAX_LENGTH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccProductMaxLength = ccProductMaxLength;
+            if (!this.toUpdateCols.contains("CC_PRODUCT_MAX_LENGTH")) {
+                this.toUpdateCols.add("CC_PRODUCT_MAX_LENGTH");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 产品最大件宽。
+     */
+    private BigDecimal ccProductMaxWidth;
+
+    /**
+     * 获取：产品最大件宽。
+     */
+    public BigDecimal getCcProductMaxWidth() {
+        return this.ccProductMaxWidth;
+    }
+
+    /**
+     * 设置：产品最大件宽。
+     */
+    public CcLogisticsPack setCcProductMaxWidth(BigDecimal ccProductMaxWidth) {
+        if (this.ccProductMaxWidth == null && ccProductMaxWidth == null) {
+            // 均为null，不做处理。
+        } else if (this.ccProductMaxWidth != null && ccProductMaxWidth != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccProductMaxWidth.compareTo(ccProductMaxWidth) != 0) {
+                this.ccProductMaxWidth = ccProductMaxWidth;
+                if (!this.toUpdateCols.contains("CC_PRODUCT_MAX_WIDTH")) {
+                    this.toUpdateCols.add("CC_PRODUCT_MAX_WIDTH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccProductMaxWidth = ccProductMaxWidth;
+            if (!this.toUpdateCols.contains("CC_PRODUCT_MAX_WIDTH")) {
+                this.toUpdateCols.add("CC_PRODUCT_MAX_WIDTH");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 产品最大件高。
+     */
+    private BigDecimal ccProductMaxHeight;
+
+    /**
+     * 获取：产品最大件高。
+     */
+    public BigDecimal getCcProductMaxHeight() {
+        return this.ccProductMaxHeight;
+    }
+
+    /**
+     * 设置：产品最大件高。
+     */
+    public CcLogisticsPack setCcProductMaxHeight(BigDecimal ccProductMaxHeight) {
+        if (this.ccProductMaxHeight == null && ccProductMaxHeight == null) {
+            // 均为null，不做处理。
+        } else if (this.ccProductMaxHeight != null && ccProductMaxHeight != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccProductMaxHeight.compareTo(ccProductMaxHeight) != 0) {
+                this.ccProductMaxHeight = ccProductMaxHeight;
+                if (!this.toUpdateCols.contains("CC_PRODUCT_MAX_HEIGHT")) {
+                    this.toUpdateCols.add("CC_PRODUCT_MAX_HEIGHT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccProductMaxHeight = ccProductMaxHeight;
+            if (!this.toUpdateCols.contains("CC_PRODUCT_MAX_HEIGHT")) {
+                this.toUpdateCols.add("CC_PRODUCT_MAX_HEIGHT");
             }
         }
         return this;
@@ -1061,8 +1582,8 @@ public class CcSparePartsInfo {
      *
      * @return
      */
-    public static CcSparePartsInfo newData() {
-        CcSparePartsInfo obj = modelHelper.newData();
+    public static CcLogisticsPack newData() {
+        CcLogisticsPack obj = modelHelper.newData();
         return obj;
     }
 
@@ -1071,8 +1592,8 @@ public class CcSparePartsInfo {
      *
      * @return
      */
-    public static CcSparePartsInfo insertData() {
-        CcSparePartsInfo obj = modelHelper.insertData();
+    public static CcLogisticsPack insertData() {
+        CcLogisticsPack obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1084,8 +1605,8 @@ public class CcSparePartsInfo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcSparePartsInfo selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcSparePartsInfo obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcLogisticsPack selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcLogisticsPack obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1095,7 +1616,7 @@ public class CcSparePartsInfo {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcSparePartsInfo selectById(String id) {
+    public static CcLogisticsPack selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1107,8 +1628,8 @@ public class CcSparePartsInfo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcSparePartsInfo> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcSparePartsInfo> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcLogisticsPack> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcLogisticsPack> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1118,7 +1639,7 @@ public class CcSparePartsInfo {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcSparePartsInfo> selectByIds(List<String> ids) {
+    public static List<CcLogisticsPack> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1130,8 +1651,8 @@ public class CcSparePartsInfo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcSparePartsInfo> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcSparePartsInfo> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcLogisticsPack> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcLogisticsPack> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1141,7 +1662,7 @@ public class CcSparePartsInfo {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcSparePartsInfo> selectByWhere(Where where) {
+    public static List<CcLogisticsPack> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1153,10 +1674,10 @@ public class CcSparePartsInfo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcSparePartsInfo selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcSparePartsInfo> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcLogisticsPack selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcLogisticsPack> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcSparePartsInfo.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcLogisticsPack.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1168,7 +1689,7 @@ public class CcSparePartsInfo {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcSparePartsInfo selectOneByWhere(Where where) {
+    public static CcLogisticsPack selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1282,7 +1803,7 @@ public class CcSparePartsInfo {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcSparePartsInfo fromModel, CcSparePartsInfo toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcLogisticsPack fromModel, CcLogisticsPack toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1292,7 +1813,7 @@ public class CcSparePartsInfo {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcSparePartsInfo fromModel, CcSparePartsInfo toModel) {
+    public static void copyCols(CcLogisticsPack fromModel, CcLogisticsPack toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 
