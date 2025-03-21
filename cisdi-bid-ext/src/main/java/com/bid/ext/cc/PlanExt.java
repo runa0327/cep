@@ -6,6 +6,7 @@ import com.bid.ext.model.CcPrjStructNodeVersion;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -33,12 +34,12 @@ public class PlanExt {
         CcPrjStructNodeVersion ccPrjStructNodeVersion = CcPrjStructNodeVersion.selectById(pCcPrjStructNodeVersion);
         String ccPrjId = ccPrjStructNodeVersion.getCcPrjId();
         String ccPrjWbsTypeId = ccPrjStructNodeVersion.getCcPrjWbsTypeId();
-        String version = ccPrjStructNodeVersion.getName();
+        String version = I18nUtil.tryGetInCurrentLang(ccPrjStructNodeVersion.getName());
 
         List<CcPrjStructNodeVersion> ccPrjStructNodeVersions = CcPrjStructNodeVersion.selectByWhere(new Where().eq(CcPrjStructNodeVersion.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNodeVersion.Cols.CC_PRJ_WBS_TYPE_ID, ccPrjWbsTypeId));
         // 使用流操作对version进行排序
         Optional<CcPrjStructNodeVersion> maxVersionNode = ccPrjStructNodeVersions.stream()
-                .max(Comparator.comparingInt(prjStructNodeVersion -> Integer.parseInt(prjStructNodeVersion.getName().replaceAll("V", ""))));
+                .max(Comparator.comparingInt(prjStructNodeVersion -> Integer.parseInt(I18nUtil.tryGetInCurrentLang(prjStructNodeVersion.getName()).replaceAll("V", ""))));
         Boolean isNewVersion = false;
         // 获取最大的version值
         if (maxVersionNode.isPresent()) {
