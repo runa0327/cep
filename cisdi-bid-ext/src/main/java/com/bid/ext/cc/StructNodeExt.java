@@ -1960,10 +1960,20 @@ public class StructNodeExt {
             String ccPrjId = ccPo.getCcPrjId();
             String ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
             // 此次更新的采购金额
-            BigDecimal trxAmt = ccPo.getTrxAmt();
-
+//            BigDecimal trxAmtInit = ccPo.getTrxAmtInit();
+            BigDecimal trxAmt = ccPo.getTrxAmtInit();
+            List<CcPoChange> ccPoChanges = CcPoChange.selectByWhere(new Where().eq(CcPoChange.Cols.CC_PO_ID, csCommId));
+            for (CcPoChange ccPoChange : ccPoChanges) {
+                String ccPoChangePickId = ccPoChange.getCcPoChangePickId();// 变更的增减
+                BigDecimal changeTrxAmt = ccPoChange.getTrxAmt();// 变更金额
+                if ("ADD".equals(ccPoChangePickId)) {
+                    trxAmt = trxAmt.add(changeTrxAmt);
+                } else if ("SUB".equals(ccPoChangePickId)) {
+                    trxAmt = trxAmt.subtract(changeTrxAmt);
+                }
+            }
             // 0.更新初始合同金额
-            ccPo.setTrxAmtInit(trxAmt);
+            ccPo.setTrxAmt(trxAmt);
             ccPo.updateById();
 
             // 1.通过实体记录id查询此实体记录已采购金额
