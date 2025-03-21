@@ -241,6 +241,10 @@ public class CcLogisticsPurchaseExt {
             }
             String countStr = String.format("%04d", count);
             sparePartsInfo.setCcSparePartsNum(contract.getCcEquipmentNum() + '-' + countStr);//编号 = 合同设备编号 + 0001（根据拆分数量）
+            //剩余数量和装箱数量初始化
+            sparePartsInfo.setCcRemainQty(0);//默认剩余数量为0
+            sparePartsInfo.setCcPackQty(Integer.valueOf(sparePartsInfo.getCcOrderQty()));//默认装箱数量为拆分的数量
+
             sparePartsInfo.updateById();
 
             CcSplitStatus splitStatus = getStatusRecordByStatusCode(CcSplitStatus.class, "SPLIT");
@@ -308,6 +312,9 @@ public class CcLogisticsPurchaseExt {
             }
             String countStr = String.format("%04d", count);
             sparePartsInfo.setCcSparePartsNum(contract.getCcEquipmentNum() + '-' + countStr);//编号 = 合同设备编号 + 0001（根据拆分数量）
+            //剩余数量和装箱数量初始化
+            sparePartsInfo.setCcRemainQty(0);//默认剩余数量为0
+            sparePartsInfo.setCcPackQty(Integer.valueOf(sparePartsInfo.getCcOrderQty()));//默认装箱数量为拆分的数量
             sparePartsInfo.insertById();
 
             //更新合同的拆分状态

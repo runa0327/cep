@@ -139,6 +139,14 @@ public class CcSparePartsInfo {
          * 零部件编号。
          */
         public static final String CC_SPARE_PARTS_NUM = "CC_SPARE_PARTS_NUM";
+        /**
+         * 剩余数量。
+         */
+        public static final String CC_REMAIN_QTY = "CC_REMAIN_QTY";
+        /**
+         * 装箱数量。
+         */
+        public static final String CC_PACK_QTY = "CC_PACK_QTY";
     }
 
     // </editor-fold>
@@ -969,6 +977,78 @@ public class CcSparePartsInfo {
             this.ccSparePartsNum = ccSparePartsNum;
             if (!this.toUpdateCols.contains("CC_SPARE_PARTS_NUM")) {
                 this.toUpdateCols.add("CC_SPARE_PARTS_NUM");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 剩余数量。
+     */
+    private Integer ccRemainQty;
+
+    /**
+     * 获取：剩余数量。
+     */
+    public Integer getCcRemainQty() {
+        return this.ccRemainQty;
+    }
+
+    /**
+     * 设置：剩余数量。
+     */
+    public CcSparePartsInfo setCcRemainQty(Integer ccRemainQty) {
+        if (this.ccRemainQty == null && ccRemainQty == null) {
+            // 均为null，不做处理。
+        } else if (this.ccRemainQty != null && ccRemainQty != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccRemainQty.compareTo(ccRemainQty) != 0) {
+                this.ccRemainQty = ccRemainQty;
+                if (!this.toUpdateCols.contains("CC_REMAIN_QTY")) {
+                    this.toUpdateCols.add("CC_REMAIN_QTY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccRemainQty = ccRemainQty;
+            if (!this.toUpdateCols.contains("CC_REMAIN_QTY")) {
+                this.toUpdateCols.add("CC_REMAIN_QTY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 装箱数量。
+     */
+    private Integer ccPackQty;
+
+    /**
+     * 获取：装箱数量。
+     */
+    public Integer getCcPackQty() {
+        return this.ccPackQty;
+    }
+
+    /**
+     * 设置：装箱数量。
+     */
+    public CcSparePartsInfo setCcPackQty(Integer ccPackQty) {
+        if (this.ccPackQty == null && ccPackQty == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPackQty != null && ccPackQty != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPackQty.compareTo(ccPackQty) != 0) {
+                this.ccPackQty = ccPackQty;
+                if (!this.toUpdateCols.contains("CC_PACK_QTY")) {
+                    this.toUpdateCols.add("CC_PACK_QTY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPackQty = ccPackQty;
+            if (!this.toUpdateCols.contains("CC_PACK_QTY")) {
+                this.toUpdateCols.add("CC_PACK_QTY");
             }
         }
         return this;
