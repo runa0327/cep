@@ -196,10 +196,6 @@ public class CcLogisticsPack {
          * 装箱数量。
          */
         public static final String CC_PACK_QTY = "CC_PACK_QTY";
-        /**
-         * 物流发货。
-         */
-        public static final String CC_LOGISTICS_SHIP_ID = "CC_LOGISTICS_SHIP_ID";
     }
 
     // </editor-fold>
@@ -1534,42 +1530,6 @@ public class CcLogisticsPack {
             this.ccPackQty = ccPackQty;
             if (!this.toUpdateCols.contains("CC_PACK_QTY")) {
                 this.toUpdateCols.add("CC_PACK_QTY");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 物流发货。
-     */
-    private String ccLogisticsShipId;
-
-    /**
-     * 获取：物流发货。
-     */
-    public String getCcLogisticsShipId() {
-        return this.ccLogisticsShipId;
-    }
-
-    /**
-     * 设置：物流发货。
-     */
-    public CcLogisticsPack setCcLogisticsShipId(String ccLogisticsShipId) {
-        if (this.ccLogisticsShipId == null && ccLogisticsShipId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccLogisticsShipId != null && ccLogisticsShipId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccLogisticsShipId.compareTo(ccLogisticsShipId) != 0) {
-                this.ccLogisticsShipId = ccLogisticsShipId;
-                if (!this.toUpdateCols.contains("CC_LOGISTICS_SHIP_ID")) {
-                    this.toUpdateCols.add("CC_LOGISTICS_SHIP_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccLogisticsShipId = ccLogisticsShipId;
-            if (!this.toUpdateCols.contains("CC_LOGISTICS_SHIP_ID")) {
-                this.toUpdateCols.add("CC_LOGISTICS_SHIP_ID");
             }
         }
         return this;

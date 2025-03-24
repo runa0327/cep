@@ -13,10 +13,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 采购物流
@@ -408,12 +405,10 @@ public class CcLogisticsPurchaseExt {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
-        //插入物流装箱数据
-        CcLogisticsShip ccLogisticsShip = CcLogisticsShip.newData();
-
         //本批箱件总数
         int num = entityRecordList.size();
         float total = 0.0f;
+        ArrayList<String> ids = new ArrayList<String>();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
             total = total + Float.valueOf(valueMap.get("CC_PACKGING_WEIGHT").toString());
@@ -421,11 +416,12 @@ public class CcLogisticsPurchaseExt {
             //更新装箱状态，将状态改成已发货
             CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
             ccLogisticsPack.setCcPackStatusId("SHIPPED");
-            ccLogisticsPack.setCcLogisticsShipId(ccLogisticsShip.getId());
             ccLogisticsPack.updateById();
+            ids.add(valueMap.get("ID").toString());
         }
 
-
+        //插入物流装箱数据
+        CcLogisticsShip ccLogisticsShip = CcLogisticsShip.newData();
         ccLogisticsShip.setTs(LocalDateTime.now());
         ccLogisticsShip.setCrtDt(LocalDateTime.now());
         ccLogisticsShip.setCrtUserId(userId);
@@ -442,6 +438,7 @@ public class CcLogisticsPurchaseExt {
         //本批箱件总数
         ccLogisticsShip.setCcPackageTotal(num);
         ccLogisticsShip.setCcTotalWeight(BigDecimal.valueOf(total));
+        ccLogisticsShip.setCcLogisticsPackIds(String.join(",", ids));
         ccLogisticsShip.insertById();
 
         // 刷新页面

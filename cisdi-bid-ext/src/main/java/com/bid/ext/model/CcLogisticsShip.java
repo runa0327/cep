@@ -104,6 +104,10 @@ public class CcLogisticsShip {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * 物流装箱。
+         */
+        public static final String CC_LOGISTICS_PACK_IDS = "CC_LOGISTICS_PACK_IDS";
+        /**
          * 运单号。
          */
         public static final String CC_SHIP_NUM = "CC_SHIP_NUM";
@@ -645,6 +649,42 @@ public class CcLogisticsShip {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 物流装箱。
+     */
+    private String ccLogisticsPackIds;
+
+    /**
+     * 获取：物流装箱。
+     */
+    public String getCcLogisticsPackIds() {
+        return this.ccLogisticsPackIds;
+    }
+
+    /**
+     * 设置：物流装箱。
+     */
+    public CcLogisticsShip setCcLogisticsPackIds(String ccLogisticsPackIds) {
+        if (this.ccLogisticsPackIds == null && ccLogisticsPackIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccLogisticsPackIds != null && ccLogisticsPackIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccLogisticsPackIds.compareTo(ccLogisticsPackIds) != 0) {
+                this.ccLogisticsPackIds = ccLogisticsPackIds;
+                if (!this.toUpdateCols.contains("CC_LOGISTICS_PACK_IDS")) {
+                    this.toUpdateCols.add("CC_LOGISTICS_PACK_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccLogisticsPackIds = ccLogisticsPackIds;
+            if (!this.toUpdateCols.contains("CC_LOGISTICS_PACK_IDS")) {
+                this.toUpdateCols.add("CC_LOGISTICS_PACK_IDS");
             }
         }
         return this;
