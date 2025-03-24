@@ -192,6 +192,14 @@ public class CcLogisticsPack {
          * 产品最大件高。
          */
         public static final String CC_PRODUCT_MAX_HEIGHT = "CC_PRODUCT_MAX_HEIGHT";
+        /**
+         * 装箱数量。
+         */
+        public static final String CC_PACK_QTY = "CC_PACK_QTY";
+        /**
+         * 物流发货。
+         */
+        public static final String CC_LOGISTICS_SHIP_ID = "CC_LOGISTICS_SHIP_ID";
     }
 
     // </editor-fold>
@@ -1490,6 +1498,78 @@ public class CcLogisticsPack {
             this.ccProductMaxHeight = ccProductMaxHeight;
             if (!this.toUpdateCols.contains("CC_PRODUCT_MAX_HEIGHT")) {
                 this.toUpdateCols.add("CC_PRODUCT_MAX_HEIGHT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 装箱数量。
+     */
+    private Integer ccPackQty;
+
+    /**
+     * 获取：装箱数量。
+     */
+    public Integer getCcPackQty() {
+        return this.ccPackQty;
+    }
+
+    /**
+     * 设置：装箱数量。
+     */
+    public CcLogisticsPack setCcPackQty(Integer ccPackQty) {
+        if (this.ccPackQty == null && ccPackQty == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPackQty != null && ccPackQty != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPackQty.compareTo(ccPackQty) != 0) {
+                this.ccPackQty = ccPackQty;
+                if (!this.toUpdateCols.contains("CC_PACK_QTY")) {
+                    this.toUpdateCols.add("CC_PACK_QTY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPackQty = ccPackQty;
+            if (!this.toUpdateCols.contains("CC_PACK_QTY")) {
+                this.toUpdateCols.add("CC_PACK_QTY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 物流发货。
+     */
+    private String ccLogisticsShipId;
+
+    /**
+     * 获取：物流发货。
+     */
+    public String getCcLogisticsShipId() {
+        return this.ccLogisticsShipId;
+    }
+
+    /**
+     * 设置：物流发货。
+     */
+    public CcLogisticsPack setCcLogisticsShipId(String ccLogisticsShipId) {
+        if (this.ccLogisticsShipId == null && ccLogisticsShipId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccLogisticsShipId != null && ccLogisticsShipId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccLogisticsShipId.compareTo(ccLogisticsShipId) != 0) {
+                this.ccLogisticsShipId = ccLogisticsShipId;
+                if (!this.toUpdateCols.contains("CC_LOGISTICS_SHIP_ID")) {
+                    this.toUpdateCols.add("CC_LOGISTICS_SHIP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccLogisticsShipId = ccLogisticsShipId;
+            if (!this.toUpdateCols.contains("CC_LOGISTICS_SHIP_ID")) {
+                this.toUpdateCols.add("CC_LOGISTICS_SHIP_ID");
             }
         }
         return this;

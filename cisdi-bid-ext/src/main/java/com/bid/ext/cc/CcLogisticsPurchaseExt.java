@@ -11,6 +11,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -371,11 +372,11 @@ public class CcLogisticsPurchaseExt {
         ccLogisticsPack.setContactMobile(varMap.get("P_CONTACT_MOBILE").toString());
         ccLogisticsPack.setCcCarryTypeId(varMap.get("P_CC_CARRY_TYPE_ID").toString());
         ccLogisticsPack.setCcPackStatusId("PACKED");
+        ccLogisticsPack.setCcPackQty(Integer.valueOf(varMap.get("P_CC_REMAIN_QTY").toString()));
 
         CcLogisticsContract contract = CcLogisticsContract.selectById(logisticsContractId);
         ccLogisticsPack.setCcEquipmentNum(contract.getCcEquipmentNum());
         ccLogisticsPack.insertById();
-
 
         //更新零部件信息的数量
         //订单总数量是不变的，变化的只有装箱数量和剩余数量
@@ -395,5 +396,94 @@ public class CcLogisticsPurchaseExt {
         }else{
             return false;
         }
+    }
+
+    /**
+     * 新增物流发货
+     */
+    public void createLogisticsShip(){
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        //插入物流装箱数据
+        CcLogisticsShip ccLogisticsShip = CcLogisticsShip.newData();
+
+        //本批箱件总数
+        int num = entityRecordList.size();
+        float total = 0.0f;
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            total = total + Float.valueOf(valueMap.get("CC_PACKGING_WEIGHT").toString());
+
+            //更新装箱状态，将状态改成已发货
+            CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
+            ccLogisticsPack.setCcPackStatusId("SHIPPED");
+            ccLogisticsPack.setCcLogisticsShipId(ccLogisticsShip.getId());
+            ccLogisticsPack.updateById();
+        }
+
+
+        ccLogisticsShip.setTs(LocalDateTime.now());
+        ccLogisticsShip.setCrtDt(LocalDateTime.now());
+        ccLogisticsShip.setCrtUserId(userId);
+        ccLogisticsShip.setLastModiDt(LocalDateTime.now());
+        ccLogisticsShip.setLastModiUserId(userId);
+        ccLogisticsShip.setStatus("AP");
+        ccLogisticsShip.setCcShipNum(varMap.get("P_CC_SHIP_NUM").toString());
+        ccLogisticsShip.setCcShipperName(varMap.get("P_CC_SHIPPER_NAME").toString());
+        ccLogisticsShip.setCcShipperPhone(varMap.get("P_CC_SHIPPER_PHONE").toString());
+        ccLogisticsShip.setCcShipperPhone(varMap.get("P_CC_SHIPPER_PHONE").toString());
+        ccLogisticsShip.setCcLogisticsSendAddr(varMap.get("P_CC_LOGISTICS_SEND_ADDR").toString());
+        ccLogisticsShip.setCcLogisticsReceiveAddr(varMap.get("P_CC_LOGISTICS_RECEIVE_ADDR").toString());
+        ccLogisticsShip.setCcShipTypeId(varMap.get("P_CC_SHIP_TYPE_ID").toString());
+        //本批箱件总数
+        ccLogisticsShip.setCcPackageTotal(num);
+        ccLogisticsShip.setCcTotalWeight(BigDecimal.valueOf(total));
+        ccLogisticsShip.insertById();
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 新增报关信息
+     */
+    public void createLogisticsDeclare(){
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
+            ccLogisticsPack.setCcPackDate(LocalDate.parse(varMap.get("P_CC_PACK_DATE").toString()));
+            ccLogisticsPack.setCcExportDeclareDate(LocalDate.parse(varMap.get("P_CC_EXPORT_DECLARE_DATE").toString()));
+            ccLogisticsPack.setCcImportDeclareDate(LocalDate.parse(varMap.get("P_CC_IMPORT_DECLARE_DATE").toString()));
+            ccLogisticsPack.setCcShippingCycle(new BigDecimal(varMap.get("P_CC_SHIPPING_CYCLE").toString()));
+            ccLogisticsPack.updateById();
+        }
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 查看弹窗确认操作，不做任何处理
+     */
+    public void check(){
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 }
