@@ -117,6 +117,10 @@ public class CcLogisticsPack {
          */
         public static final String CONTACT_MOBILE = "CONTACT_MOBILE";
         /**
+         * 设备编号。
+         */
+        public static final String CC_EQUIPMENT_NUM = "CC_EQUIPMENT_NUM";
+        /**
          * 物流采购合同。
          */
         public static final String CC_LOGISTICS_CONTRACT_ID = "CC_LOGISTICS_CONTRACT_ID";
@@ -124,10 +128,6 @@ public class CcLogisticsPack {
          * 零部件信息。
          */
         public static final String CC_SPARE_PARTS_INFO_ID = "CC_SPARE_PARTS_INFO_ID";
-        /**
-         * 运输类型。
-         */
-        public static final String CC_SHIP_TYPE_ID = "CC_SHIP_TYPE_ID";
         /**
          * 包装形式。
          */
@@ -812,6 +812,42 @@ public class CcLogisticsPack {
     }
 
     /**
+     * 设备编号。
+     */
+    private String ccEquipmentNum;
+
+    /**
+     * 获取：设备编号。
+     */
+    public String getCcEquipmentNum() {
+        return this.ccEquipmentNum;
+    }
+
+    /**
+     * 设置：设备编号。
+     */
+    public CcLogisticsPack setCcEquipmentNum(String ccEquipmentNum) {
+        if (this.ccEquipmentNum == null && ccEquipmentNum == null) {
+            // 均为null，不做处理。
+        } else if (this.ccEquipmentNum != null && ccEquipmentNum != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccEquipmentNum.compareTo(ccEquipmentNum) != 0) {
+                this.ccEquipmentNum = ccEquipmentNum;
+                if (!this.toUpdateCols.contains("CC_EQUIPMENT_NUM")) {
+                    this.toUpdateCols.add("CC_EQUIPMENT_NUM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccEquipmentNum = ccEquipmentNum;
+            if (!this.toUpdateCols.contains("CC_EQUIPMENT_NUM")) {
+                this.toUpdateCols.add("CC_EQUIPMENT_NUM");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 物流采购合同。
      */
     private String ccLogisticsContractId;
@@ -878,42 +914,6 @@ public class CcLogisticsPack {
             this.ccSparePartsInfoId = ccSparePartsInfoId;
             if (!this.toUpdateCols.contains("CC_SPARE_PARTS_INFO_ID")) {
                 this.toUpdateCols.add("CC_SPARE_PARTS_INFO_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 运输类型。
-     */
-    private String ccShipTypeId;
-
-    /**
-     * 获取：运输类型。
-     */
-    public String getCcShipTypeId() {
-        return this.ccShipTypeId;
-    }
-
-    /**
-     * 设置：运输类型。
-     */
-    public CcLogisticsPack setCcShipTypeId(String ccShipTypeId) {
-        if (this.ccShipTypeId == null && ccShipTypeId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccShipTypeId != null && ccShipTypeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccShipTypeId.compareTo(ccShipTypeId) != 0) {
-                this.ccShipTypeId = ccShipTypeId;
-                if (!this.toUpdateCols.contains("CC_SHIP_TYPE_ID")) {
-                    this.toUpdateCols.add("CC_SHIP_TYPE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccShipTypeId = ccShipTypeId;
-            if (!this.toUpdateCols.contains("CC_SHIP_TYPE_ID")) {
-                this.toUpdateCols.add("CC_SHIP_TYPE_ID");
             }
         }
         return this;

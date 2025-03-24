@@ -331,4 +331,69 @@ public class CcLogisticsPurchaseExt {
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
+
+    /**
+     * 物流装箱数据新增后更新
+     */
+    public void createLogisticsPack(){
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        //插入物流装箱数据
+        CcLogisticsPack ccLogisticsPack = CcLogisticsPack.newData();
+        ccLogisticsPack.setTs(LocalDateTime.now());
+        ccLogisticsPack.setCrtDt(LocalDateTime.now());
+        ccLogisticsPack.setCrtUserId(userId);
+        ccLogisticsPack.setLastModiDt(LocalDateTime.now());
+        ccLogisticsPack.setLastModiUserId(userId);
+        ccLogisticsPack.setStatus("AP");
+        ccLogisticsPack.setName(JsonUtil.toJson(new Internationalization(null, varMap.get("P_NAME").toString(), null)));
+        //得到物流合同ID
+        String sparePartsInfoId = varMap.get("P_CC_SPARE_PARTS_INFO_ID").toString();
+        CcSparePartsInfo sparePartsInfo = CcSparePartsInfo.selectById(sparePartsInfoId);
+        String logisticsContractId = sparePartsInfo.getCcLogisticsContractId();
+        ccLogisticsPack.setCcLogisticsContractId(logisticsContractId);//物流合同ID
+        ccLogisticsPack.setCcSparePartsInfoId(sparePartsInfoId);//零部件信息ID
+        ccLogisticsPack.setCcPackagingTypeId(varMap.get("P_CC_PACKAGING_TYPE_ID").toString());
+        ccLogisticsPack.setCcPackNum(varMap.get("P_CC_PACK_NUM").toString());
+        ccLogisticsPack.setCcHaveEnclosedDocs(stringToBoolean(varMap.get("P_CC_HAVE_ENCLOSED_DOCS").toString()));
+        ccLogisticsPack.setCcHaveRepairParts(stringToBoolean(varMap.get("P_CC_HAVE_REPAIR_PARTS").toString()));
+        ccLogisticsPack.setCcHaveSpecialTools(stringToBoolean(varMap.get("P_CC_HAVE_SPECIAL_TOOLS").toString()));
+        ccLogisticsPack.setCcIsBreakUp(stringToBoolean(varMap.get("P_CC_IS_BREAK_UP").toString()));
+        ccLogisticsPack.setCcPackgingWeight(new BigDecimal(varMap.get("P_CC_PACKGING_WEIGHT").toString()));
+        ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_LENGTH").toString()));
+        ccLogisticsPack.setCcProductMaxWidth(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_WIDTH").toString()));
+        ccLogisticsPack.setCcProductMaxHeight(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_HEIGHT").toString()));
+        ccLogisticsPack.setContactName(varMap.get("P_CONTACT_NAME").toString());
+        ccLogisticsPack.setContactMobile(varMap.get("P_CONTACT_MOBILE").toString());
+        ccLogisticsPack.setCcCarryTypeId(varMap.get("P_CC_CARRY_TYPE_ID").toString());
+        ccLogisticsPack.setCcPackStatusId("PACKED");
+
+        CcLogisticsContract contract = CcLogisticsContract.selectById(logisticsContractId);
+        ccLogisticsPack.setCcEquipmentNum(contract.getCcEquipmentNum());
+        ccLogisticsPack.insertById();
+
+
+        //更新零部件信息的数量
+        //订单总数量是不变的，变化的只有装箱数量和剩余数量
+        sparePartsInfo.setCcPackQty(Integer.valueOf(varMap.get("P_CC_REMAIN_QTY").toString()));//可装箱数量
+        sparePartsInfo.setCcRemainQty(0);//剩余数量的值一直是0，只有在执行过程中，赋给其值
+        sparePartsInfo.updateById();
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    private boolean stringToBoolean(String var) {
+        if (var.equals("1")) {
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
