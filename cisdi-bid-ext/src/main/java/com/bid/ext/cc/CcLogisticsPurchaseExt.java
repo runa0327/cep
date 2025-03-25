@@ -405,6 +405,9 @@ public class CcLogisticsPurchaseExt {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+
+        //插入物流装箱数据
+        CcLogisticsShip ccLogisticsShip = CcLogisticsShip.newData();
         //本批箱件总数
         int num = entityRecordList.size();
         float total = 0.0f;
@@ -417,11 +420,9 @@ public class CcLogisticsPurchaseExt {
             CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
             ccLogisticsPack.setCcPackStatusId("SHIPPED");
             ccLogisticsPack.updateById();
-            ids.add(valueMap.get("ID").toString());
+            ids.add(valueMap.get("ID").toString());//后面用于新增发货装箱表的数据
         }
 
-        //插入物流装箱数据
-        CcLogisticsShip ccLogisticsShip = CcLogisticsShip.newData();
         ccLogisticsShip.setTs(LocalDateTime.now());
         ccLogisticsShip.setCrtDt(LocalDateTime.now());
         ccLogisticsShip.setCrtUserId(userId);
@@ -438,9 +439,22 @@ public class CcLogisticsPurchaseExt {
         //本批箱件总数
         ccLogisticsShip.setCcPackageTotal(num);
         ccLogisticsShip.setCcTotalWeight(BigDecimal.valueOf(total));
-        ccLogisticsShip.setCcLogisticsPackIds(String.join(",", ids));
+//        ccLogisticsShip.setCcLogisticsPackIds(String.join(",", ids));
         ccLogisticsShip.insertById();
 
+        for(String id : ids){
+            //插入发货装箱关系表
+            CcShipRelatePack ccShipRelatePack = CcShipRelatePack.newData();
+            ccShipRelatePack.setCcLogisticsPackId(id);
+            ccShipRelatePack.setCcLogisticsShipId(ccLogisticsShip.getId());
+            ccShipRelatePack.setTs(LocalDateTime.now());
+            ccShipRelatePack.setCrtDt(LocalDateTime.now());
+            ccShipRelatePack.setCrtUserId(userId);
+            ccShipRelatePack.setLastModiDt(LocalDateTime.now());
+            ccShipRelatePack.setLastModiUserId(userId);
+            ccShipRelatePack.setStatus("AP");
+            ccShipRelatePack.insertById();
+        }
         // 刷新页面
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
