@@ -146,6 +146,7 @@ public class Preview {
 
         // 解析返回结果并获取文件ID
         String responseBody = response.getBody();
+        log.info(responseBody);
         Map map = JsonUtil.fromJson(responseBody, Map.class);
         Map data = (Map) map.get("data");
         if (data == null || !data.containsKey("fileId")) {

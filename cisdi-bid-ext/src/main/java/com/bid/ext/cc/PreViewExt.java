@@ -139,11 +139,11 @@ public class PreViewExt {
             FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment());
             String filePath = flFile.getPhysicalLocation();
 //            filePath = "C:\\Users\\34451\\Desktop\\test.dwg";
-
+            String fileName = I18nUtil.tryGetInCurrentLang(flFile.getDspName());
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("filePath", filePath);
-            body.add("fileName", flFile.getDspName());
+            body.add("fileName", fileName);
             body.add("parentId", "10000848931873");
             body.add("modelFileId", modelFileId);
             body.add("token", token);
@@ -206,9 +206,10 @@ public class PreViewExt {
                         String filePath = flFile.getPhysicalLocation();
                         FileSystemResource fileSystemResource = new FileSystemResource(filePath);
 
+                        String fileName = I18nUtil.tryGetInCurrentLang(flFile.getDspName());
                         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
                         body.add("file", fileSystemResource);
-                        body.add("name", flFile.getDspName());
+                        body.add("name", fileName);
                         body.add("parentId", "10000848931873");
 
                         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
