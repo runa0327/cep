@@ -5,6 +5,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.bid.ext.model.*;
+import com.bid.ext.utils.JsonUtil;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Rectangle;
@@ -927,7 +928,9 @@ public class DrawingExt {
 
         for (String attachmentId : ccAttachmentList) {
             FlFile flFile = FlFile.selectById(attachmentId);
-            String dspName = flFile.getDspName(); // 获取文件名
+//            String dspName = flFile.getDspName(); // 获取文件名
+            String dspName = JsonUtil.getCN(flFile.getDspName()); // 获取文件名
+
             String name = flFile.getName();
             int index = dspName.indexOf('-');
 
@@ -937,6 +940,7 @@ public class DrawingExt {
             }
 
             String ccConstructionDrawingId = dspName.substring(0, index);//施工图套图号
+
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
             if (SharedUtil.isEmpty(ccDrawingManagement)) {
                 count4++;
