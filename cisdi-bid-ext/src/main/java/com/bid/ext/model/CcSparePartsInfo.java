@@ -147,6 +147,10 @@ public class CcSparePartsInfo {
          * 装箱数量。
          */
         public static final String CC_PACK_QTY = "CC_PACK_QTY";
+        /**
+         * 零部件数量。
+         */
+        public static final String CC_SPARE_PARTS_QTY = "CC_SPARE_PARTS_QTY";
     }
 
     // </editor-fold>
@@ -1049,6 +1053,42 @@ public class CcSparePartsInfo {
             this.ccPackQty = ccPackQty;
             if (!this.toUpdateCols.contains("CC_PACK_QTY")) {
                 this.toUpdateCols.add("CC_PACK_QTY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 零部件数量。
+     */
+    private Integer ccSparePartsQty;
+
+    /**
+     * 获取：零部件数量。
+     */
+    public Integer getCcSparePartsQty() {
+        return this.ccSparePartsQty;
+    }
+
+    /**
+     * 设置：零部件数量。
+     */
+    public CcSparePartsInfo setCcSparePartsQty(Integer ccSparePartsQty) {
+        if (this.ccSparePartsQty == null && ccSparePartsQty == null) {
+            // 均为null，不做处理。
+        } else if (this.ccSparePartsQty != null && ccSparePartsQty != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccSparePartsQty.compareTo(ccSparePartsQty) != 0) {
+                this.ccSparePartsQty = ccSparePartsQty;
+                if (!this.toUpdateCols.contains("CC_SPARE_PARTS_QTY")) {
+                    this.toUpdateCols.add("CC_SPARE_PARTS_QTY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccSparePartsQty = ccSparePartsQty;
+            if (!this.toUpdateCols.contains("CC_SPARE_PARTS_QTY")) {
+                this.toUpdateCols.add("CC_SPARE_PARTS_QTY");
             }
         }
         return this;

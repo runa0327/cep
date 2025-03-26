@@ -215,33 +215,48 @@ public class CcLogisticsPurchaseExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    public void updateSplitDataPre() throws Exception {
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            if(Integer.valueOf(valueMap.get("CC_REMAIN_QTY").toString()) <= 0){
+                throw new Exception("零部件已无可拆分数量");
+            }
+        }
+    }
+
     /**
      * 更新合同信息的拆分状态，只要是新增了零部件信息或者选择无需拆分，都默认是已拆分的行为
      */
-    public void updateSplitData() {
+    public void updateSplitData(){
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
 
+            //订单数量判断
             CcSparePartsInfo sparePartsInfo = CcSparePartsInfo.selectById(valueMap.get("ID").toString());
 
             CcLogisticsContract contract = CcLogisticsContract.selectById(valueMap.get("CC_LOGISTICS_CONTRACT_ID").toString());
 
             //零部件编号
             Where where = new Where();
-            where.eq("CC_LOGISTICS_CONTRACT_ID", valueMap.get("ID").toString());
+            where.eq("CC_LOGISTICS_CONTRACT_ID", valueMap.get("CC_LOGISTICS_CONTRACT_ID").toString());
             List<CcSparePartsInfo> ccSparePartsInfos = CcSparePartsInfo.selectByWhere(where);
-            int count = 0;
+            int count = 1;
             if(ccSparePartsInfos != null && ccSparePartsInfos.size() > 0){
-                count = ccSparePartsInfos.size() + 1;
-            }else{
-                count = count + 1;
+                count = ccSparePartsInfos.size();
             }
             String countStr = String.format("%04d", count);
             sparePartsInfo.setCcSparePartsNum(contract.getCcEquipmentNum() + '-' + countStr);//编号 = 合同设备编号 + 0001（根据拆分数量）
-            //剩余数量和装箱数量初始化
+            //剩余数量和装箱数量初始化（需整改）
             sparePartsInfo.setCcRemainQty(0);//默认剩余数量为0
-            sparePartsInfo.setCcPackQty(Integer.valueOf(sparePartsInfo.getCcOrderQty()));//默认装箱数量为拆分的数量
+            if(Integer.valueOf(valueMap.get("CC_REMAIN_QTY").toString()) > 0){
+                sparePartsInfo.setCcPackQty(Integer.valueOf(valueMap.get("CC_SPARE_PARTS_QTY").toString()));//默认装箱数量为拆分的数量
+            }else{
+                sparePartsInfo.setCcSparePartsQty(0);
+                sparePartsInfo.setCcPackQty(0);
+                sparePartsInfo.setCcTotalWeight(BigDecimal.valueOf(0));
+            }
 
             sparePartsInfo.updateById();
 

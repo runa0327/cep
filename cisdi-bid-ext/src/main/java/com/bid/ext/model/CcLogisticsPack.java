@@ -196,6 +196,10 @@ public class CcLogisticsPack {
          * 装箱数量。
          */
         public static final String CC_PACK_QTY = "CC_PACK_QTY";
+        /**
+         * 到货状态。
+         */
+        public static final String CC_ARRIVAL_STATUS_ID = "CC_ARRIVAL_STATUS_ID";
     }
 
     // </editor-fold>
@@ -1530,6 +1534,42 @@ public class CcLogisticsPack {
             this.ccPackQty = ccPackQty;
             if (!this.toUpdateCols.contains("CC_PACK_QTY")) {
                 this.toUpdateCols.add("CC_PACK_QTY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 到货状态。
+     */
+    private String ccArrivalStatusId;
+
+    /**
+     * 获取：到货状态。
+     */
+    public String getCcArrivalStatusId() {
+        return this.ccArrivalStatusId;
+    }
+
+    /**
+     * 设置：到货状态。
+     */
+    public CcLogisticsPack setCcArrivalStatusId(String ccArrivalStatusId) {
+        if (this.ccArrivalStatusId == null && ccArrivalStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccArrivalStatusId != null && ccArrivalStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccArrivalStatusId.compareTo(ccArrivalStatusId) != 0) {
+                this.ccArrivalStatusId = ccArrivalStatusId;
+                if (!this.toUpdateCols.contains("CC_ARRIVAL_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_ARRIVAL_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccArrivalStatusId = ccArrivalStatusId;
+            if (!this.toUpdateCols.contains("CC_ARRIVAL_STATUS_ID")) {
+                this.toUpdateCols.add("CC_ARRIVAL_STATUS_ID");
             }
         }
         return this;
