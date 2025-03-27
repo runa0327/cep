@@ -8,9 +8,11 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.sqlite.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -219,8 +221,10 @@ public class CcLogisticsPurchaseExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            if(Integer.valueOf(valueMap.get("CC_REMAIN_QTY").toString()) <= 0){
-                throw new Exception("零部件已无可拆分数量");
+            if (valueMap.get("CC_REMAIN_QTY") instanceof Integer) {
+                if(Integer.valueOf(valueMap.get("CC_REMAIN_QTY").toString()) <= 0){
+                    throw new Exception("零部件已无可拆分数量");
+                }
             }
         }
     }
@@ -248,6 +252,7 @@ public class CcLogisticsPurchaseExt {
             }
             String countStr = String.format("%04d", count);
             sparePartsInfo.setCcSparePartsNum(contract.getCcEquipmentNum() + '-' + countStr);//编号 = 合同设备编号 + 0001（根据拆分数量）
+            sparePartsInfo.setCcEquipmentNum(contract.getCcEquipmentNum());
             //剩余数量和装箱数量初始化（需整改）
             sparePartsInfo.setCcRemainQty(0);//默认剩余数量为0
             if(Integer.valueOf(valueMap.get("CC_REMAIN_QTY").toString()) > 0){
@@ -325,9 +330,12 @@ public class CcLogisticsPurchaseExt {
             }
             String countStr = String.format("%04d", count);
             sparePartsInfo.setCcSparePartsNum(contract.getCcEquipmentNum() + '-' + countStr);//编号 = 合同设备编号 + 0001（根据拆分数量）
+            //零部件的设备编号，与合同相同，区别于零部件自身的设备编号
+            sparePartsInfo.setCcEquipmentNum(contract.getCcEquipmentNum());
             //剩余数量和装箱数量初始化
             sparePartsInfo.setCcRemainQty(0);//默认剩余数量为0
             sparePartsInfo.setCcPackQty(Integer.valueOf(sparePartsInfo.getCcOrderQty()));//默认装箱数量为拆分的数量
+            sparePartsInfo.setCcSparePartsQty(Integer.valueOf(varMap.get("P_CC_ORDER_QTY").toString()));//零部件数量
             sparePartsInfo.insertById();
 
             //更新合同的拆分状态
@@ -364,12 +372,12 @@ public class CcLogisticsPurchaseExt {
         ccLogisticsPack.setLastModiUserId(userId);
         ccLogisticsPack.setStatus("AP");
         ccLogisticsPack.setName(JsonUtil.toJson(new Internationalization(null, varMap.get("P_NAME").toString(), null)));
-        //得到物流合同ID
-        String sparePartsInfoId = varMap.get("P_CC_SPARE_PARTS_INFO_ID").toString();
-        CcSparePartsInfo sparePartsInfo = CcSparePartsInfo.selectById(sparePartsInfoId);
-        String logisticsContractId = sparePartsInfo.getCcLogisticsContractId();
-        ccLogisticsPack.setCcLogisticsContractId(logisticsContractId);//物流合同ID
-        ccLogisticsPack.setCcSparePartsInfoId(sparePartsInfoId);//零部件信息ID
+
+
+//        CcSparePartsInfo sparePartsInfo = CcSparePartsInfo.selectById(sparePartsInfoId);
+//        String logisticsContractId = sparePartsInfo.getCcLogisticsContractId();
+//        ccLogisticsPack.setCcLogisticsContractId(logisticsContractId);//物流合同ID
+//        ccLogisticsPack.setCcSparePartsInfoId(sparePartsInfoId);//零部件信息ID
         ccLogisticsPack.setCcPackagingTypeId(varMap.get("P_CC_PACKAGING_TYPE_ID").toString());
         ccLogisticsPack.setCcPackNum(varMap.get("P_CC_PACK_NUM").toString());
         ccLogisticsPack.setCcHaveEnclosedDocs(stringToBoolean(varMap.get("P_CC_HAVE_ENCLOSED_DOCS").toString()));
@@ -384,17 +392,45 @@ public class CcLogisticsPurchaseExt {
         ccLogisticsPack.setContactMobile(varMap.get("P_CONTACT_MOBILE").toString());
         ccLogisticsPack.setCcCarryTypeId(varMap.get("P_CC_CARRY_TYPE_ID").toString());
         ccLogisticsPack.setCcPackStatusId("PACKED");
-        ccLogisticsPack.setCcPackQty(Integer.valueOf(varMap.get("P_CC_REMAIN_QTY").toString()));
+        //设备编号
+        String sparePartsInfoIds = varMap.get("P_CC_SPARE_PARTS_INFO_IDS").toString();//多个零部件信息
+        String[] sparePartsInfoIdsArr = sparePartsInfoIds.split(",");
+        ArrayList<String> sparePartsEquipmentNum = new ArrayList<String>();//设备编号
+        for(String sparePartsInfoId : sparePartsInfoIdsArr){
+            CcSparePartsInfo info = CcSparePartsInfo.selectById(sparePartsInfoId);
+            //去掉重复的设备编号
+            if(sparePartsEquipmentNum.contains(info.getCcEquipmentNum())){
+                continue;
+            }else{
+                sparePartsEquipmentNum.add(info.getCcEquipmentNum());
+            }
+        }
+        //ArrayList<String> 转成字符串
+        String sparePartsEquipmentNumStr = StringUtils.join(sparePartsEquipmentNum, ",");
+        ccLogisticsPack.setCcEquipmentNum(sparePartsEquipmentNumStr);
 
-        CcLogisticsContract contract = CcLogisticsContract.selectById(logisticsContractId);
-        ccLogisticsPack.setCcEquipmentNum(contract.getCcEquipmentNum());
+        //装箱中零部件的份量
+        ccLogisticsPack.setCcPackQty(sparePartsInfoIdsArr.length);
+
+//        CcLogisticsContract contract = CcLogisticsContract.selectById(logisticsContractId);
+//        ccLogisticsPack.setCcEquipmentNum(contract.getCcEquipmentNum());
         ccLogisticsPack.insertById();
+
+        //得到物流合同ID
+        for(String sparePartsInfoId : sparePartsInfoIdsArr){
+            CcPackRelateSpareParts info = CcPackRelateSpareParts.newData();
+            info.setCcSparePartsInfoId(sparePartsInfoId);
+            info.setCcLogisticsPackId(ccLogisticsPack.getId());
+            CcSparePartsInfo ccSparePartsInfo = CcSparePartsInfo.selectById(sparePartsInfoId);
+            info.setCcPackQty(ccSparePartsInfo.getCcSparePartsQty());
+            info.insertById();
+        }
 
         //更新零部件信息的数量
         //订单总数量是不变的，变化的只有装箱数量和剩余数量
-        sparePartsInfo.setCcPackQty(Integer.valueOf(varMap.get("P_CC_REMAIN_QTY").toString()));//可装箱数量
-        sparePartsInfo.setCcRemainQty(0);//剩余数量的值一直是0，只有在执行过程中，赋给其值
-        sparePartsInfo.updateById();
+//        sparePartsInfo.setCcPackQty(Integer.valueOf(varMap.get("P_CC_REMAIN_QTY").toString()));//可装箱数量
+//        sparePartsInfo.setCcRemainQty(0);//剩余数量的值一直是0，只有在执行过程中，赋给其值
+//        sparePartsInfo.updateById();
 
         // 刷新页面
         InvokeActResult invokeActResult = new InvokeActResult();
@@ -434,6 +470,8 @@ public class CcLogisticsPurchaseExt {
             //更新装箱状态，将状态改成已发货
             CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
             ccLogisticsPack.setCcPackStatusId("SHIPPED");
+            //到货状态初始化
+            ccLogisticsPack.setCcArrivalStatusId("NOT_ARRIVED");
             ccLogisticsPack.updateById();
             ids.add(valueMap.get("ID").toString());//后面用于新增发货装箱表的数据
         }
@@ -506,6 +544,51 @@ public class CcLogisticsPurchaseExt {
      * 查看弹窗确认操作，不做任何处理
      */
     public void check(){
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 到货登记——新增
+     */
+    public void createArrivalRecord(){
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcArrivalRecord arrivalRecord = CcArrivalRecord.newData();
+            arrivalRecord.setTs(LocalDateTime.now());
+            arrivalRecord.setCrtDt(LocalDateTime.now());
+            arrivalRecord.setCrtUserId(userId);
+            arrivalRecord.setLastModiDt(LocalDateTime.now());
+            arrivalRecord.setLastModiUserId(userId);
+            arrivalRecord.setStatus("AP");
+            arrivalRecord.setCcLogisticsPackId(valueMap.get("ID").toString());
+            arrivalRecord.setCcArrivalDate(LocalDate.parse(varMap.get("P_CC_ARRIVAL_DATE").toString()));
+            arrivalRecord.setCcAnomalyDescribe(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_ANOMALY_DESCRIBE").toString(), null)));
+            arrivalRecord.setCcReceiver(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_RECEIVER").toString(), null)));
+            arrivalRecord.setCcReceiveAndStoreOrg(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_RECEIVE_AND_STORE_ORG").toString(), null)));
+            arrivalRecord.setCcStackSite(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_STACK_SITE").toString(), null)));
+            arrivalRecord.setCcEquipmentAppearanceInspection(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_EQUIPMENT_APPEARANCE_INSPECTION").toString(), null)));
+            arrivalRecord.setCcArrivalRecordStatusId(varMap.get("P_CC_ARRIVAL_RECORD_STATUS_ID").toString());
+            arrivalRecord.setCcArrivalNum(varMap.get("P_CC_ARRIVAL_NUM").toString());
+            arrivalRecord.insertById();
+
+            //装箱到货状态更新
+            CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
+            ccLogisticsPack.setCcArrivalStatusId("HAVE_ARRIVED");
+            ccLogisticsPack.updateById();
+        }
 
         // 刷新页面
         InvokeActResult invokeActResult = new InvokeActResult();
