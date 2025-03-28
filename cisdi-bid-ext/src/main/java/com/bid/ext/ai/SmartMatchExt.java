@@ -1,5 +1,6 @@
 package com.bid.ext.ai;
 
+import com.bid.ext.utils.ApiExtCommon;
 import com.bid.ext.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -13,6 +14,7 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class SmartMatchExt {
@@ -129,7 +132,7 @@ public class SmartMatchExt {
             String body = response.getBody();
             showAIresults(body);
         } catch (RestClientException e) {
-            Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
+            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
                     .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
                     .set("CC_QS_ISSUE_POINT_IDS", null)
                     .set("REMARK", "未解析到质安要点")
@@ -149,14 +152,15 @@ public class SmartMatchExt {
         Map<String, String> jsonMap = null;
         try {
             jsonMap = objectMapper.readValue(
-                    body, new TypeReference<Map<String, String>>() {}
+                    body, new TypeReference<Map<String, String>>() {
+                    }
             );
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
         if (!jsonMap.containsKey("result")) {
-            Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
+            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
                     .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
                     .set("CC_QS_ISSUE_POINT_IDS", null)
                     .set("REMARK", "服务器繁忙，请稍后尝试")
@@ -188,41 +192,41 @@ public class SmartMatchExt {
         String score = id2AndScore[1].trim(); // 0.95
 
         BigDecimal target = new BigDecimal("0.6");
-        log.info("相关度:"+score);
+        log.info("相关度:" + score);
         BigDecimal scoreValue = new BigDecimal(score);
         if (scoreValue.compareTo(target) < 0) {
-            Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
+            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
                     .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
                     .set("CC_QS_ISSUE_POINT_IDS", null)
                     .set("REMARK", "未解析到质安要点")
                     .exec();
-            return ;
+            return;
         }
 
-        log.info("分类ID:"+idParts[0]);
-        log.info("质安要点ID:"+id2AndScore[0]);
+        log.info("分类ID:" + idParts[0]);
+        log.info("质安要点ID:" + id2AndScore[0]);
 
-        try{
+        try {
             // 更新数据库
-            Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
-                    .set("CC_QS_ISSUE_POINT_TYPE_ID",idParts[0].trim())
-                    .set("CC_QS_ISSUE_POINT_IDS",id2AndScore[0].trim())
+            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
+                    .set("CC_QS_ISSUE_POINT_TYPE_ID", idParts[0].trim())
+                    .set("CC_QS_ISSUE_POINT_IDS", id2AndScore[0].trim())
                     .exec();
-        }
-        catch (Exception e){
-            Crud.from("CC_QS_INSPECTION").where().eq("ID",csCommId).update()
-                    .set("CC_QS_ISSUE_POINT_TYPE_ID","1898918297618862080")
-                    .set("CC_QS_ISSUE_POINT_IDS","1898918371174371328")
+        } catch (Exception e) {
+            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
+                    .set("CC_QS_ISSUE_POINT_TYPE_ID", "1898918297618862080")
+                    .set("CC_QS_ISSUE_POINT_IDS", "1898918371174371328")
                     .exec();
             e.printStackTrace();
         }
 
     }
 
-    public void smartDA(){
+    public void smartDA() {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.urlToOpenList = new ArrayList<>();
         UrlToOpen urlToOpen = new UrlToOpen();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
         String sessionId = ExtJarHelper.getLoginInfo().sessionId;
         String userName = ExtJarHelper.getLoginInfo().userInfo.name;
@@ -242,7 +246,7 @@ public class SmartMatchExt {
         headers1.add("qygly-session-id", sessionId);
         // 设置请求参数
         Map<String, Object> requestBody1 = new HashMap<>();
-        
+
         requestBody1.put("getPaginationInfo", true);
         requestBody1.put("getEditableMandatoryForAtt", true);
         requestBody1.put("getDeletableForEr", true);
@@ -259,7 +263,7 @@ public class SmartMatchExt {
         // 创建HttpEntity，包含请求头和请求体
         HttpEntity<Map<String, Object>> requestEntity1 = new HttpEntity<>(requestBody1, headers1);
         // 发送POST请求
-        String url = "http://8.137.116.250/qygly-gateway/qygly-data/fetchData";
+        String url = "https://ceecip.com/qygly-gateway/qygly-data/fetchData";
         ResponseEntity<Map> mapResponseEntity = restTemplate.postForEntity(url, requestEntity1, Map.class);
         Map<String, Object> responseBody1 = mapResponseEntity.getBody();
 
@@ -279,8 +283,44 @@ public class SmartMatchExt {
             }
         }
 
+        // 修改key 为中文
+        String heardSql = "SELECT b.code,  a.ATT_NAME,b.name from AD_SINGLE_ENT_VIEW_ATT a  left join ad_att b on b.id = a.AD_ATT_ID where a.AD_SINGLE_ENT_VIEW_ID = ?";
+        List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(heardSql, servId);
+
+        // 创建目标Map结构
+        Map<String, String> resultMap = new LinkedHashMap<>();
+
+        for (Map<String, Object> row : queryForList) {
+            // 获取code作为key（确保非空）
+            String code = row.get("code").toString();
+            Object attNameObj = row.get("ATT_NAME");
+            Object nameObj = row.get("name");
+
+            // 优先使用ATT_NAME，为空则使用name
+            String jsonValue = "";
+            if (attNameObj != null) {
+                jsonValue = attNameObj.toString();
+            } else if (nameObj != null) {
+                jsonValue = nameObj.toString();
+            }
+
+            // 获取中文值（处理null情况）
+            String cnValue = JsonUtil.getCN(jsonValue);
+            resultMap.put(code, cnValue != null ? cnValue : "其他");
+        }
+
         List<List<String>> table = new ArrayList<>();
-        table.add(new ArrayList<>(tableHeaders));
+        //  table.add(new ArrayList<>(tableHeaders));
+        // 转换表头为中文
+        List<String> translatedHeaders = tableHeaders.stream()
+                .map(code -> {
+                    String cnName = resultMap.get(code);
+                    return cnName != null ? cnName : "未知字段(" + code + ")";
+                })
+                .collect(Collectors.toList());
+
+        // 添加转换后的表头到表格
+        table.add(new ArrayList<>(translatedHeaders));
 
         // 填充数据
         for (Map<String, Object> entityRecord : entityRecordList) {
@@ -299,7 +339,7 @@ public class SmartMatchExt {
             tableData.append(String.join("&&", row)).append("\n");
         }
 
-        tableData.insert(0,"请记住以下表格数据（格式：列名用&&分隔，数据行按一定顺序排列，每一行用换行符分割），第一行是表头，后续问题将基于此表格回答。表格数据如下：");
+        tableData.insert(0, "请记住以下表格数据（格式：列名用&&分隔，数据行按一定顺序排列，每一行用换行符分割），第一行是表头，后续问题将基于此表格回答。表格数据如下：");
         tableData.append("\n请确认已理解表格结构，并存储为可查询的知识库。后续问题将涉及筛选、统计或提取特定条件下的条目");
 
         // 设置请求头
@@ -342,10 +382,54 @@ public class SmartMatchExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    // 获取AI助手信息
+    public void getAIAssistInfo() {
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String agentJson = ApiExtCommon.getJson();
+        Map agentMap = JsonUtil.fromJson(agentJson, Map.class);
+        String CODE = (String) agentMap.get("code");
+
+        StringBuilder agentSql = new StringBuilder("select c.CODE, c.NAME, c.REMARK, f.ORIGIN_FILE_PHYSICAL_LOCATION from CC_ASSIST_INFO c left join fl_file f on c.CC_ATTACHMENT = f.id where 1 = 1 ");
+        if (StringUtils.hasText(CODE)) {
+            agentSql.append(" AND c.CODE = '").append(CODE).append("'");
+        }
+
+        List<Map<String, Object>> agentList = myJdbcTemplate.queryForList(agentSql.toString());
+
+        List<AgentInfo> res = new ArrayList<>();
+        for (Map<String, Object> agentListMap : agentList) {
+
+            AgentInfo myAgent = new AgentInfo();
+            myAgent.setCode(JdbcMapUtil.getString(agentListMap, "CODE"));
+            myAgent.setName(JsonUtil.getCN(JdbcMapUtil.getString(agentListMap, "NAME")));
+            myAgent.setRemark(JdbcMapUtil.getString(agentListMap, "REMARK"));
+            myAgent.setPhoto(JdbcMapUtil.getString(agentListMap, "ORIGIN_FILE_PHYSICAL_LOCATION"));
+
+            res.add(myAgent);
+        }
+
+        HashMap<String, Object> map1 = new HashMap<>();
+        map1.put("result", res);
+        map1.put("total", res.size());
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
+        ExtJarHelper.setReturnValue(outputMap);
+
+    }
+
     public class AnalysisResult {
         private String status;
         private Object result;
         // getters/setters
+    }
+
+    @Data
+    public class AgentInfo {
+        private  String code;
+        private String name;
+        private String remark;
+        private String photo;
+
     }
 
 
