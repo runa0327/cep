@@ -587,6 +587,51 @@ public class CcLogisticsPurchaseExt {
             //装箱到货状态更新
             CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
             ccLogisticsPack.setCcArrivalStatusId("HAVE_ARRIVED");
+            //开箱验收状态初始化
+            ccLogisticsPack.setCcUnpackingInspectionStatusId("UNINSPECTED");
+            ccLogisticsPack.updateById();
+        }
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 开箱验收新增
+     */
+    public void createUnpackingInspection(){
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcUnpackingInspection ccUnpackingInspection = CcUnpackingInspection.newData();
+            ccUnpackingInspection.setTs(LocalDateTime.now());
+            ccUnpackingInspection.setCrtDt(LocalDateTime.now());
+            ccUnpackingInspection.setCrtUserId(userId);
+            ccUnpackingInspection.setLastModiDt(LocalDateTime.now());
+            ccUnpackingInspection.setLastModiUserId(userId);
+            ccUnpackingInspection.setStatus("AP");
+            ccUnpackingInspection.setCcLogisticsPackId(valueMap.get("ID").toString());
+            ccUnpackingInspection.setCcUnpackingDate(LocalDate.parse(varMap.get("P_CC_UNPACKING_DATE").toString()));
+            ccUnpackingInspection.setCcAnomalyDescribe(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_ANOMALY_DESCRIBE").toString(), null)));
+            ccUnpackingInspection.setCcInvolvedPerson(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_INVOLVED_PERSON").toString(), null)));
+            ccUnpackingInspection.setCcInvolvedOrg(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_INVOLVED_ORG").toString(), null)));
+            ccUnpackingInspection.setCcUnpackingSite(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_UNPACKING_SITE").toString(), null)));
+            ccUnpackingInspection.setCcUnpackingNum(varMap.get("P_CC_UNPACKING_NUM").toString());
+            ccUnpackingInspection.insertById();
+
+            //装箱验收状态更新
+            CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
+            ccLogisticsPack.setCcUnpackingInspectionStatusId("INSPECTED");
             ccLogisticsPack.updateById();
         }
 
