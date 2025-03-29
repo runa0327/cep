@@ -189,7 +189,7 @@ public class SmartMatchExt {
 
         // 分割第二部分
         String[] id2AndScore = idParts[1].split(":", 2);
-        String score = id2AndScore[1].trim(); // 0.95
+        String score = id2AndScore[1].trim().replaceAll("[^0-9.]", ""); // 0.95
 
         BigDecimal target = new BigDecimal("0.6");
         log.info("相关度:" + score);
@@ -209,8 +209,8 @@ public class SmartMatchExt {
         try {
             // 更新数据库
             Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
-                    .set("CC_QS_ISSUE_POINT_TYPE_ID", idParts[0].trim())
-                    .set("CC_QS_ISSUE_POINT_IDS", id2AndScore[0].trim())
+                    .set("CC_QS_ISSUE_POINT_TYPE_ID", idParts[0].trim().replaceAll("[^0-9.]", ""))
+                    .set("CC_QS_ISSUE_POINT_IDS", id2AndScore[0].trim().replaceAll("[^0-9.]", ""))
                     .exec();
         } catch (Exception e) {
             Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
@@ -264,6 +264,7 @@ public class SmartMatchExt {
         HttpEntity<Map<String, Object>> requestEntity1 = new HttpEntity<>(requestBody1, headers1);
         // 发送POST请求
         String url = "https://ceecip.com/qygly-gateway/qygly-data/fetchData";
+//        String url = "http://127.0.0.1/qygly-gateway/qygly-data/fetchData";
         ResponseEntity<Map> mapResponseEntity = restTemplate.postForEntity(url, requestEntity1, Map.class);
         Map<String, Object> responseBody1 = mapResponseEntity.getBody();
 
