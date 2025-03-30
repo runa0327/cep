@@ -8,7 +8,7 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.sqlite.util.StringUtils;
+import org.apache.tomcat.util.buf.StringUtils;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -271,9 +271,10 @@ public class CcLogisticsPurchaseExt {
                 // 判断拆分状态是否已经更新过，更新过就不必在更新
                 String latestSplitStatus = contract.getCcSplitStatusId();// 数据库中的拆分状态
                 if (latestSplitStatus != null && latestSplitStatus.equals(status)) {
-                    continue;
+                    //不做处理
+                }else{
+                    contract.setCcSplitStatusId(status);
                 }
-                contract.setCcSplitStatusId(status);
             }
             contract.updateById();
         }
@@ -406,7 +407,7 @@ public class CcLogisticsPurchaseExt {
             }
         }
         //ArrayList<String> 转成字符串
-        String sparePartsEquipmentNumStr = StringUtils.join(sparePartsEquipmentNum, ",");
+        String sparePartsEquipmentNumStr = StringUtils.join(sparePartsEquipmentNum, ',');
         ccLogisticsPack.setCcEquipmentNum(sparePartsEquipmentNumStr);
 
         //装箱中零部件的份量
