@@ -204,6 +204,10 @@ public class CcLogisticsPack {
          * 开箱验收状态。
          */
         public static final String CC_UNPACKING_INSPECTION_STATUS_ID = "CC_UNPACKING_INSPECTION_STATUS_ID";
+        /**
+         * 移交状态。
+         */
+        public static final String CC_HAND_OVER_STATUS_ID = "CC_HAND_OVER_STATUS_ID";
     }
 
     // </editor-fold>
@@ -1610,6 +1614,42 @@ public class CcLogisticsPack {
             this.ccUnpackingInspectionStatusId = ccUnpackingInspectionStatusId;
             if (!this.toUpdateCols.contains("CC_UNPACKING_INSPECTION_STATUS_ID")) {
                 this.toUpdateCols.add("CC_UNPACKING_INSPECTION_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 移交状态。
+     */
+    private String ccHandOverStatusId;
+
+    /**
+     * 获取：移交状态。
+     */
+    public String getCcHandOverStatusId() {
+        return this.ccHandOverStatusId;
+    }
+
+    /**
+     * 设置：移交状态。
+     */
+    public CcLogisticsPack setCcHandOverStatusId(String ccHandOverStatusId) {
+        if (this.ccHandOverStatusId == null && ccHandOverStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccHandOverStatusId != null && ccHandOverStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccHandOverStatusId.compareTo(ccHandOverStatusId) != 0) {
+                this.ccHandOverStatusId = ccHandOverStatusId;
+                if (!this.toUpdateCols.contains("CC_HAND_OVER_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_HAND_OVER_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccHandOverStatusId = ccHandOverStatusId;
+            if (!this.toUpdateCols.contains("CC_HAND_OVER_STATUS_ID")) {
+                this.toUpdateCols.add("CC_HAND_OVER_STATUS_ID");
             }
         }
         return this;

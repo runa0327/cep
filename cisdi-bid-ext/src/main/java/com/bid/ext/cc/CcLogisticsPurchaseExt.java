@@ -632,6 +632,50 @@ public class CcLogisticsPurchaseExt {
             //装箱验收状态更新
             CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
             ccLogisticsPack.setCcUnpackingInspectionStatusId("INSPECTED");
+            //初始化移交状态
+            ccLogisticsPack.setCcHandOverStatusId("UNHANDED_OVER");//未移交
+            ccLogisticsPack.updateById();
+        }
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 开箱验收新增
+     */
+    public void createHandOverReg(){
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            CcHandOverReg ccHandOverReg = CcHandOverReg.newData();
+            ccHandOverReg.setTs(LocalDateTime.now());
+            ccHandOverReg.setCrtDt(LocalDateTime.now());
+            ccHandOverReg.setCrtUserId(userId);
+            ccHandOverReg.setLastModiDt(LocalDateTime.now());
+            ccHandOverReg.setLastModiUserId(userId);
+            ccHandOverReg.setStatus("AP");
+            ccHandOverReg.setCcLogisticsPackId(valueMap.get("ID").toString());
+            ccHandOverReg.setCcHandOverDate(LocalDate.parse(varMap.get("P_CC_HAND_OVER_DATE").toString()));
+            ccHandOverReg.setCcHandOverWayId(varMap.get("P_CC_HAND_OVER_WAY_ID").toString());
+            ccHandOverReg.setCcInspectionOpinion(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_INSPECTION_OPINION").toString(), null)));
+            ccHandOverReg.setCcHandOverReceiver(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_HAND_OVER_RECEIVER").toString(), null)));
+            ccHandOverReg.setCcHandOverOrg(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_HAND_OVER_ORG").toString(), null)));
+            ccHandOverReg.insertById();
+
+            //装箱移交状态更新
+            CcLogisticsPack ccLogisticsPack = CcLogisticsPack.selectById(valueMap.get("ID").toString());
+            ccLogisticsPack.setCcHandOverStatusId("HANDED_OVER");
             ccLogisticsPack.updateById();
         }
 
