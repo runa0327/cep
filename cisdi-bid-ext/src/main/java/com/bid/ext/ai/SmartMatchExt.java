@@ -1,5 +1,6 @@
 package com.bid.ext.ai;
 
+import ch.qos.logback.core.joran.conditional.ElseAction;
 import com.bid.ext.utils.ApiExtCommon;
 import com.bid.ext.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,18 +11,22 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.ext.UrlToOpen;
-import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,11 +34,18 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SmartMatchExt {
 
+    private static String API_KEY_F = "app-FQemEEe1MIuc7jsmR1rjS5SS"; // 模糊查询助手
+    private static String API_KEY_A = "app-GSWig6ReLvfwihTemtUhXLaw"; // 智能分析助手
+    private static String BASE_URL = "http://119.84.70.174";
+    private static String PLATFORM_URL = "http://8.137.116.250/qygly-gateway";
+//    private static String PLATFORM_URL = "https://ceecip.com/qygly-gateway";
+
     public void fuzzymatch() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         Map<String, Object> valueMap = entityRecordList.get(0).valueMap;
-
+        String userName = ExtJarHelper.getLoginInfo().userInfo.name;
+        userName = JsonUtil.getCN(userName);
 
         String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
 //        String ccPrjId = "1790672761571196928";
@@ -88,7 +100,7 @@ public class SmartMatchExt {
         try {
             String result = String.join("\n", combinePointList);
 //            log.info(result);
-            postAIPaas(result, remark);
+            postAIPaas(result, remark, userName);
 
             // 输出示例: {"data":["1-10:分类-要点"]}
         } catch (Exception e) {
@@ -105,31 +117,41 @@ public class SmartMatchExt {
         return ccPrjTypeId;
     }
 
-    public void postAIPaas(String data, String scenario) {
+    public void postAIPaas(String data, String scenario, String user) {
 
         log.info("调用大模型");
         String csCommId = ExtJarHelper.getEntityRecordList().get(0).csCommId;
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
 
-        // 目标URL
-        String url = "http://8.137.116.250:5000/analyze";
-
+//        // 目标URL
+//        String url = "http://8.137.116.250:5000/analyze";
+//
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        Map<String, Object> requestBody = new HashMap<>();
+//        requestBody.put("data", data);    // 请替换为实际的data变量
+//        requestBody.put("scenario", scenario); // 请替换为实际的scenario变量
 
+        String url = BASE_URL + "/v1/chat-messages";
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("data", data);    // 请替换为实际的data变量
-        requestBody.put("scenario", scenario); // 请替换为实际的scenario变量
+        headers.setBearerAuth(API_KEY_F);
+        requestBody.put("data", data);
+        requestBody.put("inputs", Collections.emptyMap());
+        requestBody.put("query", "场景:" + data + "\n" + "要点:" + scenario);
+        requestBody.put("response_mode", "blocking");
+        requestBody.put("conversation_id", "");
+        requestBody.put("user", user);
 
         // 封装请求实体
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         // 发送POST请求并获取响应
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
-            System.out.println("响应状态码: " + response.getStatusCode());
-            String body = response.getBody();
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, requestEntity, Map.class);
+            log.info("响应状态码: " + response.getStatusCode());
+            Map<String, Object>  body = response.getBody();
             showAIresults(body);
         } catch (RestClientException e) {
             Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
@@ -144,79 +166,90 @@ public class SmartMatchExt {
 
     }
 
-    private void showAIresults(String body) {
+    private void showAIresults(Map<String, Object>  responseBody) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String csCommId = ExtJarHelper.getEntityRecordList().get(0).csCommId;
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, String> jsonMap = null;
         try {
-            jsonMap = objectMapper.readValue(
-                    body, new TypeReference<Map<String, String>>() {
-                    }
-            );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+            if (responseBody == null) {
+                throw new IllegalArgumentException("响应体为空");
+            }
 
-        if (!jsonMap.containsKey("result")) {
-            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
-                    .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
-                    .set("CC_QS_ISSUE_POINT_IDS", null)
-                    .set("REMARK", "服务器繁忙，请稍后尝试")
-                    .exec();
-            throw new BaseException("服务器繁忙，请稍后尝试");
-        }
+            // 提取 answer 字段
+            Object answerObj = responseBody.get("answer");
+            if (answerObj == null) {
+                throw new IllegalArgumentException("answer 字段不存在");
+            }
+            if (!(answerObj instanceof String)) {
+                throw new IllegalArgumentException("answer 不是字符串类型");
+            }
+            String answer = (String) answerObj;
 
-//        String resultValue = jsonMap.get("result");
-//        String[] entries = resultValue.split("\n");
-//
-//        String firstEntry = entries[0].trim();
-//
-//        String content = firstEntry.substring(1, firstEntry.length() - 1);
-//        String[] idParts = content.split("&&", 2);
-//
-//        String[] id2AndScore = idParts[1].split(":", 2);
-//
-//        String score = id2AndScore[1];
+            // 分割条目并验证格式
+            String[] entries = answer.split("\n");
+            if (entries.length == 0) {
+                throw new IllegalArgumentException("answer 中没有有效条目");
+            }
+            String firstEntry = entries[0].trim();
 
-        String resultValue = jsonMap.get("result");
-        String[] entries = resultValue.split("\n");
-        String firstEntry = entries[0].trim();
+            // 提取方括号内的内容
+            if (!firstEntry.startsWith("[") || !firstEntry.endsWith("]")) {
+                throw new IllegalArgumentException("条目格式无效，缺少方括号");
+            }
+            String content = firstEntry.substring(1, firstEntry.length() - 1);
 
-        // 直接分割&&而不需要substring
-        String[] idParts = firstEntry.split("&&", 2);
+            // 分割 typeId 和 pointId
+            String[] parts = content.split("&&");
+            if (parts.length < 2) {
+                throw new IllegalArgumentException("条目缺少分隔符 '&&'");
+            }
+            String typeId = parts[0];
 
-        // 分割第二部分
-        String[] id2AndScore = idParts[1].split(":", 2);
-        String score = id2AndScore[1].trim().replaceAll("[^0-9.]", ""); // 0.95
+            // 处理可能的分数部分（如 :0.85）
+            String[] pointParts = parts[1].split(":");
+            if (pointParts.length == 0) {
+                throw new IllegalArgumentException("pointId 部分格式错误");
+            }
+            String pointId = pointParts[0];
+            String score = pointParts[1];
 
-        BigDecimal target = new BigDecimal("0.6");
-        log.info("相关度:" + score);
-        BigDecimal scoreValue = new BigDecimal(score);
-        if (scoreValue.compareTo(target) < 0) {
-            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
-                    .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
-                    .set("CC_QS_ISSUE_POINT_IDS", null)
-                    .set("REMARK", "未解析到质安要点")
-                    .exec();
-            return;
-        }
+            // 返回结果（此处仅打印示例）
+            log.info("typeId: " + typeId);
+            log.info("pointId: " + pointId);
+            log.info("score: " + score);
 
-        log.info("分类ID:" + idParts[0]);
-        log.info("质安要点ID:" + id2AndScore[0]);
+            BigDecimal target = new BigDecimal("0.6");
+            BigDecimal scoreValue = new BigDecimal(score);
+            if (scoreValue.compareTo(target) < 0) {
+                Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
+                        .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
+                        .set("CC_QS_ISSUE_POINT_IDS", null)
+                        .set("REMARK", "未解析到质安要点")
+                        .exec();
+            }else {
+                Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
+                        .set("CC_QS_ISSUE_POINT_TYPE_ID", typeId)
+                        .set("CC_QS_ISSUE_POINT_IDS", pointId)
+                        .exec();
+            }
 
-        try {
-            // 更新数据库
-            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
-                    .set("CC_QS_ISSUE_POINT_TYPE_ID", idParts[0].trim().replaceAll("[^0-9.]", ""))
-                    .set("CC_QS_ISSUE_POINT_IDS", id2AndScore[0].trim().replaceAll("[^0-9.]", ""))
-                    .exec();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            // 捕获已知异常并处理
             Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
                     .set("CC_QS_ISSUE_POINT_TYPE_ID", "1898918297618862080")
                     .set("CC_QS_ISSUE_POINT_IDS", "1898918371174371328")
+                    .set("REMARK", "解析失败")
                     .exec();
+            System.err.println("解析失败: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            // 处理其他未知异常
+            Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
+                    .set("CC_QS_ISSUE_POINT_TYPE_ID", "1898918297618862080")
+                    .set("CC_QS_ISSUE_POINT_IDS", "1898918371174371328")
+                    .set("REMARK", "服务端异常")
+                    .exec();
+            System.err.println("发生未知错误: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -226,7 +259,6 @@ public class SmartMatchExt {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.urlToOpenList = new ArrayList<>();
         UrlToOpen urlToOpen = new UrlToOpen();
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
         String sessionId = ExtJarHelper.getLoginInfo().sessionId;
         String userName = ExtJarHelper.getLoginInfo().userInfo.name;
@@ -234,136 +266,142 @@ public class SmartMatchExt {
         String servId = ExtJarHelper.getSevInfo().id;
 
         // 创建RestTemplate实例
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
 
-        // 在请求头里加 qygly-session-id，值为F20ADF4165D6A728DBA02327B5836DA9
-        // 发起post请求，地址为http://8.137.116.250/qygly-data/fetchData
-        // 请求参数如下
-        // sevId: 1864839743462830080
-        // pageSize: 999999999
-        // 设置请求头
         HttpHeaders headers1 = new HttpHeaders();
+        headers1.setContentType(MediaType.APPLICATION_JSON);
         headers1.add("qygly-session-id", sessionId);
         // 设置请求参数
         Map<String, Object> requestBody1 = new HashMap<>();
 
-        requestBody1.put("getPaginationInfo", true);
-        requestBody1.put("getEditableMandatoryForAtt", true);
-        requestBody1.put("getDeletableForEr", true);
-        requestBody1.put("getColor", true);
-        requestBody1.put("getDot", true);
-        requestBody1.put("getDisabledNav", true);
-        requestBody1.put("getSelectAwareAct", true);
-        requestBody1.put("getFileInfo", true);
-        requestBody1.put("getOrderBy", true);
-        requestBody1.put("getText", true);
+        // 设置请求头
+        requestBody1.put("sevId", servId);    // 请替换为实际的data变量
 
-        requestBody1.put("sevId", servId);
-        requestBody1.put("pageSize", 999999999);
-        // 创建HttpEntity，包含请求头和请求体
+        // 封装请求实体
         HttpEntity<Map<String, Object>> requestEntity1 = new HttpEntity<>(requestBody1, headers1);
+
         // 发送POST请求
-        String url = "https://ceecip.com/qygly-gateway/qygly-data/fetchData";
-//        String url = "http://127.0.0.1/qygly-gateway/qygly-data/fetchData";
+        String url = PLATFORM_URL + "/qygly-data/exportAsExcel";
         ResponseEntity<Map> mapResponseEntity = restTemplate.postForEntity(url, requestEntity1, Map.class);
-        Map<String, Object> responseBody1 = mapResponseEntity.getBody();
 
-        List<Map<String, Object>> entityRecordList = (List<Map<String, Object>>)
-                (((Map<String, Object>) responseBody1.get("result")).get("entityRecordList"));
-
-        // 获取所有的key作为表头，并排除指定的键
-        Set<String> tableHeaders = new LinkedHashSet<>();
-        Set<String> excludedKeys = new HashSet<>(Arrays.asList("ID", "VER", "TS", "CRT_DT", "CRT_USER_ID", "LAST_MODI_DT", "LAST_MODI_USER_ID", "STATUS", "LK_WF_INST_ID"));
-
-        for (Map<String, Object> entityRecord : entityRecordList) {
-            Map<String, Object> textMap = (Map<String, Object>) entityRecord.get("textMap");
-            for (String key : textMap.keySet()) {
-                if (!excludedKeys.contains(key)) {
-                    tableHeaders.add(key);
-                }
-            }
+        String excelId = "";
+        if (mapResponseEntity.getStatusCode() == HttpStatus.OK && mapResponseEntity.getBody() != null) {
+            Map<String, Object> responseBody = mapResponseEntity.getBody();
+            excelId = (String) responseBody.get("result");
+        } else {
+            log.info("请求失败，状态码: " + mapResponseEntity.getStatusCode());
         }
 
-        // 修改key 为中文
-        String heardSql = "SELECT b.code,  a.ATT_NAME,b.name from AD_SINGLE_ENT_VIEW_ATT a  left join ad_att b on b.id = a.AD_ATT_ID where a.AD_SINGLE_ENT_VIEW_ID = ?";
-        List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(heardSql, servId);
+        byte[] fileBytes = downloadFile(excelId, sessionId);
 
-        // 创建目标Map结构
-        Map<String, String> resultMap = new LinkedHashMap<>();
-
-        for (Map<String, Object> row : queryForList) {
-            // 获取code作为key（确保非空）
-            String code = row.get("code").toString();
-            Object attNameObj = row.get("ATT_NAME");
-            Object nameObj = row.get("name");
-
-            // 优先使用ATT_NAME，为空则使用name
-            String jsonValue = "";
-            if (attNameObj != null) {
-                jsonValue = attNameObj.toString();
-            } else if (nameObj != null) {
-                jsonValue = nameObj.toString();
-            }
-
-            // 获取中文值（处理null情况）
-            String cnValue = JsonUtil.getCN(jsonValue);
-            resultMap.put(code, cnValue != null ? cnValue : "其他");
+        String fileId = "";
+        // 2. 直接上传字节数组
+        if (fileBytes != null) {
+            fileId = uploadFile(
+                    fileBytes,
+                    "/data/qygly/downloaded_file.xlsx", // 指定文件名（需带后缀）
+                    userName                  // 用户名
+            );
         }
 
-        List<List<String>> table = new ArrayList<>();
-        //  table.add(new ArrayList<>(tableHeaders));
-        // 转换表头为中文
-        List<String> translatedHeaders = tableHeaders.stream()
-                .map(code -> {
-                    String cnName = resultMap.get(code);
-                    return cnName != null ? cnName : "未知字段(" + code + ")";
-                })
-                .collect(Collectors.toList());
+        String conversationId = sendChatMessage(fileId, userName);
 
-        // 添加转换后的表头到表格
-        table.add(new ArrayList<>(translatedHeaders));
+        urlToOpen.url = "../cisdi-gczx-jszt/#/chatBox?servId=" + servId + "&user=" + userName + "&sessionId=" + sessionId + "&conversationId=" + conversationId;
+        urlToOpen.title = "智能助手";
 
-        // 填充数据
-        for (Map<String, Object> entityRecord : entityRecordList) {
-            Map<String, Object> textMap = (Map<String, Object>) entityRecord.get("textMap");
-            List<String> row = new ArrayList<>();
-            for (String header : tableHeaders) {
-                Object value = textMap.get(header);
-                row.add(value == null || value.toString().isEmpty() ? "NULL" : value.toString()); // 如果值为空，填充为"NULL"
-            }
-            table.add(row);
-        }
+        invokeActResult.urlToOpenList.add(urlToOpen);
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
 
-        // 将二维数组转换为字符串
-        StringBuilder tableData = new StringBuilder();
-        for (List<String> row : table) {
-            tableData.append(String.join("&&", row)).append("\n");
-        }
-
-        tableData.insert(0, "请记住以下表格数据（格式：列名用&&分隔，数据行按一定顺序排列，每一行用换行符分割），第一行是表头，后续问题将基于此表格回答。表格数据如下：");
-        tableData.append("\n请确认已理解表格结构，并存储为可查询的知识库。后续问题将涉及筛选、统计或提取特定条件下的条目");
+    // 上传文件
+    public String uploadFile(byte[] fileBytes, String fileName, String user) {
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+        String url = BASE_URL + "/v1/files/upload";
+        String fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth("app-4zLeurKBvnj05pEDhTKky7R9");
+        headers.setBearerAuth(API_KEY_A);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        // 构建文件部分（通过字节数组 + 文件名）
+        ByteArrayResource fileResource = new ByteArrayResource(fileBytes) {
+            @Override
+            public String getFilename() {
+                return fileName; // 必须重写文件名
+            }
+        };
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", fileResource); // 直接传递字节数组
+        body.add("user", user);
+
+        // 发送请求
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, requestEntity, Map.class);
+
+        // 处理响应
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody() != null) {
+            log.info("文件上传成功");
+            return (String) response.getBody().get("id");
+        } else {
+            log.info("文件上传失败，状态码: " + response.getStatusCode());
+            return null;
+        }
+    }
+
+    private byte[] downloadFile(String fileGuid, String sessionId) {
+        String url = PLATFORM_URL + "/qygly-file/downloadExcelFile?exportedExcelFileGuid=" + fileGuid;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("qygly-session-id", sessionId);
+
+        ResponseEntity<byte[]> response = new RestTemplate().exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                byte[].class
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return response.getBody(); // 直接返回字节数组
+        }
+        return null;
+    }
+
+
+    // 发送聊天消息
+    public String sendChatMessage(String fileId, String user) {
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+
+        String url = BASE_URL + "/chat-messages";
+
+        // 设置请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(API_KEY_A);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         // 构建请求体
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("inputs", Collections.emptyMap());
-        requestBody.put("query", tableData.toString());
+        requestBody.put("query", "请解析该表格，确保理解表格内容并存为用户知识库，后续用户提问将基于此表格回答");
         requestBody.put("response_mode", "blocking");
         requestBody.put("conversation_id", "");
-        requestBody.put("user", userName);
+        requestBody.put("user", user);
 
-        // 创建请求实体
+        // 添加文件信息
+        Map<String, String> fileInfo = new HashMap<>();
+        fileInfo.put("type", "document");
+        fileInfo.put("transfer_method", "local_file");
+        fileInfo.put("upload_file_id", fileId);
+        requestBody.put("files", Collections.singletonList(fileInfo));
+
+        // 发送请求
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
-        log.info("调用Dify 轻链助手.");
-        // 发送POST请求
         ResponseEntity<Map> response = restTemplate.postForEntity(
-                "http://119.84.70.174/v1/chat-messages",
+                BASE_URL + "/v1/chat-messages",
                 entity,
                 Map.class
         );
@@ -375,12 +413,8 @@ public class SmartMatchExt {
         } else {
             log.info("请求失败，状态码: " + response.getStatusCode());
         }
+        return conversationId;
 
-        urlToOpen.url = "../cisdi-gczx-jszt/#/chatBox?servId=" + servId + "&user=" + userName + "&sessionId=" + sessionId + "&conversationId=" + conversationId;
-        urlToOpen.title = "智能助手";
-
-        invokeActResult.urlToOpenList.add(urlToOpen);
-        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     // 获取AI助手信息
@@ -426,7 +460,7 @@ public class SmartMatchExt {
 
     @Data
     public class AgentInfo {
-        private  String code;
+        private String code;
         private String name;
         private String remark;
         private String photo;
