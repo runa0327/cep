@@ -81,17 +81,19 @@ public class CbsSubjectExt {
                             .eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, copyFromId)
             );
 
-            for (CcPrjCostOverview parentNode : parentNodes) {
-                String parentNodeId = parentNode.getId();
-                // 建立成本树
-                List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodeList, ccPrjId);
-                for (CcPrjCostOverview costNode : costTree) {
-                    costNode.setCcPrjCostOverviewPid(parentNodeId);
-                    costNode.updateById();
-                    recalculatePlanTotalCost(parentNodeId, "CBS_0_AMT");
-                    recalculatePlanTotalCost(parentNodeId, "CBS_1_AMT");
-                    recalculatePlanTotalCost(parentNodeId, "CBS_2_AMT");
-                    recalculatePlanTotalCost(parentNodeId, "CBS_3_AMT");
+            if (!SharedUtil.isEmpty(parentNodes)) {
+                for (CcPrjCostOverview parentNode : parentNodes) {
+                    String parentNodeId = parentNode.getId();
+                    // 建立成本树
+                    List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodeList, ccPrjId);
+                    for (CcPrjCostOverview costNode : costTree) {
+                        costNode.setCcPrjCostOverviewPid(parentNodeId);
+                        costNode.updateById();
+                        recalculatePlanTotalCost(parentNodeId, "CBS_0_AMT");
+                        recalculatePlanTotalCost(parentNodeId, "CBS_1_AMT");
+                        recalculatePlanTotalCost(parentNodeId, "CBS_2_AMT");
+                        recalculatePlanTotalCost(parentNodeId, "CBS_3_AMT");
+                    }
                 }
             }
 
@@ -132,15 +134,16 @@ public class CbsSubjectExt {
                         .eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId)
                         .eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, copyFromId)
         );
+        if (!SharedUtil.isEmpty(parentNodes)) {
+            for (CcPrjStructNode parentNode : parentNodes) {
+                String parentId = parentNode.getId();
+                List<CcPrjStructNode> newNodes = replaceIdsAndInsert(sourceNodes, ccPrjId, usageId);
 
-        for (CcPrjStructNode parentNode : parentNodes) {
-            String parentId = parentNode.getId();
-            List<CcPrjStructNode> newNodes = replaceIdsAndInsert(sourceNodes, ccPrjId, usageId);
-
-            for (CcPrjStructNode node : newNodes) {
-                node.setCcPrjStructNodePid(parentId);
-                node.updateById();
-                recalculatePlanCostEstimation(parentId);
+                for (CcPrjStructNode node : newNodes) {
+                    node.setCcPrjStructNodePid(parentId);
+                    node.updateById();
+                    recalculatePlanCostEstimation(parentId);
+                }
             }
         }
     }

@@ -118,6 +118,10 @@ public class CcModelFederationToFile {
          * 模型集成ID。
          */
         public static final String CC_MODEL_INTEGRATE_ID = "CC_MODEL_INTEGRATE_ID";
+        /**
+         * 预览地址。
+         */
+        public static final String CC_PREVIEW_URL = "CC_PREVIEW_URL";
     }
 
     // </editor-fold>
@@ -768,6 +772,42 @@ public class CcModelFederationToFile {
             this.ccModelIntegrateId = ccModelIntegrateId;
             if (!this.toUpdateCols.contains("CC_MODEL_INTEGRATE_ID")) {
                 this.toUpdateCols.add("CC_MODEL_INTEGRATE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 预览地址。
+     */
+    private String ccPreviewUrl;
+
+    /**
+     * 获取：预览地址。
+     */
+    public String getCcPreviewUrl() {
+        return this.ccPreviewUrl;
+    }
+
+    /**
+     * 设置：预览地址。
+     */
+    public CcModelFederationToFile setCcPreviewUrl(String ccPreviewUrl) {
+        if (this.ccPreviewUrl == null && ccPreviewUrl == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPreviewUrl != null && ccPreviewUrl != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPreviewUrl.compareTo(ccPreviewUrl) != 0) {
+                this.ccPreviewUrl = ccPreviewUrl;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_URL")) {
+                    this.toUpdateCols.add("CC_PREVIEW_URL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPreviewUrl = ccPreviewUrl;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_URL")) {
+                this.toUpdateCols.add("CC_PREVIEW_URL");
             }
         }
         return this;

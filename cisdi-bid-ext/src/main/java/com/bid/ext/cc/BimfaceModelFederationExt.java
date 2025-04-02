@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.BaseInfo;
+import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -17,6 +18,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import static com.bid.ext.cc.PreViewExt.doGetStringStringMap;
@@ -73,6 +75,7 @@ public class BimfaceModelFederationExt {
         Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
         String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
         String integrateUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/modelFederation/integrate";
+//        String integrateUrl = "http://7ip279qh9109.vicp.fun:23922/cisdi-microservice-test240511/modelFederation/integrate/";
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("integrateName", integrateName);
@@ -87,6 +90,28 @@ public class BimfaceModelFederationExt {
         log.info(response.toString());
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    public void previewIntegrate() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcModelFederationToFile ccModelFederationToFile = CcModelFederationToFile.selectById(csCommId);
+            String ccPreviewConversionStatusId = ccModelFederationToFile.getCcPreviewConversionStatusId();
+            String ccPreviewUrl = ccModelFederationToFile.getCcPreviewUrl();
+            if ("SUCC".equals(ccPreviewConversionStatusId)) {
+                UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
+                extBrowserWindowToOpen.url = ccPreviewUrl;
+                extBrowserWindowToOpen.title = "预览";
+                invokeActResult.urlToOpenList = new ArrayList<>();
+                invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
+                ExtJarHelper.setReturnValue(invokeActResult);
+                return;
+            } else if ("DOING".equals(ccPreviewConversionStatusId)) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.previewConverting");
+                throw new BaseException(message);
+            }
+        }
     }
 
 }
