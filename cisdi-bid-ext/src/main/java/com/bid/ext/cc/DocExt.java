@@ -511,7 +511,7 @@ public class DocExt {
             ccDocFile.setIsDefault(false);
             ccDocFile.setIsFavorites(false);
 
-            dspName = dspName.toLowerCase();
+            dspName = I18nUtil.tryGetInCurrentLang(dspName);
             String fileType = null;
             if (dspName.endsWith("dwg")) {
                 fileType = "CAD";
