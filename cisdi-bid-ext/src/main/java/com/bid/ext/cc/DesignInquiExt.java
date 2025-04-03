@@ -1,6 +1,7 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.*;
+import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -16,7 +17,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -65,6 +65,61 @@ public class DesignInquiExt {
 //                ExtJarHelper.setReturnValue(userIdList);
 //            }
         }
+    }
+
+    public void designInquireCreate(){
+        //获取表单提交信息
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        //插入设计咨询
+        CcDesignInqui ccDesignInqui = CcDesignInqui.newData();
+        ccDesignInqui.setTs(LocalDateTime.now());
+        ccDesignInqui.setCrtDt(LocalDateTime.now());
+        ccDesignInqui.setCrtUserId(userId);
+        ccDesignInqui.setLastModiDt(LocalDateTime.now());
+        ccDesignInqui.setLastModiUserId(userId);
+        ccDesignInqui.setStatus("AP");
+        ccDesignInqui.setCcName(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_NAME").toString(), null)));
+        ccDesignInqui.setRemark(JsonUtil.toJson(new Internationalization(null, varMap.get("P_REMARK").toString(), null)));
+        ccDesignInqui.setAssignPersonnel(varMap.get("P_ASSIGN_PERSONNEL").toString());
+        // 定义自定义的日期时间格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        ccDesignInqui.setCcInspecTime(LocalDateTime.parse(varMap.get("P_CC_INSPEC_TIME").toString(), formatter));
+        ccDesignInqui.setCcAttachments(varMap.get("P_CC_ATTACHMENTS").toString());
+        ccDesignInqui.setAssociateDrawings(varMap.get("P_ASSOCIATE_DRAWINGS").toString());//这里的ID为手续台账ID
+        ccDesignInqui.setCcProcedureLedgerId(varMap.get("P_ASSOCIATE_DRAWINGS").toString());//方便其他地方调用，两个字段一起维护
+        ccDesignInqui.setCcPrjId(varMap.get("P_CC_PRJ_ID").toString());//项目
+        ccDesignInqui.setInquireAdviceNotFeedback(varMap.get("P_ASSIGN_PERSONNEL").toString());
+
+        ccDesignInqui.insertById();
+
+        //更新图纸更新记录表
+        String ccProcedureLedgerId = varMap.get("P_ASSOCIATE_DRAWINGS").toString();//手续台账ID
+        if (ccProcedureLedgerId != null && !ccProcedureLedgerId.isEmpty()) {
+            Where attWhere = new Where();
+            attWhere.eq(CcDrawingUpdateRecord.Cols.CC_PROCEDURE_LEDGER_ID, ccProcedureLedgerId).eq(CcDrawingUpdateRecord.Cols.CC_DESIGN_INQUI_ID, null);
+            List<CcDrawingUpdateRecord> ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectByWhere(attWhere);
+            if(ccDrawingUpdateRecord != null && !ccDrawingUpdateRecord.isEmpty()){
+                for (CcDrawingUpdateRecord record : ccDrawingUpdateRecord) {
+                    record.setCcDesignInquiId(ccDesignInqui.getId());
+                    record.updateById();
+                }
+            }
+//                if (ccDrawingUpdateRecord != null) {
+//                    if(ccDrawingUpdateRecord.getCcDesignInquiId() == null || ccDrawingUpdateRecord.getCcDesignInquiId().isEmpty()){
+//                        ccDrawingUpdateRecord.setCcDesignInquiId(valueMap.get("ID").toString());
+//                        ccDrawingUpdateRecord.updateById();
+//                    }
+//                }
+        }
+
+        // 刷新页面
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**
