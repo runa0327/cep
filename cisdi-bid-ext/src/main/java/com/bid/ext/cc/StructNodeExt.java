@@ -142,7 +142,7 @@ public class StructNodeExt {
                     "WHERE cc_prj_id = ? " +
                     "AND cc_prj_wbs_type_id = ? " +
                     "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
-                    "ORDER BY CAST(REPLACE(name->>'$.ZH_CN', 'V', '') AS UNSIGNED) DESC " +
+                    "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
                     "LIMIT 1";
             try {
                 map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType, ccConstructProgressPlanId);
@@ -164,7 +164,7 @@ public class StructNodeExt {
                     "FROM cc_prj_struct_node_version " +
                     "WHERE cc_prj_id = ? " +
                     "AND cc_prj_wbs_type_id = ? " +
-                    "ORDER BY CAST(REPLACE(name->>'$.ZH_CN', 'V', '') AS UNSIGNED) DESC " +
+                    "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
                     "LIMIT 1";
             try {
                 map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType);
