@@ -1,11 +1,7 @@
 package com.bid.ext.ai;
 
-import ch.qos.logback.core.joran.conditional.ElseAction;
 import com.bid.ext.utils.ApiExtCommon;
 import com.bid.ext.utils.JsonUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -17,7 +13,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,10 +21,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class SmartMatchExt {
@@ -37,8 +30,8 @@ public class SmartMatchExt {
     private static String API_KEY_F = "app-FQemEEe1MIuc7jsmR1rjS5SS"; // 模糊查询助手
     private static String API_KEY_A = "app-GSWig6ReLvfwihTemtUhXLaw"; // 智能分析助手
     private static String BASE_URL = "http://119.84.70.174";
-    private static String PLATFORM_URL = "http://8.137.116.250/qygly-gateway";
-//    private static String PLATFORM_URL = "https://ceecip.com/qygly-gateway";
+//    private static String PLATFORM_URL = "http://8.137.116.250/qygly-gateway";
+    private static String PLATFORM_URL = "https://ceecip.com/qygly-gateway";
 
     public void fuzzymatch() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
@@ -374,8 +367,6 @@ public class SmartMatchExt {
     // 发送聊天消息
     public String sendChatMessage(String fileId, String user) {
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
-
-        String url = BASE_URL + "/chat-messages";
 
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
