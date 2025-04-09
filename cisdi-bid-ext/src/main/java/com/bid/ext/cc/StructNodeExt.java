@@ -3455,6 +3455,7 @@ public class StructNodeExt {
         // 创建基础的项目结构节点
         CcPrjStructNode ccPrjStructNode = createProjectStructNode(name, remark, pCcPrjIds, wbsType, wbsChiefUserId, pPlanFr, pPlanTo, planDays, isMileStone);
         ccPrjStructNode.setCcConstructProgressPlanId(ccConstructProgressPlanId);
+
         // 获取实体记录并处理
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         if (!SharedUtil.isEmpty(entityRecordList)) {
@@ -3463,8 +3464,14 @@ public class StructNodeExt {
                 String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
                 String ccPrjStructNodePid = JdbcMapUtil.getString(valueMap, "ID");
                 ccPrjStructNode.setCcPrjId(ccPrjId);
-                ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
-
+                if(wbsType.equals("DESIGN")){
+                    //目前只要求设计管理这边有更改，其他类型暂不做处理
+                    String faStructNodeId = JdbcMapUtil.getString(varMap, "P_FA_STRUCT_NODE_ID");
+                    ccPrjStructNode.setCcPrjStructNodePid(faStructNodeId);
+                }else{
+                    //设计管理中的父级节点可以选择，其他管理暂时默认为选中数据作为父级
+                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
+                }
                 ccPrjStructNode.insertById();
             }
         } else {
