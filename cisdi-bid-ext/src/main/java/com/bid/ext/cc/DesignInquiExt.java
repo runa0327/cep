@@ -83,7 +83,9 @@ public class DesignInquiExt {
         ccDesignInqui.setLastModiUserId(userId);
         ccDesignInqui.setStatus("AP");
         ccDesignInqui.setCcName(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_NAME").toString(), null)));
-        ccDesignInqui.setRemark(JsonUtil.toJson(new Internationalization(null, varMap.get("P_REMARK").toString(), null)));
+        if(varMap.get("P_REMARK") != null){
+            ccDesignInqui.setRemark(JsonUtil.toJson(new Internationalization(null, varMap.get("P_REMARK").toString(), null)));
+        }
         ccDesignInqui.setAssignPersonnel(varMap.get("P_ASSIGN_PERSONNEL").toString());
         // 定义自定义的日期时间格式
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
