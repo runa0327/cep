@@ -160,11 +160,18 @@ public class StructNodeExt {
 //                "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
 //                "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
 //                "LIMIT 1";
+//            sql = "SELECT name AS maxVersion " +
+//                    "FROM cc_prj_struct_node_version " +
+//                    "WHERE cc_prj_id = ? " +
+//                    "AND cc_prj_wbs_type_id = ? " +
+//                    "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
+//                    "LIMIT 1";
+            //现有数据有的是json，有的是字符串，因此不能按照版本数字排序，通过创建时间
             sql = "SELECT name AS maxVersion " +
                     "FROM cc_prj_struct_node_version " +
                     "WHERE cc_prj_id = ? " +
                     "AND cc_prj_wbs_type_id = ? " +
-                    "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
+                    "ORDER BY CRT_DT DESC " +
                     "LIMIT 1";
             try {
                 map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType);
