@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "EN：用户", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
+ * 用户。
  */
 public class AdUser {
 
@@ -47,101 +47,113 @@ public class AdUser {
 
     public static class Cols {
         /**
-         * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+         * ID。
          */
         public static final String ID = "ID";
         /**
-         * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+         * 版本。
          */
         public static final String VER = "VER";
         /**
-         * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+         * 时间戳。
          */
         public static final String TS = "TS";
         /**
-         * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+         * 是否预设。
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+         * 创建日期时间。
          */
         public static final String CRT_DT = "CRT_DT";
         /**
-         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+         * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+         * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
         /**
-         * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+         * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+         * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+         * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+         * 代码。
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         * 名称。
          */
         public static final String NAME = "NAME";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         * 备注。
          */
         public static final String REMARK = "REMARK";
         /**
-         * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+         * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
         /**
-         * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+         * 图标。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "USE_DB_VALIDATION", "ZH_CN": "使用数据库验证", "ZH_TW": "繁：使用数据库验证"}。
+         * 模块。
+         */
+        public static final String AD_MODULE_ID = "AD_MODULE_ID";
+        /**
+         * 使用数据库验证。
          */
         public static final String USE_DB_VALIDATION = "USE_DB_VALIDATION";
         /**
-         * {"EN": "PASSWORD", "ZH_CN": "数据库验证密码", "ZH_TW": "繁：数据库验证密码"}。
+         * 数据库验证密码。
          */
         public static final String PASSWORD = "PASSWORD";
         /**
-         * {"EN": "USE_EXT_VALIDATION", "ZH_CN": "使用外部验证", "ZH_TW": "繁：使用外部验证"}。
+         * 必须修改密码。
+         */
+        public static final String PASSWORD_NEED_CHANGE = "PASSWORD_NEED_CHANGE";
+        /**
+         * 使用外部验证。
          */
         public static final String USE_EXT_VALIDATION = "USE_EXT_VALIDATION";
         /**
-         * {"EN": "EXT_VALIDATION_USERNAME", "ZH_CN": "外部验证用户名", "ZH_TW": "繁：外部验证用户名"}。
+         * 外部验证用户名。
          */
         public static final String EXT_VALIDATION_USERNAME = "EXT_VALIDATION_USERNAME";
         /**
-         * {"EN": "MOBILE", "ZH_CN": "手机", "ZH_TW": "繁：手机"}。
+         * 手机。
          */
         public static final String MOBILE = "MOBILE";
         /**
-         * {"EN": "EMAIL", "ZH_CN": "邮箱", "ZH_TW": "繁：邮箱"}。
+         * 邮箱。
          */
         public static final String EMAIL = "EMAIL";
         /**
-         * {"EN": "SRC", "ZH_CN": "来源", "ZH_TW": "繁：来源"}。
+         * 来源。
          */
         public static final String SRC = "SRC";
         /**
-         * {"EN": "SRC_RECORD_ID", "ZH_CN": "来源记录ID", "ZH_TW": "繁：来源记录ID"}。
+         * 来源记录ID。
          */
         public static final String SRC_RECORD_ID = "SRC_RECORD_ID";
         /**
-         * {"EN": "SYNC_DTTM", "ZH_CN": "同步时间", "ZH_TW": "繁：同步时间"}。
+         * 同步时间。
          */
         public static final String SYNC_DTTM = "SYNC_DTTM";
+        /**
+         * 额外信息。
+         */
+        public static final String EXTRA_INFO = "EXTRA_INFO";
     }
 
     // </editor-fold>
@@ -150,19 +162,19 @@ public class AdUser {
     // <editor-fold>
 
     /**
-     * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * ID。
      */
     private String id;
 
     /**
-     * 获取：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 获取：ID。
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 设置：ID。
      */
     public AdUser setId(String id) {
         if (this.id == null && id == null) {
@@ -186,19 +198,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 版本。
      */
     private Integer ver;
 
     /**
-     * 获取：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 获取：版本。
      */
     public Integer getVer() {
         return this.ver;
     }
 
     /**
-     * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 设置：版本。
      */
     public AdUser setVer(Integer ver) {
         if (this.ver == null && ver == null) {
@@ -222,19 +234,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 时间戳。
      */
     private LocalDateTime ts;
 
     /**
-     * 获取：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 获取：时间戳。
      */
     public LocalDateTime getTs() {
         return this.ts;
     }
 
     /**
-     * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 设置：时间戳。
      */
     public AdUser setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
@@ -258,19 +270,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 是否预设。
      */
     private Boolean isPreset;
 
     /**
-     * 获取：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 获取：是否预设。
      */
     public Boolean getIsPreset() {
         return this.isPreset;
     }
 
     /**
-     * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 设置：是否预设。
      */
     public AdUser setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
@@ -294,19 +306,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 创建日期时间。
      */
     private LocalDateTime crtDt;
 
     /**
-     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 获取：创建日期时间。
      */
     public LocalDateTime getCrtDt() {
         return this.crtDt;
     }
 
     /**
-     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 设置：创建日期时间。
      */
     public AdUser setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
@@ -330,19 +342,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 创建用户。
      */
     private String crtUserId;
 
     /**
-     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 获取：创建用户。
      */
     public String getCrtUserId() {
         return this.crtUserId;
     }
 
     /**
-     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 设置：创建用户。
      */
     public AdUser setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
@@ -366,19 +378,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
 
     /**
-     * 获取：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 获取：最后修改日期时间。
      */
     public LocalDateTime getLastModiDt() {
         return this.lastModiDt;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 设置：最后修改日期时间。
      */
     public AdUser setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
@@ -402,19 +414,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 最后修改用户。
      */
     private String lastModiUserId;
 
     /**
-     * 获取：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 获取：最后修改用户。
      */
     public String getLastModiUserId() {
         return this.lastModiUserId;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 设置：最后修改用户。
      */
     public AdUser setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
@@ -438,19 +450,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 记录状态。
      */
     private String status;
 
     /**
-     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 获取：记录状态。
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 设置：记录状态。
      */
     public AdUser setStatus(String status) {
         if (this.status == null && status == null) {
@@ -474,19 +486,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 锁定流程实例。
      */
     private String lkWfInstId;
 
     /**
-     * 获取：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 获取：锁定流程实例。
      */
     public String getLkWfInstId() {
         return this.lkWfInstId;
     }
 
     /**
-     * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 设置：锁定流程实例。
      */
     public AdUser setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
@@ -510,19 +522,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 代码。
      */
     private String code;
 
     /**
-     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 获取：代码。
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 设置：代码。
      */
     public AdUser setCode(String code) {
         if (this.code == null && code == null) {
@@ -546,19 +558,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 名称。
      */
     private String name;
 
     /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 获取：名称。
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 设置：名称。
      */
     public AdUser setName(String name) {
         if (this.name == null && name == null) {
@@ -582,19 +594,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 备注。
      */
     private String remark;
 
     /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 获取：备注。
      */
     public String getRemark() {
         return this.remark;
     }
 
     /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 设置：备注。
      */
     public AdUser setRemark(String remark) {
         if (this.remark == null && remark == null) {
@@ -618,19 +630,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 快捷码。
      */
     private String fastCode;
 
     /**
-     * 获取：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 获取：快捷码。
      */
     public String getFastCode() {
         return this.fastCode;
     }
 
     /**
-     * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 设置：快捷码。
      */
     public AdUser setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
@@ -654,19 +666,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 图标。
      */
     private String iconFileGroupId;
 
     /**
-     * 获取：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 获取：图标。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 设置：图标。
      */
     public AdUser setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
@@ -690,19 +702,55 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "USE_DB_VALIDATION", "ZH_CN": "使用数据库验证", "ZH_TW": "繁：使用数据库验证"}。
+     * 模块。
+     */
+    private String adModuleId;
+
+    /**
+     * 获取：模块。
+     */
+    public String getAdModuleId() {
+        return this.adModuleId;
+    }
+
+    /**
+     * 设置：模块。
+     */
+    public AdUser setAdModuleId(String adModuleId) {
+        if (this.adModuleId == null && adModuleId == null) {
+            // 均为null，不做处理。
+        } else if (this.adModuleId != null && adModuleId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adModuleId.compareTo(adModuleId) != 0) {
+                this.adModuleId = adModuleId;
+                if (!this.toUpdateCols.contains("AD_MODULE_ID")) {
+                    this.toUpdateCols.add("AD_MODULE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adModuleId = adModuleId;
+            if (!this.toUpdateCols.contains("AD_MODULE_ID")) {
+                this.toUpdateCols.add("AD_MODULE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 使用数据库验证。
      */
     private Boolean useDbValidation;
 
     /**
-     * 获取：{"EN": "USE_DB_VALIDATION", "ZH_CN": "使用数据库验证", "ZH_TW": "繁：使用数据库验证"}。
+     * 获取：使用数据库验证。
      */
     public Boolean getUseDbValidation() {
         return this.useDbValidation;
     }
 
     /**
-     * 设置：{"EN": "USE_DB_VALIDATION", "ZH_CN": "使用数据库验证", "ZH_TW": "繁：使用数据库验证"}。
+     * 设置：使用数据库验证。
      */
     public AdUser setUseDbValidation(Boolean useDbValidation) {
         if (this.useDbValidation == null && useDbValidation == null) {
@@ -726,19 +774,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "PASSWORD", "ZH_CN": "数据库验证密码", "ZH_TW": "繁：数据库验证密码"}。
+     * 数据库验证密码。
      */
     private String password;
 
     /**
-     * 获取：{"EN": "PASSWORD", "ZH_CN": "数据库验证密码", "ZH_TW": "繁：数据库验证密码"}。
+     * 获取：数据库验证密码。
      */
     public String getPassword() {
         return this.password;
     }
 
     /**
-     * 设置：{"EN": "PASSWORD", "ZH_CN": "数据库验证密码", "ZH_TW": "繁：数据库验证密码"}。
+     * 设置：数据库验证密码。
      */
     public AdUser setPassword(String password) {
         if (this.password == null && password == null) {
@@ -762,19 +810,55 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "USE_EXT_VALIDATION", "ZH_CN": "使用外部验证", "ZH_TW": "繁：使用外部验证"}。
+     * 必须修改密码。
+     */
+    private Boolean passwordNeedChange;
+
+    /**
+     * 获取：必须修改密码。
+     */
+    public Boolean getPasswordNeedChange() {
+        return this.passwordNeedChange;
+    }
+
+    /**
+     * 设置：必须修改密码。
+     */
+    public AdUser setPasswordNeedChange(Boolean passwordNeedChange) {
+        if (this.passwordNeedChange == null && passwordNeedChange == null) {
+            // 均为null，不做处理。
+        } else if (this.passwordNeedChange != null && passwordNeedChange != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.passwordNeedChange.compareTo(passwordNeedChange) != 0) {
+                this.passwordNeedChange = passwordNeedChange;
+                if (!this.toUpdateCols.contains("PASSWORD_NEED_CHANGE")) {
+                    this.toUpdateCols.add("PASSWORD_NEED_CHANGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.passwordNeedChange = passwordNeedChange;
+            if (!this.toUpdateCols.contains("PASSWORD_NEED_CHANGE")) {
+                this.toUpdateCols.add("PASSWORD_NEED_CHANGE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 使用外部验证。
      */
     private Boolean useExtValidation;
 
     /**
-     * 获取：{"EN": "USE_EXT_VALIDATION", "ZH_CN": "使用外部验证", "ZH_TW": "繁：使用外部验证"}。
+     * 获取：使用外部验证。
      */
     public Boolean getUseExtValidation() {
         return this.useExtValidation;
     }
 
     /**
-     * 设置：{"EN": "USE_EXT_VALIDATION", "ZH_CN": "使用外部验证", "ZH_TW": "繁：使用外部验证"}。
+     * 设置：使用外部验证。
      */
     public AdUser setUseExtValidation(Boolean useExtValidation) {
         if (this.useExtValidation == null && useExtValidation == null) {
@@ -798,19 +882,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "EXT_VALIDATION_USERNAME", "ZH_CN": "外部验证用户名", "ZH_TW": "繁：外部验证用户名"}。
+     * 外部验证用户名。
      */
     private String extValidationUsername;
 
     /**
-     * 获取：{"EN": "EXT_VALIDATION_USERNAME", "ZH_CN": "外部验证用户名", "ZH_TW": "繁：外部验证用户名"}。
+     * 获取：外部验证用户名。
      */
     public String getExtValidationUsername() {
         return this.extValidationUsername;
     }
 
     /**
-     * 设置：{"EN": "EXT_VALIDATION_USERNAME", "ZH_CN": "外部验证用户名", "ZH_TW": "繁：外部验证用户名"}。
+     * 设置：外部验证用户名。
      */
     public AdUser setExtValidationUsername(String extValidationUsername) {
         if (this.extValidationUsername == null && extValidationUsername == null) {
@@ -834,19 +918,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "MOBILE", "ZH_CN": "手机", "ZH_TW": "繁：手机"}。
+     * 手机。
      */
     private String mobile;
 
     /**
-     * 获取：{"EN": "MOBILE", "ZH_CN": "手机", "ZH_TW": "繁：手机"}。
+     * 获取：手机。
      */
     public String getMobile() {
         return this.mobile;
     }
 
     /**
-     * 设置：{"EN": "MOBILE", "ZH_CN": "手机", "ZH_TW": "繁：手机"}。
+     * 设置：手机。
      */
     public AdUser setMobile(String mobile) {
         if (this.mobile == null && mobile == null) {
@@ -870,19 +954,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "EMAIL", "ZH_CN": "邮箱", "ZH_TW": "繁：邮箱"}。
+     * 邮箱。
      */
     private String email;
 
     /**
-     * 获取：{"EN": "EMAIL", "ZH_CN": "邮箱", "ZH_TW": "繁：邮箱"}。
+     * 获取：邮箱。
      */
     public String getEmail() {
         return this.email;
     }
 
     /**
-     * 设置：{"EN": "EMAIL", "ZH_CN": "邮箱", "ZH_TW": "繁：邮箱"}。
+     * 设置：邮箱。
      */
     public AdUser setEmail(String email) {
         if (this.email == null && email == null) {
@@ -906,19 +990,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "SRC", "ZH_CN": "来源", "ZH_TW": "繁：来源"}。
+     * 来源。
      */
     private String src;
 
     /**
-     * 获取：{"EN": "SRC", "ZH_CN": "来源", "ZH_TW": "繁：来源"}。
+     * 获取：来源。
      */
     public String getSrc() {
         return this.src;
     }
 
     /**
-     * 设置：{"EN": "SRC", "ZH_CN": "来源", "ZH_TW": "繁：来源"}。
+     * 设置：来源。
      */
     public AdUser setSrc(String src) {
         if (this.src == null && src == null) {
@@ -942,19 +1026,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "SRC_RECORD_ID", "ZH_CN": "来源记录ID", "ZH_TW": "繁：来源记录ID"}。
+     * 来源记录ID。
      */
     private String srcRecordId;
 
     /**
-     * 获取：{"EN": "SRC_RECORD_ID", "ZH_CN": "来源记录ID", "ZH_TW": "繁：来源记录ID"}。
+     * 获取：来源记录ID。
      */
     public String getSrcRecordId() {
         return this.srcRecordId;
     }
 
     /**
-     * 设置：{"EN": "SRC_RECORD_ID", "ZH_CN": "来源记录ID", "ZH_TW": "繁：来源记录ID"}。
+     * 设置：来源记录ID。
      */
     public AdUser setSrcRecordId(String srcRecordId) {
         if (this.srcRecordId == null && srcRecordId == null) {
@@ -978,19 +1062,19 @@ public class AdUser {
     }
 
     /**
-     * {"EN": "SYNC_DTTM", "ZH_CN": "同步时间", "ZH_TW": "繁：同步时间"}。
+     * 同步时间。
      */
     private LocalDateTime syncDttm;
 
     /**
-     * 获取：{"EN": "SYNC_DTTM", "ZH_CN": "同步时间", "ZH_TW": "繁：同步时间"}。
+     * 获取：同步时间。
      */
     public LocalDateTime getSyncDttm() {
         return this.syncDttm;
     }
 
     /**
-     * 设置：{"EN": "SYNC_DTTM", "ZH_CN": "同步时间", "ZH_TW": "繁：同步时间"}。
+     * 设置：同步时间。
      */
     public AdUser setSyncDttm(LocalDateTime syncDttm) {
         if (this.syncDttm == null && syncDttm == null) {
@@ -1008,6 +1092,42 @@ public class AdUser {
             this.syncDttm = syncDttm;
             if (!this.toUpdateCols.contains("SYNC_DTTM")) {
                 this.toUpdateCols.add("SYNC_DTTM");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 额外信息。
+     */
+    private String extraInfo;
+
+    /**
+     * 获取：额外信息。
+     */
+    public String getExtraInfo() {
+        return this.extraInfo;
+    }
+
+    /**
+     * 设置：额外信息。
+     */
+    public AdUser setExtraInfo(String extraInfo) {
+        if (this.extraInfo == null && extraInfo == null) {
+            // 均为null，不做处理。
+        } else if (this.extraInfo != null && extraInfo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.extraInfo.compareTo(extraInfo) != 0) {
+                this.extraInfo = extraInfo;
+                if (!this.toUpdateCols.contains("EXTRA_INFO")) {
+                    this.toUpdateCols.add("EXTRA_INFO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.extraInfo = extraInfo;
+            if (!this.toUpdateCols.contains("EXTRA_INFO")) {
+                this.toUpdateCols.add("EXTRA_INFO");
             }
         }
         return this;
