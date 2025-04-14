@@ -3471,8 +3471,8 @@ public class StructNodeExt {
                 String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
                 String ccPrjStructNodePid = JdbcMapUtil.getString(valueMap, "ID");
                 ccPrjStructNode.setCcPrjId(ccPrjId);
-                if(wbsType.equals("DESIGN")){
-                    //目前只要求设计管理这边有更改，其他类型暂不做处理
+                if(wbsType.equals("DESIGN") || wbsType.equals("CONSTRUCT")){
+                    //目前只要求设计管理和施工管理这边有更改，其他类型暂不做处理
                     String faStructNodeId = JdbcMapUtil.getString(varMap, "P_FA_STRUCT_NODE_ID");
                     ccPrjStructNode.setCcPrjStructNodePid(faStructNodeId);
                 }else{
