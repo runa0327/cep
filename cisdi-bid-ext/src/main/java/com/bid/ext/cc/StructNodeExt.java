@@ -3471,14 +3471,14 @@ public class StructNodeExt {
                 String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
                 String ccPrjStructNodePid = JdbcMapUtil.getString(valueMap, "ID");
                 ccPrjStructNode.setCcPrjId(ccPrjId);
-                if(wbsType.equals("DESIGN") || wbsType.equals("CONSTRUCT")){
-                    //目前只要求设计管理和施工管理这边有更改，其他类型暂不做处理
-                    String faStructNodeId = JdbcMapUtil.getString(varMap, "P_FA_STRUCT_NODE_ID");
-                    ccPrjStructNode.setCcPrjStructNodePid(faStructNodeId);
-                }else{
+//                if(wbsType.equals("DESIGN") || wbsType.equals("CONSTRUCT")){
+                //设计管理、施工管理和前期管理需要灵活选择父级节点
+                String faStructNodeId = JdbcMapUtil.getString(varMap, "P_FA_STRUCT_NODE_ID");
+                ccPrjStructNode.setCcPrjStructNodePid(faStructNodeId);
+//                }else{
                     //设计管理中的父级节点可以选择，其他管理暂时默认为选中数据作为父级
-                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
-                }
+//                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
+//                }
                 ccPrjStructNode.insertById();
             }
         } else {
