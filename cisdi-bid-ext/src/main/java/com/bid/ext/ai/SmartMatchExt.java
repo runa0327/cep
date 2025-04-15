@@ -30,8 +30,8 @@ public class SmartMatchExt {
     private static String API_KEY_F = "app-FQemEEe1MIuc7jsmR1rjS5SS"; // 模糊查询助手
     private static String API_KEY_A = "app-GSWig6ReLvfwihTemtUhXLaw"; // 智能分析助手
     private static String BASE_URL = "http://119.84.70.174";
-//    private static String PLATFORM_URL = "http://8.137.116.250/qygly-gateway";
-    private static String PLATFORM_URL = "https://ceecip.com/qygly-gateway";
+    private static String PLATFORM_URL = "http://8.137.116.250/qygly-gateway";
+//    private static String PLATFORM_URL = "https://ceecip.com/qygly-gateway";
 
     public void fuzzymatch() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
@@ -406,6 +406,18 @@ public class SmartMatchExt {
         }
         return conversationId;
 
+    }
+
+    public void speechAssistant(){
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.urlToOpenList = new ArrayList<>();
+        UrlToOpen urlToOpen = new UrlToOpen();
+
+        urlToOpen.url = "../cisdi-gczx-jszt/#/chatBox";
+        urlToOpen.title = "智能语音助手";
+
+        invokeActResult.urlToOpenList.add(urlToOpen);
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     // 获取AI助手信息
