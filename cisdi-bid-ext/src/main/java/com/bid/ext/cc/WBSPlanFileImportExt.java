@@ -77,7 +77,12 @@ public class WBSPlanFileImportExt {
         //根节点
         Task topTask = taskList.get(0);
 
-        insertNode(topTask, nodePid, wbsTypeId, seqNo, prjId, wbsChiefUserId, 0, null);
+        //施工进度计划id
+        String constructProgressPlanId = null;
+        if(wbsTypeId.equals("CONSTRUCT")){
+            constructProgressPlanId = valueMap.get("CC_CONSTRUCT_PROGRESS_PLAN_ID").toString();
+        }
+        insertNode(topTask, nodePid, wbsTypeId, seqNo, prjId, wbsChiefUserId, 0, constructProgressPlanId);
 
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
