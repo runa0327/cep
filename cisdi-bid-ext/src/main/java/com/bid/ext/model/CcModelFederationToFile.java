@@ -107,6 +107,10 @@ public class CcModelFederationToFile {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * 项目。
+         */
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        /**
          * 预览转换状态。
          */
         public static final String CC_PREVIEW_CONVERSION_STATUS_ID = "CC_PREVIEW_CONVERSION_STATUS_ID";
@@ -664,6 +668,42 @@ public class CcModelFederationToFile {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目。
+     */
+    private String ccPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getCcPrjId() {
+        return this.ccPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public CcModelFederationToFile setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjId != null && ccPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
             }
         }
         return this;

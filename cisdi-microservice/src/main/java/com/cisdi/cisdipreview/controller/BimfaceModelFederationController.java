@@ -80,7 +80,7 @@ public class BimfaceModelFederationController {
                 jdbcTemplate.update(uploadSql, "DOING", integrateId, ccModelFederationToFile);
             } catch (Exception e) {
                 // 处理失败情况，更新数据库为失败状态
-                log.error("合模失败");
+                log.error("合模失败" + e);
                 String uploadSql = "UPDATE CC_MODEL_FEDERATION_TO_FILE SET CC_PREVIEW_CONVERSION_STATUS_ID = ? WHERE ID = ?";
                 jdbcTemplate.update(uploadSql, "FAIL", ccModelFederationToFile);
             }
@@ -141,6 +141,7 @@ public class BimfaceModelFederationController {
         String responseBody = response.getBody();
         Map data = (Map) JsonUtil.fromJson(responseBody, Map.class).get("data");
         if (data == null || !data.containsKey("integrateId")) {
+            log.error(responseBody);
             throw new BaseException("BIM合模失败，没有获取到模型ID");
         }
         // 返回文件ID
