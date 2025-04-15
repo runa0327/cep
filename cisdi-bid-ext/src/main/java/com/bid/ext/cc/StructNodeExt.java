@@ -3450,6 +3450,10 @@ public class StructNodeExt {
 
             log.info("收藏计划执行成功，共处理 {} 条记录。", csCommIdList.size());
 
+            InvokeActResult invokeActResult = new InvokeActResult();
+            invokeActResult.reFetchData = true;
+            ExtJarHelper.setReturnValue(invokeActResult);
+
         } catch (Exception e) {
             // 异常处理
             log.error("收藏计划执行失败：{}", e.getMessage(), e);
