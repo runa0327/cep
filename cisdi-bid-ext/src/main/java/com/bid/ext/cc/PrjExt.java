@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import cn.hutool.core.util.IdUtil;
 import com.bid.ext.model.*;
+import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -518,4 +519,100 @@ public class PrjExt {
         }
     }
 
+    /**
+     * BIM正相关联后，同步业务数据（cc_doc_file_to_busi_data）
+     */
+    public void createDocFileToBusiData(){
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+
+        //设计咨询信息
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            if (valueMap.containsKey("CC_BIM_MODEL_COMPONENTS_ID")) {
+                //新增资料文件关联业务数据
+                CcDocFileToBusiData ccDocFileToBusiData = CcDocFileToBusiData.newData();
+                ccDocFileToBusiData.setTs(LocalDateTime.now());
+                ccDocFileToBusiData.setCrtDt(LocalDateTime.now());
+                ccDocFileToBusiData.setLastModiDt(LocalDateTime.now());
+                ccDocFileToBusiData.setCrtUserId(userId);
+                ccDocFileToBusiData.setLastModiUserId(userId);
+                ccDocFileToBusiData.setStatus("AP");
+                //BIM模型构件ID
+                String ccBimModelComponentsId = valueMap.get("CC_BIM_MODEL_COMPONENTS_ID").toString();
+                CcBimModelComponents ccBimModelComponents = CcBimModelComponents.selectById(ccBimModelComponentsId);
+                if (ccBimModelComponents != null) {
+                    if (ccBimModelComponents.getCcDocFileId() != null) {
+                        String ccDocFileId = ccBimModelComponents.getCcDocFileId();
+                        ccDocFileToBusiData.setCcDocFileId(ccDocFileId);
+                    }
+                    ccDocFileToBusiData.setDocFileComId(ccBimModelComponents.getCode());
+                    ccDocFileToBusiData.setExtraInfo(ccBimModelComponents.getExtraInfo());
+                    ccDocFileToBusiData.setDocFilePointPosition(ccBimModelComponents.getExtraInfo());
+                }
+                ccDocFileToBusiData.setEntCode("CC_QS_INSPECTION");
+                ccDocFileToBusiData.setEntityRecordId(valueMap.get("ID").toString());
+                ccDocFileToBusiData.setCcPrjId(valueMap.get("CC_PRJ_ID").toString());
+                ccDocFileToBusiData.setCcDocFileTypeId("BIM");
+                ccDocFileToBusiData.setCcDocFileToBusiDataType("0");//（0：业务数据，1：业务数据明细，2：电子沙盘）
+                ccDocFileToBusiData.insertById();
+            } else {
+                // 处理 CC_BIM_MODEL_COMPONENTS_ID 不存在的情况
+            }
+        }
+    }
+
+    /**
+     * 更新BIM模型构件信息
+     */
+    public void createBimModelComponents(){
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            //新增BIM模型构件
+            String Id = IdUtil.getSnowflakeNextIdStr();
+            CcBimModelComponents ccBimModelComponents = CcBimModelComponents.newData();
+            ccBimModelComponents.setId(Id);
+            ccBimModelComponents.setTs(LocalDateTime.now());
+            ccBimModelComponents.setCrtDt(LocalDateTime.now());
+            ccBimModelComponents.setLastModiDt(LocalDateTime.now());
+            ccBimModelComponents.setCrtUserId(userId);
+            ccBimModelComponents.setLastModiDt(LocalDateTime.now());
+            ccBimModelComponents.setStatus("AP");
+            ccBimModelComponents.setCode(valueMap.get("DOC_FILE_COM_ID").toString());
+            ccBimModelComponents.setName(JsonUtil.toJson(new Internationalization(null, valueMap.get("DOC_FILE_COM_ID").toString(), null)));
+            ccBimModelComponents.setExtraInfo(valueMap.get("EXTRA_INFO").toString());
+            ccBimModelComponents.setCcDocFileId(valueMap.get("CC_DOC_FILE_ID").toString());
+            ccBimModelComponents.insertById();
+
+            //更新质安巡检数据
+            CcQsInspection ccQsInspection = CcQsInspection.selectById(valueMap.get("ENTITY_RECORD_ID").toString());
+            ccQsInspection.setCcBimModelComponentsId(Id);
+            ccQsInspection.updateById();
+
+        }
+    }
+
+    /**
+     * 删除BIM模型构件信息
+     */
+    public void deleteBimModelComponents(){
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        for (EntityRecord entityRecord : entityRecordList) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            //更新质安巡检表
+            CcQsInspection ccQsInspection = CcQsInspection.selectById(valueMap.get("ENTITY_RECORD_ID").toString());
+            String ccBimModelComponentsId = ccQsInspection.getCcBimModelComponentsId();
+            ccQsInspection.setCcBimModelComponentsId(null);
+            ccQsInspection.updateById();
+            //为避免“BIM模型构件”的数据越来越冗余，这里还是要删除对应数据
+            CcBimModelComponents.deleteById(ccBimModelComponentsId);
+        }
+    }
 }
