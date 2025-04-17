@@ -128,7 +128,15 @@ public class CcQsInspection {
          */
         public static final String CC_NAME = "CC_NAME";
         /**
-         * {"EN": "CC_QS_INSPECTION_USER", "ZH_CN": "质安巡检用户", "ZH_TW": "繁：质安巡检用户"}。
+         * 质安问题要点分类(直接子节点)。
+         */
+        public static final String CC_QS_ISSUE_POINT_TYPE_CHILD_ID = "CC_QS_ISSUE_POINT_TYPE_CHILD_ID";
+        /**
+         * BIM模型构件。
+         */
+        public static final String CC_BIM_MODEL_COMPONENTS_ID = "CC_BIM_MODEL_COMPONENTS_ID";
+        /**
+         * 质安巡检用户。
          */
         public static final String CC_QS_INSPECTION_USER = "CC_QS_INSPECTION_USER";
         /**
@@ -152,7 +160,11 @@ public class CcQsInspection {
          */
         public static final String CC_QS_ISSUE_LEVEL_ID = "CC_QS_ISSUE_LEVEL_ID";
         /**
-         * {"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
+         * 质量考核条款(多值)。
+         */
+        public static final String CC_QS_ASSESSMENT_CRITERIA_IDS = "CC_QS_ASSESSMENT_CRITERIA_IDS";
+        /**
+         * 关联的分部分项节点。
          */
         public static final String CC_PRJ_PBS_NODE_ID = "CC_PRJ_PBS_NODE_ID";
         /**
@@ -955,7 +967,79 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_INSPECTION_USER", "ZH_CN": "质安巡检用户", "ZH_TW": "繁：质安巡检用户"}。
+     * 质安问题要点分类(直接子节点)。
+     */
+    private String ccQsIssuePointTypeChildId;
+
+    /**
+     * 获取：质安问题要点分类(直接子节点)。
+     */
+    public String getCcQsIssuePointTypeChildId() {
+        return this.ccQsIssuePointTypeChildId;
+    }
+
+    /**
+     * 设置：质安问题要点分类(直接子节点)。
+     */
+    public CcQsInspection setCcQsIssuePointTypeChildId(String ccQsIssuePointTypeChildId) {
+        if (this.ccQsIssuePointTypeChildId == null && ccQsIssuePointTypeChildId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQsIssuePointTypeChildId != null && ccQsIssuePointTypeChildId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQsIssuePointTypeChildId.compareTo(ccQsIssuePointTypeChildId) != 0) {
+                this.ccQsIssuePointTypeChildId = ccQsIssuePointTypeChildId;
+                if (!this.toUpdateCols.contains("CC_QS_ISSUE_POINT_TYPE_CHILD_ID")) {
+                    this.toUpdateCols.add("CC_QS_ISSUE_POINT_TYPE_CHILD_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQsIssuePointTypeChildId = ccQsIssuePointTypeChildId;
+            if (!this.toUpdateCols.contains("CC_QS_ISSUE_POINT_TYPE_CHILD_ID")) {
+                this.toUpdateCols.add("CC_QS_ISSUE_POINT_TYPE_CHILD_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * BIM模型构件。
+     */
+    private String ccBimModelComponentsId;
+
+    /**
+     * 获取：BIM模型构件。
+     */
+    public String getCcBimModelComponentsId() {
+        return this.ccBimModelComponentsId;
+    }
+
+    /**
+     * 设置：BIM模型构件。
+     */
+    public CcQsInspection setCcBimModelComponentsId(String ccBimModelComponentsId) {
+        if (this.ccBimModelComponentsId == null && ccBimModelComponentsId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccBimModelComponentsId != null && ccBimModelComponentsId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccBimModelComponentsId.compareTo(ccBimModelComponentsId) != 0) {
+                this.ccBimModelComponentsId = ccBimModelComponentsId;
+                if (!this.toUpdateCols.contains("CC_BIM_MODEL_COMPONENTS_ID")) {
+                    this.toUpdateCols.add("CC_BIM_MODEL_COMPONENTS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccBimModelComponentsId = ccBimModelComponentsId;
+            if (!this.toUpdateCols.contains("CC_BIM_MODEL_COMPONENTS_ID")) {
+                this.toUpdateCols.add("CC_BIM_MODEL_COMPONENTS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 质安巡检用户。
      */
     private String ccQsInspectionUser;
 
@@ -1171,7 +1255,43 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
+     * 质量考核条款(多值)。
+     */
+    private String ccQsAssessmentCriteriaIds;
+
+    /**
+     * 获取：质量考核条款(多值)。
+     */
+    public String getCcQsAssessmentCriteriaIds() {
+        return this.ccQsAssessmentCriteriaIds;
+    }
+
+    /**
+     * 设置：质量考核条款(多值)。
+     */
+    public CcQsInspection setCcQsAssessmentCriteriaIds(String ccQsAssessmentCriteriaIds) {
+        if (this.ccQsAssessmentCriteriaIds == null && ccQsAssessmentCriteriaIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQsAssessmentCriteriaIds != null && ccQsAssessmentCriteriaIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQsAssessmentCriteriaIds.compareTo(ccQsAssessmentCriteriaIds) != 0) {
+                this.ccQsAssessmentCriteriaIds = ccQsAssessmentCriteriaIds;
+                if (!this.toUpdateCols.contains("CC_QS_ASSESSMENT_CRITERIA_IDS")) {
+                    this.toUpdateCols.add("CC_QS_ASSESSMENT_CRITERIA_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQsAssessmentCriteriaIds = ccQsAssessmentCriteriaIds;
+            if (!this.toUpdateCols.contains("CC_QS_ASSESSMENT_CRITERIA_IDS")) {
+                this.toUpdateCols.add("CC_QS_ASSESSMENT_CRITERIA_IDS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 关联的分部分项节点。
      */
     private String ccPrjPbsNodeId;
 
