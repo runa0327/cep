@@ -1,6 +1,7 @@
 package com.bid.ext.cc;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONObject;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -550,8 +551,16 @@ public class PrjExt {
                         ccDocFileToBusiData.setCcDocFileId(ccDocFileId);
                     }
                     ccDocFileToBusiData.setDocFileComId(ccBimModelComponents.getCode());
-                    ccDocFileToBusiData.setExtraInfo(ccBimModelComponents.getExtraInfo());
-                    ccDocFileToBusiData.setDocFilePointPosition(ccBimModelComponents.getExtraInfo());
+                    String extraInfo = ccBimModelComponents.getExtraInfo();//额外信息
+                    ccDocFileToBusiData.setExtraInfo(extraInfo);
+                    //将额外信息中{"comId":"5911683","x":8.423844391604979,"y":12.628058753907688,"z":1.8615097497150477}的comId去掉
+                    if (extraInfo != null && extraInfo.contains("comId")) {
+                        JSONObject jsonObject = new JSONObject(extraInfo);
+                        //json中去掉comId
+                        jsonObject.remove("comId");
+                        String updatedJsonString = jsonObject.toString();
+                        ccDocFileToBusiData.setDocFilePointPosition(updatedJsonString);
+                    }
                 }
                 ccDocFileToBusiData.setEntCode("CC_QS_INSPECTION");
                 ccDocFileToBusiData.setEntityRecordId(valueMap.get("ID").toString());
