@@ -533,7 +533,7 @@ public class PrjExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            if (valueMap.containsKey("CC_BIM_MODEL_COMPONENTS_ID")) {
+            if (valueMap.containsKey("CC_BIM_MODEL_COMPONENTS_ID") && valueMap.get("CC_BIM_MODEL_COMPONENTS_ID") != null) {
                 //新增资料文件关联业务数据
                 CcDocFileToBusiData ccDocFileToBusiData = CcDocFileToBusiData.newData();
                 ccDocFileToBusiData.setTs(LocalDateTime.now());
