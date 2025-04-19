@@ -54,4 +54,10 @@ public class BaseDomain {
      * 编码
      */
     private String code;
+
+    /**
+     * 锁定流程实例
+     */
+    @TableField("LK_WF_INST_ID")
+    private  String lkWfInstId;
 }

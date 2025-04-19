@@ -1,6 +1,7 @@
 package com.pms.bid.job.serviceImpl.processInstance;
 
 import cn.hutool.core.util.IdUtil;
+import com.pms.bid.job.domain.designChaneges.CcChangeDesignDemonstrate;
 import com.pms.bid.job.domain.json.Internationalization;
 import com.pms.bid.job.domain.process.ConstructionPlan;
 import com.pms.bid.job.domain.process.SpecialEquipPreVe;
@@ -418,6 +419,70 @@ public class WfProcessInstanceServiceImpl implements WfProcessInstanceService {
         wfProcessInstance.setAdUserId(tmp.getAdUserId());
         wfProcessInstance.setCurrentViewId(secondNode.getViewId());
         wfProcessInstance.setWfProcessId(secondNode.getWfProcessId());
+        wfProcessInstanceMapper.create(wfProcessInstance);
+    }
+
+    @Override
+    public Map<String,String> createWfProcessToSendNode(CcChangeDesignDemonstrate tmp, String firstNodeId, String wfProcessId, String entId, String entCode, String adUserId) {
+
+        String now = DateUtil.getNormalTimeStr(new Date());
+        String createBy = "0099250247095871681";
+
+        //  创建流程实例
+        String wfProcessInstanceId = IdUtil.getSnowflakeNextIdStr();
+        String wfNodeInstanceId = createNodeInstanceById(IdUtil.getSnowflakeNextIdStr());
+        WfNode firstNode = wfNodeMapper.queryNodeById(firstNodeId);
+        WfProcess wfProcess = wfProcessMapper.queryNameById(wfProcessId);
+        wfProcess.setAdEntId(entId);
+        wfProcess.setEntCode(entCode);
+
+        //  创建流程实例
+        createWfProcessInstance(tmp,adUserId,wfProcessInstanceId,wfNodeInstanceId,firstNode,wfProcess,now,createBy);
+
+        //  创建第一步节点实例
+        createNodeInstance(wfProcessInstanceId,firstNode,adUserId,1,wfNodeInstanceId,now,createBy);
+
+        Map<String,String>  result=  new HashMap<String,String>();
+        result.put("wfProcessInstanceId",wfProcessInstanceId);
+        return result;
+    }
+
+    /**
+     * 为设计变更创建流程实例，设置当前节点实例
+     * @param tmp
+     * @param wfProcessInstanceId
+     * @param wfNodeInstanceId
+     * @param firstNode
+     * @param wfProcess
+     * @param now
+     * @param createBy
+     */
+    private void createWfProcessInstance(CcChangeDesignDemonstrate tmp,String  adUserId, String wfProcessInstanceId, String wfNodeInstanceId, WfNode firstNode, WfProcess wfProcess, String now, String createBy) {
+        WfProcessInstance wfProcessInstance = new WfProcessInstance();
+        wfProcessInstance.setId(wfProcessInstanceId);
+        wfProcessInstance.setVer("1");
+        wfProcessInstance.setTs(now);
+        wfProcessInstance.setCreateBy(createBy);
+        wfProcessInstance.setLastUpdateBy(createBy);
+        wfProcessInstance.setCreateDate(now);
+        wfProcessInstance.setLastUpdateDate(now);
+        wfProcessInstance.setStatus("AP");
+
+        String name = wfProcess.getWfProcessName() + "-" + now;
+
+        name = JsonUtil.toJson(new Internationalization(null,name,null));
+        wfProcessInstance.setWfProcessInstanceName(name);
+        wfProcessInstance.setStartUserId(tmp.getCreateBy());
+        wfProcessInstance.setStartDate(now);
+        wfProcessInstance.setAdEntId(wfProcess.getAdEntId());
+        wfProcessInstance.setAdEntCode(wfProcess.getEntCode());
+        wfProcessInstance.setEntityRecordId(tmp.getId());
+        wfProcessInstance.setUrgent(0);
+        wfProcessInstance.setCurrentNodeId(firstNode.getId());
+        wfProcessInstance.setWfNodeInstanceId(wfNodeInstanceId);
+        wfProcessInstance.setAdUserId(adUserId);
+        wfProcessInstance.setCurrentViewId(firstNode.getViewId());
+        wfProcessInstance.setWfProcessId(firstNode.getToNodeId());
         wfProcessInstanceMapper.create(wfProcessInstance);
     }
 }

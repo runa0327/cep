@@ -17,4 +17,17 @@
         </foreach>
     </select>
 
+    <select id="selectByWfProcessInstanceId" resultType="com.pms.bid.job.domain.ru.AdUser" parameterType="string">
+        SELECT  au.*
+        from  ad_role ar,ad_user au ,ad_role_user aru , wf_task wt ,ad_act aa
+        where wt.WF_PROCESS_INSTANCE_ID = '1910219824916799488'
+          and  ar.`code`='DESIGN_UNIT'
+          and aa.`CODE` = 'Approve'
+          AND  ar.ID = aru.AD_ROLE_ID
+          and  aru.AD_USER_ID = wt.AD_USER_ID
+          and  au.ID = wt.AD_USER_ID
+          and  wt.ad_act_id = aa.id
+        limit 0,1
+    </select>
+
 </mapper>

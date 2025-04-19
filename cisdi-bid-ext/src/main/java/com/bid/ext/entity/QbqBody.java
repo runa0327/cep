@@ -18,5 +18,13 @@ public class QbqBody {
         private String name;
         private String tel;
         private String idCardNo;
+
+        private String companyName;
+
+        private String signatoryId;
+        private String signatoryName;
+
+        private String signatoryEnterpriseName;
+        private String signatoryEnterpriseCode;
     }
 }

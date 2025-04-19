@@ -11,4 +11,7 @@ public interface AdUserMapper extends BaseMapper<AdUser> {
     public AdUser  selectUserByPrjMemberId(String memberId);
 
     public List<AdUser>  selectUserByPrjMemberIds(@Param("memberIds") List<String> memberIds);
+
+    public AdUser  selectByWfProcessInstanceId(@Param("processInstanceId") String processInstanceId);
+
 }
