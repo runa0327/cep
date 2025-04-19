@@ -386,9 +386,16 @@ public class CcLogisticsPurchaseExt {
         ccLogisticsPack.setCcHaveSpecialTools(stringToBoolean(varMap.get("P_CC_HAVE_SPECIAL_TOOLS").toString()));
         ccLogisticsPack.setCcIsBreakUp(stringToBoolean(varMap.get("P_CC_IS_BREAK_UP").toString()));
         ccLogisticsPack.setCcPackgingWeight(new BigDecimal(varMap.get("P_CC_PACKGING_WEIGHT").toString()));
-        ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_LENGTH").toString()));
-        ccLogisticsPack.setCcProductMaxWidth(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_WIDTH").toString()));
-        ccLogisticsPack.setCcProductMaxHeight(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_HEIGHT").toString()));
+        //判断varMap中是否存在P_CC_PRODUCT_MAX_LENGTH这个键
+        if(varMap.containsKey("P_CC_PRODUCT_MAX_LENGTH")){
+            ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_LENGTH").toString()));
+        }
+        if(varMap.containsKey("P_CC_PRODUCT_MAX_WIDTH")){
+            ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_WIDTH").toString()));
+        }
+        if(varMap.containsKey("P_CC_PRODUCT_MAX_HEIGHT")){
+            ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_HEIGHT").toString()));
+        }
         ccLogisticsPack.setContactName(varMap.get("P_CONTACT_NAME").toString());
         ccLogisticsPack.setContactMobile(varMap.get("P_CONTACT_MOBILE").toString());
         ccLogisticsPack.setCcCarryTypeId(varMap.get("P_CC_CARRY_TYPE_ID").toString());

@@ -160,11 +160,18 @@ public class StructNodeExt {
 //                "AND CC_CONSTRUCT_PROGRESS_PLAN_ID = ? " + //施工进度计划
 //                "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
 //                "LIMIT 1";
+//            sql = "SELECT name AS maxVersion " +
+//                    "FROM cc_prj_struct_node_version " +
+//                    "WHERE cc_prj_id = ? " +
+//                    "AND cc_prj_wbs_type_id = ? " +
+//                    "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
+//                    "LIMIT 1";
+            //现有数据有的是json，有的是字符串，因此不能按照版本数字排序，通过创建时间
             sql = "SELECT name AS maxVersion " +
                     "FROM cc_prj_struct_node_version " +
                     "WHERE cc_prj_id = ? " +
                     "AND cc_prj_wbs_type_id = ? " +
-                    "ORDER BY CAST(REPLACE(name, 'V', '') AS UNSIGNED) DESC " +
+                    "ORDER BY CRT_DT DESC " +
                     "LIMIT 1";
             try {
                 map = myJdbcTemplate.queryForMap(sql, pCcPrjIds, planType);
@@ -3399,25 +3406,143 @@ public class StructNodeExt {
     /**
      * 收藏计划
      */
+//    public void addFavorite() {
+//        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+//            String csCommId = entityRecord.csCommId;
+//            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+//            ccPrjStructNode.setIsFavorites(true);
+//            ccPrjStructNode.updateById();
+//        }
+//    }
+
+    /**
+     * 收藏计划
+     */
     public void addFavorite() {
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            String csCommId = entityRecord.csCommId;
-            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
-            ccPrjStructNode.setIsFavorites(true);
-            ccPrjStructNode.updateById();
+        try {
+            // 获取实体记录列表
+            List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+            if (entityRecordList == null || entityRecordList.isEmpty()) {
+                log.info("实体记录列表为空，无需处理。");
+                return;
+            }
+
+            // 收集需要更新的 csCommId
+            List<String> csCommIdList = new ArrayList<>();
+            for (EntityRecord entityRecord : entityRecordList) {
+                String csCommId = entityRecord.csCommId;
+                if (csCommId == null || csCommId.isEmpty()) {
+                    log.warn("跳过无效的 csCommId: {}", csCommId);
+                    continue;
+                }
+                csCommIdList.add(csCommId);
+            }
+
+            if (csCommIdList.isEmpty()) {
+                log.info("无有效的 csCommId 需要处理。");
+                return;
+            }
+
+            // 批量更新收藏状态
+            for (String csCommId : csCommIdList) {
+                updateFavoriteStatus(csCommId, true);
+            }
+
+            log.info("收藏计划执行成功，共处理 {} 条记录。", csCommIdList.size());
+
+            InvokeActResult invokeActResult = new InvokeActResult();
+            invokeActResult.reFetchData = true;
+            ExtJarHelper.setReturnValue(invokeActResult);
+
+        } catch (Exception e) {
+            // 异常处理
+            log.error("收藏计划执行失败：{}", e.getMessage(), e);
         }
     }
 
     /**
+     * 递归更新节点及其所有子节点的收藏状态
+     *
+     * @param csCommId     节点ID
+     * @param isFavorites  是否收藏
+     */
+    private void updateFavoriteStatus(String csCommId, boolean isFavorites) {
+        try {
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+            if (ccPrjStructNode == null) {
+                log.warn("节点ID {} 对应的 CcPrjStructNode 不存在，跳过更新。", csCommId);
+                return;
+            }
+
+            // 更新当前节点的收藏状态
+            ccPrjStructNode.setIsFavorites(isFavorites);
+            ccPrjStructNode.updateById();
+            log.info("更新节点ID {} 的收藏状态为 {}", csCommId, isFavorites);
+
+            // 获取子节点并递归更新
+            List<Map<String, Object>> childNodes = getChildNodes(csCommId);
+            if (childNodes != null && !childNodes.isEmpty()) {
+                for (Map<String, Object> childNode : childNodes) {
+                    String childCsCommId = (String) childNode.get("ID");
+                    updateFavoriteStatus(childCsCommId, isFavorites);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("更新节点ID {} 的收藏状态时发生异常：{}", csCommId, e.getMessage(), e);
+        }
+    }
+
+//    /**
+//     * 取消收藏
+//     */
+//    public void removeFavorite() {
+//        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+//            String csCommId = entityRecord.csCommId;
+//            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+//            ccPrjStructNode.setIsFavorites(false);
+//            ccPrjStructNode.updateById();
+//        }
+//    }
+    /**
      * 取消收藏
      */
-
     public void removeFavorite() {
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            String csCommId = entityRecord.csCommId;
-            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
-            ccPrjStructNode.setIsFavorites(false);
-            ccPrjStructNode.updateById();
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        if (entityRecordList != null) {
+            for (EntityRecord entityRecord : entityRecordList) {
+                String csCommId = entityRecord.csCommId;
+                if (csCommId != null) {
+                    CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+                    if (ccPrjStructNode != null) {
+                        ccPrjStructNode.setIsFavorites(false);
+                        ccPrjStructNode.updateById();
+                        // 处理子节点
+                        removeFavoriteForNode(ccPrjStructNode.getId());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 递归取消收藏子节点
+     */
+    private void removeFavoriteForNode(String nodeId) {
+        List<Map<String, Object>> children = getChildNodes(nodeId);
+        if (children != null) {
+            for (Map<String, Object> child : children) {
+                String childId = (String) child.get("ID");
+                if (childId != null) {
+                    CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(childId);
+                    if (ccPrjStructNode != null) {
+                        ccPrjStructNode.setIsFavorites(false);
+                        ccPrjStructNode.updateById();
+                        // 递归处理子节点
+                        removeFavoriteForNode(childId);
+                    }
+                }
+            }
         }
     }
 
@@ -3464,14 +3589,14 @@ public class StructNodeExt {
                 String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
                 String ccPrjStructNodePid = JdbcMapUtil.getString(valueMap, "ID");
                 ccPrjStructNode.setCcPrjId(ccPrjId);
-                if(wbsType.equals("DESIGN")){
-                    //目前只要求设计管理这边有更改，其他类型暂不做处理
-                    String faStructNodeId = JdbcMapUtil.getString(varMap, "P_FA_STRUCT_NODE_ID");
-                    ccPrjStructNode.setCcPrjStructNodePid(faStructNodeId);
-                }else{
+//                if(wbsType.equals("DESIGN") || wbsType.equals("CONSTRUCT")){
+                //设计管理、施工管理和前期管理需要灵活选择父级节点
+                String faStructNodeId = JdbcMapUtil.getString(varMap, "P_FA_STRUCT_NODE_ID");
+                ccPrjStructNode.setCcPrjStructNodePid(faStructNodeId);
+//                }else{
                     //设计管理中的父级节点可以选择，其他管理暂时默认为选中数据作为父级
-                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
-                }
+//                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
+//                }
                 ccPrjStructNode.insertById();
             }
         } else {

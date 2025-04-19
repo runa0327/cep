@@ -39,12 +39,14 @@ public class BimfaceModelFederationExt {
         String token = doGetStringStringMap();
         String ccBimfaceFileIds = "";
         String integrateName = "";
+        String previousCcPrjId = null;
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String id = entityRecord.csCommId;
             CcDocFile ccDocFile = CcDocFile.selectById(id);
-            String ccDocFileName = ccDocFile.getName();
+            String ccDocFileName = I18nUtil.tryGetInCurrentLang(ccDocFile.getName());
             String ccPreviewFileId = ccDocFile.getCcPreviewFileId();
             String ccPreviewConversionStatusId = ccDocFile.getCcPreviewConversionStatusId();
+            String ccPrjId = ccDocFile.getCcPrjId();
             if ("SUCC".equals(ccPreviewConversionStatusId)) {
                 // 判断integrateName是否为空，如果为空，直接赋值，否则加上"+"
                 if (integrateName.isEmpty()) {
@@ -57,6 +59,16 @@ public class BimfaceModelFederationExt {
                 } else {
                     ccBimfaceFileIds += "," + ccPreviewFileId;
                 }
+                // 如果previousCcPrjId为空，则初始化并设置
+                if (previousCcPrjId == null) {
+                    previousCcPrjId = ccPrjId;
+                } else {
+                    // 如果当前的ccPrjId与第一次的ccPrjId不同，抛出异常
+                    if (!previousCcPrjId.equals(ccPrjId)) {
+                        String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.differentPrjId");
+                        throw new BaseException(message);
+                    }
+                }
             } else if ("DOING".equals(ccPreviewConversionStatusId)) {
                 String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.previewConverting");
                 throw new BaseException(message);
@@ -68,6 +80,7 @@ public class BimfaceModelFederationExt {
         }
 
         CcModelFederationToFile ccModelFederationToFile = CcModelFederationToFile.newData();
+        ccModelFederationToFile.setCcPrjId(previousCcPrjId);
         ccModelFederationToFile.setCcBimfaceFileIds(ccBimfaceFileIds);
         ccModelFederationToFile.setName(integrateName);
         ccModelFederationToFile.insertById();

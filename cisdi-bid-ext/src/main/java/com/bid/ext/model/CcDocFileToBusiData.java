@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 模型集成ID关联文件ID。
+ * 资料文件关联业务数据。
  */
-public class CcModelFederationToFile {
+public class CcDocFileToBusiData {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcModelFederationToFile> modelHelper = new ModelHelper<>("CC_MODEL_FEDERATION_TO_FILE", new CcModelFederationToFile());
+    private static final ModelHelper<CcDocFileToBusiData> modelHelper = new ModelHelper<>("CC_DOC_FILE_TO_BUSI_DATA", new CcDocFileToBusiData());
 
     /**
      * 待更新的列。
@@ -37,7 +37,7 @@ public class CcModelFederationToFile {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_MODEL_FEDERATION_TO_FILE";
+    public static final String ENT_CODE = "CC_DOC_FILE_TO_BUSI_DATA";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -91,14 +91,6 @@ public class CcModelFederationToFile {
          */
         public static final String CODE = "CODE";
         /**
-         * 名称。
-         */
-        public static final String NAME = "NAME";
-        /**
-         * 备注。
-         */
-        public static final String REMARK = "REMARK";
-        /**
          * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
@@ -111,21 +103,57 @@ public class CcModelFederationToFile {
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * 预览转换状态。
+         * 资料文件类型。
          */
-        public static final String CC_PREVIEW_CONVERSION_STATUS_ID = "CC_PREVIEW_CONVERSION_STATUS_ID";
+        public static final String CC_DOC_FILE_TYPE_ID = "CC_DOC_FILE_TYPE_ID";
         /**
-         * bimface文件ID。
+         * 资料文件。
          */
-        public static final String CC_BIMFACE_FILE_IDS = "CC_BIMFACE_FILE_IDS";
+        public static final String CC_DOC_FILE_ID = "CC_DOC_FILE_ID";
         /**
-         * 模型集成ID。
+         * 资料文件组件ID。
          */
-        public static final String CC_MODEL_INTEGRATE_ID = "CC_MODEL_INTEGRATE_ID";
+        public static final String DOC_FILE_COM_ID = "DOC_FILE_COM_ID";
         /**
-         * 预览地址。
+         * 资料文件点位。
          */
-        public static final String CC_PREVIEW_URL = "CC_PREVIEW_URL";
+        public static final String DOC_FILE_POINT_POSITION = "DOC_FILE_POINT_POSITION";
+        /**
+         * 实体代码。
+         */
+        public static final String ENT_CODE = "ENT_CODE";
+        /**
+         * 实体记录ID。
+         */
+        public static final String ENTITY_RECORD_ID = "ENTITY_RECORD_ID";
+        /**
+         * 名称。
+         */
+        public static final String NAME = "NAME";
+        /**
+         * 附件。
+         */
+        public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
+        /**
+         * 附件2。
+         */
+        public static final String CC_ATTACHMENTS2 = "CC_ATTACHMENTS2";
+        /**
+         * 备注。
+         */
+        public static final String REMARK = "REMARK";
+        /**
+         * 超链接。
+         */
+        public static final String HREF = "HREF";
+        /**
+         * 额外信息。
+         */
+        public static final String EXTRA_INFO = "EXTRA_INFO";
+        /**
+         * 业务数据类型。
+         */
+        public static final String CC_DOC_FILE_TO_BUSI_DATA_TYPE = "CC_DOC_FILE_TO_BUSI_DATA_TYPE";
     }
 
     // </editor-fold>
@@ -148,7 +176,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：ID。
      */
-    public CcModelFederationToFile setId(String id) {
+    public CcDocFileToBusiData setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -184,7 +212,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：版本。
      */
-    public CcModelFederationToFile setVer(Integer ver) {
+    public CcDocFileToBusiData setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -220,7 +248,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：时间戳。
      */
-    public CcModelFederationToFile setTs(LocalDateTime ts) {
+    public CcDocFileToBusiData setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -256,7 +284,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：是否预设。
      */
-    public CcModelFederationToFile setIsPreset(Boolean isPreset) {
+    public CcDocFileToBusiData setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -292,7 +320,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：创建日期时间。
      */
-    public CcModelFederationToFile setCrtDt(LocalDateTime crtDt) {
+    public CcDocFileToBusiData setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -328,7 +356,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：创建用户。
      */
-    public CcModelFederationToFile setCrtUserId(String crtUserId) {
+    public CcDocFileToBusiData setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -364,7 +392,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：最后修改日期时间。
      */
-    public CcModelFederationToFile setLastModiDt(LocalDateTime lastModiDt) {
+    public CcDocFileToBusiData setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -400,7 +428,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：最后修改用户。
      */
-    public CcModelFederationToFile setLastModiUserId(String lastModiUserId) {
+    public CcDocFileToBusiData setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -436,7 +464,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：记录状态。
      */
-    public CcModelFederationToFile setStatus(String status) {
+    public CcDocFileToBusiData setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -472,7 +500,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：锁定流程实例。
      */
-    public CcModelFederationToFile setLkWfInstId(String lkWfInstId) {
+    public CcDocFileToBusiData setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -508,7 +536,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：代码。
      */
-    public CcModelFederationToFile setCode(String code) {
+    public CcDocFileToBusiData setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -530,78 +558,6 @@ public class CcModelFederationToFile {
     }
 
     /**
-     * 名称。
-     */
-    private String name;
-
-    /**
-     * 获取：名称。
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * 设置：名称。
-     */
-    public CcModelFederationToFile setName(String name) {
-        if (this.name == null && name == null) {
-            // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 备注。
-     */
-    private String remark;
-
-    /**
-     * 获取：备注。
-     */
-    public String getRemark() {
-        return this.remark;
-    }
-
-    /**
-     * 设置：备注。
-     */
-    public CcModelFederationToFile setRemark(String remark) {
-        if (this.remark == null && remark == null) {
-            // 均为null，不做处理。
-        } else if (this.remark != null && remark != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.remark.compareTo(remark) != 0) {
-                this.remark = remark;
-                if (!this.toUpdateCols.contains("REMARK")) {
-                    this.toUpdateCols.add("REMARK");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.remark = remark;
-            if (!this.toUpdateCols.contains("REMARK")) {
-                this.toUpdateCols.add("REMARK");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 快捷码。
      */
     private String fastCode;
@@ -616,7 +572,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：快捷码。
      */
-    public CcModelFederationToFile setFastCode(String fastCode) {
+    public CcDocFileToBusiData setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -652,7 +608,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：图标。
      */
-    public CcModelFederationToFile setIconFileGroupId(String iconFileGroupId) {
+    public CcDocFileToBusiData setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -688,7 +644,7 @@ public class CcModelFederationToFile {
     /**
      * 设置：项目。
      */
-    public CcModelFederationToFile setCcPrjId(String ccPrjId) {
+    public CcDocFileToBusiData setCcPrjId(String ccPrjId) {
         if (this.ccPrjId == null && ccPrjId == null) {
             // 均为null，不做处理。
         } else if (this.ccPrjId != null && ccPrjId != null) {
@@ -710,144 +666,468 @@ public class CcModelFederationToFile {
     }
 
     /**
-     * 预览转换状态。
+     * 资料文件类型。
      */
-    private String ccPreviewConversionStatusId;
+    private String ccDocFileTypeId;
 
     /**
-     * 获取：预览转换状态。
+     * 获取：资料文件类型。
      */
-    public String getCcPreviewConversionStatusId() {
-        return this.ccPreviewConversionStatusId;
+    public String getCcDocFileTypeId() {
+        return this.ccDocFileTypeId;
     }
 
     /**
-     * 设置：预览转换状态。
+     * 设置：资料文件类型。
      */
-    public CcModelFederationToFile setCcPreviewConversionStatusId(String ccPreviewConversionStatusId) {
-        if (this.ccPreviewConversionStatusId == null && ccPreviewConversionStatusId == null) {
+    public CcDocFileToBusiData setCcDocFileTypeId(String ccDocFileTypeId) {
+        if (this.ccDocFileTypeId == null && ccDocFileTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.ccPreviewConversionStatusId != null && ccPreviewConversionStatusId != null) {
+        } else if (this.ccDocFileTypeId != null && ccDocFileTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccPreviewConversionStatusId.compareTo(ccPreviewConversionStatusId) != 0) {
-                this.ccPreviewConversionStatusId = ccPreviewConversionStatusId;
-                if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_STATUS_ID")) {
-                    this.toUpdateCols.add("CC_PREVIEW_CONVERSION_STATUS_ID");
+            if (this.ccDocFileTypeId.compareTo(ccDocFileTypeId) != 0) {
+                this.ccDocFileTypeId = ccDocFileTypeId;
+                if (!this.toUpdateCols.contains("CC_DOC_FILE_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_DOC_FILE_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccPreviewConversionStatusId = ccPreviewConversionStatusId;
-            if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_STATUS_ID")) {
-                this.toUpdateCols.add("CC_PREVIEW_CONVERSION_STATUS_ID");
+            this.ccDocFileTypeId = ccDocFileTypeId;
+            if (!this.toUpdateCols.contains("CC_DOC_FILE_TYPE_ID")) {
+                this.toUpdateCols.add("CC_DOC_FILE_TYPE_ID");
             }
         }
         return this;
     }
 
     /**
-     * bimface文件ID。
+     * 资料文件。
      */
-    private String ccBimfaceFileIds;
+    private String ccDocFileId;
 
     /**
-     * 获取：bimface文件ID。
+     * 获取：资料文件。
      */
-    public String getCcBimfaceFileIds() {
-        return this.ccBimfaceFileIds;
+    public String getCcDocFileId() {
+        return this.ccDocFileId;
     }
 
     /**
-     * 设置：bimface文件ID。
+     * 设置：资料文件。
      */
-    public CcModelFederationToFile setCcBimfaceFileIds(String ccBimfaceFileIds) {
-        if (this.ccBimfaceFileIds == null && ccBimfaceFileIds == null) {
+    public CcDocFileToBusiData setCcDocFileId(String ccDocFileId) {
+        if (this.ccDocFileId == null && ccDocFileId == null) {
             // 均为null，不做处理。
-        } else if (this.ccBimfaceFileIds != null && ccBimfaceFileIds != null) {
+        } else if (this.ccDocFileId != null && ccDocFileId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccBimfaceFileIds.compareTo(ccBimfaceFileIds) != 0) {
-                this.ccBimfaceFileIds = ccBimfaceFileIds;
-                if (!this.toUpdateCols.contains("CC_BIMFACE_FILE_IDS")) {
-                    this.toUpdateCols.add("CC_BIMFACE_FILE_IDS");
+            if (this.ccDocFileId.compareTo(ccDocFileId) != 0) {
+                this.ccDocFileId = ccDocFileId;
+                if (!this.toUpdateCols.contains("CC_DOC_FILE_ID")) {
+                    this.toUpdateCols.add("CC_DOC_FILE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccBimfaceFileIds = ccBimfaceFileIds;
-            if (!this.toUpdateCols.contains("CC_BIMFACE_FILE_IDS")) {
-                this.toUpdateCols.add("CC_BIMFACE_FILE_IDS");
+            this.ccDocFileId = ccDocFileId;
+            if (!this.toUpdateCols.contains("CC_DOC_FILE_ID")) {
+                this.toUpdateCols.add("CC_DOC_FILE_ID");
             }
         }
         return this;
     }
 
     /**
-     * 模型集成ID。
+     * 资料文件组件ID。
      */
-    private String ccModelIntegrateId;
+    private String docFileComId;
 
     /**
-     * 获取：模型集成ID。
+     * 获取：资料文件组件ID。
      */
-    public String getCcModelIntegrateId() {
-        return this.ccModelIntegrateId;
+    public String getDocFileComId() {
+        return this.docFileComId;
     }
 
     /**
-     * 设置：模型集成ID。
+     * 设置：资料文件组件ID。
      */
-    public CcModelFederationToFile setCcModelIntegrateId(String ccModelIntegrateId) {
-        if (this.ccModelIntegrateId == null && ccModelIntegrateId == null) {
+    public CcDocFileToBusiData setDocFileComId(String docFileComId) {
+        if (this.docFileComId == null && docFileComId == null) {
             // 均为null，不做处理。
-        } else if (this.ccModelIntegrateId != null && ccModelIntegrateId != null) {
+        } else if (this.docFileComId != null && docFileComId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccModelIntegrateId.compareTo(ccModelIntegrateId) != 0) {
-                this.ccModelIntegrateId = ccModelIntegrateId;
-                if (!this.toUpdateCols.contains("CC_MODEL_INTEGRATE_ID")) {
-                    this.toUpdateCols.add("CC_MODEL_INTEGRATE_ID");
+            if (this.docFileComId.compareTo(docFileComId) != 0) {
+                this.docFileComId = docFileComId;
+                if (!this.toUpdateCols.contains("DOC_FILE_COM_ID")) {
+                    this.toUpdateCols.add("DOC_FILE_COM_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccModelIntegrateId = ccModelIntegrateId;
-            if (!this.toUpdateCols.contains("CC_MODEL_INTEGRATE_ID")) {
-                this.toUpdateCols.add("CC_MODEL_INTEGRATE_ID");
+            this.docFileComId = docFileComId;
+            if (!this.toUpdateCols.contains("DOC_FILE_COM_ID")) {
+                this.toUpdateCols.add("DOC_FILE_COM_ID");
             }
         }
         return this;
     }
 
     /**
-     * 预览地址。
+     * 资料文件点位。
      */
-    private String ccPreviewUrl;
+    private String docFilePointPosition;
 
     /**
-     * 获取：预览地址。
+     * 获取：资料文件点位。
      */
-    public String getCcPreviewUrl() {
-        return this.ccPreviewUrl;
+    public String getDocFilePointPosition() {
+        return this.docFilePointPosition;
     }
 
     /**
-     * 设置：预览地址。
+     * 设置：资料文件点位。
      */
-    public CcModelFederationToFile setCcPreviewUrl(String ccPreviewUrl) {
-        if (this.ccPreviewUrl == null && ccPreviewUrl == null) {
+    public CcDocFileToBusiData setDocFilePointPosition(String docFilePointPosition) {
+        if (this.docFilePointPosition == null && docFilePointPosition == null) {
             // 均为null，不做处理。
-        } else if (this.ccPreviewUrl != null && ccPreviewUrl != null) {
+        } else if (this.docFilePointPosition != null && docFilePointPosition != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccPreviewUrl.compareTo(ccPreviewUrl) != 0) {
-                this.ccPreviewUrl = ccPreviewUrl;
-                if (!this.toUpdateCols.contains("CC_PREVIEW_URL")) {
-                    this.toUpdateCols.add("CC_PREVIEW_URL");
+            if (this.docFilePointPosition.compareTo(docFilePointPosition) != 0) {
+                this.docFilePointPosition = docFilePointPosition;
+                if (!this.toUpdateCols.contains("DOC_FILE_POINT_POSITION")) {
+                    this.toUpdateCols.add("DOC_FILE_POINT_POSITION");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccPreviewUrl = ccPreviewUrl;
-            if (!this.toUpdateCols.contains("CC_PREVIEW_URL")) {
-                this.toUpdateCols.add("CC_PREVIEW_URL");
+            this.docFilePointPosition = docFilePointPosition;
+            if (!this.toUpdateCols.contains("DOC_FILE_POINT_POSITION")) {
+                this.toUpdateCols.add("DOC_FILE_POINT_POSITION");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实体代码。
+     */
+    private String entCode;
+
+    /**
+     * 获取：实体代码。
+     */
+    public String getEntCode() {
+        return this.entCode;
+    }
+
+    /**
+     * 设置：实体代码。
+     */
+    public CcDocFileToBusiData setEntCode(String entCode) {
+        if (this.entCode == null && entCode == null) {
+            // 均为null，不做处理。
+        } else if (this.entCode != null && entCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.entCode.compareTo(entCode) != 0) {
+                this.entCode = entCode;
+                if (!this.toUpdateCols.contains("ENT_CODE")) {
+                    this.toUpdateCols.add("ENT_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.entCode = entCode;
+            if (!this.toUpdateCols.contains("ENT_CODE")) {
+                this.toUpdateCols.add("ENT_CODE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实体记录ID。
+     */
+    private String entityRecordId;
+
+    /**
+     * 获取：实体记录ID。
+     */
+    public String getEntityRecordId() {
+        return this.entityRecordId;
+    }
+
+    /**
+     * 设置：实体记录ID。
+     */
+    public CcDocFileToBusiData setEntityRecordId(String entityRecordId) {
+        if (this.entityRecordId == null && entityRecordId == null) {
+            // 均为null，不做处理。
+        } else if (this.entityRecordId != null && entityRecordId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.entityRecordId.compareTo(entityRecordId) != 0) {
+                this.entityRecordId = entityRecordId;
+                if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
+                    this.toUpdateCols.add("ENTITY_RECORD_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.entityRecordId = entityRecordId;
+            if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
+                this.toUpdateCols.add("ENTITY_RECORD_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 名称。
+     */
+    private String name;
+
+    /**
+     * 获取：名称。
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * 设置：名称。
+     */
+    public CcDocFileToBusiData setName(String name) {
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件。
+     */
+    private String ccAttachments;
+
+    /**
+     * 获取：附件。
+     */
+    public String getCcAttachments() {
+        return this.ccAttachments;
+    }
+
+    /**
+     * 设置：附件。
+     */
+    public CcDocFileToBusiData setCcAttachments(String ccAttachments) {
+        if (this.ccAttachments == null && ccAttachments == null) {
+            // 均为null，不做处理。
+        } else if (this.ccAttachments != null && ccAttachments != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccAttachments.compareTo(ccAttachments) != 0) {
+                this.ccAttachments = ccAttachments;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
+                    this.toUpdateCols.add("CC_ATTACHMENTS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccAttachments = ccAttachments;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
+                this.toUpdateCols.add("CC_ATTACHMENTS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件2。
+     */
+    private String ccAttachments2;
+
+    /**
+     * 获取：附件2。
+     */
+    public String getCcAttachments2() {
+        return this.ccAttachments2;
+    }
+
+    /**
+     * 设置：附件2。
+     */
+    public CcDocFileToBusiData setCcAttachments2(String ccAttachments2) {
+        if (this.ccAttachments2 == null && ccAttachments2 == null) {
+            // 均为null，不做处理。
+        } else if (this.ccAttachments2 != null && ccAttachments2 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccAttachments2.compareTo(ccAttachments2) != 0) {
+                this.ccAttachments2 = ccAttachments2;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENTS2")) {
+                    this.toUpdateCols.add("CC_ATTACHMENTS2");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccAttachments2 = ccAttachments2;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENTS2")) {
+                this.toUpdateCols.add("CC_ATTACHMENTS2");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 备注。
+     */
+    private String remark;
+
+    /**
+     * 获取：备注。
+     */
+    public String getRemark() {
+        return this.remark;
+    }
+
+    /**
+     * 设置：备注。
+     */
+    public CcDocFileToBusiData setRemark(String remark) {
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 超链接。
+     */
+    private String href;
+
+    /**
+     * 获取：超链接。
+     */
+    public String getHref() {
+        return this.href;
+    }
+
+    /**
+     * 设置：超链接。
+     */
+    public CcDocFileToBusiData setHref(String href) {
+        if (this.href == null && href == null) {
+            // 均为null，不做处理。
+        } else if (this.href != null && href != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.href.compareTo(href) != 0) {
+                this.href = href;
+                if (!this.toUpdateCols.contains("HREF")) {
+                    this.toUpdateCols.add("HREF");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.href = href;
+            if (!this.toUpdateCols.contains("HREF")) {
+                this.toUpdateCols.add("HREF");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 额外信息。
+     */
+    private String extraInfo;
+
+    /**
+     * 获取：额外信息。
+     */
+    public String getExtraInfo() {
+        return this.extraInfo;
+    }
+
+    /**
+     * 设置：额外信息。
+     */
+    public CcDocFileToBusiData setExtraInfo(String extraInfo) {
+        if (this.extraInfo == null && extraInfo == null) {
+            // 均为null，不做处理。
+        } else if (this.extraInfo != null && extraInfo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.extraInfo.compareTo(extraInfo) != 0) {
+                this.extraInfo = extraInfo;
+                if (!this.toUpdateCols.contains("EXTRA_INFO")) {
+                    this.toUpdateCols.add("EXTRA_INFO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.extraInfo = extraInfo;
+            if (!this.toUpdateCols.contains("EXTRA_INFO")) {
+                this.toUpdateCols.add("EXTRA_INFO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 业务数据类型。
+     */
+    private String ccDocFileToBusiDataType;
+
+    /**
+     * 获取：业务数据类型。
+     */
+    public String getCcDocFileToBusiDataType() {
+        return this.ccDocFileToBusiDataType;
+    }
+
+    /**
+     * 设置：业务数据类型。
+     */
+    public CcDocFileToBusiData setCcDocFileToBusiDataType(String ccDocFileToBusiDataType) {
+        if (this.ccDocFileToBusiDataType == null && ccDocFileToBusiDataType == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDocFileToBusiDataType != null && ccDocFileToBusiDataType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDocFileToBusiDataType.compareTo(ccDocFileToBusiDataType) != 0) {
+                this.ccDocFileToBusiDataType = ccDocFileToBusiDataType;
+                if (!this.toUpdateCols.contains("CC_DOC_FILE_TO_BUSI_DATA_TYPE")) {
+                    this.toUpdateCols.add("CC_DOC_FILE_TO_BUSI_DATA_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDocFileToBusiDataType = ccDocFileToBusiDataType;
+            if (!this.toUpdateCols.contains("CC_DOC_FILE_TO_BUSI_DATA_TYPE")) {
+                this.toUpdateCols.add("CC_DOC_FILE_TO_BUSI_DATA_TYPE");
             }
         }
         return this;
@@ -940,8 +1220,8 @@ public class CcModelFederationToFile {
      *
      * @return
      */
-    public static CcModelFederationToFile newData() {
-        CcModelFederationToFile obj = modelHelper.newData();
+    public static CcDocFileToBusiData newData() {
+        CcDocFileToBusiData obj = modelHelper.newData();
         return obj;
     }
 
@@ -950,8 +1230,8 @@ public class CcModelFederationToFile {
      *
      * @return
      */
-    public static CcModelFederationToFile insertData() {
-        CcModelFederationToFile obj = modelHelper.insertData();
+    public static CcDocFileToBusiData insertData() {
+        CcDocFileToBusiData obj = modelHelper.insertData();
         return obj;
     }
 
@@ -963,8 +1243,8 @@ public class CcModelFederationToFile {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcModelFederationToFile selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcModelFederationToFile obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcDocFileToBusiData selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcDocFileToBusiData obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -974,7 +1254,7 @@ public class CcModelFederationToFile {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcModelFederationToFile selectById(String id) {
+    public static CcDocFileToBusiData selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -986,8 +1266,8 @@ public class CcModelFederationToFile {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcModelFederationToFile> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcModelFederationToFile> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcDocFileToBusiData> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcDocFileToBusiData> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -997,7 +1277,7 @@ public class CcModelFederationToFile {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcModelFederationToFile> selectByIds(List<String> ids) {
+    public static List<CcDocFileToBusiData> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1009,8 +1289,8 @@ public class CcModelFederationToFile {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcModelFederationToFile> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcModelFederationToFile> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcDocFileToBusiData> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcDocFileToBusiData> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1020,7 +1300,7 @@ public class CcModelFederationToFile {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcModelFederationToFile> selectByWhere(Where where) {
+    public static List<CcDocFileToBusiData> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1032,10 +1312,10 @@ public class CcModelFederationToFile {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcModelFederationToFile selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcModelFederationToFile> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcDocFileToBusiData selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcDocFileToBusiData> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcModelFederationToFile.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcDocFileToBusiData.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1047,7 +1327,7 @@ public class CcModelFederationToFile {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcModelFederationToFile selectOneByWhere(Where where) {
+    public static CcDocFileToBusiData selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1161,7 +1441,7 @@ public class CcModelFederationToFile {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcModelFederationToFile fromModel, CcModelFederationToFile toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcDocFileToBusiData fromModel, CcDocFileToBusiData toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1171,7 +1451,7 @@ public class CcModelFederationToFile {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcModelFederationToFile fromModel, CcModelFederationToFile toModel) {
+    public static void copyCols(CcDocFileToBusiData fromModel, CcDocFileToBusiData toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

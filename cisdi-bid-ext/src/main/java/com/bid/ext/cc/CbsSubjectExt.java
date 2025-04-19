@@ -259,12 +259,14 @@ public class CbsSubjectExt {
                 String ccPrjStructNodeId = ccPrjStructNode.getId();
                 recalculatePlanCostEstimation(ccPrjStructNodeId);
             }
-            for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
-                String ccPrjCostOverviewId = ccPrjCostOverview.getId();
-                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_0_AMT");
-                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_1_AMT");
-                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_2_AMT");
-                recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_3_AMT");
+            if (!SharedUtil.isEmpty(ccPrjCostOverviews)) {
+                for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
+                    String ccPrjCostOverviewId = ccPrjCostOverview.getId();
+                    recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_0_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_1_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_2_AMT");
+                    recalculatePlanTotalCost(ccPrjCostOverviewId, "CBS_3_AMT");
+                }
             }
 
         }

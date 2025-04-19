@@ -408,6 +408,18 @@ public class SmartMatchExt {
 
     }
 
+    public void speechAssistant(){
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.urlToOpenList = new ArrayList<>();
+        UrlToOpen urlToOpen = new UrlToOpen();
+
+        urlToOpen.url = "../cisdi-gczx-jszt/#/chatBox";
+        urlToOpen.title = "智能语音助手";
+
+        invokeActResult.urlToOpenList.add(urlToOpen);
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
     // 获取AI助手信息
     public void getAIAssistInfo() {
 
