@@ -123,6 +123,12 @@ public class DocExt {
             String userId = originalUserId; // 每次循环重置为原始用户 ID
             String csCommId = entityRecord.csCommId;
             CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
+
+            // 检查并更新 IS_FAVORITES 字段
+            Boolean isFavorites = ccDocFile.getIsFavorites();
+            if (Boolean.FALSE.equals(isFavorites)) {
+                ccDocFile.setIsFavorites(true);
+            }
             String ccFavoritesUserIds = ccDocFile.getCcFavoritesUserIds();
 
             if (!SharedUtil.isEmpty(ccFavoritesUserIds)) {
@@ -151,6 +157,12 @@ public class DocExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
+
+            // 检查并更新 IS_FAVORITES 字段
+            Boolean isFavorites = ccDocFile.getIsFavorites();
+            if (Boolean.TRUE.equals(isFavorites)) {
+                ccDocFile.setIsFavorites(false);
+            }
             String ccFavoritesUserIds = ccDocFile.getCcFavoritesUserIds();
 
             if (!SharedUtil.isEmpty(ccFavoritesUserIds)) {
