@@ -127,6 +127,10 @@ public class CcDesignInqui {
          */
         public static final String INQUIRE_ADVICE_NOT_FEEDBACK = "INQUIRE_ADVICE_NOT_FEEDBACK";
         /**
+         * 手续台账。
+         */
+        public static final String CC_PROCEDURE_LEDGER_IDS = "CC_PROCEDURE_LEDGER_IDS";
+        /**
          * 咨询名称。
          */
         public static final String CC_NAME = "CC_NAME";
@@ -888,6 +892,42 @@ public class CcDesignInqui {
             this.inquireAdviceNotFeedback = inquireAdviceNotFeedback;
             if (!this.toUpdateCols.contains("INQUIRE_ADVICE_NOT_FEEDBACK")) {
                 this.toUpdateCols.add("INQUIRE_ADVICE_NOT_FEEDBACK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 手续台账。
+     */
+    private String ccProcedureLedgerIds;
+
+    /**
+     * 获取：手续台账。
+     */
+    public String getCcProcedureLedgerIds() {
+        return this.ccProcedureLedgerIds;
+    }
+
+    /**
+     * 设置：手续台账。
+     */
+    public CcDesignInqui setCcProcedureLedgerIds(String ccProcedureLedgerIds) {
+        if (this.ccProcedureLedgerIds == null && ccProcedureLedgerIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccProcedureLedgerIds != null && ccProcedureLedgerIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccProcedureLedgerIds.compareTo(ccProcedureLedgerIds) != 0) {
+                this.ccProcedureLedgerIds = ccProcedureLedgerIds;
+                if (!this.toUpdateCols.contains("CC_PROCEDURE_LEDGER_IDS")) {
+                    this.toUpdateCols.add("CC_PROCEDURE_LEDGER_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccProcedureLedgerIds = ccProcedureLedgerIds;
+            if (!this.toUpdateCols.contains("CC_PROCEDURE_LEDGER_IDS")) {
+                this.toUpdateCols.add("CC_PROCEDURE_LEDGER_IDS");
             }
         }
         return this;

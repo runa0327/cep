@@ -91,8 +91,17 @@ public class DesignInquiExt {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         ccDesignInqui.setCcInspecTime(LocalDateTime.parse(varMap.get("P_CC_INSPEC_TIME").toString(), formatter));
         ccDesignInqui.setCcAttachments(varMap.get("P_CC_ATTACHMENTS").toString());
-        ccDesignInqui.setAssociateDrawings(varMap.get("P_ASSOCIATE_DRAWINGS").toString());//这里的ID为手续台账ID
-        ccDesignInqui.setCcProcedureLedgerId(varMap.get("P_ASSOCIATE_DRAWINGS").toString());//方便其他地方调用，两个字段一起维护
+        String associateDrawings = varMap.get("P_ASSOCIATE_DRAWINGS").toString();
+        ccDesignInqui.setAssociateDrawings(associateDrawings);//这里的ID为手续台账ID
+        if(associateDrawings!= null &&!associateDrawings.isEmpty()){
+            //方便其他地方调用，这两个字段一起维护
+            if(associateDrawings.contains(",")){
+                ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);
+            }else{
+                ccDesignInqui.setCcProcedureLedgerId(associateDrawings);//这个字段只能存单值
+                ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);//这个字段只能存多值
+            }
+        }
         ccDesignInqui.setCcPrjId(varMap.get("P_CC_PRJ_ID").toString());//项目
         ccDesignInqui.setInquireAdviceNotFeedback(varMap.get("P_ASSIGN_PERSONNEL").toString());
 
