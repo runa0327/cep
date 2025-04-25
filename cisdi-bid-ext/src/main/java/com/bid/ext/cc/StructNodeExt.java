@@ -1992,13 +1992,15 @@ public class StructNodeExt {
 //            BigDecimal trxAmtInit = ccPo.getTrxAmtInit();
             BigDecimal trxAmt = ccPo.getTrxAmtInit();
             List<CcPoChange> ccPoChanges = CcPoChange.selectByWhere(new Where().eq(CcPoChange.Cols.CC_PO_ID, csCommId));
-            for (CcPoChange ccPoChange : ccPoChanges) {
-                String ccPoChangePickId = ccPoChange.getCcPoChangePickId();// 变更的增减
-                BigDecimal changeTrxAmt = ccPoChange.getTrxAmt();// 变更金额
-                if ("ADD".equals(ccPoChangePickId)) {
-                    trxAmt = trxAmt.add(changeTrxAmt);
-                } else if ("SUB".equals(ccPoChangePickId)) {
-                    trxAmt = trxAmt.subtract(changeTrxAmt);
+            if (!SharedUtil.isEmpty(ccPoChanges)) {
+                for (CcPoChange ccPoChange : ccPoChanges) {
+                    String ccPoChangePickId = ccPoChange.getCcPoChangePickId();// 变更的增减
+                    BigDecimal changeTrxAmt = ccPoChange.getTrxAmt();// 变更金额
+                    if ("ADD".equals(ccPoChangePickId)) {
+                        trxAmt = trxAmt.add(changeTrxAmt);
+                    } else if ("SUB".equals(ccPoChangePickId)) {
+                        trxAmt = trxAmt.subtract(changeTrxAmt);
+                    }
                 }
             }
             // 0.更新初始合同金额
@@ -3463,8 +3465,8 @@ public class StructNodeExt {
     /**
      * 递归更新节点及其所有子节点的收藏状态
      *
-     * @param csCommId     节点ID
-     * @param isFavorites  是否收藏
+     * @param csCommId    节点ID
+     * @param isFavorites 是否收藏
      */
     private void updateFavoriteStatus(String csCommId, boolean isFavorites) {
         try {
@@ -3504,6 +3506,7 @@ public class StructNodeExt {
 //            ccPrjStructNode.updateById();
 //        }
 //    }
+
     /**
      * 取消收藏
      */
@@ -3594,7 +3597,7 @@ public class StructNodeExt {
                 String faStructNodeId = JdbcMapUtil.getString(varMap, "P_FA_STRUCT_NODE_ID");
                 ccPrjStructNode.setCcPrjStructNodePid(faStructNodeId);
 //                }else{
-                    //设计管理中的父级节点可以选择，其他管理暂时默认为选中数据作为父级
+                //设计管理中的父级节点可以选择，其他管理暂时默认为选中数据作为父级
 //                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
 //                }
                 ccPrjStructNode.insertById();
