@@ -895,4 +895,27 @@ public class DocExt {
             throw new BaseException(message);
         }
     }
+
+    /**
+     * 预判断是否批量上传CAD图纸
+     */
+    public void preCheckBatchUploadCadFile(){
+        Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
+        String ccDocDirId = null;
+        for (Map.Entry<String, List<DrivenInfo>> entry : drivenInfosMap.entrySet()) {
+            List<DrivenInfo> drivenInfos = entry.getValue();
+            for (DrivenInfo drivenInfo : drivenInfos) {
+                String code = drivenInfo.code;
+                if ("CC_DOC_DIR_ID".equals(code)) {
+                    ccDocDirId = drivenInfo.value;
+                }
+            }
+        }
+
+        CcDocDir ccDocDir = CcDocDir.selectById(ccDocDirId);
+        String ccDrawingUpdateRecordId = ccDocDir.getCcDrawingUpdateRecordId();
+        if(ccDrawingUpdateRecordId != null){
+            throw new BaseException("来源为设计管理的文件夹不可操作");
+        }
+    }
 }
