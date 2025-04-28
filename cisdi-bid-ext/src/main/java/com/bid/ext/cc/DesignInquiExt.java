@@ -96,10 +96,12 @@ public class DesignInquiExt {
         if(associateDrawings!= null &&!associateDrawings.isEmpty()){
             //方便其他地方调用，这两个字段一起维护
             if(associateDrawings.contains(",")){
-                ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);
+                //暂时隐藏
+//                ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);
             }else{
                 ccDesignInqui.setCcProcedureLedgerId(associateDrawings);//这个字段只能存单值
-                ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);//这个字段只能存多值
+                //暂时隐藏
+//                ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);//这个字段只能存多值
             }
         }
         ccDesignInqui.setCcPrjId(varMap.get("P_CC_PRJ_ID").toString());//项目
@@ -276,7 +278,11 @@ public class DesignInquiExt {
 
         ccDrawingUpdateRecord.insertById();
 
-        handleDesignResultFile(myJdbcTemplate, ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecord.getId(), ccPrjId);
+        String ccDrawingUpdateRecordId = ccDrawingUpdateRecord.getId();
+        //将之前的文件目录版本置为false
+        updatePreviousVersion(ccDrawingUpdateRecordId);
+
+        handleDesignResultFile(myJdbcTemplate, ccAttachment, cCProcedureLedgerId, ccDrawingUpdateRecordId, ccPrjId);
 
         //判断更新的文件是不是zip格式
 //        FlFile flFile = FlFile.selectById(ccAttachment);
@@ -332,6 +338,7 @@ public class DesignInquiExt {
         myCcDocDir.setCcPrjId(ccPrjId);
         myCcDocDir.setCcDrawingUpdateRecordId(ccDrawingUpdateRecordId);
         myCcDocDir.setCcDocFolderTypeId("CAD");
+        myCcDocDir.setCcIsLatest(true);//当前版本为最新版本，会将之前的版本设置为false
         myCcDocDir.insertById();
 
         // cc_package_file 表中插入数据
@@ -379,6 +386,37 @@ public class DesignInquiExt {
         myCcDocFile.setCcPreviewConversionStatusId("TODO");
         myCcDocFile.setIsDefault(false);
         myCcDocFile.insertById();
+    }
+
+    /**
+     * 更新表cc_doc_dir，将之前版本的is_latest字段为false
+     */
+    private void updatePreviousVersion(String ccDrawingUpdateRecordId) {
+        CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectById(ccDrawingUpdateRecordId);
+        String ccDesignInquiId = ccDrawingUpdateRecord.getCcDesignInquiId();
+
+        Where where = new Where();
+        where.eq("CC_DESIGN_INQUI_ID", ccDesignInquiId);
+        List<CcDrawingUpdateRecord> ccCcDrawingUpdateRecords = CcDrawingUpdateRecord.selectByWhere(where);
+        Where where2 = new Where();
+        ArrayList<String> ccDrawingUpdateRecordIds = new ArrayList<>();
+        for (CcDrawingUpdateRecord ccCcDrawingUpdateRecord : ccCcDrawingUpdateRecords) {
+            ccDrawingUpdateRecordIds.add(ccCcDrawingUpdateRecord.getId());
+//            where2.in("CC_DRAWING_UPDATE_RECORD_ID", ccCcDrawingUpdateRecord.getId());
+        }
+        //数组转换为字符串
+        String ccDrawingUpdateRecordIdsStr = String.join(",", ccDrawingUpdateRecordIds);
+
+//        where2.in("CC_DRAWING_UPDATE_RECORD_ID", ccCcDrawingUpdateRecords);
+        where2.sql("CC_DRAWING_UPDATE_RECORD_ID IN (" + ccDrawingUpdateRecordIdsStr + ")");
+        Map<String, Object> map = new HashMap<>();
+        map.put("CC_IS_LATEST", false);
+        int updateCount = CcDocDir.updateByWhere(where2, map);
+        if (updateCount > 0) {
+            log.info("更新表cc_doc_dir，将之前版本的is_latest字段为false成功");
+        } else {
+            log.info("更新表cc_doc_dir，将之前版本的is_latest字段为false失败");
+        }
     }
 
     /**
