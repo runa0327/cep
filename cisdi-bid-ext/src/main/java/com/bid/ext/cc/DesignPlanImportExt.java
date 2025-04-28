@@ -29,7 +29,7 @@ public class DesignPlanImportExt {
     /**
      * 设计计划Excel导入
      */
-    public void DesignPlanImportFromExcel() {
+    public void designPlanImportFromExcel() {
         List<String> fileIdList = ExtJarHelper.getFileIdList();
         for (String fileId : fileIdList) {
             try {
@@ -68,7 +68,7 @@ public class DesignPlanImportExt {
     /**
      * 设计计划模板excel导入
      */
-    public void DesignPlanTemImportFromExcel() {
+    public void designPlanTemImportFromExcel() {
         List<String> fileIdList = ExtJarHelper.getFileIdList();
         for (String fileId : fileIdList) {
             try {

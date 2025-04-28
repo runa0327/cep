@@ -29,7 +29,7 @@ public class PrePlanImportExt {
     /**
      * 前期计划Excel导入
      */
-    public void PrePlanImportFromExcel() {
+    public void prePlanImportFromExcel() {
         List<String> fileIdList = ExtJarHelper.getFileIdList();
         for (String fileId : fileIdList) {
             try {
@@ -68,7 +68,7 @@ public class PrePlanImportExt {
     /**
      * 前期计划模板excel导入
      */
-    public void PrePlanTemImportFromExcel() {
+    public void prePlanTemImportFromExcel() {
         List<String> fileIdList = ExtJarHelper.getFileIdList();
         for (String fileId : fileIdList) {
             try {
