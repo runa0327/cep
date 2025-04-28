@@ -1269,6 +1269,10 @@ public class StructNodeExt {
                             //  ccDrawingUpdateRecord.setCcDesignInquiId(ccDesignInquiId);//设计咨询ID
                             ccDrawingUpdateRecord.setCcVerNum("1");//新建的手续台账，图纸更新记录默认为第一版
                             ccDrawingUpdateRecord.insertById();
+                            String ccDrawingUpdateRecordId = ccDrawingUpdateRecord.getId();
+
+                            //将之前的文件目录版本置为false
+                            updatePreviousVersion(ccDrawingUpdateRecordId);
                             //处理设计管理的zip包
                             handleDesignResultFile(myJdbcTemplate, attachments, ccProcedureLedger.getId(), ccDrawingUpdateRecord.getId(), ccPrjId);
                         }
@@ -1281,6 +1285,37 @@ public class StructNodeExt {
         recalculationPlan();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 更新表cc_doc_dir，将之前版本的is_latest字段为false
+     */
+    private void updatePreviousVersion(String ccDrawingUpdateRecordId) {
+        CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectById(ccDrawingUpdateRecordId);
+        String ccDesignInquiId = ccDrawingUpdateRecord.getCcDesignInquiId();
+
+        Where where = new Where();
+        where.eq("CC_DESIGN_INQUI_ID", ccDesignInquiId);
+        List<CcDrawingUpdateRecord> ccCcDrawingUpdateRecords = CcDrawingUpdateRecord.selectByWhere(where);
+        Where where2 = new Where();
+        ArrayList<String> ccDrawingUpdateRecordIds = new ArrayList<>();
+        for (CcDrawingUpdateRecord ccCcDrawingUpdateRecord : ccCcDrawingUpdateRecords) {
+            ccDrawingUpdateRecordIds.add(ccCcDrawingUpdateRecord.getId());
+//            where2.in("CC_DRAWING_UPDATE_RECORD_ID", ccCcDrawingUpdateRecord.getId());
+        }
+        //数组转换为字符串
+        String ccDrawingUpdateRecordIdsStr = String.join(",", ccDrawingUpdateRecordIds);
+
+//        where2.in("CC_DRAWING_UPDATE_RECORD_ID", ccCcDrawingUpdateRecords);
+        where2.sql("CC_DRAWING_UPDATE_RECORD_ID IN (" + ccDrawingUpdateRecordIdsStr + ")");
+        Map<String, Object> map = new HashMap<>();
+        map.put("CC_IS_LATEST", false);
+        int updateCount = CcDocDir.updateByWhere(where2, map);
+        if (updateCount > 0) {
+            log.info("更新表cc_doc_dir，将之前版本的is_latest字段为false成功");
+        } else {
+            log.info("更新表cc_doc_dir，将之前版本的is_latest字段为false失败");
+        }
     }
 
     /**
@@ -1319,6 +1354,7 @@ public class StructNodeExt {
         myCcDocDir.setCcPrjId(ccPrjId);
         myCcDocDir.setCcDrawingUpdateRecordId(ccDrawingUpdateRecordId);
         myCcDocDir.setCcDocFolderTypeId("CAD");
+        myCcDocDir.setCcIsLatest(true);//当前版本为最新版本，会将之前的版本设置为false
         myCcDocDir.insertById();
 
         // cc_package_file 表中插入数据

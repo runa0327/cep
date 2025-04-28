@@ -120,6 +120,14 @@ public class CcDocDir {
          */
         public static final String CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID = "CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID";
         /**
+         * 图纸更新记录。
+         */
+        public static final String CC_DRAWING_UPDATE_RECORD_ID = "CC_DRAWING_UPDATE_RECORD_ID";
+        /**
+         * 是否最新版本。
+         */
+        public static final String CC_IS_LATEST = "CC_IS_LATEST";
+        /**
          * 名称。
          */
         public static final String NAME = "NAME";
@@ -143,10 +151,6 @@ public class CcDocDir {
          * 资料父目录。
          */
         public static final String CC_DOC_DIR_PID = "CC_DOC_DIR_PID";
-        /**
-         * 图纸更新记录。
-         */
-        public static final String CC_DRAWING_UPDATE_RECORD_ID = "CC_DRAWING_UPDATE_RECORD_ID";
     }
 
     // </editor-fold>
@@ -803,6 +807,78 @@ public class CcDocDir {
     }
 
     /**
+     * 图纸更新记录。
+     */
+    private String ccDrawingUpdateRecordId;
+
+    /**
+     * 获取：图纸更新记录。
+     */
+    public String getCcDrawingUpdateRecordId() {
+        return this.ccDrawingUpdateRecordId;
+    }
+
+    /**
+     * 设置：图纸更新记录。
+     */
+    public CcDocDir setCcDrawingUpdateRecordId(String ccDrawingUpdateRecordId) {
+        if (this.ccDrawingUpdateRecordId == null && ccDrawingUpdateRecordId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDrawingUpdateRecordId != null && ccDrawingUpdateRecordId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDrawingUpdateRecordId.compareTo(ccDrawingUpdateRecordId) != 0) {
+                this.ccDrawingUpdateRecordId = ccDrawingUpdateRecordId;
+                if (!this.toUpdateCols.contains("CC_DRAWING_UPDATE_RECORD_ID")) {
+                    this.toUpdateCols.add("CC_DRAWING_UPDATE_RECORD_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDrawingUpdateRecordId = ccDrawingUpdateRecordId;
+            if (!this.toUpdateCols.contains("CC_DRAWING_UPDATE_RECORD_ID")) {
+                this.toUpdateCols.add("CC_DRAWING_UPDATE_RECORD_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否最新版本。
+     */
+    private Boolean ccIsLatest;
+
+    /**
+     * 获取：是否最新版本。
+     */
+    public Boolean getCcIsLatest() {
+        return this.ccIsLatest;
+    }
+
+    /**
+     * 设置：是否最新版本。
+     */
+    public CcDocDir setCcIsLatest(Boolean ccIsLatest) {
+        if (this.ccIsLatest == null && ccIsLatest == null) {
+            // 均为null，不做处理。
+        } else if (this.ccIsLatest != null && ccIsLatest != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccIsLatest.compareTo(ccIsLatest) != 0) {
+                this.ccIsLatest = ccIsLatest;
+                if (!this.toUpdateCols.contains("CC_IS_LATEST")) {
+                    this.toUpdateCols.add("CC_IS_LATEST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccIsLatest = ccIsLatest;
+            if (!this.toUpdateCols.contains("CC_IS_LATEST")) {
+                this.toUpdateCols.add("CC_IS_LATEST");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 名称。
      */
     private String name;
@@ -1013,42 +1089,6 @@ public class CcDocDir {
             this.ccDocDirPid = ccDocDirPid;
             if (!this.toUpdateCols.contains("CC_DOC_DIR_PID")) {
                 this.toUpdateCols.add("CC_DOC_DIR_PID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 图纸更新记录。
-     */
-    private String ccDrawingUpdateRecordId;
-
-    /**
-     * 获取：图纸更新记录。
-     */
-    public String getCcDrawingUpdateRecordId() {
-        return this.ccDrawingUpdateRecordId;
-    }
-
-    /**
-     * 设置：图纸更新记录。
-     */
-    public CcDocDir setCcDrawingUpdateRecordId(String ccDrawingUpdateRecordId) {
-        if (this.ccDrawingUpdateRecordId == null && ccDrawingUpdateRecordId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccDrawingUpdateRecordId != null && ccDrawingUpdateRecordId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccDrawingUpdateRecordId.compareTo(ccDrawingUpdateRecordId) != 0) {
-                this.ccDrawingUpdateRecordId = ccDrawingUpdateRecordId;
-                if (!this.toUpdateCols.contains("CC_DRAWING_UPDATE_RECORD_ID")) {
-                    this.toUpdateCols.add("CC_DRAWING_UPDATE_RECORD_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccDrawingUpdateRecordId = ccDrawingUpdateRecordId;
-            if (!this.toUpdateCols.contains("CC_DRAWING_UPDATE_RECORD_ID")) {
-                this.toUpdateCols.add("CC_DRAWING_UPDATE_RECORD_ID");
             }
         }
         return this;
