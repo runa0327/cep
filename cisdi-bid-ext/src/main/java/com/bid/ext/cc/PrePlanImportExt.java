@@ -127,9 +127,16 @@ public class PrePlanImportExt {
             String name = getCellStringValue(row.getCell(1)); // B列：名称（必填）
             String isMilestone = getCellStringValue(row.getCell(2)); // C列：是否里程碑
             String wbsChiefUserName = getCellStringValue(row.getCell(3)); // D列：进度负责人
-            String sql = "select t.AD_USER_ID from cc_prj_member t where t.name ->'$.ZH_CN' = ? and t.is_primary_pos is true and t.CC_PRJ_ID = ?";
-            Map<String, Object> adUser = myJdbcTemplate.queryForMap(sql, wbsChiefUserName, pCcPrjIds);
-            String adUserId = JdbcMapUtil.getString(adUser, "AD_USER_ID");
+            String adUserId = null;
+            if (wbsChiefUserName == null || wbsChiefUserName.trim().isEmpty()) {
+                String sql = "select t.AD_USER_ID from cc_prj_member t where t.name ->'$.ZH_CN' = ? and t.is_primary_pos is true and t.CC_PRJ_ID = ?";
+                List<Map<String, Object>> adUserList = myJdbcTemplate.queryForList(sql, wbsChiefUserName, pCcPrjIds);
+                if (adUserList.size() > 0) {
+                    for (Map<String, Object> adUser : adUserList) {
+                        adUserId = JdbcMapUtil.getString(adUser, "AD_USER_ID");
+                    }
+                }
+            }
 
 //            Object adUserId = Crud.from("CC_PRJ_MEMBER").where().eq(CcPrjMember.Cols.NAME, wbsChiefUserName).eq(CcPrjMember.Cols.IS_PRIMARY_POS, true).eq(CcPrjMember.Cols.CC_PRJ_ID, pCcPrjIds).select().specifyCols(CcPrjMember.Cols.AD_USER_ID).execForValue();
 

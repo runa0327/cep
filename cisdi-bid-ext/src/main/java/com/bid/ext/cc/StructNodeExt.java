@@ -283,6 +283,20 @@ public class StructNodeExt {
         );
         if (!SharedUtil.isEmpty(ccPrjStructNodesDr)) {
             for (CcPrjStructNode ccPrjStructNodeDr : ccPrjStructNodesDr) {
+                String name = ccPrjStructNodeDr.getName();
+                LocalDate planFr = ccPrjStructNodeDr.getPlanFr();
+                LocalDate planTo = ccPrjStructNodeDr.getPlanTo();
+                String wbsChiefUserId = ccPrjStructNodeDr.getWbsChiefUserId();
+                if (planFr == null) {
+                    throw new BaseException("计划明细【" + I18nUtil.tryGetInCurrentLang(name) + "】未填写计划开始时间");
+                }
+                if (planTo == null) {
+                    throw new BaseException("计划明细【" + I18nUtil.tryGetInCurrentLang(name) + "】未填写计划结束时间");
+                }
+                if (wbsChiefUserId == null || wbsChiefUserId.isEmpty()) {
+                    throw new BaseException("计划明细【" + I18nUtil.tryGetInCurrentLang(name) + "】未填写责任人");
+                }
+
                 ccPrjStructNodeDr.setStatus(String.valueOf(StatusE.AP));
                 ccPrjStructNodeDr.updateById();
 
