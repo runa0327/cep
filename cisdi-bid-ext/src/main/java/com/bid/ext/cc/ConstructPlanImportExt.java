@@ -68,7 +68,7 @@ public class ConstructPlanImportExt {
     /**
      * 施工计划模板excel导入
      */
-    public void DesignPlanTemImportFromExcel() {
+    public void constructPlanTemImportFromExcel() {
         List<String> fileIdList = ExtJarHelper.getFileIdList();
         for (String fileId : fileIdList) {
             try {
