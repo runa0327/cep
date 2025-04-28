@@ -65,6 +65,44 @@ public class ConstructPlanImportExt {
         }
     }
 
+    /**
+     * 施工计划模板excel导入
+     */
+    public void DesignPlanTemImportFromExcel() {
+        List<String> fileIdList = ExtJarHelper.getFileIdList();
+        for (String fileId : fileIdList) {
+            try {
+                // 1. 获取文件物理路径
+                FlFile flFile = FlFile.selectById(fileId);
+                String physicalLocation = flFile.getPhysicalLocation();
+                File file = new File(physicalLocation);
+
+                // 2. 校验文件类型
+                String ext = flFile.getExt();
+                if (!"xls".equals(ext) && !"xlsx".equals(ext)) {
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+                    throw new BaseException(message);
+                }
+
+                // 3. 读取Excel并构建树形结构
+                List<CcPrjStructNode> nodes = readAndBuildTreeConstructTem(file);
+
+                // 4. 保存树形数据到数据库
+                saveTree(nodes);
+
+                // 5. 返回成功结果
+                InvokeActResult invokeActResult = new InvokeActResult();
+                invokeActResult.reFetchData = true;
+                ExtJarHelper.setReturnValue(invokeActResult);
+
+            } catch (BaseException e) {
+                throw e; // 直接抛出已知异常
+            } catch (Exception e) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+                throw new BaseException(message, e);
+            }
+        }
+    }
 
     /**
      * 读取Excel并构建树形结构
