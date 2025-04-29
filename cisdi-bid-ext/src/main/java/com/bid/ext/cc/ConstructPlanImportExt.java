@@ -143,14 +143,8 @@ public class ConstructPlanImportExt {
             String isMilestone = getCellStringValue(row.getCell(2)); // C列：是否里程碑
             String wbsChiefUserName = getCellStringValue(row.getCell(3)); // D列：进度负责人
             String adUserId = null;
-            if (wbsChiefUserName == null || wbsChiefUserName.trim().isEmpty()) {
-                String sql = "select t.AD_USER_ID from cc_prj_member t where t.name ->'$.ZH_CN' = ? and t.is_primary_pos is true and t.CC_PRJ_ID = ?";
-                List<Map<String, Object>> adUserList = myJdbcTemplate.queryForList(sql, wbsChiefUserName, pCcPrjIds);
-                if (adUserList.size() > 0) {
-                    for (Map<String, Object> adUser : adUserList) {
-                        adUserId = JdbcMapUtil.getString(adUser, "AD_USER_ID");
-                    }
-                }
+            if (wbsChiefUserName != null && !wbsChiefUserName.trim().isEmpty()) {
+                adUserId = getWbsChiefUserId(myJdbcTemplate, pCcPrjIds, wbsChiefUserName, adUserId);
             }
 
 //            Object adUserId = Crud.from("CC_PRJ_MEMBER").where().eq(CcPrjMember.Cols.NAME, wbsChiefUserName).eq(CcPrjMember.Cols.IS_PRIMARY_POS, true).eq(CcPrjMember.Cols.CC_PRJ_ID, pCcPrjIds).select().specifyCols(CcPrjMember.Cols.AD_USER_ID).execForValue();
@@ -166,7 +160,9 @@ public class ConstructPlanImportExt {
 
             // 校验必填字段
             if (name == null || name.trim().isEmpty()) {
-                throw new BaseException("第 " + (rowIdx + 1) + " 行错误：名称不能为空");
+//                throw new BaseException("第 " + (rowIdx + 1) + " 行错误：名称不能为空");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.nameCannotBeEmpty", rowIdx + 1);
+                throw new BaseException(message);
             }
 
             // 创建节点（不依赖SEQ_NO）
@@ -193,7 +189,9 @@ public class ConstructPlanImportExt {
                     String parentSeq = getParentSeq(seq);
                     CcPrjStructNode parent = seqMap.get(parentSeq);
                     if (parent == null) {
-                        throw new BaseException("第 " + (rowIdx + 1) + " 行错误：父节点 [" + parentSeq + "] 不存在");
+//                        throw new BaseException("第 " + (rowIdx + 1) + " 行错误：父节点 [" + parentSeq + "] 不存在");
+                        String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.parentNodeNotExist", rowIdx + 1, parentSeq);
+                        throw new BaseException(message);
                     }
                     node.setCcPrjStructNodePid(parent.getId()); // 后续更新PID
                     roots.add(node);
@@ -263,7 +261,9 @@ public class ConstructPlanImportExt {
 
             // 校验必填字段
             if (name == null || name.trim().isEmpty()) {
-                throw new BaseException("第 " + (rowIdx + 1) + " 行错误：名称不能为空");
+//                throw new BaseException("第 " + (rowIdx + 1) + " 行错误：名称不能为空");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.nameCannotBeEmpty", rowIdx + 1);
+                throw new BaseException(message);
             }
 
             // 创建节点（不依赖SEQ_NO）
@@ -290,7 +290,9 @@ public class ConstructPlanImportExt {
                     String parentSeq = getParentSeq(seq);
                     CcPrjStructNode parent = seqMap.get(parentSeq);
                     if (parent == null) {
-                        throw new BaseException("第 " + (rowIdx + 1) + " 行错误：父节点 [" + parentSeq + "] 不存在");
+//                        throw new BaseException("第 " + (rowIdx + 1) + " 行错误：父节点 [" + parentSeq + "] 不存在");
+                        String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.parentNodeNotExist", rowIdx + 1, parentSeq);
+                        throw new BaseException(message);
                     }
                     node.setCcPrjStructNodePid(parent.getId()); // 后续更新PID
                     roots.add(node);

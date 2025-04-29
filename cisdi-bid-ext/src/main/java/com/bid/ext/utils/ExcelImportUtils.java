@@ -1,8 +1,13 @@
 package com.bid.ext.utils;
 
+import com.bid.ext.model.CcDocDir;
+import com.bid.ext.model.CcPrj;
 import com.bid.ext.model.CcPrjStructNode;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -11,6 +16,7 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ExcelImportUtils {
 
@@ -38,6 +44,34 @@ public class ExcelImportUtils {
                     );
                     if (parent != null) {
                         node.setCcPrjStructNodePid(parent.getId());
+                        node.updateById();
+                    }
+                }
+            }
+        });
+    }
+
+    public static void saveDirTree(List<CcDocDir> roots) {
+        // 1. 扁平化所有节点（按层级顺序）
+        List<CcDocDir> allNodes = flattenDirTree(roots);
+
+        // 2. 先插入所有节点（生成ID）
+        allNodes.forEach(node -> {
+            node.insertById();
+        });
+
+        // 3. 更新父节点ID（若需要）
+        allNodes.forEach(node -> {
+            String seq = node.getSeqNo() != null ? node.getSeqNo().toString() : null;
+            if (seq != null && !seq.isEmpty()) {
+                String parentSeq = getParentSeq(seq);
+                if (parentSeq != null) {
+                    // 查询父节点ID（根据SEQ_NO）
+                    CcDocDir parent = CcDocDir.selectOneByWhere(
+                            new Where().eq(CcDocDir.Cols.SEQ_NO, new BigDecimal(parentSeq))
+                    );
+                    if (parent != null) {
+                        node.setCcDocDirPid(parent.getId());
                         node.updateById();
                     }
                 }
@@ -84,7 +118,9 @@ public class ExcelImportUtils {
             }
             return value;
         } catch (NumberFormatException e) {
-            throw new BaseException("序号转换错误: " + seq);
+//            throw new BaseException("序号转换错误: " + seq);
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.seqConversionError", seq);
+            throw new BaseException(message);
         }
     }
 
@@ -95,6 +131,18 @@ public class ExcelImportUtils {
     public static List<CcPrjStructNode> flattenTree(List<CcPrjStructNode> nodes) {
         List<CcPrjStructNode> result = new ArrayList<>();
         for (CcPrjStructNode node : nodes) {
+            result.add(node);
+            // 递归处理子节点（需根据业务补充子节点获取逻辑）
+            // if (node.getChildren() != null) {
+            //     result.addAll(flattenTree(node.getChildren()));
+            // }
+        }
+        return result;
+    }
+
+    public static List<CcDocDir> flattenDirTree(List<CcDocDir> nodes) {
+        List<CcDocDir> result = new ArrayList<>();
+        for (CcDocDir node : nodes) {
             result.add(node);
             // 递归处理子节点（需根据业务补充子节点获取逻辑）
             // if (node.getChildren() != null) {
@@ -135,5 +183,23 @@ public class ExcelImportUtils {
             default:
                 return null;
         }
+    }
+
+
+    public static String getWbsChiefUserId(MyJdbcTemplate myJdbcTemplate, String pCcPrjIds, String wbsChiefUserName, String adUserId) {
+        String sql = "select t.AD_USER_ID from cc_prj_member t where t.name ->'$.ZH_CN' = ? and t.is_primary_pos is true and t.CC_PRJ_ID = ?";
+        List<Map<String, Object>> adUserList = myJdbcTemplate.queryForList(sql, wbsChiefUserName, pCcPrjIds);
+        CcPrj ccPrj = CcPrj.selectById(pCcPrjIds);
+        String ccPrjName = I18nUtil.tryGetInCurrentLang(ccPrj.getName());
+        if (!adUserList.isEmpty()) {
+            for (Map<String, Object> adUser : adUserList) {
+                adUserId = JdbcMapUtil.getString(adUser, "AD_USER_ID");
+            }
+        } else {
+//            throw new BaseException("导入失败，【" + I18nUtil.tryGetInCurrentLang(wbsChiefUserName) + "】未加入到该项目中");
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.seqConversionError", wbsChiefUserName, ccPrjName);
+            throw new BaseException(message);
+        }
+        return adUserId;
     }
 }

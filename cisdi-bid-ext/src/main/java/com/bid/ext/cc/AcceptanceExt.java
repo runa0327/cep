@@ -1,10 +1,7 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.entity.*;
-import com.bid.ext.model.AdAtt;
-import com.bid.ext.model.CcCompletionAcceptance;
-import com.bid.ext.model.FlFile;
-import com.bid.ext.model.FlPath;
+import com.bid.ext.model.*;
 import com.bid.ext.utils.DownloadUtils;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
@@ -15,11 +12,16 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.interaction.DrivenInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
@@ -33,6 +35,8 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static com.bid.ext.utils.ExcelImportUtils.*;
 
 public class AcceptanceExt {
 
@@ -649,6 +653,120 @@ public class AcceptanceExt {
         if (contractorCount != chiefUserIdsCount) {
             throw new BaseException(errorMessage);
         }
+    }
+
+    /**
+     * 竣工验收模板excel导入
+     */
+    public void importAcceptanceExcel() {
+        List<String> fileIdList = ExtJarHelper.getFileIdList();
+        for (String fileId : fileIdList) {
+            try {
+                // 1. 获取文件物理路径
+                FlFile flFile = FlFile.selectById(fileId);
+                String physicalLocation = flFile.getPhysicalLocation();
+                File file = new File(physicalLocation);
+
+                // 2. 校验文件类型
+                String ext = flFile.getExt();
+                if (!"xls".equals(ext) && !"xlsx".equals(ext)) {
+                    String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.excelFormat");
+                    throw new BaseException(message);
+                }
+
+                // 3. 读取Excel并构建树形结构
+                List<CcDocDir> nodes = readAndBuildTreeAcceptanceTem(file);
+
+                // 4. 保存树形数据到数据库
+                saveDirTree(nodes);
+
+                // 5. 返回成功结果
+                InvokeActResult invokeActResult = new InvokeActResult();
+                invokeActResult.reFetchData = true;
+                ExtJarHelper.setReturnValue(invokeActResult);
+
+            } catch (BaseException e) {
+                throw e; // 直接抛出已知异常
+            } catch (Exception e) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+                throw new BaseException(message, e);
+            }
+        }
+    }
+
+    /**
+     * 读取Excel并构建树形结构
+     */
+    private List<CcDocDir> readAndBuildTreeAcceptanceTem(File file) throws IOException {
+        Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
+        //模板目录ID
+        String ccDocDirAcceptanceTemplateTypeId = null;
+        for (Map.Entry<String, List<DrivenInfo>> entry : drivenInfosMap.entrySet()) {
+            List<DrivenInfo> drivenInfos = entry.getValue();
+            Optional<String> value = drivenInfos.stream()
+                    .filter(info -> "CC_DOC_DIR_ACCEPTANCE_TEMPLATE_TYPE_ID".equals(info.code))
+                    .map(info -> info.value)
+                    .findFirst();
+            if (value.isPresent()) {
+                ccDocDirAcceptanceTemplateTypeId = value.get();
+            }
+        }
+
+        Workbook workbook = WorkbookFactory.create(file);
+        Sheet sheet = workbook.getSheetAt(0); // 第一个Sheet
+        Map<String, CcDocDir> seqMap = new HashMap<>(); // 序号 -> 节点
+        List<CcDocDir> roots = new ArrayList<>();
+
+        // 从第3行开始读取（假设前两行为标题和说明）
+        for (int rowIdx = 2; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+            Row row = sheet.getRow(rowIdx);
+            if (row == null) continue;
+
+            // 解析关键字段
+            String seq = getCellStringValue(row.getCell(0)); // A列：序号
+            String name = getCellStringValue(row.getCell(1)); // B列：名称（必填）
+
+            // 校验必填字段
+            if (name == null || name.trim().isEmpty()) {
+//                throw new BaseException("第 " + (rowIdx + 1) + " 行错误：名称不能为空");
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.nameCannotBeEmpty", rowIdx + 1);
+                throw new BaseException(message);
+            }
+
+            // 创建节点（不依赖SEQ_NO）
+            CcDocDir node = CcDocDir.newData();
+            node.setName(name);
+            node.setCcDocDirAcceptanceTemplateTypeId(ccDocDirAcceptanceTemplateTypeId);
+            node.setCcDocFolderTypeId("ACCEPTANCE");
+            node.setIsTemplate(true);
+
+            // 处理父子关系
+            if (seq == null || seq.isEmpty()) {
+                // 根节点（PID为空）
+                roots.add(node);
+            } else {
+                if (seq.contains(".")) {
+                    // 层级序号（如1.1.1），需绑定父节点
+                    String parentSeq = getParentSeq(seq);
+                    CcDocDir parent = seqMap.get(parentSeq);
+                    if (parent == null) {
+//                        throw new BaseException("第 " + (rowIdx + 1) + " 行错误：父节点 [" + parentSeq + "] 不存在");
+                        String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.parentNodeNotExist", rowIdx + 1, parentSeq);
+                        throw new BaseException(message);
+                    }
+                    node.setCcDocDirPid(parent.getId()); // 后续更新PID
+                    roots.add(node);
+                } else {
+                    // 独立序号（如1、2），视为根节点
+                    roots.add(node);
+                }
+            }
+
+            // 记录当前节点（用于后续子节点查找）
+            seqMap.put(seq, node);
+        }
+
+        return roots;
     }
 
 }
