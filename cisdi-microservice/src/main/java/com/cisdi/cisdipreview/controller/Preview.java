@@ -1,5 +1,6 @@
 package com.cisdi.cisdipreview.controller;
 
+import com.cisdi.cisdipreview.model.BIMFaceScene;
 import com.cisdi.cisdipreview.model.TranslateRequestBody;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping(value = "/preview")
@@ -32,20 +34,58 @@ public class Preview {
     @Autowired
     private RestTemplate restTemplate;
 
+    private static class TokenOrgCode {
+        String token;
+        String orgCode;
+
+        TokenOrgCode(String token, String orgCode) {
+            this.token = token;
+            this.orgCode = orgCode;
+        }
+    }
+
+    // 使用ConcurrentHashMap作为内存缓存（Key: fileId）
+    private static final ConcurrentHashMap<String, TokenOrgCode> FILE_ID_TO_TOKEN_ORG_CODE = new ConcurrentHashMap<>();
+
     @GetMapping("/preview_callback")
     public ResponseEntity<Map<String, String>> callback(
             @RequestParam String fileId,
             @RequestParam String status,
             @RequestParam String reason,
+            @RequestParam String sceneId,
             @RequestParam String nonce,
             @RequestParam String signature
-    ) {
+    ) throws Exception {
         // todo 验证签名
         if ("success".equals(status)) {
-            String querySql = "SELECT ID, CC_DOC_FILE_TYPE_ID FROM CC_DOC_FILE WHERE CC_PREVIEW_FILE_ID = ?";
+            // 从缓存中获取token和orgCode
+            TokenOrgCode tokenOrgCode = FILE_ID_TO_TOKEN_ORG_CODE.get(fileId);
+            if (tokenOrgCode == null) {
+                log.error("未找到fileId对应的token和orgCode: {}", fileId);
+                // 处理缓存未命中的情况（如记录错误或重试）
+            }
+            String querySql = "SELECT ID, CC_DOC_FILE_TYPE_ID,NAME,CC_PREVIEW_FILE_ID FROM CC_DOC_FILE WHERE CC_PREVIEW_FILE_ID = ?";
             Map<String, Object> map = jdbcTemplate.queryForMap(querySql, fileId);
+
             String id = JdbcMapUtil.getString(map, "ID");
             String ccDocFileTypeId = JdbcMapUtil.getString(map, "CC_DOC_FILE_TYPE_ID");
+            String name = JdbcMapUtil.getString(map, "NAME");
+            String ccAttachment = JdbcMapUtil.getString(map, "CC_ATTACHMENT");
+
+            String fileSql = "SELECT NAME FROM FL_FILE WHERE ID = ?";
+            Map<String, Object> fileMap = jdbcTemplate.queryForMap(fileSql, ccAttachment);
+            String fileName = JdbcMapUtil.getString(fileMap, "NAME");
+
+            // 若类型为GIS且无场景则创建场景
+            if ("GIS".equals(ccDocFileTypeId) && SharedUtil.isEmpty(sceneId)) {
+                createScene(
+                        fileId,
+                        name,
+                        fileName,
+                        tokenOrgCode.token,
+                        tokenOrgCode.orgCode
+                );
+            }
 
             String uploadSql = "UPDATE CC_DOC_FILE SET CC_PREVIEW_CONVERSION_STATUS_ID = ?, CC_PREVIEW_URL = ? WHERE ID = ?";
             String previewUrl = "../cisdi-gczx-jszt/#/preview?type=" + ccDocFileTypeId + "&previewFileId=" + fileId;
@@ -97,6 +137,7 @@ public class Preview {
             try {
                 // 转换文件逻辑
                 convertFileInBimface(uploadedFileId, token, orgCode);
+                FILE_ID_TO_TOKEN_ORG_CODE.put(uploadedFileId, new TokenOrgCode(token, orgCode));
 
                 // 文件转换请求提交成功，更新数据库状态
                 String uploadSql = "UPDATE CC_DOC_FILE SET CC_PREVIEW_CONVERSION_STATUS_ID = ? WHERE ID = ?";
@@ -181,6 +222,35 @@ public class Preview {
 
         if (response.getStatusCode() != HttpStatus.OK) {
             String message = "模型转换失败！";
+            log.error(message + response);
+            throw new BaseException(message);
+        }
+    }
+
+    private void createScene(String modelId, String modelName, String fileName, String token, String orgCode) throws Exception {
+//        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+//        String token = doGetStringStringMap(); // 获取认证token
+        headers.set("Authorization", "Bearer " + token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> map = jdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
+        String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
+        String callBackUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/preview/preview_callback";
+
+//        callBackUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/preview_callback/";
+
+        // 构建请求体
+        BIMFaceScene requestBody = new BIMFaceScene(modelId, modelName, modelId, fileName, callBackUrl);
+
+        HttpEntity<BIMFaceScene> entity = new HttpEntity<>(requestBody, headers);
+
+        // 发送创建场景请求
+        String translateUrl = "https://api.bimface.com/scene";
+        ResponseEntity<String> response = restTemplate.exchange(translateUrl, HttpMethod.PUT, entity, String.class);
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            String message = "场景创建失败！";
             log.error(message + response);
             throw new BaseException(message);
         }
