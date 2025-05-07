@@ -215,6 +215,25 @@ public class PrePlanImportExt {
 //        String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
         Workbook workbook = WorkbookFactory.create(file);
         Sheet sheet = workbook.getSheetAt(0); // 第一个Sheet
+
+        Row headerRow = sheet.getRow(0);
+        if (headerRow == null) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.invalidTemplate");
+            throw new BaseException(message);
+        }
+
+        // 获取标题行各列的值
+        String col0 = getCellStringValue(headerRow.getCell(0));
+        String col1 = getCellStringValue(headerRow.getCell(1));
+        String col2 = getCellStringValue(headerRow.getCell(2));
+        String col3 = getCellStringValue(headerRow.getCell(3));
+
+        // 验证列标题是否正确
+        if (!"序号".equals(col0) || !"*名称".equals(col1) || !"是否里程碑".equals(col2) || !"备注".equals(col3)) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.invalidTemplate");
+            throw new BaseException(message);
+        }
+
         Map<String, CcPrjStructNode> seqMap = new HashMap<>(); // 序号 -> 节点
         List<CcPrjStructNode> roots = new ArrayList<>();
 

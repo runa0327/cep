@@ -135,7 +135,7 @@ public class PreViewExt {
             Map<String, Object> map = myJdbcTemplate.queryForMap("SELECT SETTING_VALUE FROM ad_sys_setting WHERE CODE = 'GATEWAY_URL'");
             String gateWayUrl = JdbcMapUtil.getString(map, "SETTING_VALUE");
             String uploadAndConvertUrl = gateWayUrl + "cisdi-microservice-" + orgCode + "/preview/upload-and-convert";
-//            uploadAndConvertUrl = "http://41112cuoc557.vicp.fun:55465/cisdi-microservice/preview/upload-and-convert/";
+//            uploadAndConvertUrl = "http://7ip279qh9109.vicp.fun:23922/cisdi-microservice-test240511/preview/upload-and-convert";
             FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment());
             String filePath = flFile.getPhysicalLocation();
 //            filePath = "C:\\Users\\34451\\Desktop\\test.dwg";

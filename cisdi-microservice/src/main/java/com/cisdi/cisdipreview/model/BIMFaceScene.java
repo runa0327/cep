@@ -9,14 +9,14 @@ import java.util.List;
 @Data
 public class BIMFaceScene {
     private String name;  // 动态字段
-    private final String type = "Globe";
-    private final String projectId = "10000848931873";
-    private final SceneSetting sceneSetting = new SceneSetting();
+    private String type = "Globe";
+    private long projectId = 10000848931873L;
+    private SceneSetting sceneSetting = new SceneSetting();
     private List<Resource> resources = new ArrayList<>();
     private String callback;
 
     // 构造方法设置动态资源
-    public BIMFaceScene(String sceneName, String modelName, String modelId, String fileName, String callback) {
+    public BIMFaceScene(String sceneName, String modelName, Long modelId, String fileName, String callback) {
         this.name = sceneName;
         this.resources.add(Resource.createTilesetLayer(modelName, modelId, fileName));
         this.resources.add(Resource.createTileLayer());
@@ -70,7 +70,7 @@ class Position {
 class Resource {
     private String id;
     private String name;
-    private String modelId;
+    private long modelId;
     private String modelType;
     private String fileName;
     private String parentId;
@@ -80,7 +80,7 @@ class Resource {
     private String url;
 
     // 创建动态TilesetLayer
-    public static Resource createTilesetLayer(String name, String modelId, String fileName) {
+    public static Resource createTilesetLayer(String name, long modelId, String fileName) {
         Resource resource = new Resource();
         resource.setId("tileset-layer");
         resource.setName(name);
