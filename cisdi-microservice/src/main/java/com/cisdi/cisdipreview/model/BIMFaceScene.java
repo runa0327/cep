@@ -102,7 +102,7 @@ class Resource {
         resource.setPriority(1);
         resource.setTypeName("TileLayer");
         resource.setMaxLevel("18");
-        resource.setUrl("https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={x}&TILECOL={y}&tk=b730b52fa82a500fb108a86df18a78e3");
+        resource.setUrl("https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={x}&TILECOL={y}&tk=b730b52fa82d500fb108a86df18a78e3");
         return resource;
     }
 
