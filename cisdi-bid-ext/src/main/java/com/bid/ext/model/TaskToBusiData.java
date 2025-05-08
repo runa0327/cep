@@ -107,9 +107,21 @@ public class TaskToBusiData {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * 是否当前。
+         */
+        public static final String IS_CURRENT = "IS_CURRENT";
+        /**
          * 任务代码。
          */
         public static final String TASK_CODE = "TASK_CODE";
+        /**
+         * 签署原文件。
+         */
+        public static final String CC_SIGN_ORIGINAL_FILE = "CC_SIGN_ORIGINAL_FILE";
+        /**
+         * 签署文件状态。
+         */
+        public static final String CC_SIGN_FILE_STATUS_ID = "CC_SIGN_FILE_STATUS_ID";
         /**
          * 实体代码。
          */
@@ -666,6 +678,42 @@ public class TaskToBusiData {
     }
 
     /**
+     * 是否当前。
+     */
+    private Boolean isCurrent;
+
+    /**
+     * 获取：是否当前。
+     */
+    public Boolean getIsCurrent() {
+        return this.isCurrent;
+    }
+
+    /**
+     * 设置：是否当前。
+     */
+    public TaskToBusiData setIsCurrent(Boolean isCurrent) {
+        if (this.isCurrent == null && isCurrent == null) {
+            // 均为null，不做处理。
+        } else if (this.isCurrent != null && isCurrent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isCurrent.compareTo(isCurrent) != 0) {
+                this.isCurrent = isCurrent;
+                if (!this.toUpdateCols.contains("IS_CURRENT")) {
+                    this.toUpdateCols.add("IS_CURRENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isCurrent = isCurrent;
+            if (!this.toUpdateCols.contains("IS_CURRENT")) {
+                this.toUpdateCols.add("IS_CURRENT");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 任务代码。
      */
     private String taskCode;
@@ -696,6 +744,78 @@ public class TaskToBusiData {
             this.taskCode = taskCode;
             if (!this.toUpdateCols.contains("TASK_CODE")) {
                 this.toUpdateCols.add("TASK_CODE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 签署原文件。
+     */
+    private String ccSignOriginalFile;
+
+    /**
+     * 获取：签署原文件。
+     */
+    public String getCcSignOriginalFile() {
+        return this.ccSignOriginalFile;
+    }
+
+    /**
+     * 设置：签署原文件。
+     */
+    public TaskToBusiData setCcSignOriginalFile(String ccSignOriginalFile) {
+        if (this.ccSignOriginalFile == null && ccSignOriginalFile == null) {
+            // 均为null，不做处理。
+        } else if (this.ccSignOriginalFile != null && ccSignOriginalFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccSignOriginalFile.compareTo(ccSignOriginalFile) != 0) {
+                this.ccSignOriginalFile = ccSignOriginalFile;
+                if (!this.toUpdateCols.contains("CC_SIGN_ORIGINAL_FILE")) {
+                    this.toUpdateCols.add("CC_SIGN_ORIGINAL_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccSignOriginalFile = ccSignOriginalFile;
+            if (!this.toUpdateCols.contains("CC_SIGN_ORIGINAL_FILE")) {
+                this.toUpdateCols.add("CC_SIGN_ORIGINAL_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 签署文件状态。
+     */
+    private String ccSignFileStatusId;
+
+    /**
+     * 获取：签署文件状态。
+     */
+    public String getCcSignFileStatusId() {
+        return this.ccSignFileStatusId;
+    }
+
+    /**
+     * 设置：签署文件状态。
+     */
+    public TaskToBusiData setCcSignFileStatusId(String ccSignFileStatusId) {
+        if (this.ccSignFileStatusId == null && ccSignFileStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccSignFileStatusId != null && ccSignFileStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccSignFileStatusId.compareTo(ccSignFileStatusId) != 0) {
+                this.ccSignFileStatusId = ccSignFileStatusId;
+                if (!this.toUpdateCols.contains("CC_SIGN_FILE_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_SIGN_FILE_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccSignFileStatusId = ccSignFileStatusId;
+            if (!this.toUpdateCols.contains("CC_SIGN_FILE_STATUS_ID")) {
+                this.toUpdateCols.add("CC_SIGN_FILE_STATUS_ID");
             }
         }
         return this;

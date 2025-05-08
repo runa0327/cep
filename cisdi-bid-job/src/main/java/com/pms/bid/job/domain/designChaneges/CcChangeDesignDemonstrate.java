@@ -58,4 +58,12 @@ public class CcChangeDesignDemonstrate extends BaseDomain {
     @TableField("REMARK")
     private String remark;
 
+
+
+    /**
+     * 签署状态
+     */
+    @TableField("CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID")
+    private String changeSignDemonstrateStatusId;
+
 }

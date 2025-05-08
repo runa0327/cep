@@ -70,18 +70,26 @@ public class CcChangeSignDemonstrateServiceImpl implements CcChangeSignDemonstra
             String taskCode = request.getChangeTaskInfo().getTaskCode();
             Integer taskStatus = request.getChangeTaskInfo().getTaskStatus();
 
-            if(taskStatus==4){ //已办结
+            //查询签署任务关联的业务数据
+            LambdaQueryWrapper<TaskToBusiData>  queryTaskToBusiData = new LambdaQueryWrapper<>();
+            queryTaskToBusiData.eq(TaskToBusiData::getTaskCode, taskCode);
+            queryTaskToBusiData.eq(TaskToBusiData::getIsCurrent, 1);
+            TaskToBusiData taskToBusiData = taskToBusiDataMapper.selectOne(queryTaskToBusiData);
+            taskToBusiData.setSignFileStatusId(taskStatus+"");
 
-                //查询签署任务关联的业务数据
-                LambdaQueryWrapper<TaskToBusiData>  queryTaskToBusiData = new LambdaQueryWrapper<>();
-                queryTaskToBusiData.eq(TaskToBusiData::getTaskCode, taskCode);
-                TaskToBusiData taskToBusiData = taskToBusiDataMapper.selectOne(queryTaskToBusiData);
+            taskToBusiDataMapper.updateById(taskToBusiData);//更新业务系统中关联数据的状态
+
+            if(taskStatus==4){ //已办结
 
                 String  entCode = taskToBusiData.getEntCode();
                 String entityRecordId = taskToBusiData.getEntityRecordId();
-                if ("CC_CHANGE_DESIGN_DEMONSTRATE".equals(entCode)){
-//                    CcChangeDesignDemonstrate ccChangeDesignDemonstrate = changeDesignDemonstrateMapper.selectById(entityRecordId);
-                    //签署状态改为完成
+                if ("CC_CHANGE_DESIGN_DEMONSTRATE".equals(entCode)) {
+                    CcChangeDesignDemonstrate ccChangeDesignDemonstrate = changeDesignDemonstrateMapper.selectById(entityRecordId);
+                   if(ccChangeDesignDemonstrate!=null){
+//                    签署状态改为完成
+                        ccChangeDesignDemonstrate.setChangeSignDemonstrateStatusId("SF");
+                        changeDesignDemonstrateMapper.updateById(ccChangeDesignDemonstrate);
+                    }
 
                 }else if("CC_CHANGE_SIGN_DEMONSTRATE".equals(entCode)) {
                     CcChangeSignDemonstrate ccChangeSignDemonstrate = changeSignDemonstrateMapper.selectById(entityRecordId);

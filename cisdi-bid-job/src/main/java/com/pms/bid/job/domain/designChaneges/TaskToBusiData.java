@@ -32,4 +32,26 @@ public class TaskToBusiData extends BaseDomain {
     @TableField("ENTITY_RECORD_ID")
     private String entityRecordId;
 
+
+    /**
+     * 发起签署的PDF原文件
+     */
+    @TableField("CC_SIGN_ORIGINAL_FILE")
+    private String signOriginalFile;
+
+    /**
+     * 文件签署状态
+     */
+    @TableField("CC_SIGN_FILE_STATUS_ID")
+    private String signFileStatusId;
+
+    /**
+     * 是否为当前任务关联
+     */
+    @TableField("IS_CURRENT")
+    private Integer isCurrent;
+
+
+
+
 }

@@ -1,4 +1,4 @@
-package com.pms.bid.job.controller.specialEquip;
+package com.pms.bid.job.controller.qbq;
 
 import com.pms.bid.job.domain.qbq.QbqCallbackRequest;
 import com.pms.bid.job.domain.qbq.QbqCallbackResponse;
@@ -22,4 +22,5 @@ public class QbqController {
     public QbqCallbackResponse taskStatusCallBack(@RequestBody QbqCallbackRequest request) {
         return changeSignDemonstrateService.checkChangeSignStatus(request);
     }
+
 }
