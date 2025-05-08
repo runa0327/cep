@@ -147,8 +147,9 @@ public class PlanExt {
         ccPrjStructNode.setCopyFromPrjStructNodeId(copyFromPrjStructNodeId);
 
         //进度计划ID
-        String ccConstructProgressPlanId = StructNodeExt.getConstructProgressPlanId();
-        ccPrjStructNode.setCcConstructProgressPlanId(ccConstructProgressPlanId);
+        String ccConstructProgressPlanId = JdbcMapUtil.getString(nodeData, "CC_CONSTRUCT_PROGRESS_PLAN_ID");
+        String ConstructProgressPlanId = StructNodeExt.getConstructProgressPlanId() != null ? StructNodeExt.getConstructProgressPlanId() : ccConstructProgressPlanId;
+        ccPrjStructNode.setCcConstructProgressPlanId(ConstructProgressPlanId);
         ccPrjStructNode.insertById();
     }
 
