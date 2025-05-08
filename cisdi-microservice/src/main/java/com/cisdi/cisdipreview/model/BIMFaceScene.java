@@ -30,7 +30,7 @@ class SceneSetting {
     private final BaseLatLon baseLatLon = new BaseLatLon(23.0, 115.56302);
     private final HomeView homeView = new HomeView(
             new Orientation(-1.5707963267948966, 0.0, 0.0),
-            new Position(1000.0, 23.0, 115.56302)
+            new Position(10000000.0, 23.0, 115.56302)
     );
 }
 

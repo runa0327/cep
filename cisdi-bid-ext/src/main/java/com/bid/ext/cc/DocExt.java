@@ -33,6 +33,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -101,9 +103,18 @@ public class DocExt {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.getPreviewById");
             throw new BaseException(message);
         }
+        String ccPreviewUrl = ccDocFile.getCcPreviewUrl();
+
+        Pattern pattern = Pattern.compile("sceneId=([^&]*)");
+        Matcher matcher = pattern.matcher(ccPreviewUrl);
+        String sceneId = null;
+        if (matcher.find()) {
+            sceneId = matcher.group(1); // 返回第一个捕获组（即 sceneId= 后面的内容）
+        }
         FlFile flFile = FlFile.selectById(ccAttachment);
         String fileInlineUrl = flFile.getFileInlineUrl();
         Map<String, Object> outputMap = new HashMap<>();
+        outputMap.put("sceneId", sceneId);
         outputMap.put("fileInlineUrl", fileInlineUrl);
         String ccPreviewFileId = ccDocFile.getCcPreviewFileId();
         outputMap.put("ccPreviewFileId", ccPreviewFileId);
@@ -899,7 +910,7 @@ public class DocExt {
     /**
      * 预判断是否批量上传CAD图纸
      */
-    public void preCheckBatchUploadCadFile(){
+    public void preCheckBatchUploadCadFile() {
         Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
         String ccDocDirId = null;
         for (Map.Entry<String, List<DrivenInfo>> entry : drivenInfosMap.entrySet()) {
@@ -914,7 +925,7 @@ public class DocExt {
 
         CcDocDir ccDocDir = CcDocDir.selectById(ccDocDirId);
         String ccDrawingUpdateRecordId = ccDocDir.getCcDrawingUpdateRecordId();
-        if(ccDrawingUpdateRecordId != null){
+        if (ccDrawingUpdateRecordId != null) {
             throw new BaseException("来源为设计管理的文件夹不可操作");
         }
     }
