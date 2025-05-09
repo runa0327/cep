@@ -8,6 +8,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -214,5 +215,46 @@ public class PlanExt {
      */
     public void constructCheckPlan() {
         this.checkPlan("construct");
+    }
+
+    /**
+     * 前期编制计划自动带出现行计划
+     */
+    public void editFromApPlanPre() {
+        editFromApPlan("PRE");
+    }
+
+    /**
+     * 设计编制计划自动带出现行计划
+     */
+    public void editFromApPlanDesign() {
+        editFromApPlan("DESIGN");
+    }
+
+    /**
+     * 编制计划自动带出现行计划
+     */
+    private static void editFromApPlan(String planType) {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        Map<String, Object> globalVarMap = loginInfo.globalVarMap;
+        String ccPrjId = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String sql = "select * from cc_prj_struct_node t where T.IS_TEMPLATE=0 AND T.IS_WBS=1 AND T.CC_PRJ_WBS_TYPE_ID=?  AND T.STATUS= ? AND T.CC_PRJ_ID = ? ";
+        // 获取编制中计划
+        List<Map<String, Object>> drMaps = myJdbcTemplate.queryForList(sql, planType, StatusE.DR.toString(), ccPrjId);
+        if (drMaps.isEmpty()) {
+            // 获取现行计划
+            List<Map<String, Object>> apMaps = myJdbcTemplate.queryForList(sql, planType, StatusE.AP.toString(), ccPrjId);
+
+            List<Map<String, Object>> list = replaceIdsAndInsert(apMaps);
+            // 序号
+            BigDecimal seqNo = BigDecimal.ZERO;
+            // 对于每一个模板结构节点，将其作为子节点插入
+            for (Map<String, Object> node : list) {
+                insertWbsNode(node, seqNo, true);
+                seqNo = seqNo.add(BigDecimal.ONE);
+            }
+        }
     }
 }
