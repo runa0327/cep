@@ -84,8 +84,6 @@ public class PersonnelExt {
      */
     private   void   importPersonnelEntryInfoPreCheck(String filePath) {
 
-
-
         boolean   isExist  = false;
         int personNumber = 0;
 
@@ -182,7 +180,7 @@ public class PersonnelExt {
 
 //        filePath = "/Users/hejialun/Documents/Russia/人员管理模板%2B带备注.xlsx";
 
-        importPersonnelEntryInfoPreCheck(filePath);//检查是否存在未退出的人员数据
+//        importPersonnelEntryInfoPreCheck(filePath);//检查是否存在未退出的人员数据
 
 
 
@@ -348,7 +346,8 @@ public class PersonnelExt {
 
                 selectEntryInfo.eq("RU_USER_NAME",personName);
                 selectEntryInfo.eq("RU_USER_AGE",age.intValue());
-                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
+//                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
+                selectEntryInfo.eq("RU_USER_ENTRY_DATE",entryDate);
 
                 RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
                 if (SharedUtil.isEmpty(userEntryInfo)){ //没有数据新增

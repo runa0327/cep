@@ -1,5 +1,6 @@
 package com.bid.ext.qbq;
 
+import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.bid.ext.entity.QbqBody;
@@ -1331,6 +1332,13 @@ public class QbqExt {
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qbq.getSignTaskUrlFailed");
             throw new BaseException(message);
         }
+
+        JSONObject entries = JSONUtil.parseObj(response.getBody());
+        JSONObject data = (JSONObject)entries.get("data");
+
+        Map<String,Object> result = new HashMap<>();
+        result.put("url",data.get("url"));
+        ExtJarHelper.setReturnValue(result);
 
     }
 
