@@ -168,7 +168,7 @@ public class RuUserEntryInfo {
          */
         public static final String RU_USER_HAVE_SAFETY_TRAINING = "RU_USER_HAVE_SAFETY_TRAINING";
         /**
-         * 进场频次。
+         * 入境频次。
          */
         public static final String RU_ENTRY_FREQUENCY = "RU_ENTRY_FREQUENCY";
         /**
@@ -1271,19 +1271,19 @@ public class RuUserEntryInfo {
     }
 
     /**
-     * 进场频次。
+     * 入境频次。
      */
     private Integer ruEntryFrequency;
 
     /**
-     * 获取：进场频次。
+     * 获取：入境频次。
      */
     public Integer getRuEntryFrequency() {
         return this.ruEntryFrequency;
     }
 
     /**
-     * 设置：进场频次。
+     * 设置：入境频次。
      */
     public RuUserEntryInfo setRuEntryFrequency(Integer ruEntryFrequency) {
         if (this.ruEntryFrequency == null && ruEntryFrequency == null) {
