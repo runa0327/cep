@@ -236,16 +236,18 @@ public class PlanExt {
      */
     private static void editFromApPlan(String planType) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
         Map<String, Object> globalVarMap = loginInfo.globalVarMap;
         String ccPrjId = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        String sql = "select * from cc_prj_struct_node t where T.IS_TEMPLATE=0 AND T.IS_WBS=1 AND T.CC_PRJ_WBS_TYPE_ID=?  AND T.STATUS= ? AND T.CC_PRJ_ID = ? ";
+        String sql = "select * from cc_prj_struct_node t where T.IS_TEMPLATE=0 AND T.IS_WBS=1 AND T.CC_PRJ_WBS_TYPE_ID=?  AND T.STATUS= ? AND T.CC_PRJ_ID = ? AND T.CRT_USER_ID = ? ";
         // 获取编制中计划
-        List<Map<String, Object>> drMaps = myJdbcTemplate.queryForList(sql, planType, StatusE.DR.toString(), ccPrjId);
+        List<Map<String, Object>> drMaps = myJdbcTemplate.queryForList(sql, planType, StatusE.DR.toString(), ccPrjId, userId);
         if (drMaps.isEmpty()) {
             // 获取现行计划
-            List<Map<String, Object>> apMaps = myJdbcTemplate.queryForList(sql, planType, StatusE.AP.toString(), ccPrjId);
+            String apSql = "select * from cc_prj_struct_node t where T.IS_TEMPLATE=0 AND T.IS_WBS=1 AND T.CC_PRJ_WBS_TYPE_ID=?  AND T.STATUS= ? AND T.CC_PRJ_ID = ?";
+            List<Map<String, Object>> apMaps = myJdbcTemplate.queryForList(apSql, planType, StatusE.AP.toString(), ccPrjId);
 
             List<Map<String, Object>> list = replaceIdsAndInsert(apMaps);
             // 序号
