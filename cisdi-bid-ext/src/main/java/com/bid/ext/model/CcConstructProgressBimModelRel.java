@@ -7,22 +7,20 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 施工进度计划。
+ * 施工进度模型。
  */
-public class CcConstructProgressPlan {
+public class CcConstructProgressBimModelRel {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcConstructProgressPlan> modelHelper = new ModelHelper<>("CC_CONSTRUCT_PROGRESS_PLAN", new CcConstructProgressPlan());
+    private static final ModelHelper<CcConstructProgressBimModelRel> modelHelper = new ModelHelper<>("CC_CONSTRUCT_PROGRESS_BIM_MODEL_REL", new CcConstructProgressBimModelRel());
 
     /**
      * 待更新的列。
@@ -39,7 +37,7 @@ public class CcConstructProgressPlan {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_CONSTRUCT_PROGRESS_PLAN";
+    public static final String ENT_CODE = "CC_CONSTRUCT_PROGRESS_BIM_MODEL_REL";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -69,6 +67,10 @@ public class CcConstructProgressPlan {
          */
         public static final String CRT_DT = "CRT_DT";
         /**
+         * 创建用户。
+         */
+        public static final String CRT_USER_ID = "CRT_USER_ID";
+        /**
          * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
@@ -76,10 +78,6 @@ public class CcConstructProgressPlan {
          * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
-        /**
-         * 名称。
-         */
-        public static final String NAME = "NAME";
         /**
          * 记录状态。
          */
@@ -93,6 +91,10 @@ public class CcConstructProgressPlan {
          */
         public static final String CODE = "CODE";
         /**
+         * 名称。
+         */
+        public static final String NAME = "NAME";
+        /**
          * 备注。
          */
         public static final String REMARK = "REMARK";
@@ -105,61 +107,13 @@ public class CcConstructProgressPlan {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 项目。
+         * 资料文件。
          */
-        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        public static final String CC_DOC_FILE_ID = "CC_DOC_FILE_ID";
         /**
-         * 是否提交。
+         * 施工进度计划。
          */
-        public static final String CC_CONSTRUCT_IS_COMMIT = "CC_CONSTRUCT_IS_COMMIT";
-        /**
-         * 模型关联。
-         */
-        public static final String CC_BIM_MODEL_REL_IDS = "CC_BIM_MODEL_REL_IDS";
-        /**
-         * 创建用户。
-         */
-        public static final String CRT_USER_ID = "CRT_USER_ID";
-        /**
-         * 施工进度计划类型。
-         */
-        public static final String CC_CONSTRUCT_PROGRESS_PLAN_TYPE_ID = "CC_CONSTRUCT_PROGRESS_PLAN_TYPE_ID";
-        /**
-         * 施工进度计划责任人。
-         */
-        public static final String CC_CONSTRUCTION_SCHEDULE_RESPONSIBLE_PERSON = "CC_CONSTRUCTION_SCHEDULE_RESPONSIBLE_PERSON";
-        /**
-         * 计划从。
-         */
-        public static final String PLAN_FR = "PLAN_FR";
-        /**
-         * 计划到。
-         */
-        public static final String PLAN_TO = "PLAN_TO";
-        /**
-         * 计划天数。
-         */
-        public static final String PLAN_DAYS = "PLAN_DAYS";
-        /**
-         * 实际从。
-         */
-        public static final String ACT_FR = "ACT_FR";
-        /**
-         * 实际到。
-         */
-        public static final String ACT_TO = "ACT_TO";
-        /**
-         * 实际天数。
-         */
-        public static final String ACT_DAYS = "ACT_DAYS";
-        /**
-         * 生效时间。
-         */
-        public static final String EFFECTIVE_TIME = "EFFECTIVE_TIME";
-        /**
-         * 附件。
-         */
-        public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
+        public static final String CC_CONSTRUCT_PROGRESS_PLAN_ID = "CC_CONSTRUCT_PROGRESS_PLAN_ID";
     }
 
     // </editor-fold>
@@ -182,7 +136,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：ID。
      */
-    public CcConstructProgressPlan setId(String id) {
+    public CcConstructProgressBimModelRel setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -218,7 +172,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：版本。
      */
-    public CcConstructProgressPlan setVer(Integer ver) {
+    public CcConstructProgressBimModelRel setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -254,7 +208,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：时间戳。
      */
-    public CcConstructProgressPlan setTs(LocalDateTime ts) {
+    public CcConstructProgressBimModelRel setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -290,7 +244,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：是否预设。
      */
-    public CcConstructProgressPlan setIsPreset(Boolean isPreset) {
+    public CcConstructProgressBimModelRel setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -326,7 +280,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：创建日期时间。
      */
-    public CcConstructProgressPlan setCrtDt(LocalDateTime crtDt) {
+    public CcConstructProgressBimModelRel setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -348,6 +302,42 @@ public class CcConstructProgressPlan {
     }
 
     /**
+     * 创建用户。
+     */
+    private String crtUserId;
+
+    /**
+     * 获取：创建用户。
+     */
+    public String getCrtUserId() {
+        return this.crtUserId;
+    }
+
+    /**
+     * 设置：创建用户。
+     */
+    public CcConstructProgressBimModelRel setCrtUserId(String crtUserId) {
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
@@ -362,7 +352,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：最后修改日期时间。
      */
-    public CcConstructProgressPlan setLastModiDt(LocalDateTime lastModiDt) {
+    public CcConstructProgressBimModelRel setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -398,7 +388,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：最后修改用户。
      */
-    public CcConstructProgressPlan setLastModiUserId(String lastModiUserId) {
+    public CcConstructProgressBimModelRel setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -420,42 +410,6 @@ public class CcConstructProgressPlan {
     }
 
     /**
-     * 名称。
-     */
-    private String name;
-
-    /**
-     * 获取：名称。
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * 设置：名称。
-     */
-    public CcConstructProgressPlan setName(String name) {
-        if (this.name == null && name == null) {
-            // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 记录状态。
      */
     private String status;
@@ -470,7 +424,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：记录状态。
      */
-    public CcConstructProgressPlan setStatus(String status) {
+    public CcConstructProgressBimModelRel setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -506,7 +460,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：锁定流程实例。
      */
-    public CcConstructProgressPlan setLkWfInstId(String lkWfInstId) {
+    public CcConstructProgressBimModelRel setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -542,7 +496,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：代码。
      */
-    public CcConstructProgressPlan setCode(String code) {
+    public CcConstructProgressBimModelRel setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -564,6 +518,42 @@ public class CcConstructProgressPlan {
     }
 
     /**
+     * 名称。
+     */
+    private String name;
+
+    /**
+     * 获取：名称。
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * 设置：名称。
+     */
+    public CcConstructProgressBimModelRel setName(String name) {
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 备注。
      */
     private String remark;
@@ -578,7 +568,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：备注。
      */
-    public CcConstructProgressPlan setRemark(String remark) {
+    public CcConstructProgressBimModelRel setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -614,7 +604,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：快捷码。
      */
-    public CcConstructProgressPlan setFastCode(String fastCode) {
+    public CcConstructProgressBimModelRel setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -650,7 +640,7 @@ public class CcConstructProgressPlan {
     /**
      * 设置：图标。
      */
-    public CcConstructProgressPlan setIconFileGroupId(String iconFileGroupId) {
+    public CcConstructProgressBimModelRel setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -672,504 +662,72 @@ public class CcConstructProgressPlan {
     }
 
     /**
-     * 项目。
+     * 资料文件。
      */
-    private String ccPrjId;
+    private String ccDocFileId;
 
     /**
-     * 获取：项目。
+     * 获取：资料文件。
      */
-    public String getCcPrjId() {
-        return this.ccPrjId;
+    public String getCcDocFileId() {
+        return this.ccDocFileId;
     }
 
     /**
-     * 设置：项目。
+     * 设置：资料文件。
      */
-    public CcConstructProgressPlan setCcPrjId(String ccPrjId) {
-        if (this.ccPrjId == null && ccPrjId == null) {
+    public CcConstructProgressBimModelRel setCcDocFileId(String ccDocFileId) {
+        if (this.ccDocFileId == null && ccDocFileId == null) {
             // 均为null，不做处理。
-        } else if (this.ccPrjId != null && ccPrjId != null) {
+        } else if (this.ccDocFileId != null && ccDocFileId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
-                this.ccPrjId = ccPrjId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ID");
+            if (this.ccDocFileId.compareTo(ccDocFileId) != 0) {
+                this.ccDocFileId = ccDocFileId;
+                if (!this.toUpdateCols.contains("CC_DOC_FILE_ID")) {
+                    this.toUpdateCols.add("CC_DOC_FILE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccPrjId = ccPrjId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ID");
+            this.ccDocFileId = ccDocFileId;
+            if (!this.toUpdateCols.contains("CC_DOC_FILE_ID")) {
+                this.toUpdateCols.add("CC_DOC_FILE_ID");
             }
         }
         return this;
     }
 
     /**
-     * 是否提交。
+     * 施工进度计划。
      */
-    private Boolean ccConstructIsCommit;
+    private String ccConstructProgressPlanId;
 
     /**
-     * 获取：是否提交。
+     * 获取：施工进度计划。
      */
-    public Boolean getCcConstructIsCommit() {
-        return this.ccConstructIsCommit;
+    public String getCcConstructProgressPlanId() {
+        return this.ccConstructProgressPlanId;
     }
 
     /**
-     * 设置：是否提交。
+     * 设置：施工进度计划。
      */
-    public CcConstructProgressPlan setCcConstructIsCommit(Boolean ccConstructIsCommit) {
-        if (this.ccConstructIsCommit == null && ccConstructIsCommit == null) {
+    public CcConstructProgressBimModelRel setCcConstructProgressPlanId(String ccConstructProgressPlanId) {
+        if (this.ccConstructProgressPlanId == null && ccConstructProgressPlanId == null) {
             // 均为null，不做处理。
-        } else if (this.ccConstructIsCommit != null && ccConstructIsCommit != null) {
+        } else if (this.ccConstructProgressPlanId != null && ccConstructProgressPlanId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccConstructIsCommit.compareTo(ccConstructIsCommit) != 0) {
-                this.ccConstructIsCommit = ccConstructIsCommit;
-                if (!this.toUpdateCols.contains("CC_CONSTRUCT_IS_COMMIT")) {
-                    this.toUpdateCols.add("CC_CONSTRUCT_IS_COMMIT");
+            if (this.ccConstructProgressPlanId.compareTo(ccConstructProgressPlanId) != 0) {
+                this.ccConstructProgressPlanId = ccConstructProgressPlanId;
+                if (!this.toUpdateCols.contains("CC_CONSTRUCT_PROGRESS_PLAN_ID")) {
+                    this.toUpdateCols.add("CC_CONSTRUCT_PROGRESS_PLAN_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccConstructIsCommit = ccConstructIsCommit;
-            if (!this.toUpdateCols.contains("CC_CONSTRUCT_IS_COMMIT")) {
-                this.toUpdateCols.add("CC_CONSTRUCT_IS_COMMIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 模型关联。
-     */
-    private String ccBimModelRelIds;
-
-    /**
-     * 获取：模型关联。
-     */
-    public String getCcBimModelRelIds() {
-        return this.ccBimModelRelIds;
-    }
-
-    /**
-     * 设置：模型关联。
-     */
-    public CcConstructProgressPlan setCcBimModelRelIds(String ccBimModelRelIds) {
-        if (this.ccBimModelRelIds == null && ccBimModelRelIds == null) {
-            // 均为null，不做处理。
-        } else if (this.ccBimModelRelIds != null && ccBimModelRelIds != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccBimModelRelIds.compareTo(ccBimModelRelIds) != 0) {
-                this.ccBimModelRelIds = ccBimModelRelIds;
-                if (!this.toUpdateCols.contains("CC_BIM_MODEL_REL_IDS")) {
-                    this.toUpdateCols.add("CC_BIM_MODEL_REL_IDS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccBimModelRelIds = ccBimModelRelIds;
-            if (!this.toUpdateCols.contains("CC_BIM_MODEL_REL_IDS")) {
-                this.toUpdateCols.add("CC_BIM_MODEL_REL_IDS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 创建用户。
-     */
-    private String crtUserId;
-
-    /**
-     * 获取：创建用户。
-     */
-    public String getCrtUserId() {
-        return this.crtUserId;
-    }
-
-    /**
-     * 设置：创建用户。
-     */
-    public CcConstructProgressPlan setCrtUserId(String crtUserId) {
-        if (this.crtUserId == null && crtUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.crtUserId != null && crtUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.crtUserId.compareTo(crtUserId) != 0) {
-                this.crtUserId = crtUserId;
-                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                    this.toUpdateCols.add("CRT_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.crtUserId = crtUserId;
-            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                this.toUpdateCols.add("CRT_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 施工进度计划类型。
-     */
-    private String ccConstructProgressPlanTypeId;
-
-    /**
-     * 获取：施工进度计划类型。
-     */
-    public String getCcConstructProgressPlanTypeId() {
-        return this.ccConstructProgressPlanTypeId;
-    }
-
-    /**
-     * 设置：施工进度计划类型。
-     */
-    public CcConstructProgressPlan setCcConstructProgressPlanTypeId(String ccConstructProgressPlanTypeId) {
-        if (this.ccConstructProgressPlanTypeId == null && ccConstructProgressPlanTypeId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccConstructProgressPlanTypeId != null && ccConstructProgressPlanTypeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccConstructProgressPlanTypeId.compareTo(ccConstructProgressPlanTypeId) != 0) {
-                this.ccConstructProgressPlanTypeId = ccConstructProgressPlanTypeId;
-                if (!this.toUpdateCols.contains("CC_CONSTRUCT_PROGRESS_PLAN_TYPE_ID")) {
-                    this.toUpdateCols.add("CC_CONSTRUCT_PROGRESS_PLAN_TYPE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccConstructProgressPlanTypeId = ccConstructProgressPlanTypeId;
-            if (!this.toUpdateCols.contains("CC_CONSTRUCT_PROGRESS_PLAN_TYPE_ID")) {
-                this.toUpdateCols.add("CC_CONSTRUCT_PROGRESS_PLAN_TYPE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 施工进度计划责任人。
-     */
-    private String ccConstructionScheduleResponsiblePerson;
-
-    /**
-     * 获取：施工进度计划责任人。
-     */
-    public String getCcConstructionScheduleResponsiblePerson() {
-        return this.ccConstructionScheduleResponsiblePerson;
-    }
-
-    /**
-     * 设置：施工进度计划责任人。
-     */
-    public CcConstructProgressPlan setCcConstructionScheduleResponsiblePerson(String ccConstructionScheduleResponsiblePerson) {
-        if (this.ccConstructionScheduleResponsiblePerson == null && ccConstructionScheduleResponsiblePerson == null) {
-            // 均为null，不做处理。
-        } else if (this.ccConstructionScheduleResponsiblePerson != null && ccConstructionScheduleResponsiblePerson != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccConstructionScheduleResponsiblePerson.compareTo(ccConstructionScheduleResponsiblePerson) != 0) {
-                this.ccConstructionScheduleResponsiblePerson = ccConstructionScheduleResponsiblePerson;
-                if (!this.toUpdateCols.contains("CC_CONSTRUCTION_SCHEDULE_RESPONSIBLE_PERSON")) {
-                    this.toUpdateCols.add("CC_CONSTRUCTION_SCHEDULE_RESPONSIBLE_PERSON");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccConstructionScheduleResponsiblePerson = ccConstructionScheduleResponsiblePerson;
-            if (!this.toUpdateCols.contains("CC_CONSTRUCTION_SCHEDULE_RESPONSIBLE_PERSON")) {
-                this.toUpdateCols.add("CC_CONSTRUCTION_SCHEDULE_RESPONSIBLE_PERSON");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 计划从。
-     */
-    private LocalDate planFr;
-
-    /**
-     * 获取：计划从。
-     */
-    public LocalDate getPlanFr() {
-        return this.planFr;
-    }
-
-    /**
-     * 设置：计划从。
-     */
-    public CcConstructProgressPlan setPlanFr(LocalDate planFr) {
-        if (this.planFr == null && planFr == null) {
-            // 均为null，不做处理。
-        } else if (this.planFr != null && planFr != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.planFr.compareTo(planFr) != 0) {
-                this.planFr = planFr;
-                if (!this.toUpdateCols.contains("PLAN_FR")) {
-                    this.toUpdateCols.add("PLAN_FR");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.planFr = planFr;
-            if (!this.toUpdateCols.contains("PLAN_FR")) {
-                this.toUpdateCols.add("PLAN_FR");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 计划到。
-     */
-    private LocalDate planTo;
-
-    /**
-     * 获取：计划到。
-     */
-    public LocalDate getPlanTo() {
-        return this.planTo;
-    }
-
-    /**
-     * 设置：计划到。
-     */
-    public CcConstructProgressPlan setPlanTo(LocalDate planTo) {
-        if (this.planTo == null && planTo == null) {
-            // 均为null，不做处理。
-        } else if (this.planTo != null && planTo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.planTo.compareTo(planTo) != 0) {
-                this.planTo = planTo;
-                if (!this.toUpdateCols.contains("PLAN_TO")) {
-                    this.toUpdateCols.add("PLAN_TO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.planTo = planTo;
-            if (!this.toUpdateCols.contains("PLAN_TO")) {
-                this.toUpdateCols.add("PLAN_TO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 计划天数。
-     */
-    private BigDecimal planDays;
-
-    /**
-     * 获取：计划天数。
-     */
-    public BigDecimal getPlanDays() {
-        return this.planDays;
-    }
-
-    /**
-     * 设置：计划天数。
-     */
-    public CcConstructProgressPlan setPlanDays(BigDecimal planDays) {
-        if (this.planDays == null && planDays == null) {
-            // 均为null，不做处理。
-        } else if (this.planDays != null && planDays != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.planDays.compareTo(planDays) != 0) {
-                this.planDays = planDays;
-                if (!this.toUpdateCols.contains("PLAN_DAYS")) {
-                    this.toUpdateCols.add("PLAN_DAYS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.planDays = planDays;
-            if (!this.toUpdateCols.contains("PLAN_DAYS")) {
-                this.toUpdateCols.add("PLAN_DAYS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实际从。
-     */
-    private LocalDate actFr;
-
-    /**
-     * 获取：实际从。
-     */
-    public LocalDate getActFr() {
-        return this.actFr;
-    }
-
-    /**
-     * 设置：实际从。
-     */
-    public CcConstructProgressPlan setActFr(LocalDate actFr) {
-        if (this.actFr == null && actFr == null) {
-            // 均为null，不做处理。
-        } else if (this.actFr != null && actFr != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.actFr.compareTo(actFr) != 0) {
-                this.actFr = actFr;
-                if (!this.toUpdateCols.contains("ACT_FR")) {
-                    this.toUpdateCols.add("ACT_FR");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.actFr = actFr;
-            if (!this.toUpdateCols.contains("ACT_FR")) {
-                this.toUpdateCols.add("ACT_FR");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实际到。
-     */
-    private LocalDate actTo;
-
-    /**
-     * 获取：实际到。
-     */
-    public LocalDate getActTo() {
-        return this.actTo;
-    }
-
-    /**
-     * 设置：实际到。
-     */
-    public CcConstructProgressPlan setActTo(LocalDate actTo) {
-        if (this.actTo == null && actTo == null) {
-            // 均为null，不做处理。
-        } else if (this.actTo != null && actTo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.actTo.compareTo(actTo) != 0) {
-                this.actTo = actTo;
-                if (!this.toUpdateCols.contains("ACT_TO")) {
-                    this.toUpdateCols.add("ACT_TO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.actTo = actTo;
-            if (!this.toUpdateCols.contains("ACT_TO")) {
-                this.toUpdateCols.add("ACT_TO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实际天数。
-     */
-    private BigDecimal actDays;
-
-    /**
-     * 获取：实际天数。
-     */
-    public BigDecimal getActDays() {
-        return this.actDays;
-    }
-
-    /**
-     * 设置：实际天数。
-     */
-    public CcConstructProgressPlan setActDays(BigDecimal actDays) {
-        if (this.actDays == null && actDays == null) {
-            // 均为null，不做处理。
-        } else if (this.actDays != null && actDays != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.actDays.compareTo(actDays) != 0) {
-                this.actDays = actDays;
-                if (!this.toUpdateCols.contains("ACT_DAYS")) {
-                    this.toUpdateCols.add("ACT_DAYS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.actDays = actDays;
-            if (!this.toUpdateCols.contains("ACT_DAYS")) {
-                this.toUpdateCols.add("ACT_DAYS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 生效时间。
-     */
-    private LocalDateTime effectiveTime;
-
-    /**
-     * 获取：生效时间。
-     */
-    public LocalDateTime getEffectiveTime() {
-        return this.effectiveTime;
-    }
-
-    /**
-     * 设置：生效时间。
-     */
-    public CcConstructProgressPlan setEffectiveTime(LocalDateTime effectiveTime) {
-        if (this.effectiveTime == null && effectiveTime == null) {
-            // 均为null，不做处理。
-        } else if (this.effectiveTime != null && effectiveTime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.effectiveTime.compareTo(effectiveTime) != 0) {
-                this.effectiveTime = effectiveTime;
-                if (!this.toUpdateCols.contains("EFFECTIVE_TIME")) {
-                    this.toUpdateCols.add("EFFECTIVE_TIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.effectiveTime = effectiveTime;
-            if (!this.toUpdateCols.contains("EFFECTIVE_TIME")) {
-                this.toUpdateCols.add("EFFECTIVE_TIME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 附件。
-     */
-    private String ccAttachments;
-
-    /**
-     * 获取：附件。
-     */
-    public String getCcAttachments() {
-        return this.ccAttachments;
-    }
-
-    /**
-     * 设置：附件。
-     */
-    public CcConstructProgressPlan setCcAttachments(String ccAttachments) {
-        if (this.ccAttachments == null && ccAttachments == null) {
-            // 均为null，不做处理。
-        } else if (this.ccAttachments != null && ccAttachments != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccAttachments.compareTo(ccAttachments) != 0) {
-                this.ccAttachments = ccAttachments;
-                if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                    this.toUpdateCols.add("CC_ATTACHMENTS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccAttachments = ccAttachments;
-            if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                this.toUpdateCols.add("CC_ATTACHMENTS");
+            this.ccConstructProgressPlanId = ccConstructProgressPlanId;
+            if (!this.toUpdateCols.contains("CC_CONSTRUCT_PROGRESS_PLAN_ID")) {
+                this.toUpdateCols.add("CC_CONSTRUCT_PROGRESS_PLAN_ID");
             }
         }
         return this;
@@ -1262,8 +820,8 @@ public class CcConstructProgressPlan {
      *
      * @return
      */
-    public static CcConstructProgressPlan newData() {
-        CcConstructProgressPlan obj = modelHelper.newData();
+    public static CcConstructProgressBimModelRel newData() {
+        CcConstructProgressBimModelRel obj = modelHelper.newData();
         return obj;
     }
 
@@ -1272,8 +830,8 @@ public class CcConstructProgressPlan {
      *
      * @return
      */
-    public static CcConstructProgressPlan insertData() {
-        CcConstructProgressPlan obj = modelHelper.insertData();
+    public static CcConstructProgressBimModelRel insertData() {
+        CcConstructProgressBimModelRel obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1285,8 +843,8 @@ public class CcConstructProgressPlan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcConstructProgressPlan selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcConstructProgressPlan obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcConstructProgressBimModelRel selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcConstructProgressBimModelRel obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1296,7 +854,7 @@ public class CcConstructProgressPlan {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcConstructProgressPlan selectById(String id) {
+    public static CcConstructProgressBimModelRel selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1308,8 +866,8 @@ public class CcConstructProgressPlan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructProgressPlan> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcConstructProgressPlan> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcConstructProgressBimModelRel> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcConstructProgressBimModelRel> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1319,7 +877,7 @@ public class CcConstructProgressPlan {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructProgressPlan> selectByIds(List<String> ids) {
+    public static List<CcConstructProgressBimModelRel> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1331,8 +889,8 @@ public class CcConstructProgressPlan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructProgressPlan> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcConstructProgressPlan> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcConstructProgressBimModelRel> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcConstructProgressBimModelRel> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1342,7 +900,7 @@ public class CcConstructProgressPlan {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcConstructProgressPlan> selectByWhere(Where where) {
+    public static List<CcConstructProgressBimModelRel> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1354,10 +912,10 @@ public class CcConstructProgressPlan {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcConstructProgressPlan selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcConstructProgressPlan> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcConstructProgressBimModelRel selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcConstructProgressBimModelRel> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcConstructProgressPlan.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcConstructProgressBimModelRel.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1369,7 +927,7 @@ public class CcConstructProgressPlan {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcConstructProgressPlan selectOneByWhere(Where where) {
+    public static CcConstructProgressBimModelRel selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1483,7 +1041,7 @@ public class CcConstructProgressPlan {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcConstructProgressPlan fromModel, CcConstructProgressPlan toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcConstructProgressBimModelRel fromModel, CcConstructProgressBimModelRel toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1493,7 +1051,7 @@ public class CcConstructProgressPlan {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcConstructProgressPlan fromModel, CcConstructProgressPlan toModel) {
+    public static void copyCols(CcConstructProgressBimModelRel fromModel, CcConstructProgressBimModelRel toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 
