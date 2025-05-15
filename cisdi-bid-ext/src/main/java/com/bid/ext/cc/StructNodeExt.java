@@ -3618,7 +3618,7 @@ public class StructNodeExt {
         String wbsChiefUserId = JdbcMapUtil.getString(varMap, "P_WBS_CHIEF_USER_ID");
         LocalDate pPlanFr = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_FR");
         LocalDate pPlanTo = JdbcMapUtil.getLocalDate(varMap, "P_PLAN_TO");
-        boolean isMileStone = Boolean.valueOf(JdbcMapUtil.getString(varMap, "P_IS_STONE"));
+        Boolean isMileStone = JdbcMapUtil.getBoolean(varMap, "P_IS_STONE");
         String wbsType = JdbcMapUtil.getString(varMap, "P_PLAN_TYPE");
 
         // 校验日期
