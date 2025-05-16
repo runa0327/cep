@@ -5,6 +5,7 @@ import com.bid.ext.model.CcPrjStructNode;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -13,8 +14,10 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.bid.ext.cc.PlanExt.insertWbsNode;
 import static com.bid.ext.cc.StructNodeExt.replaceIdsAndInsert;
@@ -79,6 +82,35 @@ public class ConstructProgressExt {
         String pCcPrjIds = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");
         if (pCcPrjIds != null && pCcPrjIds.contains(",")) {
             throw new BaseException("仅允许在唯一项目存在的情况下编辑计划");
+        }
+    }
+
+    /**
+     * 施工进度计划日期验证
+     */
+    public void ConstructProgressDate() {
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        LocalDate planFr = JdbcMapUtil.getLocalDate(valueMap, "PLAN_FR");
+        LocalDate planTo = JdbcMapUtil.getLocalDate(valueMap, "PLAN_TO");
+        dateCheckCalculate(planFr, planTo);
+    }
+
+
+    /**
+     * 日期检查计算
+     *
+     * @throws Exception
+     */
+    private void dateCheckCalculate(LocalDate startDate, LocalDate endDate) {
+        // 检查参数是否为null
+        Objects.requireNonNull(startDate, "开始日期不能为null");
+        Objects.requireNonNull(endDate, "结束日期不能为null");
+
+        // 检查开始日期是否晚于结束日期
+        if (startDate.isAfter(endDate)) {
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("cisdi.gczx.ql.nodeDateCheckCalculate");
+            throw new BaseException(message);
         }
     }
 
