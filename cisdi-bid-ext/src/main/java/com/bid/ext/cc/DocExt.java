@@ -104,12 +104,13 @@ public class DocExt {
             throw new BaseException(message);
         }
         String ccPreviewUrl = ccDocFile.getCcPreviewUrl();
-
-        Pattern pattern = Pattern.compile("sceneId=([^&]*)");
-        Matcher matcher = pattern.matcher(ccPreviewUrl);
         String sceneId = null;
-        if (matcher.find()) {
-            sceneId = matcher.group(1); // 返回第一个捕获组（即 sceneId= 后面的内容）
+        if (!SharedUtil.isEmpty(ccPreviewUrl)) {
+            Pattern pattern = Pattern.compile("sceneId=([^&]*)");
+            Matcher matcher = pattern.matcher(ccPreviewUrl);
+            if (matcher.find()) {
+                sceneId = matcher.group(1);
+            }
         }
         FlFile flFile = FlFile.selectById(ccAttachment);
         String fileInlineUrl = flFile.getFileInlineUrl();
