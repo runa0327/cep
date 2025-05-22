@@ -1168,9 +1168,11 @@ public class StructNodeExt {
         LocalDateTime now = LocalDateTime.parse(progTimeStr, formatter);
         Integer actWbsPct = JdbcMapUtil.getInt(varMap, "P_ACT_WBS_PCT");
         String pCcProgressUnitId = JdbcMapUtil.getString(varMap, "P_CC_PROGRESS_UNIT_ID");
-        if (actWbsPct > 100 || actWbsPct < 0) {
-            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.exceedsDataRange");
-            throw new BaseException(message);
+        if (SharedUtil.isEmpty(pCcProgressUnitId)) {
+            if (actWbsPct > 100 || actWbsPct < 0) {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.exceedsDataRange");
+                throw new BaseException(message);
+            }
         }
         int curWbsPct = JdbcMapUtil.getInt(varMap, "P_CUR_WBS_PCT");
         if (actWbsPct < curWbsPct) {
