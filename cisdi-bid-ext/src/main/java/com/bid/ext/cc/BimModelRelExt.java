@@ -13,6 +13,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -444,18 +445,33 @@ public class BimModelRelExt {
             String structNodeId = valueMap.get("ID").toString();
             CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(structNodeId);
             //当前序号
-            String currentSeqNo = valueMap.get("SEQ_NO").toString();
+            BigDecimal currentSeqNo = new BigDecimal(valueMap.get("SEQ_NO").toString());
+            String currentPid = null;
+            if(valueMap.get("CC_PRJ_STRUCT_NODE_PID") != null){
+                currentPid = valueMap.get("CC_PRJ_STRUCT_NODE_PID").toString();//当前PID
+            }
             //数据库序号
-            String dbSeqNo = ccPrjStructNode.getSeqNo().toString();
-            if(currentSeqNo.equals(dbSeqNo)){
-                //提示：序号变更后，可能会影响层级维护，请谨慎操作！
-                continue;
+            BigDecimal dbSeqNo = ccPrjStructNode.getSeqNo().stripTrailingZeros();
+            String dbPid = ccPrjStructNode.getCcPrjStructNodePid();//数据库PID
+            //通过序号判断是否变更，前提是在同一个父级节点下，所以判断是要求判断PID是否相同
+            if(dbPid !=null && currentPid != null && dbPid.equals(currentPid)){
+                //在同一父节点下的变动
+                if(currentSeqNo.equals(dbSeqNo)){
+                    //提示：序号变更后，可能会影响层级维护，请谨慎操作！
+                    continue;
+                }
+            }else if(currentPid == null && dbPid == null){
+                //更新前后都没有父节点，说明只是调整了顺序
+                if(currentSeqNo.equals(dbSeqNo)){
+                    //提示：序号变更后，可能会影响层级维护，请谨慎操作！
+                    continue;
+                }
             }
             //删除之前的关联关系
             deleteStructNodeRel(structNodeId);
             //判断新的父节点是否关联模型构件
 
-            if(valueMap.get("CC_PRJ_STRUCT_NODE_PID") == null){
+            if(currentPid == null){
                 //层级更新后，没有父节点，则只处理当前节点之前的关联关系
                 //当前节点的CC_IS_REL_BIM_MODEL_COMPONENT为false
                 ccPrjStructNode.setCcIsRelBimModelComponent(false);
@@ -486,9 +502,9 @@ public class BimModelRelExt {
      */
     public void getStructNodeByModelId(){
         Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
-//        String csCommId = JdbcMapUtil.getString(inputMap, "csCommId");
+        String csCommId = JdbcMapUtil.getString(inputMap, "csCommId");
         //测试ID：1920288243449733120,1912024978913730560
-        String csCommId  = "1868474414879682560";
+//        String csCommId  = "1868474414879682560";
 
         CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
         String ccAttachment = ccDocFile.getCcAttachment();
