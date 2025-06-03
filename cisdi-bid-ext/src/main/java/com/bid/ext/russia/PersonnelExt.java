@@ -178,7 +178,7 @@ public class PersonnelExt {
 
 //        filePath = "C:\\Users\\Administrator\\Documents\\Russia\\人员管理模板%2B带备注.xlsx";
 
-//        filePath = "/Users/hejialun/Documents/Russia/人员管理模板%2B带备注.xlsx";
+//        filePath = "/Users/hejialun/Documents/Russia/2修改人员导入信息 (1)_副本.xlsx";
 
 //        importPersonnelEntryInfoPreCheck(filePath);//检查是否存在未退出的人员数据
 
@@ -244,9 +244,9 @@ public class PersonnelExt {
                 }
                 //获取手机号
                 String  phoneNum  = getStringCellValue(row.getCell(4));
-                if (SharedUtil.isEmpty(phoneNum)) {
-                    break;
-                }
+//                if (SharedUtil.isEmpty(phoneNum)) {
+//                    break;
+//                }
 
                 //签证到期日期
                 LocalDate  visaExpirationDate = getLocalDateCellValue(row.getCell(5));
@@ -347,7 +347,7 @@ public class PersonnelExt {
                 selectEntryInfo.eq("RU_USER_NAME",personName);
                 selectEntryInfo.eq("RU_USER_AGE",age.intValue());
 //                selectEntryInfo.eq("RU_USER_VISA_EXPIRATION_DATE",visaExpirationDate);
-                selectEntryInfo.eq("RU_USER_ENTRY_DATE",entryDate);
+                selectEntryInfo.eq("RU_USER_ENTER_A_COUNTRY_DATE",intoCountryDate);
 
                 RuUserEntryInfo userEntryInfo = RuUserEntryInfo.selectOneByWhere(selectEntryInfo);
                 if (SharedUtil.isEmpty(userEntryInfo)){ //没有数据新增
@@ -358,10 +358,12 @@ public class PersonnelExt {
                     newUserEntryInfo.setRemark(remark);
                     newUserEntryInfo.setRuEntryFrequency(getFrequency(personName,age.intValue())+1);
                     newUserEntryInfo.insertById();
+                    System.out.println(2);
                 }else{//有数据，修改
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, userEntryInfo);
                     userEntryInfo.setRemark(remark);
                     userEntryInfo.updateById();
+                    System.out.println(1);
                 }
             }
         } catch (IOException e) {
