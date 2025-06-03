@@ -244,9 +244,9 @@ public class PersonnelExt {
                 }
                 //获取手机号
                 String  phoneNum  = getStringCellValue(row.getCell(4));
-                if (SharedUtil.isEmpty(phoneNum)) {
-                    break;
-                }
+//                if (SharedUtil.isEmpty(phoneNum)) {
+//                    break;
+//                }
 
                 //签证到期日期
                 LocalDate  visaExpirationDate = getLocalDateCellValue(row.getCell(5));
