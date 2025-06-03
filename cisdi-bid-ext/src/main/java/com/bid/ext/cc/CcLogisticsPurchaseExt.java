@@ -589,7 +589,9 @@ public class CcLogisticsPurchaseExt {
             arrivalRecord.setCcStackSite(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_STACK_SITE").toString(), null)));
             arrivalRecord.setCcEquipmentAppearanceInspection(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_EQUIPMENT_APPEARANCE_INSPECTION").toString(), null)));
             arrivalRecord.setCcArrivalRecordStatusId(varMap.get("P_CC_ARRIVAL_RECORD_STATUS_ID").toString());
-            arrivalRecord.setCcArrivalNum(varMap.get("P_CC_ARRIVAL_NUM").toString());
+            //考虑到批量操作的情况，运单号就不从表单中获取，而是从valueMap中获取
+            String arrivalNum = valueMap.get("ID").toString();
+            arrivalRecord.setCcArrivalNum(arrivalNum);
             arrivalRecord.insertById();
 
             //装箱到货状态更新
