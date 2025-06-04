@@ -594,9 +594,16 @@ public class CcLogisticsPurchaseExt {
             arrivalRecord.setCcStackSite(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_STACK_SITE").toString(), null)));
             arrivalRecord.setCcEquipmentAppearanceInspection(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_EQUIPMENT_APPEARANCE_INSPECTION").toString(), null)));
             arrivalRecord.setCcArrivalRecordStatusId(varMap.get("P_CC_ARRIVAL_RECORD_STATUS_ID").toString());
-            //考虑到批量操作的情况，运单号就不从表单中获取，而是从valueMap中获取
-            String arrivalNum = valueMap.get("ID").toString();
-            arrivalRecord.setCcArrivalNum(arrivalNum);
+            //考虑到批量操作的情况，不从表单中获取，而是从valueMap中获取
+            String packId = valueMap.get("ID").toString();//装箱ID
+            Where where = new Where();
+            where.eq("CC_LOGISTICS_PACK_ID ", packId);
+            CcShipRelatePack ccShipRelatePack = CcShipRelatePack.selectOneByWhere(where);
+            //一个运输关联多个装箱，表设计有问题，这里查出的ccShipRelatePackList只有一条数据
+            Where  where1 = new Where();
+            where1.eq("ID ", ccShipRelatePack.getCcLogisticsShipId());
+            CcLogisticsShip ccLogisticsShip = CcLogisticsShip.selectOneByWhere(where1);
+            arrivalRecord.setCcArrivalNum(ccLogisticsShip.getCcShipNum());
             arrivalRecord.insertById();
 
             //装箱到货状态更新
@@ -641,7 +648,10 @@ public class CcLogisticsPurchaseExt {
             ccUnpackingInspection.setCcInvolvedPerson(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_INVOLVED_PERSON").toString(), null)));
             ccUnpackingInspection.setCcInvolvedOrg(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_INVOLVED_ORG").toString(), null)));
             ccUnpackingInspection.setCcUnpackingSite(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_UNPACKING_SITE").toString(), null)));
-            ccUnpackingInspection.setCcUnpackingNum(varMap.get("P_CC_UNPACKING_NUM").toString());
+            //考虑到批量操作的情况，不从表单中获取，而是从valueMap中获取
+            String unpackingNum = valueMap.get("CC_PACK_NUM").toString();
+            ccUnpackingInspection.setCcUnpackingNum(unpackingNum);
+//            ccUnpackingInspection.setCcUnpackingNum(varMap.get("P_CC_UNPACKING_NUM").toString());
             ccUnpackingInspection.insertById();
 
             //装箱验收状态更新

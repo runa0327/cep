@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "EN：资料文件", "ZH_CN": "资料文件", "ZH_TW": "繁：资料文件"}。
+ * 资料文件。
  */
 public class CcDocFile {
 
@@ -49,143 +49,147 @@ public class CcDocFile {
 
     public static class Cols {
         /**
-         * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+         * ID。
          */
         public static final String ID = "ID";
         /**
-         * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+         * 版本。
          */
         public static final String VER = "VER";
         /**
-         * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+         * 时间戳。
          */
         public static final String TS = "TS";
         /**
-         * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+         * 是否预设。
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+         * 创建日期时间。
          */
         public static final String CRT_DT = "CRT_DT";
         /**
-         * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+         * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+         * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+         * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+         * 代码。
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+         * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
         /**
-         * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+         * 图标。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+         * 序号。
          */
         public static final String SEQ_NO = "SEQ_NO";
         /**
-         * {"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+         * 收藏用户。
          */
         public static final String CC_FAVORITES_USER_IDS = "CC_FAVORITES_USER_IDS";
         /**
-         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-         */
-        public static final String CC_PRJ_ID = "CC_PRJ_ID";
-        /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         * 名称。
          */
         public static final String NAME = "NAME";
         /**
-         * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+         * 项目。
+         */
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        /**
+         * 资料文件日期。
          */
         public static final String CC_DOC_DATE = "CC_DOC_DATE";
         /**
-         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+         * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+         * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         * 备注。
          */
         public static final String REMARK = "REMARK";
         /**
-         * {"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+         * 资料文件类型。
          */
         public static final String CC_DOC_FILE_TYPE_ID = "CC_DOC_FILE_TYPE_ID";
         /**
-         * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+         * 附件。
          */
         public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
         /**
-         * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+         * 缩略图附件。
          */
         public static final String CC_PREVIEW_ATTACHMENT = "CC_PREVIEW_ATTACHMENT";
         /**
-         * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+         * 图纸审批状态。
          */
         public static final String CC_DRAWING_APPROVED_STATUS = "CC_DRAWING_APPROVED_STATUS";
         /**
-         * {"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
+         * 预览文件ID。
          */
         public static final String CC_PREVIEW_FILE_ID = "CC_PREVIEW_FILE_ID";
         /**
-         * {"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
+         * 预览文件显示大小。
          */
         public static final String CC_PREVIEW_DSP_SIZE = "CC_PREVIEW_DSP_SIZE";
         /**
-         * {"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
+         * 预览转换状态。
          */
         public static final String CC_PREVIEW_CONVERSION_STATUS_ID = "CC_PREVIEW_CONVERSION_STATUS_ID";
         /**
-         * {"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
+         * 预览转换开始。
          */
         public static final String CC_PREVIEW_CONVERSION_START = "CC_PREVIEW_CONVERSION_START";
         /**
-         * {"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
+         * 预览转换结束。
          */
         public static final String CC_PREVIEW_CONVERSION_END = "CC_PREVIEW_CONVERSION_END";
         /**
-         * {"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+         * 预览地址。
          */
         public static final String CC_PREVIEW_URL = "CC_PREVIEW_URL";
         /**
-         * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+         * 默认。
          */
         public static final String IS_DEFAULT = "IS_DEFAULT";
         /**
-         * {"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+         * 是否自动转换。
+         */
+        public static final String IS_AUTO_CONVERT = "IS_AUTO_CONVERT";
+        /**
+         * 是否收藏。
          */
         public static final String IS_FAVORITES = "IS_FAVORITES";
         /**
-         * {"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
+         * 资料目录。
          */
         public static final String CC_DOC_DIR_ID = "CC_DOC_DIR_ID";
         /**
-         * {"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+         * 竣工验收资料文件类型。
          */
         public static final String CC_COMPLET_FILE_TYPE_ID = "CC_COMPLET_FILE_TYPE_ID";
         /**
-         * {"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+         * 竣工验收资料类型。
          */
         public static final String CC_COMPLET_TYPE_ID = "CC_COMPLET_TYPE_ID";
         /**
-         * {"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+         * 资料文件来源。
          */
         public static final String CC_DOC_FILE_FROM = "CC_DOC_FILE_FROM";
     }
@@ -196,19 +200,19 @@ public class CcDocFile {
     // <editor-fold>
 
     /**
-     * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * ID。
      */
     private String id;
 
     /**
-     * 获取：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 获取：ID。
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 设置：ID。
      */
     public CcDocFile setId(String id) {
         if (this.id == null && id == null) {
@@ -232,19 +236,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 版本。
      */
     private Integer ver;
 
     /**
-     * 获取：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 获取：版本。
      */
     public Integer getVer() {
         return this.ver;
     }
 
     /**
-     * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 设置：版本。
      */
     public CcDocFile setVer(Integer ver) {
         if (this.ver == null && ver == null) {
@@ -268,19 +272,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 时间戳。
      */
     private LocalDateTime ts;
 
     /**
-     * 获取：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 获取：时间戳。
      */
     public LocalDateTime getTs() {
         return this.ts;
     }
 
     /**
-     * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 设置：时间戳。
      */
     public CcDocFile setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
@@ -304,19 +308,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 是否预设。
      */
     private Boolean isPreset;
 
     /**
-     * 获取：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 获取：是否预设。
      */
     public Boolean getIsPreset() {
         return this.isPreset;
     }
 
     /**
-     * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 设置：是否预设。
      */
     public CcDocFile setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
@@ -340,19 +344,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 创建日期时间。
      */
     private LocalDateTime crtDt;
 
     /**
-     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 获取：创建日期时间。
      */
     public LocalDateTime getCrtDt() {
         return this.crtDt;
     }
 
     /**
-     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 设置：创建日期时间。
      */
     public CcDocFile setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
@@ -376,19 +380,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 最后修改用户。
      */
     private String lastModiUserId;
 
     /**
-     * 获取：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 获取：最后修改用户。
      */
     public String getLastModiUserId() {
         return this.lastModiUserId;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 设置：最后修改用户。
      */
     public CcDocFile setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
@@ -412,19 +416,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 记录状态。
      */
     private String status;
 
     /**
-     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 获取：记录状态。
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 设置：记录状态。
      */
     public CcDocFile setStatus(String status) {
         if (this.status == null && status == null) {
@@ -448,19 +452,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 锁定流程实例。
      */
     private String lkWfInstId;
 
     /**
-     * 获取：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 获取：锁定流程实例。
      */
     public String getLkWfInstId() {
         return this.lkWfInstId;
     }
 
     /**
-     * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 设置：锁定流程实例。
      */
     public CcDocFile setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
@@ -484,19 +488,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 代码。
      */
     private String code;
 
     /**
-     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 获取：代码。
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 设置：代码。
      */
     public CcDocFile setCode(String code) {
         if (this.code == null && code == null) {
@@ -520,19 +524,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 快捷码。
      */
     private String fastCode;
 
     /**
-     * 获取：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 获取：快捷码。
      */
     public String getFastCode() {
         return this.fastCode;
     }
 
     /**
-     * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 设置：快捷码。
      */
     public CcDocFile setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
@@ -556,19 +560,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 图标。
      */
     private String iconFileGroupId;
 
     /**
-     * 获取：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 获取：图标。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 设置：图标。
      */
     public CcDocFile setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
@@ -592,19 +596,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     * 序号。
      */
     private BigDecimal seqNo;
 
     /**
-     * 获取：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     * 获取：序号。
      */
     public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
-     * 设置：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     * 设置：序号。
      */
     public CcDocFile setSeqNo(BigDecimal seqNo) {
         if (this.seqNo == null && seqNo == null) {
@@ -628,19 +632,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     * 收藏用户。
      */
     private String ccFavoritesUserIds;
 
     /**
-     * 获取：{"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     * 获取：收藏用户。
      */
     public String getCcFavoritesUserIds() {
         return this.ccFavoritesUserIds;
     }
 
     /**
-     * 设置：{"EN": "收藏用户", "ZH_CN": "收藏用户", "ZH_TW": "收藏用户"}。
+     * 设置：收藏用户。
      */
     public CcDocFile setCcFavoritesUserIds(String ccFavoritesUserIds) {
         if (this.ccFavoritesUserIds == null && ccFavoritesUserIds == null) {
@@ -664,55 +668,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    private String ccPrjId;
-
-    /**
-     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    public String getCcPrjId() {
-        return this.ccPrjId;
-    }
-
-    /**
-     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    public CcDocFile setCcPrjId(String ccPrjId) {
-        if (this.ccPrjId == null && ccPrjId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjId != null && ccPrjId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
-                this.ccPrjId = ccPrjId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjId = ccPrjId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 名称。
      */
     private String name;
 
     /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 获取：名称。
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 设置：名称。
      */
     public CcDocFile setName(String name) {
         if (this.name == null && name == null) {
@@ -736,19 +704,55 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     * 项目。
+     */
+    private String ccPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getCcPrjId() {
+        return this.ccPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public CcDocFile setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjId != null && ccPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 资料文件日期。
      */
     private LocalDate ccDocDate;
 
     /**
-     * 获取：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     * 获取：资料文件日期。
      */
     public LocalDate getCcDocDate() {
         return this.ccDocDate;
     }
 
     /**
-     * 设置：{"EN": "资料文件日期", "ZH_CN": "资料文件日期", "ZH_TW": "资料文件日期"}。
+     * 设置：资料文件日期。
      */
     public CcDocFile setCcDocDate(LocalDate ccDocDate) {
         if (this.ccDocDate == null && ccDocDate == null) {
@@ -772,19 +776,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 创建用户。
      */
     private String crtUserId;
 
     /**
-     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 获取：创建用户。
      */
     public String getCrtUserId() {
         return this.crtUserId;
     }
 
     /**
-     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 设置：创建用户。
      */
     public CcDocFile setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
@@ -808,19 +812,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
 
     /**
-     * 获取：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 获取：最后修改日期时间。
      */
     public LocalDateTime getLastModiDt() {
         return this.lastModiDt;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 设置：最后修改日期时间。
      */
     public CcDocFile setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
@@ -844,19 +848,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 备注。
      */
     private String remark;
 
     /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 获取：备注。
      */
     public String getRemark() {
         return this.remark;
     }
 
     /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 设置：备注。
      */
     public CcDocFile setRemark(String remark) {
         if (this.remark == null && remark == null) {
@@ -880,19 +884,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+     * 资料文件类型。
      */
     private String ccDocFileTypeId;
 
     /**
-     * 获取：{"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+     * 获取：资料文件类型。
      */
     public String getCcDocFileTypeId() {
         return this.ccDocFileTypeId;
     }
 
     /**
-     * 设置：{"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+     * 设置：资料文件类型。
      */
     public CcDocFile setCcDocFileTypeId(String ccDocFileTypeId) {
         if (this.ccDocFileTypeId == null && ccDocFileTypeId == null) {
@@ -916,19 +920,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 附件。
      */
     private String ccAttachment;
 
     /**
-     * 获取：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 获取：附件。
      */
     public String getCcAttachment() {
         return this.ccAttachment;
     }
 
     /**
-     * 设置：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 设置：附件。
      */
     public CcDocFile setCcAttachment(String ccAttachment) {
         if (this.ccAttachment == null && ccAttachment == null) {
@@ -952,19 +956,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     * 缩略图附件。
      */
     private String ccPreviewAttachment;
 
     /**
-     * 获取：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     * 获取：缩略图附件。
      */
     public String getCcPreviewAttachment() {
         return this.ccPreviewAttachment;
     }
 
     /**
-     * 设置：{"EN": "缩略图附件", "ZH_CN": "缩略图附件", "ZH_TW": "缩略图附件"}。
+     * 设置：缩略图附件。
      */
     public CcDocFile setCcPreviewAttachment(String ccPreviewAttachment) {
         if (this.ccPreviewAttachment == null && ccPreviewAttachment == null) {
@@ -988,19 +992,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     * 图纸审批状态。
      */
     private Integer ccDrawingApprovedStatus;
 
     /**
-     * 获取：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     * 获取：图纸审批状态。
      */
     public Integer getCcDrawingApprovedStatus() {
         return this.ccDrawingApprovedStatus;
     }
 
     /**
-     * 设置：{"EN": "图纸审批状态", "ZH_CN": "图纸审批状态", "ZH_TW": "图纸审批状态"}。
+     * 设置：图纸审批状态。
      */
     public CcDocFile setCcDrawingApprovedStatus(Integer ccDrawingApprovedStatus) {
         if (this.ccDrawingApprovedStatus == null && ccDrawingApprovedStatus == null) {
@@ -1024,19 +1028,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
+     * 预览文件ID。
      */
     private String ccPreviewFileId;
 
     /**
-     * 获取：{"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
+     * 获取：预览文件ID。
      */
     public String getCcPreviewFileId() {
         return this.ccPreviewFileId;
     }
 
     /**
-     * 设置：{"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
+     * 设置：预览文件ID。
      */
     public CcDocFile setCcPreviewFileId(String ccPreviewFileId) {
         if (this.ccPreviewFileId == null && ccPreviewFileId == null) {
@@ -1060,19 +1064,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
+     * 预览文件显示大小。
      */
     private String ccPreviewDspSize;
 
     /**
-     * 获取：{"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
+     * 获取：预览文件显示大小。
      */
     public String getCcPreviewDspSize() {
         return this.ccPreviewDspSize;
     }
 
     /**
-     * 设置：{"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
+     * 设置：预览文件显示大小。
      */
     public CcDocFile setCcPreviewDspSize(String ccPreviewDspSize) {
         if (this.ccPreviewDspSize == null && ccPreviewDspSize == null) {
@@ -1096,19 +1100,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
+     * 预览转换状态。
      */
     private String ccPreviewConversionStatusId;
 
     /**
-     * 获取：{"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
+     * 获取：预览转换状态。
      */
     public String getCcPreviewConversionStatusId() {
         return this.ccPreviewConversionStatusId;
     }
 
     /**
-     * 设置：{"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
+     * 设置：预览转换状态。
      */
     public CcDocFile setCcPreviewConversionStatusId(String ccPreviewConversionStatusId) {
         if (this.ccPreviewConversionStatusId == null && ccPreviewConversionStatusId == null) {
@@ -1132,19 +1136,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
+     * 预览转换开始。
      */
     private LocalDateTime ccPreviewConversionStart;
 
     /**
-     * 获取：{"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
+     * 获取：预览转换开始。
      */
     public LocalDateTime getCcPreviewConversionStart() {
         return this.ccPreviewConversionStart;
     }
 
     /**
-     * 设置：{"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
+     * 设置：预览转换开始。
      */
     public CcDocFile setCcPreviewConversionStart(LocalDateTime ccPreviewConversionStart) {
         if (this.ccPreviewConversionStart == null && ccPreviewConversionStart == null) {
@@ -1168,19 +1172,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
+     * 预览转换结束。
      */
     private LocalDateTime ccPreviewConversionEnd;
 
     /**
-     * 获取：{"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
+     * 获取：预览转换结束。
      */
     public LocalDateTime getCcPreviewConversionEnd() {
         return this.ccPreviewConversionEnd;
     }
 
     /**
-     * 设置：{"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
+     * 设置：预览转换结束。
      */
     public CcDocFile setCcPreviewConversionEnd(LocalDateTime ccPreviewConversionEnd) {
         if (this.ccPreviewConversionEnd == null && ccPreviewConversionEnd == null) {
@@ -1204,19 +1208,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+     * 预览地址。
      */
     private String ccPreviewUrl;
 
     /**
-     * 获取：{"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+     * 获取：预览地址。
      */
     public String getCcPreviewUrl() {
         return this.ccPreviewUrl;
     }
 
     /**
-     * 设置：{"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+     * 设置：预览地址。
      */
     public CcDocFile setCcPreviewUrl(String ccPreviewUrl) {
         if (this.ccPreviewUrl == null && ccPreviewUrl == null) {
@@ -1240,19 +1244,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     * 默认。
      */
     private Boolean isDefault;
 
     /**
-     * 获取：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     * 获取：默认。
      */
     public Boolean getIsDefault() {
         return this.isDefault;
     }
 
     /**
-     * 设置：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     * 设置：默认。
      */
     public CcDocFile setIsDefault(Boolean isDefault) {
         if (this.isDefault == null && isDefault == null) {
@@ -1276,19 +1280,55 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     * 是否自动转换。
+     */
+    private Boolean isAutoConvert;
+
+    /**
+     * 获取：是否自动转换。
+     */
+    public Boolean getIsAutoConvert() {
+        return this.isAutoConvert;
+    }
+
+    /**
+     * 设置：是否自动转换。
+     */
+    public CcDocFile setIsAutoConvert(Boolean isAutoConvert) {
+        if (this.isAutoConvert == null && isAutoConvert == null) {
+            // 均为null，不做处理。
+        } else if (this.isAutoConvert != null && isAutoConvert != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isAutoConvert.compareTo(isAutoConvert) != 0) {
+                this.isAutoConvert = isAutoConvert;
+                if (!this.toUpdateCols.contains("IS_AUTO_CONVERT")) {
+                    this.toUpdateCols.add("IS_AUTO_CONVERT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isAutoConvert = isAutoConvert;
+            if (!this.toUpdateCols.contains("IS_AUTO_CONVERT")) {
+                this.toUpdateCols.add("IS_AUTO_CONVERT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否收藏。
      */
     private Boolean isFavorites;
 
     /**
-     * 获取：{"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     * 获取：是否收藏。
      */
     public Boolean getIsFavorites() {
         return this.isFavorites;
     }
 
     /**
-     * 设置：{"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     * 设置：是否收藏。
      */
     public CcDocFile setIsFavorites(Boolean isFavorites) {
         if (this.isFavorites == null && isFavorites == null) {
@@ -1312,19 +1352,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
+     * 资料目录。
      */
     private String ccDocDirId;
 
     /**
-     * 获取：{"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
+     * 获取：资料目录。
      */
     public String getCcDocDirId() {
         return this.ccDocDirId;
     }
 
     /**
-     * 设置：{"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
+     * 设置：资料目录。
      */
     public CcDocFile setCcDocDirId(String ccDocDirId) {
         if (this.ccDocDirId == null && ccDocDirId == null) {
@@ -1348,19 +1388,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+     * 竣工验收资料文件类型。
      */
     private String ccCompletFileTypeId;
 
     /**
-     * 获取：{"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+     * 获取：竣工验收资料文件类型。
      */
     public String getCcCompletFileTypeId() {
         return this.ccCompletFileTypeId;
     }
 
     /**
-     * 设置：{"EN": "竣工验收资料文件类型", "ZH_CN": "竣工验收资料文件类型", "ZH_TW": "竣工验收资料文件类型"}。
+     * 设置：竣工验收资料文件类型。
      */
     public CcDocFile setCcCompletFileTypeId(String ccCompletFileTypeId) {
         if (this.ccCompletFileTypeId == null && ccCompletFileTypeId == null) {
@@ -1384,19 +1424,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+     * 竣工验收资料类型。
      */
     private String ccCompletTypeId;
 
     /**
-     * 获取：{"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+     * 获取：竣工验收资料类型。
      */
     public String getCcCompletTypeId() {
         return this.ccCompletTypeId;
     }
 
     /**
-     * 设置：{"EN": "竣工验收资料类型", "ZH_CN": "竣工验收资料类型", "ZH_TW": "竣工验收资料类型"}。
+     * 设置：竣工验收资料类型。
      */
     public CcDocFile setCcCompletTypeId(String ccCompletTypeId) {
         if (this.ccCompletTypeId == null && ccCompletTypeId == null) {
@@ -1420,19 +1460,19 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+     * 资料文件来源。
      */
     private Integer ccDocFileFrom;
 
     /**
-     * 获取：{"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+     * 获取：资料文件来源。
      */
     public Integer getCcDocFileFrom() {
         return this.ccDocFileFrom;
     }
 
     /**
-     * 设置：{"EN": "资料文件来源", "ZH_CN": "资料文件来源", "ZH_TW": "资料文件来源"}。
+     * 设置：资料文件来源。
      */
     public CcDocFile setCcDocFileFrom(Integer ccDocFileFrom) {
         if (this.ccDocFileFrom == null && ccDocFileFrom == null) {

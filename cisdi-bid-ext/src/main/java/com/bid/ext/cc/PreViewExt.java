@@ -430,4 +430,16 @@ public class PreViewExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 自动转换模型
+     */
+    public void autoConvertModel() {
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        Boolean isAutoConvert = JdbcMapUtil.getBoolean(valueMap, "IS_AUTO_CONVERT");
+        if (isAutoConvert) {
+            newPreview();
+        }
+    }
+
 }
