@@ -40,7 +40,7 @@ public class ShareController {
 
         try {
             boolean allFile = panoData.isAllFile();
-            List<String> selectedFolders = panoData.getSelectedFolders();
+
 
             String dataType = panoData.getDataType();
             String code = panoData.getOrgId();
@@ -80,6 +80,15 @@ public class ShareController {
 
             Map<String, Object> shareMapData = JsonUtil.convertJsonToMap(shareContextData);
             String ccPrjId = JdbcMapUtil.getString(shareMapData, "prjId");
+            List<String> selectedFolders = new ArrayList<>();
+            Object foldersObj = shareMapData.get("selectedFolders");
+            if (foldersObj instanceof List) {
+                for (Object item : (List<?>) foldersObj) {
+                    if (item instanceof String) {
+                        selectedFolders.add((String) item);
+                    }
+                }
+            }
 
             // 处理 prjId 为空的情况
             if (SharedUtil.isEmpty(ccPrjId)) {
@@ -107,7 +116,8 @@ public class ShareController {
             params.add(dataType);
 
             // 添加文件夹过滤条件
-            if (!allFile && selectedFolders != null && !selectedFolders.isEmpty()) {
+            if (!allFile && !selectedFolders.isEmpty()) {
+                logger.info("文件夹过滤！");
                 String folderPlaceholders = String.join(", ",
                         Collections.nCopies(selectedFolders.size(), "?"));
 
