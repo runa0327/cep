@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -272,8 +273,8 @@ public class DocExt {
         flFile.setName(fileId);
         flFile.setExt("zip");
         flFile.setDspName(fileId + ".zip");
-        flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-        flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+        flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+        flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
         flFile.setSizeKb(sizeKb);
         flFile.setDspSize(dspSize);
         flFile.setUploadDttm(LocalDateTime.now());
@@ -484,8 +485,8 @@ public class DocExt {
                 attachmentPreview.setName(ccDocFile.getId() + "_preview");
                 attachmentPreview.setExt(flFile.getExt());
                 attachmentPreview.setDspName(ccDocFile.getId() + "_preview." + flFile.getExt());
-                attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                 attachmentPreview.setSizeKb(sizeKb);
                 attachmentPreview.setDspSize(previewDspSize);
                 attachmentPreview.setUploadDttm(LocalDateTime.now());
@@ -591,8 +592,8 @@ public class DocExt {
                     attachmentPreview.setName(ccDocFile.getId() + "_preview");
                     attachmentPreview.setExt(flFile.getExt());
                     attachmentPreview.setDspName(ccDocFile.getId() + "_preview." + flFile.getExt());
-                    attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     attachmentPreview.setSizeKb(sizeKb);
                     attachmentPreview.setDspSize(previewDspSize);
                     attachmentPreview.setUploadDttm(LocalDateTime.now());
@@ -692,8 +693,8 @@ public class DocExt {
                     attachmentPreview.setName(ccDocFile.getId() + "_preview");
                     attachmentPreview.setExt(flFile.getExt());
                     attachmentPreview.setDspName(ccDocFile.getId() + "_preview." + flFile.getExt());
-                    attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     attachmentPreview.setSizeKb(sizeKb);
                     attachmentPreview.setDspSize(dspSize);
                     attachmentPreview.setUploadDttm(LocalDateTime.now());

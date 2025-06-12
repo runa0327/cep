@@ -538,4 +538,29 @@ public class BimModelRelExt {
 
         ExtJarHelper.setReturnValue(outputMap);
     }
+
+
+    /**
+     * 施工进度节点关联构件前判断，判断施工进度是否关联模型
+     * 如果关联了模型则通过，没有关联模型提示“请先将施工进度关联模型后操作”
+     */
+    public void structNodeRelPreCheck(){
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            if(valueMap.containsKey("CC_CONSTRUCT_PROGRESS_PLAN_ID")){
+                if(valueMap.get("CC_CONSTRUCT_PROGRESS_PLAN_ID")!= null){
+                    String constructProgressPlanId = valueMap.get("CC_CONSTRUCT_PROGRESS_PLAN_ID").toString();
+                    Where where = new Where();
+                    where.eq("CC_CONSTRUCT_PROGRESS_PLAN_ID", constructProgressPlanId);
+                    List<CcConstructProgressBimModelRel> rel = CcConstructProgressBimModelRel.selectByWhere(where);
+                    if(rel != null && !rel.isEmpty()){
+                        continue;
+                    }else{
+                        //文字提示
+                        throw new BaseException("请先将施工进度与模型完成关联，再进行后续操作！");
+                    }
+                }
+            }
+        }
+    }
 }

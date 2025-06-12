@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.entity.*;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.DownloadUtils;
@@ -392,8 +393,8 @@ public class AcceptanceExt {
                 flFile.setName("竣工验收报告");
                 flFile.setExt("pdf");
                 flFile.setDspName("竣工验收报告.pdf");
-                flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                 flFile.setSizeKb(sizeKb);
                 flFile.setDspSize(dspSize);
                 flFile.setUploadDttm(LocalDateTime.now());

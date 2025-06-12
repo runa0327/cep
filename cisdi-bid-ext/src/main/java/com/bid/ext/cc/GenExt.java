@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.AdAtt;
 import com.bid.ext.model.CcQsInspection;
 import com.bid.ext.model.FlFile;
@@ -129,8 +130,8 @@ public class GenExt {
                 flFile.setName("整改通知单");
                 flFile.setExt("pdf");
                 flFile.setDspName("整改通知单.pdf");
-                flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                 flFile.setSizeKb(sizeKb);
                 flFile.setDspSize(dspSize);
                 flFile.setUploadDttm(LocalDateTime.now());

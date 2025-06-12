@@ -1,6 +1,7 @@
 package com.bid.ext.bid;
 
 import cn.hutool.core.io.FileUtil;
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
@@ -166,8 +167,8 @@ public class BidExt {
                 flFile.setName("报价PPT");
                 flFile.setExt("pptx");
                 flFile.setDspName("报价PPT.pptx");
-                flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                 flFile.setUploadDttm(LocalDateTime.now());
                 flFile.setPhysicalLocation(path);
                 flFile.setOriginFilePhysicalLocation(path);

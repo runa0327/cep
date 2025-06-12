@@ -107,37 +107,21 @@ public class FlPath {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 文件上传URL。
-         */
-        public static final String FILE_UPLOAD_URL = "FILE_UPLOAD_URL";
-        /**
-         * 文件附件URL。
-         */
-        public static final String FILE_ATTACHMENT_URL = "FILE_ATTACHMENT_URL";
-        /**
-         * 文件内联URL。
-         */
-        public static final String FILE_INLINE_URL = "FILE_INLINE_URL";
-        /**
          * 目录。
          */
         public static final String DIR = "DIR";
+        /**
+         * 创建子文件夹。
+         */
+        public static final String CREATE_SUB_FOLDERS = "CREATE_SUB_FOLDERS";
         /**
          * 存储空间名称。
          */
         public static final String BUCKET_NAME = "BUCKET_NAME";
         /**
-         * 存储空间公有。
-         */
-        public static final String BUCKET_PUBLIC = "BUCKET_PUBLIC";
-        /**
          * 存储空间域名。
          */
         public static final String BUCKET_DOMAIN_NAME = "BUCKET_DOMAIN_NAME";
-        /**
-         * 启用HTTPS。
-         */
-        public static final String ENABLE_HTTPS = "ENABLE_HTTPS";
         /**
          * 是否公开读取。
          */
@@ -694,114 +678,6 @@ public class FlPath {
     }
 
     /**
-     * 文件上传URL。
-     */
-    private String fileUploadUrl;
-
-    /**
-     * 获取：文件上传URL。
-     */
-    public String getFileUploadUrl() {
-        return this.fileUploadUrl;
-    }
-
-    /**
-     * 设置：文件上传URL。
-     */
-    public FlPath setFileUploadUrl(String fileUploadUrl) {
-        if (this.fileUploadUrl == null && fileUploadUrl == null) {
-            // 均为null，不做处理。
-        } else if (this.fileUploadUrl != null && fileUploadUrl != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.fileUploadUrl.compareTo(fileUploadUrl) != 0) {
-                this.fileUploadUrl = fileUploadUrl;
-                if (!this.toUpdateCols.contains("FILE_UPLOAD_URL")) {
-                    this.toUpdateCols.add("FILE_UPLOAD_URL");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.fileUploadUrl = fileUploadUrl;
-            if (!this.toUpdateCols.contains("FILE_UPLOAD_URL")) {
-                this.toUpdateCols.add("FILE_UPLOAD_URL");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 文件附件URL。
-     */
-    private String fileAttachmentUrl;
-
-    /**
-     * 获取：文件附件URL。
-     */
-    public String getFileAttachmentUrl() {
-        return this.fileAttachmentUrl;
-    }
-
-    /**
-     * 设置：文件附件URL。
-     */
-    public FlPath setFileAttachmentUrl(String fileAttachmentUrl) {
-        if (this.fileAttachmentUrl == null && fileAttachmentUrl == null) {
-            // 均为null，不做处理。
-        } else if (this.fileAttachmentUrl != null && fileAttachmentUrl != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.fileAttachmentUrl.compareTo(fileAttachmentUrl) != 0) {
-                this.fileAttachmentUrl = fileAttachmentUrl;
-                if (!this.toUpdateCols.contains("FILE_ATTACHMENT_URL")) {
-                    this.toUpdateCols.add("FILE_ATTACHMENT_URL");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.fileAttachmentUrl = fileAttachmentUrl;
-            if (!this.toUpdateCols.contains("FILE_ATTACHMENT_URL")) {
-                this.toUpdateCols.add("FILE_ATTACHMENT_URL");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 文件内联URL。
-     */
-    private String fileInlineUrl;
-
-    /**
-     * 获取：文件内联URL。
-     */
-    public String getFileInlineUrl() {
-        return this.fileInlineUrl;
-    }
-
-    /**
-     * 设置：文件内联URL。
-     */
-    public FlPath setFileInlineUrl(String fileInlineUrl) {
-        if (this.fileInlineUrl == null && fileInlineUrl == null) {
-            // 均为null，不做处理。
-        } else if (this.fileInlineUrl != null && fileInlineUrl != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.fileInlineUrl.compareTo(fileInlineUrl) != 0) {
-                this.fileInlineUrl = fileInlineUrl;
-                if (!this.toUpdateCols.contains("FILE_INLINE_URL")) {
-                    this.toUpdateCols.add("FILE_INLINE_URL");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.fileInlineUrl = fileInlineUrl;
-            if (!this.toUpdateCols.contains("FILE_INLINE_URL")) {
-                this.toUpdateCols.add("FILE_INLINE_URL");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 目录。
      */
     private String dir;
@@ -832,6 +708,42 @@ public class FlPath {
             this.dir = dir;
             if (!this.toUpdateCols.contains("DIR")) {
                 this.toUpdateCols.add("DIR");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 创建子文件夹。
+     */
+    private Boolean createSubFolders;
+
+    /**
+     * 获取：创建子文件夹。
+     */
+    public Boolean getCreateSubFolders() {
+        return this.createSubFolders;
+    }
+
+    /**
+     * 设置：创建子文件夹。
+     */
+    public FlPath setCreateSubFolders(Boolean createSubFolders) {
+        if (this.createSubFolders == null && createSubFolders == null) {
+            // 均为null，不做处理。
+        } else if (this.createSubFolders != null && createSubFolders != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.createSubFolders.compareTo(createSubFolders) != 0) {
+                this.createSubFolders = createSubFolders;
+                if (!this.toUpdateCols.contains("CREATE_SUB_FOLDERS")) {
+                    this.toUpdateCols.add("CREATE_SUB_FOLDERS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.createSubFolders = createSubFolders;
+            if (!this.toUpdateCols.contains("CREATE_SUB_FOLDERS")) {
+                this.toUpdateCols.add("CREATE_SUB_FOLDERS");
             }
         }
         return this;
@@ -874,42 +786,6 @@ public class FlPath {
     }
 
     /**
-     * 存储空间公有。
-     */
-    private Boolean bucketPublic;
-
-    /**
-     * 获取：存储空间公有。
-     */
-    public Boolean getBucketPublic() {
-        return this.bucketPublic;
-    }
-
-    /**
-     * 设置：存储空间公有。
-     */
-    public FlPath setBucketPublic(Boolean bucketPublic) {
-        if (this.bucketPublic == null && bucketPublic == null) {
-            // 均为null，不做处理。
-        } else if (this.bucketPublic != null && bucketPublic != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.bucketPublic.compareTo(bucketPublic) != 0) {
-                this.bucketPublic = bucketPublic;
-                if (!this.toUpdateCols.contains("BUCKET_PUBLIC")) {
-                    this.toUpdateCols.add("BUCKET_PUBLIC");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.bucketPublic = bucketPublic;
-            if (!this.toUpdateCols.contains("BUCKET_PUBLIC")) {
-                this.toUpdateCols.add("BUCKET_PUBLIC");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 存储空间域名。
      */
     private String bucketDomainName;
@@ -940,42 +816,6 @@ public class FlPath {
             this.bucketDomainName = bucketDomainName;
             if (!this.toUpdateCols.contains("BUCKET_DOMAIN_NAME")) {
                 this.toUpdateCols.add("BUCKET_DOMAIN_NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 启用HTTPS。
-     */
-    private Boolean enableHttps;
-
-    /**
-     * 获取：启用HTTPS。
-     */
-    public Boolean getEnableHttps() {
-        return this.enableHttps;
-    }
-
-    /**
-     * 设置：启用HTTPS。
-     */
-    public FlPath setEnableHttps(Boolean enableHttps) {
-        if (this.enableHttps == null && enableHttps == null) {
-            // 均为null，不做处理。
-        } else if (this.enableHttps != null && enableHttps != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.enableHttps.compareTo(enableHttps) != 0) {
-                this.enableHttps = enableHttps;
-                if (!this.toUpdateCols.contains("ENABLE_HTTPS")) {
-                    this.toUpdateCols.add("ENABLE_HTTPS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.enableHttps = enableHttps;
-            if (!this.toUpdateCols.contains("ENABLE_HTTPS")) {
-                this.toUpdateCols.add("ENABLE_HTTPS");
             }
         }
         return this;

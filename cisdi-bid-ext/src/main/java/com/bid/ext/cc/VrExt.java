@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.CcVr;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
@@ -107,8 +108,8 @@ public class VrExt {
                     attachmentPreview.setName(ccVr.getId() + "_preview");
                     attachmentPreview.setExt(flFile.getExt());
                     attachmentPreview.setDspName(ccVr.getId() + "_preview." + flFile.getExt());
-                    attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     attachmentPreview.setSizeKb(sizeKb);
                     attachmentPreview.setDspSize(dspSize);
                     attachmentPreview.setUploadDttm(LocalDateTime.now());

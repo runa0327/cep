@@ -1,6 +1,7 @@
 package com.bid.ext.cc;
 
 import cn.hutool.core.util.IdUtil;
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -407,8 +408,8 @@ public class ZipProcessorExt {
         packageFile.setName(firstFileName);
         packageFile.setExt(lastFileExt);
         packageFile.setDspName(fileName);
-        packageFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-        packageFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+        packageFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+        packageFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
         packageFile.setSizeKb(sizeKb);
         packageFile.setDspSize(previewDspSize);
         packageFile.setUploadDttm(LocalDateTime.now());
