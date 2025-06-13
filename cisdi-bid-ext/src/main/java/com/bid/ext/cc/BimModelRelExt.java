@@ -271,10 +271,80 @@ public class BimModelRelExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
 
             String structNodeId = valueMap.get("ID").toString();//施工进度计划ID
-            //删除数据：施工进度模型（CC_CONSTRUCT_PROGRESS_BIM_MODEL_REL）
-            deleteStructNodeRel(structNodeId);
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(structNodeId);
+            /* 层级维护 start */
+            //维护层级的变动，判断当前节点变动后的父节点
+            String currentPid = null;
+            if(valueMap.get("CC_PRJ_STRUCT_NODE_PID") != null){
+                currentPid = valueMap.get("CC_PRJ_STRUCT_NODE_PID").toString();//当前PID
+            }
+
+            //判断新的父节点是否关联模型构件
+            if(currentPid == null){
+                //要确认是否为正常的数据更新，如果是数据更新，则不会对构件关联进行更新
+                //删除数据
+                deleteStructNodeRel(structNodeId);
+                boolean isRel = false;//默认没有关联
+                String bimComponentsIds = null;
+                //判断valueMap是否包含CC_BIM_MODEL_REL_IDS
+                if(valueMap.containsKey("CC_BIM_MODEL_COMPONENTS_IDS") && valueMap.get("CC_BIM_MODEL_COMPONENTS_IDS")!= null){
+                    //模型IDs
+                    bimComponentsIds = valueMap.get("CC_BIM_MODEL_COMPONENTS_IDS").toString();
+                    isRel = true;
+                    String[] bimComponentIdArray = bimComponentsIds.split(",");
+                    for (String bimComponentId : bimComponentIdArray) {
+
+                        //判断数据是否存在，不重复添加
+                        if(!isRelBimComponentRelExist(structNodeId, bimComponentId)){
+                            //提示添加成功
+                            continue;
+                        }
+
+                        CcStructNodeBimComponentsRel rel = CcStructNodeBimComponentsRel.newData();
+                        rel.setTs(LocalDateTime.now());
+                        rel.setCrtDt(LocalDateTime.now());
+                        rel.setCrtUserId(userId);
+                        rel.setLastModiDt(LocalDateTime.now());
+                        rel.setLastModiUserId(userId);
+                        rel.setStatus("AP");
+                        rel.setCcPrjStructNodeId(structNodeId);//施工进度节点ID
+                        rel.setCcBimModelComponentsId(bimComponentId);//BIM构件ID
+                        rel.insertById();
+                    }
+                }
+                ccPrjStructNode.setCcIsRelBimModelComponent(isRel);
+                ccPrjStructNode.setCcBimModelComponentsIds(bimComponentsIds);//构件关联置空
+                ccPrjStructNode.updateById();
+
+                //判断该节点是否有子节点，将其子节点的“是否关联模型构件”一并更新
+                updateChildStructNodeRel(ccPrjStructNode.getId(), isRel);
+            }else{
+                //新的父节点ID
+//                String newParentId = valueMap.get("CC_PRJ_STRUCT_NODE_PID").toString();
+                //移动层级后有了新的父节点
+                //判断父节点是否关联模型构件
+                //删除数据
+                deleteStructNodeRel(structNodeId);
+                CcPrjStructNode newParentNode = CcPrjStructNode.selectById(currentPid);
+                if(newParentNode.getCcIsRelBimModelComponent()){
+                    ccPrjStructNode.setCcIsRelBimModelComponent(true);
+                    ccPrjStructNode.setCcBimModelComponentsIds(null);//构件关联置空
+                    ccPrjStructNode.updateById();
+                    //判断该节点是否有子节点，将其子节点的“是否关联模型构件”一并更新
+                    updateChildStructNodeRel(ccPrjStructNode.getId(), true);
+                }else{
+                    ccPrjStructNode.setCcIsRelBimModelComponent(false);
+                    ccPrjStructNode.setCcBimModelComponentsIds(null);//构件关联置空
+                    ccPrjStructNode.updateById();
+                    //判断该节点是否有子节点，将其子节点的“是否关联模型构件”一并更新
+                    updateChildStructNodeRel(ccPrjStructNode.getId(), false);
+                }
+            }
+            /* 层级维护 end */
+
+            /* 数据修改 start */
             //判断valueMap是否包含CC_BIM_MODEL_REL_IDS
-            if(valueMap.containsKey("CC_BIM_MODEL_COMPONENTS_IDS") && valueMap.get("CC_BIM_MODEL_COMPONENTS_IDS")!= null){
+           /* if(valueMap.containsKey("CC_BIM_MODEL_COMPONENTS_IDS") && valueMap.get("CC_BIM_MODEL_COMPONENTS_IDS")!= null){
                 //模型IDs
                 String bimComponentsIds = valueMap.get("CC_BIM_MODEL_COMPONENTS_IDS").toString();
                 if(bimComponentsIds != null){
@@ -299,7 +369,8 @@ public class BimModelRelExt {
                         rel.insertById();
                     }
                 }
-            }
+            }*/
+            /* 数据修改 end */
         }
 
         InvokeActResult invokeActResult = new InvokeActResult();
