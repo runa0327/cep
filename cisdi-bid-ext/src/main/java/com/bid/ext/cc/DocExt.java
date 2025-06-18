@@ -728,8 +728,39 @@ public class DocExt {
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
             CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
-            ccDocDir.setCcDocDirStatusId("lock");
-            ccDocDir.updateById();
+            if (ccDocDir != null) {
+                // 锁定当前目录
+                ccDocDir.setCcDocDirStatusId("lock");
+                ccDocDir.updateById();
+                // 递归锁定所有子目录
+                lockOrUnlockSubDirs(csCommId, "lock");
+            }
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 递归锁定指定目录的所有子目录
+     * @param parentId 父目录的 ID
+     * @param lockOrUnlock 锁定或解锁操作
+     */
+    private void lockOrUnlockSubDirs(String parentId, String lockOrUnlock) {
+        Where where = new Where();
+        where.eq(CcDocDir.Cols.CC_DOC_DIR_PID, parentId);
+        List<CcDocDir> ccDocDirList = CcDocDir.selectByWhere(where);
+        if(ccDocDirList != null && !ccDocDirList.isEmpty()) {
+            for (CcDocDir subCcDocDir : ccDocDirList) {
+                // 锁定当前子目录
+                subCcDocDir.setCcDocDirStatusId(lockOrUnlock);
+                subCcDocDir.updateById();
+                // 递归锁定当前子目录的子目录
+                lockOrUnlockSubDirs(subCcDocDir.getId(), lockOrUnlock);
+            }
+        }else{
+            return;
         }
     }
 
@@ -741,9 +772,20 @@ public class DocExt {
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
             CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
-            ccDocDir.setCcDocDirStatusId("unlock");
-            ccDocDir.updateById();
+//            ccDocDir.setCcDocDirStatusId("unlock");
+//            ccDocDir.updateById();
+            if (ccDocDir != null) {
+                // 锁定当前目录
+                ccDocDir.setCcDocDirStatusId("unlock");
+                ccDocDir.updateById();
+                // 递归锁定所有子目录
+                lockOrUnlockSubDirs(csCommId, "unlock");
+            }
         }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**
