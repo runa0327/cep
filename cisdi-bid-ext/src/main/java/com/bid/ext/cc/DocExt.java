@@ -729,6 +729,16 @@ public class DocExt {
             String csCommId = entityRecord.csCommId;
             CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
             if (ccDocDir != null) {
+
+                //判断是否存在父级目录
+                if (ccDocDir.getCcDocDirPid() != null) {
+                    String dirPid = ccDocDir.getCcDocDirPid();
+                    //判断父级目录是否锁定
+                    CcDocDir parentCcDocDir = CcDocDir.selectById(dirPid);
+                    if (parentCcDocDir.getCcDocDirStatusId().equals("lock")) {
+                        throw new BaseException("父级目录已锁定，请先解锁父级目录！");
+                    }
+                }
                 // 锁定当前目录
                 ccDocDir.setCcDocDirStatusId("lock");
                 ccDocDir.updateById();
@@ -775,6 +785,15 @@ public class DocExt {
 //            ccDocDir.setCcDocDirStatusId("unlock");
 //            ccDocDir.updateById();
             if (ccDocDir != null) {
+                //判断是否存在父级目录
+                if (ccDocDir.getCcDocDirPid() != null) {
+                    String dirPid = ccDocDir.getCcDocDirPid();
+                    //判断父级目录是否锁定
+                    CcDocDir parentCcDocDir = CcDocDir.selectById(dirPid);
+                    if (parentCcDocDir.getCcDocDirStatusId().equals("lock")) {
+                        throw new BaseException("父级目录已锁定，请先解锁父级目录！");
+                    }
+                }
                 // 锁定当前目录
                 ccDocDir.setCcDocDirStatusId("unlock");
                 ccDocDir.updateById();
