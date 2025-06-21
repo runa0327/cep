@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class PanoData {
-    String shareId;
-    String dataType;
-    String orgId;
+    private String shareId;
+    private String dataType;
+    private String orgId;
+
+    private boolean allFile;
 }

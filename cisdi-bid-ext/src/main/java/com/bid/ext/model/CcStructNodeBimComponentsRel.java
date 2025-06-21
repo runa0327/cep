@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 路径。
+ * 施工节点构件。
  */
-public class FlPath {
+public class CcStructNodeBimComponentsRel {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<FlPath> modelHelper = new ModelHelper<>("FL_PATH", new FlPath());
+    private static final ModelHelper<CcStructNodeBimComponentsRel> modelHelper = new ModelHelper<>("CC_STRUCT_NODE_BIM_COMPONENTS_REL", new CcStructNodeBimComponentsRel());
 
     /**
      * 待更新的列。
@@ -37,7 +37,7 @@ public class FlPath {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "FL_PATH";
+    public static final String ENT_CODE = "CC_STRUCT_NODE_BIM_COMPONENTS_REL";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -107,29 +107,13 @@ public class FlPath {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 目录。
+         * 项目结构节点。
          */
-        public static final String DIR = "DIR";
+        public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
         /**
-         * 创建子文件夹。
+         * BIM模型构件。
          */
-        public static final String CREATE_SUB_FOLDERS = "CREATE_SUB_FOLDERS";
-        /**
-         * 存储空间名称。
-         */
-        public static final String BUCKET_NAME = "BUCKET_NAME";
-        /**
-         * 存储空间域名。
-         */
-        public static final String BUCKET_DOMAIN_NAME = "BUCKET_DOMAIN_NAME";
-        /**
-         * 是否公开读取。
-         */
-        public static final String IS_PUBLIC_READ = "IS_PUBLIC_READ";
-        /**
-         * 主机。
-         */
-        public static final String FL_HOST_ID = "FL_HOST_ID";
+        public static final String CC_BIM_MODEL_COMPONENTS_ID = "CC_BIM_MODEL_COMPONENTS_ID";
     }
 
     // </editor-fold>
@@ -152,7 +136,7 @@ public class FlPath {
     /**
      * 设置：ID。
      */
-    public FlPath setId(String id) {
+    public CcStructNodeBimComponentsRel setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -188,7 +172,7 @@ public class FlPath {
     /**
      * 设置：版本。
      */
-    public FlPath setVer(Integer ver) {
+    public CcStructNodeBimComponentsRel setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -224,7 +208,7 @@ public class FlPath {
     /**
      * 设置：时间戳。
      */
-    public FlPath setTs(LocalDateTime ts) {
+    public CcStructNodeBimComponentsRel setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -260,7 +244,7 @@ public class FlPath {
     /**
      * 设置：是否预设。
      */
-    public FlPath setIsPreset(Boolean isPreset) {
+    public CcStructNodeBimComponentsRel setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -296,7 +280,7 @@ public class FlPath {
     /**
      * 设置：创建日期时间。
      */
-    public FlPath setCrtDt(LocalDateTime crtDt) {
+    public CcStructNodeBimComponentsRel setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -332,7 +316,7 @@ public class FlPath {
     /**
      * 设置：创建用户。
      */
-    public FlPath setCrtUserId(String crtUserId) {
+    public CcStructNodeBimComponentsRel setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -368,7 +352,7 @@ public class FlPath {
     /**
      * 设置：最后修改日期时间。
      */
-    public FlPath setLastModiDt(LocalDateTime lastModiDt) {
+    public CcStructNodeBimComponentsRel setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -404,7 +388,7 @@ public class FlPath {
     /**
      * 设置：最后修改用户。
      */
-    public FlPath setLastModiUserId(String lastModiUserId) {
+    public CcStructNodeBimComponentsRel setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -440,7 +424,7 @@ public class FlPath {
     /**
      * 设置：记录状态。
      */
-    public FlPath setStatus(String status) {
+    public CcStructNodeBimComponentsRel setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -476,7 +460,7 @@ public class FlPath {
     /**
      * 设置：锁定流程实例。
      */
-    public FlPath setLkWfInstId(String lkWfInstId) {
+    public CcStructNodeBimComponentsRel setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -512,7 +496,7 @@ public class FlPath {
     /**
      * 设置：代码。
      */
-    public FlPath setCode(String code) {
+    public CcStructNodeBimComponentsRel setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -548,7 +532,7 @@ public class FlPath {
     /**
      * 设置：名称。
      */
-    public FlPath setName(String name) {
+    public CcStructNodeBimComponentsRel setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -584,7 +568,7 @@ public class FlPath {
     /**
      * 设置：备注。
      */
-    public FlPath setRemark(String remark) {
+    public CcStructNodeBimComponentsRel setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -620,7 +604,7 @@ public class FlPath {
     /**
      * 设置：快捷码。
      */
-    public FlPath setFastCode(String fastCode) {
+    public CcStructNodeBimComponentsRel setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -656,7 +640,7 @@ public class FlPath {
     /**
      * 设置：图标。
      */
-    public FlPath setIconFileGroupId(String iconFileGroupId) {
+    public CcStructNodeBimComponentsRel setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -678,216 +662,72 @@ public class FlPath {
     }
 
     /**
-     * 目录。
+     * 项目结构节点。
      */
-    private String dir;
+    private String ccPrjStructNodeId;
 
     /**
-     * 获取：目录。
+     * 获取：项目结构节点。
      */
-    public String getDir() {
-        return this.dir;
+    public String getCcPrjStructNodeId() {
+        return this.ccPrjStructNodeId;
     }
 
     /**
-     * 设置：目录。
+     * 设置：项目结构节点。
      */
-    public FlPath setDir(String dir) {
-        if (this.dir == null && dir == null) {
+    public CcStructNodeBimComponentsRel setCcPrjStructNodeId(String ccPrjStructNodeId) {
+        if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
             // 均为null，不做处理。
-        } else if (this.dir != null && dir != null) {
+        } else if (this.ccPrjStructNodeId != null && ccPrjStructNodeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.dir.compareTo(dir) != 0) {
-                this.dir = dir;
-                if (!this.toUpdateCols.contains("DIR")) {
-                    this.toUpdateCols.add("DIR");
+            if (this.ccPrjStructNodeId.compareTo(ccPrjStructNodeId) != 0) {
+                this.ccPrjStructNodeId = ccPrjStructNodeId;
+                if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.dir = dir;
-            if (!this.toUpdateCols.contains("DIR")) {
-                this.toUpdateCols.add("DIR");
+            this.ccPrjStructNodeId = ccPrjStructNodeId;
+            if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
             }
         }
         return this;
     }
 
     /**
-     * 创建子文件夹。
+     * BIM模型构件。
      */
-    private Boolean createSubFolders;
+    private String ccBimModelComponentsId;
 
     /**
-     * 获取：创建子文件夹。
+     * 获取：BIM模型构件。
      */
-    public Boolean getCreateSubFolders() {
-        return this.createSubFolders;
+    public String getCcBimModelComponentsId() {
+        return this.ccBimModelComponentsId;
     }
 
     /**
-     * 设置：创建子文件夹。
+     * 设置：BIM模型构件。
      */
-    public FlPath setCreateSubFolders(Boolean createSubFolders) {
-        if (this.createSubFolders == null && createSubFolders == null) {
+    public CcStructNodeBimComponentsRel setCcBimModelComponentsId(String ccBimModelComponentsId) {
+        if (this.ccBimModelComponentsId == null && ccBimModelComponentsId == null) {
             // 均为null，不做处理。
-        } else if (this.createSubFolders != null && createSubFolders != null) {
+        } else if (this.ccBimModelComponentsId != null && ccBimModelComponentsId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.createSubFolders.compareTo(createSubFolders) != 0) {
-                this.createSubFolders = createSubFolders;
-                if (!this.toUpdateCols.contains("CREATE_SUB_FOLDERS")) {
-                    this.toUpdateCols.add("CREATE_SUB_FOLDERS");
+            if (this.ccBimModelComponentsId.compareTo(ccBimModelComponentsId) != 0) {
+                this.ccBimModelComponentsId = ccBimModelComponentsId;
+                if (!this.toUpdateCols.contains("CC_BIM_MODEL_COMPONENTS_ID")) {
+                    this.toUpdateCols.add("CC_BIM_MODEL_COMPONENTS_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.createSubFolders = createSubFolders;
-            if (!this.toUpdateCols.contains("CREATE_SUB_FOLDERS")) {
-                this.toUpdateCols.add("CREATE_SUB_FOLDERS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 存储空间名称。
-     */
-    private String bucketName;
-
-    /**
-     * 获取：存储空间名称。
-     */
-    public String getBucketName() {
-        return this.bucketName;
-    }
-
-    /**
-     * 设置：存储空间名称。
-     */
-    public FlPath setBucketName(String bucketName) {
-        if (this.bucketName == null && bucketName == null) {
-            // 均为null，不做处理。
-        } else if (this.bucketName != null && bucketName != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.bucketName.compareTo(bucketName) != 0) {
-                this.bucketName = bucketName;
-                if (!this.toUpdateCols.contains("BUCKET_NAME")) {
-                    this.toUpdateCols.add("BUCKET_NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.bucketName = bucketName;
-            if (!this.toUpdateCols.contains("BUCKET_NAME")) {
-                this.toUpdateCols.add("BUCKET_NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 存储空间域名。
-     */
-    private String bucketDomainName;
-
-    /**
-     * 获取：存储空间域名。
-     */
-    public String getBucketDomainName() {
-        return this.bucketDomainName;
-    }
-
-    /**
-     * 设置：存储空间域名。
-     */
-    public FlPath setBucketDomainName(String bucketDomainName) {
-        if (this.bucketDomainName == null && bucketDomainName == null) {
-            // 均为null，不做处理。
-        } else if (this.bucketDomainName != null && bucketDomainName != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.bucketDomainName.compareTo(bucketDomainName) != 0) {
-                this.bucketDomainName = bucketDomainName;
-                if (!this.toUpdateCols.contains("BUCKET_DOMAIN_NAME")) {
-                    this.toUpdateCols.add("BUCKET_DOMAIN_NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.bucketDomainName = bucketDomainName;
-            if (!this.toUpdateCols.contains("BUCKET_DOMAIN_NAME")) {
-                this.toUpdateCols.add("BUCKET_DOMAIN_NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 是否公开读取。
-     */
-    private Boolean isPublicRead;
-
-    /**
-     * 获取：是否公开读取。
-     */
-    public Boolean getIsPublicRead() {
-        return this.isPublicRead;
-    }
-
-    /**
-     * 设置：是否公开读取。
-     */
-    public FlPath setIsPublicRead(Boolean isPublicRead) {
-        if (this.isPublicRead == null && isPublicRead == null) {
-            // 均为null，不做处理。
-        } else if (this.isPublicRead != null && isPublicRead != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.isPublicRead.compareTo(isPublicRead) != 0) {
-                this.isPublicRead = isPublicRead;
-                if (!this.toUpdateCols.contains("IS_PUBLIC_READ")) {
-                    this.toUpdateCols.add("IS_PUBLIC_READ");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.isPublicRead = isPublicRead;
-            if (!this.toUpdateCols.contains("IS_PUBLIC_READ")) {
-                this.toUpdateCols.add("IS_PUBLIC_READ");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 主机。
-     */
-    private String flHostId;
-
-    /**
-     * 获取：主机。
-     */
-    public String getFlHostId() {
-        return this.flHostId;
-    }
-
-    /**
-     * 设置：主机。
-     */
-    public FlPath setFlHostId(String flHostId) {
-        if (this.flHostId == null && flHostId == null) {
-            // 均为null，不做处理。
-        } else if (this.flHostId != null && flHostId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.flHostId.compareTo(flHostId) != 0) {
-                this.flHostId = flHostId;
-                if (!this.toUpdateCols.contains("FL_HOST_ID")) {
-                    this.toUpdateCols.add("FL_HOST_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.flHostId = flHostId;
-            if (!this.toUpdateCols.contains("FL_HOST_ID")) {
-                this.toUpdateCols.add("FL_HOST_ID");
+            this.ccBimModelComponentsId = ccBimModelComponentsId;
+            if (!this.toUpdateCols.contains("CC_BIM_MODEL_COMPONENTS_ID")) {
+                this.toUpdateCols.add("CC_BIM_MODEL_COMPONENTS_ID");
             }
         }
         return this;
@@ -980,8 +820,8 @@ public class FlPath {
      *
      * @return
      */
-    public static FlPath newData() {
-        FlPath obj = modelHelper.newData();
+    public static CcStructNodeBimComponentsRel newData() {
+        CcStructNodeBimComponentsRel obj = modelHelper.newData();
         return obj;
     }
 
@@ -990,8 +830,8 @@ public class FlPath {
      *
      * @return
      */
-    public static FlPath insertData() {
-        FlPath obj = modelHelper.insertData();
+    public static CcStructNodeBimComponentsRel insertData() {
+        CcStructNodeBimComponentsRel obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1003,8 +843,8 @@ public class FlPath {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static FlPath selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        FlPath obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcStructNodeBimComponentsRel selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcStructNodeBimComponentsRel obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1014,7 +854,7 @@ public class FlPath {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static FlPath selectById(String id) {
+    public static CcStructNodeBimComponentsRel selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1026,8 +866,8 @@ public class FlPath {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<FlPath> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<FlPath> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcStructNodeBimComponentsRel> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcStructNodeBimComponentsRel> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1037,7 +877,7 @@ public class FlPath {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<FlPath> selectByIds(List<String> ids) {
+    public static List<CcStructNodeBimComponentsRel> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1049,8 +889,8 @@ public class FlPath {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<FlPath> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<FlPath> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcStructNodeBimComponentsRel> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcStructNodeBimComponentsRel> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1060,7 +900,7 @@ public class FlPath {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<FlPath> selectByWhere(Where where) {
+    public static List<CcStructNodeBimComponentsRel> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1072,10 +912,10 @@ public class FlPath {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static FlPath selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<FlPath> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcStructNodeBimComponentsRel selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcStructNodeBimComponentsRel> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用FlPath.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcStructNodeBimComponentsRel.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1087,7 +927,7 @@ public class FlPath {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static FlPath selectOneByWhere(Where where) {
+    public static CcStructNodeBimComponentsRel selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1201,7 +1041,7 @@ public class FlPath {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(FlPath fromModel, FlPath toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcStructNodeBimComponentsRel fromModel, CcStructNodeBimComponentsRel toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1211,7 +1051,7 @@ public class FlPath {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(FlPath fromModel, FlPath toModel) {
+    public static void copyCols(CcStructNodeBimComponentsRel fromModel, CcStructNodeBimComponentsRel toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

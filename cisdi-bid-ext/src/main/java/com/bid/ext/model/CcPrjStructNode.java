@@ -125,6 +125,14 @@ public class CcPrjStructNode {
          */
         public static final String CC_CONSTRUCT_PROGRESS_PLAN_ID = "CC_CONSTRUCT_PROGRESS_PLAN_ID";
         /**
+         * 模型构件。
+         */
+        public static final String CC_BIM_MODEL_COMPONENTS_IDS = "CC_BIM_MODEL_COMPONENTS_IDS";
+        /**
+         * 是否关联模型构件。
+         */
+        public static final String CC_IS_REL_BIM_MODEL_COMPONENT = "CC_IS_REL_BIM_MODEL_COMPONENT";
+        /**
          * 产品负责人。
          */
         public static final String PBS_CHIEF_USER_ID = "PBS_CHIEF_USER_ID";
@@ -966,6 +974,78 @@ public class CcPrjStructNode {
             this.ccConstructProgressPlanId = ccConstructProgressPlanId;
             if (!this.toUpdateCols.contains("CC_CONSTRUCT_PROGRESS_PLAN_ID")) {
                 this.toUpdateCols.add("CC_CONSTRUCT_PROGRESS_PLAN_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 模型构件。
+     */
+    private String ccBimModelComponentsIds;
+
+    /**
+     * 获取：模型构件。
+     */
+    public String getCcBimModelComponentsIds() {
+        return this.ccBimModelComponentsIds;
+    }
+
+    /**
+     * 设置：模型构件。
+     */
+    public CcPrjStructNode setCcBimModelComponentsIds(String ccBimModelComponentsIds) {
+        if (this.ccBimModelComponentsIds == null && ccBimModelComponentsIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccBimModelComponentsIds != null && ccBimModelComponentsIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccBimModelComponentsIds.compareTo(ccBimModelComponentsIds) != 0) {
+                this.ccBimModelComponentsIds = ccBimModelComponentsIds;
+                if (!this.toUpdateCols.contains("CC_BIM_MODEL_COMPONENTS_IDS")) {
+                    this.toUpdateCols.add("CC_BIM_MODEL_COMPONENTS_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccBimModelComponentsIds = ccBimModelComponentsIds;
+            if (!this.toUpdateCols.contains("CC_BIM_MODEL_COMPONENTS_IDS")) {
+                this.toUpdateCols.add("CC_BIM_MODEL_COMPONENTS_IDS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否关联模型构件。
+     */
+    private Boolean ccIsRelBimModelComponent;
+
+    /**
+     * 获取：是否关联模型构件。
+     */
+    public Boolean getCcIsRelBimModelComponent() {
+        return this.ccIsRelBimModelComponent;
+    }
+
+    /**
+     * 设置：是否关联模型构件。
+     */
+    public CcPrjStructNode setCcIsRelBimModelComponent(Boolean ccIsRelBimModelComponent) {
+        if (this.ccIsRelBimModelComponent == null && ccIsRelBimModelComponent == null) {
+            // 均为null，不做处理。
+        } else if (this.ccIsRelBimModelComponent != null && ccIsRelBimModelComponent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccIsRelBimModelComponent.compareTo(ccIsRelBimModelComponent) != 0) {
+                this.ccIsRelBimModelComponent = ccIsRelBimModelComponent;
+                if (!this.toUpdateCols.contains("CC_IS_REL_BIM_MODEL_COMPONENT")) {
+                    this.toUpdateCols.add("CC_IS_REL_BIM_MODEL_COMPONENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccIsRelBimModelComponent = ccIsRelBimModelComponent;
+            if (!this.toUpdateCols.contains("CC_IS_REL_BIM_MODEL_COMPONENT")) {
+                this.toUpdateCols.add("CC_IS_REL_BIM_MODEL_COMPONENT");
             }
         }
         return this;

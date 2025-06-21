@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.CcVr;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
@@ -107,8 +108,8 @@ public class VrExt {
                     attachmentPreview.setName(ccVr.getId() + "_preview");
                     attachmentPreview.setExt(flFile.getExt());
                     attachmentPreview.setDspName(ccVr.getId() + "_preview." + flFile.getExt());
-                    attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     attachmentPreview.setSizeKb(sizeKb);
                     attachmentPreview.setDspSize(dspSize);
                     attachmentPreview.setUploadDttm(LocalDateTime.now());
@@ -294,5 +295,166 @@ public class VrExt {
 //        Map<String, Object> outputMap = new HashMap<>();
 //        outputMap.put("hotPointId", hotPointId);
 //        ExtJarHelper.setReturnValue(outputMap);
+    }
+
+    /**
+     * API:获取文件夹VR全景
+     */
+    public void getSelectedVr() {
+        Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String ccPrjId = JdbcMapUtil.getString(inputMap, "ccPrjId");
+
+        // 新增：获取 selectedFolders 参数（字符串列表）
+        List<String> selectedFolders = null;
+        Object foldersObj = inputMap.get("selectedFolders");
+        if (foldersObj instanceof List) {
+            selectedFolders = new ArrayList<>();
+            for (Object item : (List<?>) foldersObj) {
+                if (item instanceof String) {
+                    selectedFolders.add((String) item);
+                }
+            }
+        }
+
+        // 判断是否有选中的文件夹
+        boolean hasSelectedFolders = selectedFolders != null && !selectedFolders.isEmpty();
+
+        String sqlPanoMonth;
+        String sqlPanoLst;
+        if (SharedUtil.isEmpty(ccPrjId)) {
+            sqlPanoMonth = "SELECT DISTINCT DATE_FORMAT(CC_DOC_DATE, '%Y-%m') AS CC_PANO_MONTH, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_PANO_RET_MONTH "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE CC_DOC_DATE IS NOT NULL "
+                    + "  AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) "
+                    // 新增文件夹过滤条件
+                    + (hasSelectedFolders ? "  AND cc_doc_dir_id IN (" + buildInClause(selectedFolders) + ") " : "")
+                    + "ORDER BY CC_PANO_MONTH DESC";
+
+            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_YEAR_MONTH, "
+                    + "CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? "
+                    + "  AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) "
+                    // 新增文件夹过滤条件
+                    + (hasSelectedFolders ? "  AND cc_doc_dir_id IN (" + buildInClause(selectedFolders) + ") " : "")
+                    + "ORDER BY CC_DOC_DATE DESC";
+        } else {
+            sqlPanoMonth = "SELECT DISTINCT DATE_FORMAT(CC_DOC_DATE, '%Y-%m') AS CC_PANO_MONTH, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_PANO_RET_MONTH "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE CC_DOC_DATE IS NOT NULL AND CC_PRJ_ID = ? "
+                    // 新增文件夹过滤条件
+                    + (hasSelectedFolders ? "  AND cc_doc_dir_id IN (" + buildInClause(selectedFolders) + ") " : "")
+                    + "ORDER BY CC_PANO_MONTH DESC";
+
+            sqlPanoLst = "SELECT `NAME`, ID, CC_DOC_DATE, "
+                    + "CONCAT(YEAR(CC_DOC_DATE), '-', LPAD(MONTH(CC_DOC_DATE), 2, '0')) AS CC_YEAR_MONTH, "
+                    + "CC_ATTACHMENT, CC_PREVIEW_ATTACHMENT "
+                    + "FROM CC_DOC_FILE "
+                    + "WHERE DATE_FORMAT(CC_DOC_DATE, '%Y-%m') LIKE ? "
+                    + "  AND CC_PRJ_ID = ? "
+                    // 新增文件夹过滤条件
+                    + (hasSelectedFolders ? "  AND cc_doc_dir_id IN (" + buildInClause(selectedFolders) + ") " : "")
+                    + "ORDER BY CC_DOC_DATE DESC";
+        }
+
+        List<Map<String, Object>> ccPanoMonths;
+        if (SharedUtil.isEmpty(ccPrjId)) {
+            // ================ 修改2：处理带文件夹参数的情况 ================
+            if (hasSelectedFolders) {
+                // 如果ccPrjId为空但有文件夹参数
+                ccPanoMonths = myJdbcTemplate.queryForList(sqlPanoMonth);
+            } else {
+                ccPanoMonths = myJdbcTemplate.queryForList(sqlPanoMonth);
+            }
+        } else {
+            // ================ 修改3：处理带文件夹参数的情况 ================
+            if (hasSelectedFolders) {
+                // 同时有ccPrjId和文件夹参数
+                ccPanoMonths = myJdbcTemplate.queryForList(sqlPanoMonth, ccPrjId);
+            } else {
+                ccPanoMonths = myJdbcTemplate.queryForList(sqlPanoMonth, ccPrjId);
+            }
+        }
+
+        List<Map<String, Object>> vrLst = new ArrayList<>();
+        List<String> fileIdList = new ArrayList<>();
+
+        for (Map<String, Object> mapPanoMonth : ccPanoMonths) {
+            String panoMonth = JdbcMapUtil.getString(mapPanoMonth, "CC_PANO_MONTH");
+            List<Map<String, Object>> ccVrs;
+
+            // ================ 修改4：处理带文件夹参数的查询 ================
+            if (SharedUtil.isEmpty(ccPrjId)) {
+                if (hasSelectedFolders) {
+                    ccVrs = myJdbcTemplate.queryForList(sqlPanoLst, panoMonth);
+                } else {
+                    ccVrs = myJdbcTemplate.queryForList(sqlPanoLst, panoMonth);
+                }
+            } else {
+                if (hasSelectedFolders) {
+                    ccVrs = myJdbcTemplate.queryForList(sqlPanoLst, panoMonth, ccPrjId);
+                } else {
+                    ccVrs = myJdbcTemplate.queryForList(sqlPanoLst, panoMonth, ccPrjId);
+                }
+            }
+            List<Map<String, String>> panoLst = new ArrayList<>();
+
+            for (Map<String, Object> ccVr : ccVrs) {
+                String name = JdbcMapUtil.getString(ccVr, "NAME");
+                String vrDate = JdbcMapUtil.getString(ccVr, "CC_DOC_DATE");
+                String ccVrYearMonth = JdbcMapUtil.getString(ccVr, "CC_YEAR_MONTH");
+                String ccVrAttachment = JdbcMapUtil.getString(ccVr, "CC_ATTACHMENT");
+                String ccVrAttachmentPreview = JdbcMapUtil.getString(ccVr, "CC_PREVIEW_ATTACHMENT");
+                String ccDocFileId = JdbcMapUtil.getString(ccVr, "ID");
+
+                if (null == ccVrAttachment || null == ccVrAttachmentPreview) {
+                    continue;
+                }
+
+                FlFile ccVrAttachmentFlFile = FlFile.selectById(ccVrAttachment);
+                FlFile ccVrAttachmentPreviewFlFile = FlFile.selectById(ccVrAttachmentPreview);
+
+                if (!checkFileExists(ccVrAttachmentFlFile.getPhysicalLocation()) || !checkFileExists(ccVrAttachmentPreviewFlFile.getPhysicalLocation())) {
+                    continue;
+                }
+
+                Map<String, String> ccVrItem = new HashMap<>();
+                ccVrItem.put("NAME", name);
+                ccVrItem.put("VR_DATE", vrDate);
+                ccVrItem.put("CC_YEAR_MONTH", ccVrYearMonth);
+                ccVrItem.put("CC_VR_ATTACHMENT", ccVrAttachmentFlFile.getFileInlineUrl());
+                ccVrItem.put("CC_VR_ATTACHMENT_ID", ccVrAttachmentFlFile.getId());
+                ccVrItem.put("CC_VR_ATTACHMENT_PREVIEW", ccVrAttachmentPreviewFlFile.getFileInlineUrl());
+                ccVrItem.put("CC_VR_ATTACHMENT_PREVIEW_ID", ccVrAttachmentPreviewFlFile.getId());
+                ccVrItem.put("CC_DOC_FILE_ID", ccDocFileId);
+                panoLst.add(ccVrItem);
+                fileIdList.add(ccVrAttachmentFlFile.getId());
+                fileIdList.add(ccVrAttachmentPreviewFlFile.getId());
+            }
+
+            if (!panoLst.isEmpty()) {
+                Map<String, Object> ccPano = new HashMap<>();
+                ccPano.put("pano-month", JdbcMapUtil.getString(mapPanoMonth, "CC_PANO_RET_MONTH"));
+                ccPano.put("pano-list", panoLst);
+                vrLst.add(ccPano);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("data", vrLst);
+        result.put("fileIdList", fileIdList);
+        ExtJarHelper.setReturnValue(result);
+    }
+
+
+    private String buildInClause(List<String> values) {
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+        return "'" + String.join("','", values) + "'";
     }
 }

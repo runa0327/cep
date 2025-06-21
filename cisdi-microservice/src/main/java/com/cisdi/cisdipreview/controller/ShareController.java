@@ -22,7 +22,6 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping(value = "/share")
@@ -40,9 +39,8 @@ public class ShareController {
         result.put("data", dataList);
 
         try {
-            // 记录接收到的请求
-            logger.info("收到 getPanoramaData 请求，dataType: {}, orgId: {}, shareId: {}",
-                    panoData.getDataType(), panoData.getOrgId(), panoData.getShareId());
+            boolean allFile = panoData.isAllFile();
+
 
             String dataType = panoData.getDataType();
             String code = panoData.getOrgId();
@@ -63,7 +61,6 @@ public class ShareController {
                 logger.warn("SERVICE_NAME 为空，orgId: {}", code);
                 return Collections.singletonMap("data", new ArrayList<>());
             }
-            logger.info("找到 orgName: {}", orgName);
 
             // 获取分享内容的所属项目
             String shareSql = "SELECT t.SHARE_CONTEXT_DATA FROM " + sanitizeSchema(orgName) + ".AD_SHARE t WHERE t.id = ?";
@@ -83,37 +80,59 @@ public class ShareController {
 
             Map<String, Object> shareMapData = JsonUtil.convertJsonToMap(shareContextData);
             String ccPrjId = JdbcMapUtil.getString(shareMapData, "prjId");
+            List<String> selectedFolders = new ArrayList<>();
+            Object foldersObj = shareMapData.get("selectedFolders");
+            if (foldersObj instanceof List) {
+                for (Object item : (List<?>) foldersObj) {
+                    if (item instanceof String) {
+                        selectedFolders.add((String) item);
+                    }
+                }
+            }
 
             // 处理 prjId 为空的情况
             if (SharedUtil.isEmpty(ccPrjId)) {
                 ccPrjId = RequestHeaderContext.getInstance().getpCcPrjIds();
-                logger.info("prjId 为空，获取 pCcPrjIds: {}", ccPrjId);
             }
 
             // 拆分 ccPrjId 为列表
             List<String> ccPrjIds = parsePrjIds(ccPrjId);
-            logger.info("解析得到的 ccPrjIds: {}", ccPrjIds);
+
 
             if (ccPrjIds.isEmpty()) {
-                logger.info("没有有效的项目 ID。");
                 return result;
             }
 
             // 根据项目 id 查询全景
-            String placeholders = ccPrjIds.stream()
-                    .map(id -> "?")
-                    .collect(Collectors.joining(", "));
-            String panoSql = "SELECT * FROM " + sanitizeSchema(orgName) + ".CC_DOC_FILE t WHERE t.cc_prj_id IN (" + placeholders + ") AND t.CC_DOC_FILE_TYPE_ID = ?";
+            String placeholders = String.join(", ", Collections.nCopies(ccPrjIds.size(), "?"));
+            StringBuilder panoSql = new StringBuilder("SELECT * FROM ")
+                    .append(sanitizeSchema(orgName))
+                    .append(".CC_DOC_FILE t WHERE t.cc_prj_id IN (")
+                    .append(placeholders)
+                    .append(") AND t.CC_DOC_FILE_TYPE_ID = ?");
 
-            // 构建参数数组：项目 ID 列表 + dataType
-            Object[] params = Stream.concat(ccPrjIds.stream(), Stream.of(dataType))
-                    .toArray();
+            // 动态构建参数列表
+            List<Object> params = new ArrayList<>(ccPrjIds);
+            params.add(dataType);
 
-            List<Map<String, Object>> panoList = jdbcTemplate.queryForList(panoSql, params);
-            logger.info("检索到 {} 条全景记录。", panoList.size());
+            // 添加文件夹过滤条件
+            if (!allFile && !selectedFolders.isEmpty()) {
+                logger.info("文件夹过滤！");
+                String folderPlaceholders = String.join(", ",
+                        Collections.nCopies(selectedFolders.size(), "?"));
+
+                panoSql.append(" AND t.CC_DOC_DIR_ID IN (")
+                        .append(folderPlaceholders)
+                        .append(")");
+
+                params.addAll(selectedFolders);
+            }
+
+            List<Map<String, Object>> panoList = jdbcTemplate.queryForList(
+                    panoSql.toString(), params.toArray()
+            );
 
             if (panoList.isEmpty()) {
-                logger.info("未找到符合条件的全景数据。");
                 return result;
             }
 
@@ -189,14 +208,11 @@ public class ShareController {
                 monthData.put("pano-list", panoItems);
                 dataList.add(monthData);
             }
-
-            logger.info("成功处理全景数据。");
             return result;
 
         } catch (Exception e) {
-            logger.error("getPanoramaData 方法出错", e);
-            // 可选：返回更详细的错误信息
-            return Collections.singletonMap("error", "内部服务器错误。请联系技术支持。");
+            logger.error("处理全景数据失败: {}", e.getMessage(), e);
+            return Collections.singletonMap("error", "服务器内部错误");
         }
     }
 

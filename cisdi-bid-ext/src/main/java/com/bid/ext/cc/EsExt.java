@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.entity.QbqBody;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.DownloadUtils;
@@ -124,8 +125,8 @@ public class EsExt {
                 flFile.setName(fileName);
                 flFile.setExt("pdf");
                 flFile.setDspName(fileName + ".pdf");
-                flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                 flFile.setSizeKb(sizeKb);
                 flFile.setDspSize(dspSize);
                 flFile.setUploadDttm(LocalDateTime.now());
@@ -263,8 +264,8 @@ public class EsExt {
                 flFile.setName(fileName);
                 flFile.setExt("pdf");
                 flFile.setDspName(fileName + ".pdf");
-                flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                 flFile.setSizeKb(sizeKb);
                 flFile.setDspSize(dspSize);
                 flFile.setUploadDttm(LocalDateTime.now());
@@ -415,8 +416,8 @@ public class EsExt {
                     flFile.setName(fileName);
                     flFile.setExt("pdf");
                     flFile.setDspName(fileName + ".pdf");
-                    flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     flFile.setSizeKb(sizeKb);
                     flFile.setDspSize(dspSize);
                     flFile.setUploadDttm(LocalDateTime.now());
@@ -645,8 +646,8 @@ public class EsExt {
                     flFile.setName(fileName);
                     flFile.setExt("pdf");
                     flFile.setDspName(fileName + ".pdf");
-                    flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     flFile.setSizeKb(sizeKb);
                     flFile.setDspSize(dspSize);
                     flFile.setUploadDttm(LocalDateTime.now());

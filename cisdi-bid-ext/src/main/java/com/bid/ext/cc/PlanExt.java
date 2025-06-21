@@ -81,7 +81,10 @@ public class PlanExt {
      */
     public static void insertWbsNode(Map<String, Object> nodeData, BigDecimal seqNo, Boolean isNewVersion) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
-        String ccPrjId = JdbcMapUtil.getString(nodeData, "CC_PRJ_ID");
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        //获取当前系统选择的项目
+        String ccPrjId = JdbcMapUtil.getString(varMap, "P_CC_PRJ_IDS");
+//        String ccPrjId = JdbcMapUtil.getString(nodeData, "CC_PRJ_ID");
         if (ccPrjId == null) {
             Map<String, Object> globalVarMap = loginInfo.globalVarMap;
             ccPrjId = JdbcMapUtil.getString(globalVarMap, "P_CC_PRJ_IDS");

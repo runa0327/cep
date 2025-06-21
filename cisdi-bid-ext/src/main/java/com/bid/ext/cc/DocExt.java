@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -272,8 +273,8 @@ public class DocExt {
         flFile.setName(fileId);
         flFile.setExt("zip");
         flFile.setDspName(fileId + ".zip");
-        flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-        flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+        flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+        flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
         flFile.setSizeKb(sizeKb);
         flFile.setDspSize(dspSize);
         flFile.setUploadDttm(LocalDateTime.now());
@@ -484,8 +485,8 @@ public class DocExt {
                 attachmentPreview.setName(ccDocFile.getId() + "_preview");
                 attachmentPreview.setExt(flFile.getExt());
                 attachmentPreview.setDspName(ccDocFile.getId() + "_preview." + flFile.getExt());
-                attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                 attachmentPreview.setSizeKb(sizeKb);
                 attachmentPreview.setDspSize(previewDspSize);
                 attachmentPreview.setUploadDttm(LocalDateTime.now());
@@ -591,8 +592,8 @@ public class DocExt {
                     attachmentPreview.setName(ccDocFile.getId() + "_preview");
                     attachmentPreview.setExt(flFile.getExt());
                     attachmentPreview.setDspName(ccDocFile.getId() + "_preview." + flFile.getExt());
-                    attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     attachmentPreview.setSizeKb(sizeKb);
                     attachmentPreview.setDspSize(previewDspSize);
                     attachmentPreview.setUploadDttm(LocalDateTime.now());
@@ -692,8 +693,8 @@ public class DocExt {
                     attachmentPreview.setName(ccDocFile.getId() + "_preview");
                     attachmentPreview.setExt(flFile.getExt());
                     attachmentPreview.setDspName(ccDocFile.getId() + "_preview." + flFile.getExt());
-                    attachmentPreview.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                    attachmentPreview.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    attachmentPreview.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                    attachmentPreview.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
                     attachmentPreview.setSizeKb(sizeKb);
                     attachmentPreview.setDspSize(dspSize);
                     attachmentPreview.setUploadDttm(LocalDateTime.now());
@@ -727,8 +728,49 @@ public class DocExt {
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
             CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
-            ccDocDir.setCcDocDirStatusId("lock");
-            ccDocDir.updateById();
+            if (ccDocDir != null) {
+
+                //判断是否存在父级目录
+                if (ccDocDir.getCcDocDirPid() != null) {
+                    String dirPid = ccDocDir.getCcDocDirPid();
+                    //判断父级目录是否锁定
+                    CcDocDir parentCcDocDir = CcDocDir.selectById(dirPid);
+                    if (parentCcDocDir.getCcDocDirStatusId().equals("lock")) {
+                        throw new BaseException("父级目录已锁定，请先解锁父级目录！");
+                    }
+                }
+                // 锁定当前目录
+                ccDocDir.setCcDocDirStatusId("lock");
+                ccDocDir.updateById();
+                // 递归锁定所有子目录
+                lockOrUnlockSubDirs(csCommId, "lock");
+            }
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 递归锁定指定目录的所有子目录
+     * @param parentId 父目录的 ID
+     * @param lockOrUnlock 锁定或解锁操作
+     */
+    private void lockOrUnlockSubDirs(String parentId, String lockOrUnlock) {
+        Where where = new Where();
+        where.eq(CcDocDir.Cols.CC_DOC_DIR_PID, parentId);
+        List<CcDocDir> ccDocDirList = CcDocDir.selectByWhere(where);
+        if(ccDocDirList != null && !ccDocDirList.isEmpty()) {
+            for (CcDocDir subCcDocDir : ccDocDirList) {
+                // 锁定当前子目录
+                subCcDocDir.setCcDocDirStatusId(lockOrUnlock);
+                subCcDocDir.updateById();
+                // 递归锁定当前子目录的子目录
+                lockOrUnlockSubDirs(subCcDocDir.getId(), lockOrUnlock);
+            }
+        }else{
+            return;
         }
     }
 
@@ -740,9 +782,29 @@ public class DocExt {
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
             CcDocDir ccDocDir = CcDocDir.selectById(csCommId);
-            ccDocDir.setCcDocDirStatusId("unlock");
-            ccDocDir.updateById();
+//            ccDocDir.setCcDocDirStatusId("unlock");
+//            ccDocDir.updateById();
+            if (ccDocDir != null) {
+                //判断是否存在父级目录
+                if (ccDocDir.getCcDocDirPid() != null) {
+                    String dirPid = ccDocDir.getCcDocDirPid();
+                    //判断父级目录是否锁定
+                    CcDocDir parentCcDocDir = CcDocDir.selectById(dirPid);
+                    if (parentCcDocDir.getCcDocDirStatusId().equals("lock")) {
+                        throw new BaseException("父级目录已锁定，请先解锁父级目录！");
+                    }
+                }
+                // 锁定当前目录
+                ccDocDir.setCcDocDirStatusId("unlock");
+                ccDocDir.updateById();
+                // 递归锁定所有子目录
+                lockOrUnlockSubDirs(csCommId, "unlock");
+            }
         }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**

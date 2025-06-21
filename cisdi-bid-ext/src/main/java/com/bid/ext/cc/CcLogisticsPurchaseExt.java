@@ -217,16 +217,20 @@ public class CcLogisticsPurchaseExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 判断零部件是否还有剩余可拆分（废弃，去掉剩余可拆分的概念）
+     * @throws Exception
+     */
     public void updateSplitDataPre() throws Exception {
-        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
-        for (EntityRecord entityRecord : entityRecordList) {
-            Map<String, Object> valueMap = entityRecord.valueMap;
-            if (valueMap.get("CC_REMAIN_QTY") instanceof Integer) {
-                if(Integer.valueOf(valueMap.get("CC_REMAIN_QTY").toString()) <= 0){
-                    throw new Exception("零部件已无可拆分数量");
-                }
-            }
-        }
+//        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+//        for (EntityRecord entityRecord : entityRecordList) {
+//            Map<String, Object> valueMap = entityRecord.valueMap;
+//            if (valueMap.get("CC_REMAIN_QTY") instanceof Integer) {
+//                if(Integer.valueOf(valueMap.get("CC_REMAIN_QTY").toString()) <= 0){
+//                    throw new Exception("零部件已无可拆分数量");
+//                }
+//            }
+//        }
     }
 
     /**
@@ -422,6 +426,7 @@ public class CcLogisticsPurchaseExt {
 
 //        CcLogisticsContract contract = CcLogisticsContract.selectById(logisticsContractId);
 //        ccLogisticsPack.setCcEquipmentNum(contract.getCcEquipmentNum());
+
         ccLogisticsPack.insertById();
 
         //得到物流合同ID

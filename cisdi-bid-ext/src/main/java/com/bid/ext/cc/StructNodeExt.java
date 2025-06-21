@@ -3636,6 +3636,12 @@ public class StructNodeExt {
         CcPrjStructNode ccPrjStructNode = createProjectStructNode(name, remark, pCcPrjIds, wbsType, wbsChiefUserId, pPlanFr, pPlanTo, planDays, isMileStone);
         ccPrjStructNode.setCcConstructProgressPlanId(ccConstructProgressPlanId);
 
+        //模型构件关联
+        if(varMap.containsKey("P_CC_BIM_MODEL_COMPONENTS_IDS")){
+            String bimModelComponentsIds = JdbcMapUtil.getString(varMap, "P_CC_BIM_MODEL_COMPONENTS_IDS");
+            ccPrjStructNode.setCcBimModelComponentsIds(bimModelComponentsIds);
+        }
+
         // 获取实体记录并处理
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         if (!SharedUtil.isEmpty(entityRecordList)) {
@@ -3652,7 +3658,38 @@ public class StructNodeExt {
                 //设计管理中的父级节点可以选择，其他管理暂时默认为选中数据作为父级
 //                    ccPrjStructNode.setCcPrjStructNodePid(ccPrjStructNodePid);
 //                }
+
+                String bimComponentsIds = null;//初始化构件ID
+                //节点和构件关联表数据插入
+                if(wbsType.equals("CONSTRUCT")){
+                    //暂时只针对施工计划
+                    if(varMap.containsKey("P_CC_BIM_MODEL_COMPONENTS_IDS") && varMap.get("P_CC_BIM_MODEL_COMPONENTS_IDS") != null){
+                        bimComponentsIds =  varMap.get("P_CC_BIM_MODEL_COMPONENTS_IDS").toString();
+//                        structNodeRelateBimModelComponent(ccPrjStructNode.getId(),ccPrjStructNode.getCcBimModelComponentsIds());
+                        ccPrjStructNode.setCcBimModelComponentsIds(bimComponentsIds);
+                    }else{
+                        ccPrjStructNode.setCcBimModelComponentsIds(null);
+                    }
+                    boolean rel = false;//是否关联构件
+                    //判断新增时是否关联了父级节点
+                    if(varMap.containsKey("P_FA_STRUCT_NODE_ID") && varMap.get("P_FA_STRUCT_NODE_ID") != null){
+                        //关联了父级节点
+                        //判断父节点是否关联构件
+                        if(valueMap.containsKey("CC_IS_REL_BIM_MODEL_COMPONENT")){
+                            if(valueMap.get("CC_IS_REL_BIM_MODEL_COMPONENT") != null){
+                                rel = JdbcMapUtil.getBoolean(valueMap, "CC_IS_REL_BIM_MODEL_COMPONENT");
+                            }
+                        }
+                    }
+                    //父节点是否关联模型构件
+                    ccPrjStructNode.setCcIsRelBimModelComponent(rel);
+                }
                 ccPrjStructNode.insertById();
+
+                //进度节点数据插入后，在插入构件关联数据
+                if(bimComponentsIds!= null){
+                    structNodeRelateBimModelComponent(ccPrjStructNode.getId(),bimComponentsIds);
+                }
             }
         } else {
             ccPrjStructNode.insertById();
@@ -3661,6 +3698,31 @@ public class StructNodeExt {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 施工计划节点关联模型构件关联表数据插入
+     * @param id 施工计划节点ID
+     * @param ccBimModelComponentsIds 模型构件ID
+     */
+    private void structNodeRelateBimModelComponent(String id, String ccBimModelComponentsIds) {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        //将模型构件ID进行拆分
+        String[] bimModelComponentIds = ccBimModelComponentsIds.split(",");
+        for (String bimModelComponentId : bimModelComponentIds) {
+            CcStructNodeBimComponentsRel rel = CcStructNodeBimComponentsRel.newData();
+            rel.setTs(LocalDateTime.now());
+            rel.setCrtDt(LocalDateTime.now());
+            rel.setCrtUserId(userId);
+            rel.setLastModiDt(LocalDateTime.now());
+            rel.setLastModiUserId(userId);
+            rel.setStatus("AP");
+            rel.setCcPrjStructNodeId(id);//施工进度计划ID
+            rel.setCcBimModelComponentsId(bimModelComponentId);//BIM模型ID
+            rel.insertById();
+        }
     }
 
     /**
