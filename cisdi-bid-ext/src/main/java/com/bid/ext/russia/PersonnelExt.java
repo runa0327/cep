@@ -358,12 +358,10 @@ public class PersonnelExt {
                     newUserEntryInfo.setRemark(remark);
                     newUserEntryInfo.setRuEntryFrequency(getFrequency(personName,age.intValue())+1);
                     newUserEntryInfo.insertById();
-                    System.out.println(2);
                 }else{//有数据，修改
                     setUserEntryInfo(prjId,personName, age, phoneNum, visaExpirationDate, intoCountryDate, accommodation, timeOfProcessingLandingVisa, entryDate, exitDate, exitCountryDate, workTypeId, userInfoId, accommodationId, userEntryInfo);
                     userEntryInfo.setRemark(remark);
                     userEntryInfo.updateById();
-                    System.out.println(1);
                 }
             }
         } catch (IOException e) {

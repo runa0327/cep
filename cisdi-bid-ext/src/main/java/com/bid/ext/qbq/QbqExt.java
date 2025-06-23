@@ -7,7 +7,6 @@ import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.entity.QbqBody;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.DownloadUtils;
-import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -20,6 +19,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.JsonUtil;
 import com.qygly.shared.util.SharedUtil;
 import com.tencentcloudapi.trp.v20210515.models.Ext;
 import lombok.extern.slf4j.Slf4j;
@@ -255,7 +255,8 @@ public class QbqExt {
                 }
 
                 // 将 Map 转换为 JSON 字符串
-                String jsonBody = JSONUtil.toJsonStr(requestBody);
+//                String jsonBody = JSONUtil.toJsonStr(requestBody);
+                String jsonBody = JsonUtil.toJson(requestBody);
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("Content-Type", "application/json");
@@ -371,7 +372,8 @@ public class QbqExt {
                 }
 
                 // 将 Map 转换为 JSON 字符串
-                String jsonBody = JSONUtil.toJsonStr(requestBody);
+//                String jsonBody = JSONUtil.toJsonStr(requestBody);
+                String jsonBody = JsonUtil.toJson(requestBody);
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("Content-Type", "application/json");
@@ -463,16 +465,16 @@ public class QbqExt {
             userList = queryQbqChangeDesignUser(wfProcessInstanceId,csCommId);
         }
 
-        LocalDate trxDate = JdbcMapUtil.getLocalDate(valueMap, "TRX_DATE");
-        int trxDateYear = trxDate.getYear();
-        String trxDateMonth = String.format("%02d", trxDate.getMonthValue());
-        String trxDateDay = String.format("%02d", trxDate.getDayOfMonth());
-
         String fileName = null;
 
         Map<String, Object> map = new HashMap<String, Object>();
         byte[] word = null;
         if("Type0".equals(type)){
+            LocalDate trxDate = JdbcMapUtil.getLocalDate(valueMap, "TRX_DATE");
+            int trxDateYear = trxDate.getYear();
+            String trxDateMonth = String.format("%02d", trxDate.getMonthValue());
+            String trxDateDay = String.format("%02d", trxDate.getDayOfMonth());
+
             String name = JdbcMapUtil.getString(valueMap, "NAME");
             String ccBidNo = JdbcMapUtil.getString(valueMap, "CC_BID_NO");
             String part = JdbcMapUtil.getString(valueMap, "PART");
@@ -776,7 +778,8 @@ public class QbqExt {
         }
 
         // 将 Map 转换为 JSON 字符串
-        String jsonBody = JSONUtil.toJsonStr(requestBody);
+//        String jsonBody = JSONUtil.toJsonStr(requestBody);
+        String jsonBody = JsonUtil.toJson(requestBody);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
@@ -868,8 +871,8 @@ public class QbqExt {
                 signerIds.append(",");
             }
         }
-        List<QbqBody.User> signUser = queryQbqFileSignUser(signerIds.toString());
 
+        List<QbqBody.User> signUser = queryQbqFileSignUser(signerIds.toString());
 
         for (EntityRecord entityRecord:entityRecordList) {
             String entityId = (String) entityRecord.valueMap.get("ID");
@@ -1116,7 +1119,9 @@ public class QbqExt {
         requestBody.put("deadlineTime",deadlineTime);//过期时间
 
         // 将 Map 转换为 JSON 字符串
-        String jsonBody = JSONUtil.toJsonStr(requestBody);
+//        String jsonBody = JSONUtil.toJsonStr(requestBody);
+        String jsonBody =JsonUtil.toJson(requestBody);
+
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
@@ -1249,6 +1254,7 @@ public class QbqExt {
 
             // 调用 LibreOffice 进行 DOCX 转 PDF
             ProcessBuilder builder = new ProcessBuilder();
+            builder.directory(new java.io.File(tempPdf.getParent().toString()));
             builder.command(libreOfficePath, "--convert-to", "pdf:writer_pdf_Export", tempFile.toString(), "--outdir", tempPdf.getParent().toString());
 
             Process process = builder.start();
