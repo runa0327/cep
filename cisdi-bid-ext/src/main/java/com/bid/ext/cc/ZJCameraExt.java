@@ -72,6 +72,8 @@ public class ZJCameraExt {
         ExtJarHelper.setReturnValue(resultMap);
     }
 
+
+
     /**
      * 获取湛江十七冶accessToken
      */
@@ -152,6 +154,53 @@ public class ZJCameraExt {
 
     /**
      * 获取摄像头列表
+     * @return
+     */
+    public void  getCameraRTMPLocation(){
+
+        Map<String, Object> paramMap = ExtJarHelper.getExtApiParamMap();
+        Object channelNo = paramMap.get("channelNo");//通道号
+        Object protocol = paramMap.get("protocol");//通道号
+
+        StringRedisTemplate stringRedisTemplate = ExtJarHelper.getStringRedisTemplate();
+
+        String value = getToken("sqy");
+
+
+            // 2、换accessToken：
+            RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/x-www-form-urlencoded");
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("accessToken", value);
+            body.add("deviceSerial", SQY_DEVICE_SERIAL);
+            body.add("channelNo",channelNo);
+            body.add("protocol",protocol);
+            body.add("expireTime",60*60*24);
+
+            HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(EZVIZ_BASE_URL + "/lapp/v2/live/address/get", HttpMethod.POST, entity, String.class);
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+//                String message = "获取萤石云摄像头列表失败！";
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.ysy.getCameraListFail");
+                log.error(message + response);
+                throw new BaseException(message);
+            }
+
+            String res = response.getBody();
+
+        Map<String,Object> map = JsonUtil.fromJson(res, Map.class);
+
+
+        ExtJarHelper.setReturnValue(map);
+    }
+
+    /**
+     * 获取直播地址
      * @param company 获取公司
      * @return
      */
@@ -195,7 +244,7 @@ public class ZJCameraExt {
                 throw new BaseException(message);
             }
 
-             res = response.getBody();
+            res = response.getBody();
 
 
             if ("sqy".equals(company)) {

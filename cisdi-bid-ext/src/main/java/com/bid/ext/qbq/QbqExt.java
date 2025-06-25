@@ -12,7 +12,9 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.OpenMode;
 import com.qygly.shared.ad.entity.EntityInfo;
+import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -31,6 +33,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.swing.*;
 import java.io.*;
@@ -92,6 +95,7 @@ public class QbqExt {
             throw new BaseException(message+":"+e.getMessage());
         }
     }
+
 
 
     /**
@@ -441,9 +445,13 @@ public class QbqExt {
 
             attWhere.eq(AdAtt.Cols.CODE, CcChangeSignDemonstrate.Cols.CC_ENGINEERING_DATA);
             adAtt = AdAtt.selectOneByWhere(attWhere);
-        }else{
+        }else if("Type0".equals(type)){
             entityCode = "CC_CHANGE_DESIGN_DEMONSTRATE";
             attWhere.eq(AdAtt.Cols.CODE, CcChangeDesignDemonstrate.Cols.CC_CHANGE_ORDER_FILE);
+            adAtt = AdAtt.selectOneByWhere(attWhere);
+        }else{
+            entityCode = "CC_CHANGE_SIGN";
+            attWhere.eq(AdAtt.Cols.CODE, CcChangeSign.Cols.CC_ATTACHMENTS);
             adAtt = AdAtt.selectOneByWhere(attWhere);
         }
 
@@ -461,8 +469,48 @@ public class QbqExt {
         List<QbqBody.User> userList = null;
         if("Type0".equals(type)){
             userList = queryQbqUser(wfProcessInstanceId,csCommId);
-        }else{
+        }else if("Type1".equals(type)){
             userList = queryQbqChangeDesignUser(wfProcessInstanceId,csCommId);
+        }else{
+            userList = new ArrayList<>();
+
+            //固定签署人员
+            QbqBody.User clc = new QbqBody.User();
+            clc.setId("1787382018144423936");
+            clc.setName("何佳伦");
+            clc.setIdCardNo("500224199206130312");
+            clc.setTel("17783862327");
+            clc.setSignatoryId("123456");
+            clc.setSignatoryName("施工单位");
+
+            userList.add(clc);
+
+            QbqBody.User clc2 = new QbqBody.User();
+            clc2.setId("1925793767951716352");
+            clc2.setName("黎静");
+            clc2.setIdCardNo("500233199510309524");
+            clc2.setTel("18223619813");
+            clc2.setSignatoryId("123456789");
+            clc2.setSignatoryName("设计单位");
+            userList.add(clc2);
+
+            QbqBody.User clc3 = new QbqBody.User();
+            clc3.setId("1892496741488345088");
+            clc3.setName("刘旭");
+            clc3.setIdCardNo("612525200005151833");
+            clc3.setTel("15591424995");
+            clc3.setSignatoryId("123456789d");
+            clc3.setSignatoryName("监理单位");
+            userList.add(clc3);
+
+            QbqBody.User clc4 = new QbqBody.User();
+            clc4.setId("0099250247095871681");
+            clc4.setName("陈励超");
+            clc4.setIdCardNo("500103199311080313");
+            clc4.setTel("13996023636");
+            clc4.setSignatoryId("123456789e");
+            clc4.setSignatoryName("建设单位");
+            userList.add(clc4);
         }
 
         String fileName = null;
@@ -501,7 +549,7 @@ public class QbqExt {
             map.put("CONSTRUCTION_COMMENT", constructionComment);
 
             word = DownloadUtils.createWord(map, "acceptance_demo.docx");
-        }else{
+        }else if("Type1".equals(type)){
             CcChangeDesignDemonstrate ccChangeDesignDemonstrate = CcChangeDesignDemonstrate.selectById(csCommId);
             String ccChangeSignDemonstrateId = ccChangeDesignDemonstrate.getCcChangeSignDemonstrateId();
             CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(ccChangeSignDemonstrateId);
@@ -523,9 +571,66 @@ public class QbqExt {
             map.put("day", day);
 
             word = DownloadUtils.createWord(map, "changeOrder.docx");
+        }else{
+            LocalDate trxDate = JdbcMapUtil.getLocalDate(valueMap, "TRX_DATE");
+            int trxDateYear = trxDate.getYear();
+            String trxDateMonth = String.format("%02d", trxDate.getMonthValue());
+            String trxDateDay = String.format("%02d", trxDate.getDayOfMonth());
+
+            CcChangeSign ccChangeSign = CcChangeSign.selectById(csCommId);
+
+            String projectName = ccChangeSign.getName();
+            String ccBidNo = "CISDI-TEST-000101";
+            String name = ccChangeSign.getName();
+            String ccAttachments = ccChangeSign.getCcAttachments();
+
+            String[] attachmentIds = ccAttachments.split(",");
+
+            String ccAttachmentName = "";
+            for (int i = 0; i < attachmentIds.length; i++) {
+                FlFile flFile1 = FlFile.selectById(attachmentIds[i]);
+                ccAttachmentName += com.bid.ext.utils.JsonUtil.getCN(flFile1.getName());
+
+                if (i< attachmentIds.length-1){
+                    ccAttachmentName +=",";
+                }
+            }
+
+//            fileName = com.bid.ext.utils.JsonUtil.getCN(name) + "变更签证";
+
+//            map.put("projectName", com.bid.ext.utils.JsonUtil.getCN(projectName));
+//            map.put("bidNo", ccBidNo);
+//            map.put("name", com.bid.ext.utils.JsonUtil.getCN(name));
+//            map.put("fileName", ccAttachmentName);
+//            map.put("year", year);
+//            map.put("month", month);
+//            map.put("day", day);
+
+            fileName = com.bid.ext.utils.JsonUtil.getCN(name) +"-现场签证";
+
+            map.put("PROJECT_NAME", com.bid.ext.utils.JsonUtil.getCN(projectName));
+            map.put("NAME", com.bid.ext.utils.JsonUtil.getCN(ccChangeSign.getName()));
+            map.put("Y", trxDateYear);
+            map.put("M", trxDateMonth);
+            map.put("D", trxDateDay);
+            map.put("ORDER_NUMBER", ccBidNo);
+            map.put("CON_COMPANY","中冶赛迪");
+            if(ccChangeSign.getAmtChangeValue()!=null){
+                map.put("AM", ccChangeSign.getAmtChangeValue().divide(new BigDecimal("10000"),2));
+            }else{
+                map.put("AM", new BigDecimal("1"));
+            }
+
+            map.put("CHANGE_REASON", ccChangeSign.getChangeReason());
+            map.put("CHANGE_CONTENT", ccChangeSign.getChangeContent());
+
+            word = DownloadUtils.createWord(map, "change_sign_order.docx");
+
         }
 
-        byte[] b = convertWordToPDF(word);
+
+//        byte[] b = convertWordToPDF(word);
+        byte[] b = convertFileToPDF(word,"docx");
 
         FlFile flFile = FlFile.newData();
 
@@ -535,7 +640,7 @@ public class QbqExt {
         // 构建文件名和路径
             String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
 
-//        String path = "/Users/hejialun/Documents/new-ql/12工程变更指令.pdf";
+//        String path = "/Users/hejialun/Documents/new-ql/12E变更签证.pdf";
 
         saveWordToFile(b, path);
         boolean fileExists = checkFileExists(path);
@@ -565,26 +670,79 @@ public class QbqExt {
             flFile.setIsPublicRead(false);
             flFile.insertById();
 
-
             if("Type0".equals(type)) {
                 CcChangeSignDemonstrate ccChangeSignDemonstrate = CcChangeSignDemonstrate.selectById(EntityRecordUtil.getId(entityRecord));
                 ccChangeSignDemonstrate.setCcEngineeringData(fileId);
                 ccChangeSignDemonstrate.updateById();
-            }else{
+
+                //发起签署，工程联系单Type0，变更指令 Type1，
+                initiateSigning( type,userList, fileId, wfProcessInstanceId, csCommId,entityCode,deadlineTime);
+            }else if("Type1".equals(type)){
                 CcChangeDesignDemonstrate ccChangeDesignDemonstrate = CcChangeDesignDemonstrate.selectById(EntityRecordUtil.getId(entityRecord));
                 ccChangeDesignDemonstrate.setCcChangeOrderFile(fileId);
                 ccChangeDesignDemonstrate.updateById();
+
+                //发起签署，工程联系单Type0，变更指令 Type1，
+                initiateSigning( type,userList, fileId, wfProcessInstanceId, csCommId,entityCode,deadlineTime);
+            }else{
+                TaskToBusiData taskToBusiData = TaskToBusiData.newData();
+                taskToBusiData.setEntityRecordId(csCommId);
+                taskToBusiData.setCcSignOriginalFile(fileId);
+                taskToBusiData.setEntCode("CC_CHANGE_SIGN");
+                taskToBusiData.setIsCurrent(true);
+                taskToBusiData.setCcSignFileStatusId("1");
+                taskToBusiData.insertById();
+
+                AdUser publisher = AdUser.selectById("1787382018144423936");
+
+                //发起签署，变更签证固定人员签署
+                initiateFileSigning(type,userList,fileName,path,csCommId,"变更签证签署",publisher,deadlineTime,taskToBusiData);
+
             }
 
-            //发起签署，工程联系单Type0，变更指令 Type1，
-            initiateSigning( type,userList, fileId, wfProcessInstanceId, csCommId,entityCode,deadlineTime);
+
 
         } else {
-            changeSignStatus("IF",entityCode,csCommId);//签署状态变为发起失败
+            if("Type0".equals(type)||"Type1".equals(type)) {
+                changeSignStatus("IF", entityCode, csCommId);//签署状态变为发起失败
+            }
             String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileNotFound", path);
             throw new BaseException(message);
         }
+
     }
+
+
+    //签署详情查看
+    public void signDetailViewOpen(){
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+
+        EntityRecord entityRecord = entityRecordList.get(0);
+        String csCommId = entityRecord.csCommId;
+
+        Where where = new Where();
+        where.eq("ENTITY_RECORD_ID",csCommId);
+        where.eq("IS_CURRENT",1);
+        where.eq("ENT_CODE","CC_CHANGE_SIGN");
+
+        TaskToBusiData taskToBusiData = TaskToBusiData.selectOneByWhere(where);
+
+        if(taskToBusiData==null||!StringUtils.hasText(taskToBusiData.getTaskCode())){
+            throw new BaseException("该变更签证未发起签署任务！");
+        }
+
+        UrlToOpen urlToOpen=new UrlToOpen();
+//        urlToOpen.url="http://localhost:5173/zj/#/taskDetalDemo?taskCode="+taskToBusiData.getTaskCode();
+        urlToOpen.url="../cisdi-gczx-jszt/#/taskDetalDemo?taskCode="+taskToBusiData.getTaskCode();
+        urlToOpen.openMode= OpenMode.INNER;
+        urlToOpen.title = "签署详情";
+        InvokeActResult invokeActResult=new InvokeActResult();
+        invokeActResult.urlToOpenList=Arrays.asList(urlToOpen);
+        ExtJarHelper.setReturnValue(invokeActResult);
+
+    }
+
 
 
 
@@ -1228,6 +1386,7 @@ public class QbqExt {
 
             // 根据发行版设置 code
             String code;
+//            String code="LIBRE_PATH_CENTOS";
             if (distro.contains("centos")) {
                 code = "LIBRE_PATH_CENTOS";
             } else if (distro.contains("ubuntu")) {
@@ -1400,5 +1559,53 @@ public class QbqExt {
         }
 
     }
+
+
+    //变更签证签署任务发起
+    public void genChangeSignTask(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE,30); //过期时间30天
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String deadlineTime = simpleDateFormat.format(calendar.getTime());
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        String month = String.format("%02d", now.getMonthValue());
+        String day = String.format("%02d", now.getDayOfMonth());
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            signTaskCreate(entityRecord,year,month,day,loginInfo,"Type2",deadlineTime);
+        }
+
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+
+    }
+
+
+    public void getFileUrl(){
+        RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
+
+        Map<String, Object> paramMap = ExtJarHelper.getExtApiParamMap();
+
+        String taskCode = (String) paramMap.get("taskCode");
+
+        String downloadUrl = UriComponentsBuilder
+                .fromHttpUrl("http://localhost:9999/qbq/getFileUrl")
+                .queryParam("taskCode", taskCode)
+                .toUriString();
+        ResponseEntity<String> downloadResponse = restTemplate.getForEntity(downloadUrl, String.class);
+        String downloadBody = downloadResponse.getBody();
+        JSONObject entries = JSONUtil.parseObj(downloadBody);
+
+        Map<String,Object> result = new HashMap<>();
+        result.put("url",entries.get("url"));
+        ExtJarHelper.setReturnValue(result);
+    }
+
 
 }
