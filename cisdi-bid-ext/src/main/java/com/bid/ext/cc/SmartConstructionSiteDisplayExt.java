@@ -8,6 +8,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
+import lombok.val;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -416,6 +417,8 @@ public class SmartConstructionSiteDisplayExt {
             outputMap.put("rotationAngle", rotationAngle);
             int angle = (int) (Math.floor(Math.random() * 10) + 60); // 倾角
             outputMap.put("angle", angle);
+            int windSpeed = (int) (Math.floor(Math.random() * 10) + 1); // 风速
+            outputMap.put("windSpeed", windSpeed);
         }else{
             //暂时不写
         }
@@ -765,7 +768,7 @@ public class SmartConstructionSiteDisplayExt {
                     "\tchannelNo: 3,\n" +
                     "\tdeviceName: '十七冶零碳炼钢项目',\n" +
                     "\tlocalName: '十七冶零碳炼钢项目',\n" +
-                    "\tchannelName: '宿舍楼施工区(不在线）',\n" +
+                    "\tchannelName: '宿舍楼施工区',\n" +
                     "\tstatus: 1,\n" +
                     "\tisShared: '1',\n" +
                     "\tpicUrl: 'https://statics.ys7.com/device/assets/imgs/public/homeDevice.jpeg',\n" +

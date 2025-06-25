@@ -584,26 +584,28 @@ public class PrjExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            //新增BIM模型构件
-            String Id = IdUtil.getSnowflakeNextIdStr();
-            CcBimModelComponents ccBimModelComponents = CcBimModelComponents.newData();
-            ccBimModelComponents.setId(Id);
-            ccBimModelComponents.setTs(LocalDateTime.now());
-            ccBimModelComponents.setCrtDt(LocalDateTime.now());
-            ccBimModelComponents.setLastModiDt(LocalDateTime.now());
-            ccBimModelComponents.setCrtUserId(userId);
-            ccBimModelComponents.setLastModiDt(LocalDateTime.now());
-            ccBimModelComponents.setStatus("AP");
-            ccBimModelComponents.setCode(valueMap.get("DOC_FILE_COM_ID").toString());
-            ccBimModelComponents.setName(JsonUtil.toJson(new Internationalization(null, valueMap.get("DOC_FILE_COM_ID").toString(), null)));
-            ccBimModelComponents.setExtraInfo(valueMap.get("EXTRA_INFO").toString());
-            ccBimModelComponents.setCcDocFileId(valueMap.get("CC_DOC_FILE_ID").toString());
-            ccBimModelComponents.insertById();
+            if("CC_QS_INSPECTION".equalsIgnoreCase(valueMap.get("ENT_CODE").toString())) {
+                //新增BIM模型构件
+                String Id = IdUtil.getSnowflakeNextIdStr();
+                CcBimModelComponents ccBimModelComponents = CcBimModelComponents.newData();
+                ccBimModelComponents.setId(Id);
+                ccBimModelComponents.setTs(LocalDateTime.now());
+                ccBimModelComponents.setCrtDt(LocalDateTime.now());
+                ccBimModelComponents.setLastModiDt(LocalDateTime.now());
+                ccBimModelComponents.setCrtUserId(userId);
+                ccBimModelComponents.setLastModiDt(LocalDateTime.now());
+                ccBimModelComponents.setStatus("AP");
+                ccBimModelComponents.setCode(valueMap.get("DOC_FILE_COM_ID").toString());
+                ccBimModelComponents.setName(JsonUtil.toJson(new Internationalization(null, valueMap.get("DOC_FILE_COM_ID").toString(), null)));
+                ccBimModelComponents.setExtraInfo(valueMap.get("EXTRA_INFO").toString());
+                ccBimModelComponents.setCcDocFileId(valueMap.get("CC_DOC_FILE_ID").toString());
+                ccBimModelComponents.insertById();
 
-            //更新质安巡检数据
-            CcQsInspection ccQsInspection = CcQsInspection.selectById(valueMap.get("ENTITY_RECORD_ID").toString());
-            ccQsInspection.setCcBimModelComponentsId(Id);
-            ccQsInspection.updateById();
+                //更新质安巡检数据
+                CcQsInspection ccQsInspection = CcQsInspection.selectById(valueMap.get("ENTITY_RECORD_ID").toString());
+                ccQsInspection.setCcBimModelComponentsId(Id);
+                ccQsInspection.updateById();
+            }
 
         }
     }
@@ -615,13 +617,17 @@ public class PrjExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            //更新质安巡检表
-            CcQsInspection ccQsInspection = CcQsInspection.selectById(valueMap.get("ENTITY_RECORD_ID").toString());
-            String ccBimModelComponentsId = ccQsInspection.getCcBimModelComponentsId();
-            ccQsInspection.setCcBimModelComponentsId(null);
-            ccQsInspection.updateById();
-            //为避免“BIM模型构件”的数据越来越冗余，这里还是要删除对应数据
-            CcBimModelComponents.deleteById(ccBimModelComponentsId);
+
+
+            if("CC_QS_INSPECTION".equalsIgnoreCase(valueMap.get("ENT_CODE").toString())){
+                //更新质安巡检表
+                CcQsInspection ccQsInspection = CcQsInspection.selectById(valueMap.get("ENTITY_RECORD_ID").toString());
+                String ccBimModelComponentsId = ccQsInspection.getCcBimModelComponentsId();
+                ccQsInspection.setCcBimModelComponentsId(null);
+                ccQsInspection.updateById();
+                //为避免“BIM模型构件”的数据越来越冗余，这里还是要删除对应数据
+                CcBimModelComponents.deleteById(ccBimModelComponentsId);
+            }
         }
     }
 }
