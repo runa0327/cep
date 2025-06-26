@@ -492,7 +492,7 @@ public class QbqExt {
             clc2.setIdCardNo("500233199510309524");
             clc2.setTel("18223619813");
             clc2.setSignatoryId("123456789");
-            clc2.setSignatoryName("设计单位");
+            clc2.setSignatoryName("造价咨询单位");
             userList.add(clc2);
 
             QbqBody.User clc3 = new QbqBody.User();
