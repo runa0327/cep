@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.SharedConstants;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
@@ -624,6 +625,8 @@ public class DocExt {
      * 当上传的文件是VR时生成VR缩略图
      */
     public void genVrDocPreview() throws IOException {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String orgId = loginInfo.currentOrgInfo.id;
         InvokeActResult invokeActResult = new InvokeActResult();
 //        Map<String, Object> varMap = ExtJarHelper.getVarMap();
 //        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_PRJ_IDS");
@@ -633,7 +636,6 @@ public class DocExt {
         Map<String, Object> map = myJdbcTemplate.queryForMap(sql);
         String urlHead = JdbcMapUtil.getString(map, "name");
         String sessionId = ExtJarHelper.getLoginInfo().sessionId;
-        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
@@ -669,7 +671,13 @@ public class DocExt {
                 String month = String.format("%02d", now.getMonthValue());
                 String day = String.format("%02d", now.getDayOfMonth());
 
-                String previewPath = flPath.getDir() + year + "/" + month + "/" + day + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
+                String dir = flPath.getDir();
+                if (dir.contains(SharedConstants.PLACE_HOLDER_ORG_ID)) {
+                    // 不必采用(?i)忽略大小写，都是后端写入与解析的，必定保持统一：
+                    dir = dir.replaceAll(/*"(?i)" +*/ SharedConstants.PLACE_HOLDER_ORG_ID, orgId);
+                }
+
+                String previewPath = dir + year + "/" + month + "/" + day + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
                 File outputFile = new File(previewPath); // 输出图片文件
                 ImageIO.write(outputImage, flFile.getExt(), outputFile);
 
@@ -754,14 +762,15 @@ public class DocExt {
 
     /**
      * 递归锁定指定目录的所有子目录
-     * @param parentId 父目录的 ID
+     *
+     * @param parentId     父目录的 ID
      * @param lockOrUnlock 锁定或解锁操作
      */
     private void lockOrUnlockSubDirs(String parentId, String lockOrUnlock) {
         Where where = new Where();
         where.eq(CcDocDir.Cols.CC_DOC_DIR_PID, parentId);
         List<CcDocDir> ccDocDirList = CcDocDir.selectByWhere(where);
-        if(ccDocDirList != null && !ccDocDirList.isEmpty()) {
+        if (ccDocDirList != null && !ccDocDirList.isEmpty()) {
             for (CcDocDir subCcDocDir : ccDocDirList) {
                 // 锁定当前子目录
                 subCcDocDir.setCcDocDirStatusId(lockOrUnlock);
@@ -769,7 +778,7 @@ public class DocExt {
                 // 递归锁定当前子目录的子目录
                 lockOrUnlockSubDirs(subCcDocDir.getId(), lockOrUnlock);
             }
-        }else{
+        } else {
             return;
         }
     }

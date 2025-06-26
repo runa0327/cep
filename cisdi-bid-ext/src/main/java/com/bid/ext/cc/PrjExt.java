@@ -253,6 +253,20 @@ public class PrjExt {
     }
 
     /**
+     * 从项目列表以外进入具体项目时，设置全局变量P_CC_PRJ_IDS的值。
+     */
+    public void boardToPrj() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            ViewNavExtResult result = new ViewNavExtResult();
+            result.changedGlobalVarMap = new LinkedHashMap<>();
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            result.changedGlobalVarMap.put("P_CC_PRJ_IDS", ccPrjId);
+            ExtJarHelper.setReturnValue(result);
+        }
+    }
+
+    /**
      * 创建项目初始化项目成员
      */
     public void initPrjMember() {
@@ -523,7 +537,7 @@ public class PrjExt {
     /**
      * BIM正相关联后，同步业务数据（cc_doc_file_to_busi_data）
      */
-    public void createDocFileToBusiData(){
+    public void createDocFileToBusiData() {
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
@@ -577,7 +591,7 @@ public class PrjExt {
     /**
      * 更新BIM模型构件信息
      */
-    public void createBimModelComponents(){
+    public void createBimModelComponents() {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
 
@@ -613,7 +627,7 @@ public class PrjExt {
     /**
      * 删除BIM模型构件信息
      */
-    public void deleteBimModelComponents(){
+    public void deleteBimModelComponents() {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
