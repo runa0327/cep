@@ -1,6 +1,7 @@
 package com.bid.ext.qbq;
 
 import cn.hutool.json.JSON;
+import cn.hutool.json.JSONNull;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.bid.ext.config.FlPathConfig;
@@ -685,6 +686,18 @@ public class QbqExt {
                 //发起签署，工程联系单Type0，变更指令 Type1，
                 initiateSigning( type,userList, fileId, wfProcessInstanceId, csCommId,entityCode,deadlineTime);
             }else{
+
+                Where queryTaskToBusiData = new Where();
+                queryTaskToBusiData.eq("ENTITY_RECORD_ID",csCommId);
+                queryTaskToBusiData.eq("IS_CURRENT",1);
+                queryTaskToBusiData.eq("ENT_CODE","CC_CHANGE_SIGN");
+                TaskToBusiData oldTaskToBusiData = TaskToBusiData.selectOneByWhere(queryTaskToBusiData);
+
+                if (oldTaskToBusiData!=null){
+                    oldTaskToBusiData.setIsCurrent(false);
+                    oldTaskToBusiData.updateById();
+                }
+
                 TaskToBusiData taskToBusiData = TaskToBusiData.newData();
                 taskToBusiData.setEntityRecordId(csCommId);
                 taskToBusiData.setCcSignOriginalFile(fileId);
@@ -699,8 +712,6 @@ public class QbqExt {
                 initiateFileSigning(type,userList,fileName,path,csCommId,"变更签证签署",publisher,deadlineTime,taskToBusiData);
 
             }
-
-
 
         } else {
             if("Type0".equals(type)||"Type1".equals(type)) {
@@ -1587,7 +1598,7 @@ public class QbqExt {
     }
 
 
-    public void getFileUrl(){
+    public void getFileUrl() {
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
 
         Map<String, Object> paramMap = ExtJarHelper.getExtApiParamMap();
@@ -1600,11 +1611,21 @@ public class QbqExt {
                 .toUriString();
         ResponseEntity<String> downloadResponse = restTemplate.getForEntity(downloadUrl, String.class);
         String downloadBody = downloadResponse.getBody();
-        JSONObject entries = JSONUtil.parseObj(downloadBody);
 
-        Map<String,Object> result = new HashMap<>();
-        result.put("url",entries.get("url"));
-        ExtJarHelper.setReturnValue(result);
+        downloadResponse.getStatusCodeValue();
+        if (downloadResponse.getStatusCodeValue() == 200) {
+
+            JSONObject entries = JSONUtil.parseObj(downloadBody);
+            if (JSONNull.NULL.equals(entries.get("url"))){
+                throw new BaseException("签署任务未完成，无法查看签署文件！");
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("url", entries.get("url"));
+            ExtJarHelper.setReturnValue(result);
+        }else{
+            throw new BaseException("文件地址获取失败");
+        }
     }
 
 
