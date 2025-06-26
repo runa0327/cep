@@ -12,6 +12,7 @@ import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.LoginExtResult;
 import com.qygly.shared.interaction.ViewNavExtResult;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -256,14 +257,24 @@ public class PrjExt {
      * 从项目列表以外进入具体项目时，设置全局变量P_CC_PRJ_IDS的值。
      */
     public void boardToPrj() {
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            ViewNavExtResult result = new ViewNavExtResult();
-            result.changedGlobalVarMap = new LinkedHashMap<>();
-            Map<String, Object> valueMap = entityRecord.valueMap;
-            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
-            result.changedGlobalVarMap.put("P_CC_PRJ_IDS", ccPrjId);
-            ExtJarHelper.setReturnValue(result);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String cc_prj_ids = null;
+        String UID = loginInfo.userInfo.id;
+        String sql = "SELECT T.ID ID FROM CC_PRJ_MEMBER M, CC_PRJ T WHERE M.CC_PRJ_ID=T.ID AND M.AD_USER_ID= ?";
+        List<Map<String, Object>> ids = myJdbcTemplate.queryForList(sql, UID);
+        if (ids != null) {
+            List<String> lst = new ArrayList<>();
+            for (Map<String, Object> id : ids) {
+                String string = JdbcMapUtil.getString(id, "ID");
+                lst.add(string);
+            }
+            cc_prj_ids = SharedUtil.strListToSplittedStr(lst);
         }
+        LoginExtResult result = new LoginExtResult();
+        result.changedGlobalVarMap = new LinkedHashMap<>();
+        result.changedGlobalVarMap.put("P_CC_PRJ_IDS", cc_prj_ids);
+        ExtJarHelper.setReturnValue(result);
     }
 
     /**
@@ -598,7 +609,7 @@ public class PrjExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         for (EntityRecord entityRecord : entityRecordList) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            if("CC_QS_INSPECTION".equalsIgnoreCase(valueMap.get("ENT_CODE").toString())) {
+            if ("CC_QS_INSPECTION".equalsIgnoreCase(valueMap.get("ENT_CODE").toString())) {
                 //新增BIM模型构件
                 String Id = IdUtil.getSnowflakeNextIdStr();
                 CcBimModelComponents ccBimModelComponents = CcBimModelComponents.newData();
@@ -633,7 +644,7 @@ public class PrjExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
 
 
-            if("CC_QS_INSPECTION".equalsIgnoreCase(valueMap.get("ENT_CODE").toString())){
+            if ("CC_QS_INSPECTION".equalsIgnoreCase(valueMap.get("ENT_CODE").toString())) {
                 //更新质安巡检表
                 CcQsInspection ccQsInspection = CcQsInspection.selectById(valueMap.get("ENTITY_RECORD_ID").toString());
                 String ccBimModelComponentsId = ccQsInspection.getCcBimModelComponentsId();
