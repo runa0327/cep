@@ -1309,7 +1309,9 @@ public class StructNodeExt {
     private void updatePreviousVersion(String ccDrawingUpdateRecordId) {
         CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectById(ccDrawingUpdateRecordId);
         String ccDesignInquiId = ccDrawingUpdateRecord.getCcDesignInquiId();
-
+        if(ccDesignInquiId == null){
+            return;
+        }
         Where where = new Where();
         where.eq("CC_DESIGN_INQUI_ID", ccDesignInquiId);
         List<CcDrawingUpdateRecord> ccCcDrawingUpdateRecords = CcDrawingUpdateRecord.selectByWhere(where);
