@@ -648,6 +648,7 @@ public class DocExt {
             FlFile flFile = FlFile.selectById(ccDocFile.getCcAttachment()); // 获取文件对象
             if (null != flFile) {
                 String originFilePhysicalLocation = flFile.getOriginFilePhysicalLocation();
+//                originFilePhysicalLocation = "E:\\data\\qygly\\file\\test240511\\FileStore\\2025\\07\\10\\banner_error.png";
                 BufferedImage originalImage = ImageIO.read(new File(originFilePhysicalLocation));
                 String flPathId = flFile.getFlPathId();
 
@@ -677,7 +678,17 @@ public class DocExt {
                     dir = dir.replaceAll(/*"(?i)" +*/ SharedConstants.PLACE_HOLDER_ORG_ID, orgId);
                 }
 
-                String previewPath = dir + year + "/" + month + "/" + day + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
+                if (dir.contains("@OID")) {
+                    // 不必采用(?i)忽略大小写，都是后端写入与解析的，必定保持统一：
+                    dir = dir.replaceAll(/*"(?i)" +*/ "@OID", orgId);
+                }
+                String dirFile = dir + year + "/" + month + "/" + day;
+                //判断目录是否存在
+                if(!checkFileExists(dirFile)){
+                    cn.hutool.core.io.FileUtil.mkdir(dirFile);
+                }
+
+                String previewPath = dirFile + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
                 File outputFile = new File(previewPath); // 输出图片文件
                 ImageIO.write(outputImage, flFile.getExt(), outputFile);
 

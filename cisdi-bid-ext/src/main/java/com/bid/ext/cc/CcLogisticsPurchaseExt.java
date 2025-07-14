@@ -391,13 +391,13 @@ public class CcLogisticsPurchaseExt {
         ccLogisticsPack.setCcIsBreakUp(stringToBoolean(varMap.get("P_CC_IS_BREAK_UP").toString()));
         ccLogisticsPack.setCcPackgingWeight(new BigDecimal(varMap.get("P_CC_PACKGING_WEIGHT").toString()));
         //判断varMap中是否存在P_CC_PRODUCT_MAX_LENGTH这个键
-        if(varMap.containsKey("P_CC_PRODUCT_MAX_LENGTH")){
+        if(varMap.containsKey("P_CC_PRODUCT_MAX_LENGTH") && varMap.get("P_CC_PRODUCT_MAX_LENGTH") != null){
             ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_LENGTH").toString()));
         }
-        if(varMap.containsKey("P_CC_PRODUCT_MAX_WIDTH")){
+        if(varMap.containsKey("P_CC_PRODUCT_MAX_WIDTH") && varMap.get("P_CC_PRODUCT_MAX_WIDTH") != null){
             ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_WIDTH").toString()));
         }
-        if(varMap.containsKey("P_CC_PRODUCT_MAX_HEIGHT")){
+        if(varMap.containsKey("P_CC_PRODUCT_MAX_HEIGHT") && varMap.get("P_CC_PRODUCT_MAX_HEIGHT") != null){
             ccLogisticsPack.setCcProductMaxLength(new BigDecimal(varMap.get("P_CC_PRODUCT_MAX_HEIGHT").toString()));
         }
         ccLogisticsPack.setContactName(varMap.get("P_CONTACT_NAME").toString());

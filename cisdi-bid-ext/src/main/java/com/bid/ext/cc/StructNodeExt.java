@@ -1291,6 +1291,9 @@ public class StructNodeExt {
                             updatePreviousVersion(ccDrawingUpdateRecordId);
                             //处理设计管理的zip包
                             handleDesignResultFile(myJdbcTemplate, attachments, ccProcedureLedger.getId(), ccDrawingUpdateRecord.getId(), ccPrjId);
+
+                            //成果图纸权限，上传用户拥有成果图纸的所有权限（授权、下载、查看）
+                            addAuth(ccProcedureLedger.getId());
                         }
                     }
 
@@ -1301,6 +1304,23 @@ public class StructNodeExt {
         recalculationPlan();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 成果图纸权限，上传用户拥有成果图纸的所有权限（授权、下载、查看）
+     * @param id 成果图纸ID（前期手续ID）
+     */
+    private void addAuth(String id) {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        CcResultDrawingsAuth ccResultDrawingsAuth = CcResultDrawingsAuth.newData();
+        ccResultDrawingsAuth.setAdUserId(userId);
+        ccResultDrawingsAuth.setCcProcedureLedgerId(id);
+        ccResultDrawingsAuth.setHaveCheckPerms(true);
+        ccResultDrawingsAuth.setHaveDownloadPerms(true);
+        ccResultDrawingsAuth.setHaveManagePerms(true);
+        ccResultDrawingsAuth.insertById();
     }
 
     /**

@@ -71,7 +71,7 @@ public class DesignInquiExt {
     /**
      * 设计咨询创建
      */
-    public void designInquireCreate(){
+    public void designInquireCreate() {
         //获取表单提交信息
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
@@ -87,7 +87,7 @@ public class DesignInquiExt {
         ccDesignInqui.setLastModiUserId(userId);
         ccDesignInqui.setStatus("AP");
         ccDesignInqui.setCcName(JsonUtil.toJson(new Internationalization(null, varMap.get("P_CC_NAME").toString(), null)));
-        if(varMap.get("P_REMARK") != null){
+        if (varMap.get("P_REMARK") != null) {
             ccDesignInqui.setRemark(JsonUtil.toJson(new Internationalization(null, varMap.get("P_REMARK").toString(), null)));
         }
         ccDesignInqui.setAssignPersonnel(varMap.get("P_ASSIGN_PERSONNEL").toString());
@@ -101,10 +101,10 @@ public class DesignInquiExt {
 
         ccDesignInqui.setCcPrjId(ccPrjId);//项目
         ccDesignInqui.setInquireAdviceNotFeedback(varMap.get("P_ASSIGN_PERSONNEL").toString());
-        if(associateDrawings.contains(",")){
+        if (associateDrawings.contains(",")) {
             //暂时隐藏
             ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);
-        }else{
+        } else {
             ccDesignInqui.setCcProcedureLedgerId(associateDrawings);//这个字段只能存单值
             //暂时隐藏
             ccDesignInqui.setCcProcedureLedgerIds(associateDrawings);//这个字段只能存多值
@@ -113,11 +113,11 @@ public class DesignInquiExt {
         ccDesignInqui.insertById();
 
         //更新图纸更新记录表
-        if(associateDrawings!= null &&!associateDrawings.isEmpty()){
+        if (associateDrawings != null && !associateDrawings.isEmpty()) {
             String ccDesignInquiId = ccDesignInqui.getId();
             //方便其他地方调用，这两个字段一起维护
             //字段多余了
-            if(associateDrawings.contains(",")){
+            if (associateDrawings.contains(",")) {
                 //字符串转数组
                 String[] ccProcedureLedgerIds = associateDrawings.split(",");
                 //选择多个图纸时，每个图纸情况不一样（有些绑定了设计咨询，有些还没绑定），需要一个一个判断
@@ -125,11 +125,11 @@ public class DesignInquiExt {
                     Where attWhere = new Where();
                     attWhere.eq(CcDrawingUpdateRecord.Cols.CC_PROCEDURE_LEDGER_ID, ccProcedureLedgerId).eq(CcDrawingUpdateRecord.Cols.CC_DESIGN_INQUI_ID, null);
                     CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectOneByWhere(attWhere);
-                    if(ccDrawingUpdateRecord != null){
+                    if (ccDrawingUpdateRecord != null) {
                         //这里有数据，说明这个图纸还没有绑定设计咨询
                         ccDrawingUpdateRecord.setCcDesignInquiId(ccDesignInquiId);
                         ccDrawingUpdateRecord.updateById();
-                    }else{
+                    } else {
                         //这里没有数据，说明这个图纸已经绑定了设计咨询，我们需要新增一个图纸更新记录，并且将最新版本的图纸绑定到这个图纸更新记录中
                         //分两步走
                         //第一步：查询出我们想要复制的图纸更新记录数据(最新版)
@@ -155,7 +155,7 @@ public class DesignInquiExt {
                         ccDrawingUpdateRecordNew.setLastModiDt(LocalDateTime.now());
                         ccDrawingUpdateRecordNew.setLastModiUserId(userId);
                         ccDrawingUpdateRecordNew.setStatus("AP");
-                        if(map.get("REMARK") != null){
+                        if (map.get("REMARK") != null) {
                             ccDrawingUpdateRecordNew.setRemark(map.get("REMARK").toString());
                         }
                         ccDrawingUpdateRecordNew.setCcAttachment(map.get("CC_ATTACHMENT").toString());
@@ -163,17 +163,17 @@ public class DesignInquiExt {
                         ccDrawingUpdateRecordNew.insertById();
                     }
                 }
-            }else{
+            } else {
                 //只有一个图纸的情况
                 String ccProcedureLedgerId = associateDrawings;
                 Where attWhere = new Where();
                 attWhere.eq(CcDrawingUpdateRecord.Cols.CC_PROCEDURE_LEDGER_ID, ccProcedureLedgerId).eq(CcDrawingUpdateRecord.Cols.CC_DESIGN_INQUI_ID, null);
                 CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectOneByWhere(attWhere);
-                if(ccDrawingUpdateRecord != null){
+                if (ccDrawingUpdateRecord != null) {
                     //这里有数据，说明这个图纸还没有绑定设计咨询
                     ccDrawingUpdateRecord.setCcDesignInquiId(ccDesignInquiId);
                     ccDrawingUpdateRecord.updateById();
-                }else{
+                } else {
                     //这里没有数据，说明这个图纸已经绑定了设计咨询，我们需要新增一个图纸更新记录，并且将最新版本的图纸绑定到这个图纸更新记录中
                     //分两步走
                     //第一步：查询出我们想要复制的图纸更新记录数据(最新版)
@@ -199,7 +199,7 @@ public class DesignInquiExt {
                     ccDrawingUpdateRecordNew.setLastModiDt(LocalDateTime.now());
                     ccDrawingUpdateRecordNew.setLastModiUserId(userId);
                     ccDrawingUpdateRecordNew.setStatus("AP");
-                    if(map.get("REMARK") != null){
+                    if (map.get("REMARK") != null) {
                         ccDrawingUpdateRecordNew.setRemark(map.get("REMARK").toString());
                     }
                     ccDrawingUpdateRecordNew.setCcAttachment(map.get("CC_ATTACHMENT").toString());
@@ -233,7 +233,7 @@ public class DesignInquiExt {
                 Where attWhere = new Where();
                 attWhere.eq(CcDrawingUpdateRecord.Cols.CC_PROCEDURE_LEDGER_ID, ccProcedureLedgerId).eq(CcDrawingUpdateRecord.Cols.CC_DESIGN_INQUI_ID, null);
                 List<CcDrawingUpdateRecord> ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectByWhere(attWhere);
-                if(!ccDrawingUpdateRecord.isEmpty()){
+                if (!ccDrawingUpdateRecord.isEmpty()) {
                     for (CcDrawingUpdateRecord record : ccDrawingUpdateRecord) {
                         record.setCcDesignInquiId(valueMap.get("ID").toString());
                         record.updateById();
@@ -289,7 +289,7 @@ public class DesignInquiExt {
     /**
      * 设计成果图纸更新
      */
-    public void updateDrawingRecord(){
+    public void updateDrawingRecord() {
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
@@ -321,7 +321,7 @@ public class DesignInquiExt {
         String ccAttachment = varMap.get("P_CC_ATTACHMENT").toString();
 
         //前期手续版本
-        if(cCProcedureLedgerId.isEmpty() || cCProcedureLedgerId == null){
+        if (cCProcedureLedgerId.isEmpty() || cCProcedureLedgerId == null) {
             return;
         }
         CcProcedureLedger ccProcedureLedger = CcProcedureLedger.selectById(cCProcedureLedgerId);
@@ -334,9 +334,9 @@ public class DesignInquiExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String executeSql = "SELECT MAX(CC_VER_NUM) AS MAX_VER FROM CC_DRAWING_UPDATE_RECORD WHERE CC_DESIGN_INQUI_ID = ?";
         Map<String, Object> maxVerObj = myJdbcTemplate.queryForMap(executeSql, ccDesignInquiId);
-        if(maxVerObj.get("MAX_VER") == null){
+        if (maxVerObj.get("MAX_VER") == null) {
             ver += 1;
-        }else{
+        } else {
             int maxVer = Integer.parseInt(maxVerObj.get("MAX_VER").toString());
             ver = maxVer + 1;
         }
@@ -385,7 +385,7 @@ public class DesignInquiExt {
     /**
      * 设计成果图纸更新(新)
      */
-    public void updateDrawingRecordNew(){
+    public void updateDrawingRecordNew() {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
 
@@ -419,7 +419,7 @@ public class DesignInquiExt {
         String ccAttachment = varMap.get("P_CC_ATTACHMENT").toString();
 
         //前期手续版本
-        if(cCProcedureLedgerId.isEmpty() || cCProcedureLedgerId == null){
+        if (cCProcedureLedgerId.isEmpty() || cCProcedureLedgerId == null) {
             return;
         }
         CcProcedureLedger ccProcedureLedger = CcProcedureLedger.selectById(cCProcedureLedgerId);
@@ -432,9 +432,9 @@ public class DesignInquiExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String executeSql = "SELECT MAX(CC_VER_NUM) AS MAX_VER FROM CC_DRAWING_UPDATE_RECORD WHERE CC_DESIGN_INQUI_ID = ?";
         Map<String, Object> maxVerObj = myJdbcTemplate.queryForMap(executeSql, ccDesignInquiId);
-        if(maxVerObj.get("MAX_VER") == null){
+        if (maxVerObj.get("MAX_VER") == null) {
             ver += 1;
-        }else{
+        } else {
             int maxVer = Integer.parseInt(maxVerObj.get("MAX_VER").toString());
             ver = maxVer + 1;
         }
@@ -488,9 +488,9 @@ public class DesignInquiExt {
         // 处理设计结果的逻辑
         FlFile file = FlFile.selectById(attachments);
         String ext = file.getExt();//文件后缀
-        if(ext.equals("zip")){
-            handleDesignZipFile(myJdbcTemplate, attachments, ccProcedureLedgerId,ccDrawingUpdateRecordId);
-        }else{
+        if (ext.equals("zip")) {
+            handleDesignZipFile(myJdbcTemplate, attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
+        } else {
             handleDesignOtherFile(file, ccPrjId, attachments, ccProcedureLedgerId, ccDrawingUpdateRecordId);
         }
 
@@ -499,7 +499,7 @@ public class DesignInquiExt {
     /**
      * 处理设计结果的其他类型的文件，如pdf,dwg等
      */
-    private void handleDesignOtherFile(FlFile file, String ccPrjId, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
+    private void handleDesignOtherFile(FlFile file, String ccPrjId, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
@@ -601,7 +601,7 @@ public class DesignInquiExt {
     /**
      * 解压zip包，并存储在cc_doc_file和cc_doc_dir表中
      */
-    private void handleDesignZipFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId){
+    private void handleDesignZipFile(MyJdbcTemplate myJdbcTemplate, String attachments, String ccProcedureLedgerId, String ccDrawingUpdateRecordId) {
         // 处理设计结果的逻辑
         //处理设计管理的zip包
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
@@ -635,5 +635,78 @@ public class DesignInquiExt {
                 throw e;
             }
         }
+    }
+
+    /**
+     * 成果图纸权限设置
+     */
+    public void resultDrawingsAuth() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcMemberTreeIds = JdbcMapUtil.getString(varMap, "P_CC_MEMBER_TREE_IDS");
+        Boolean pHaveManagePerms = JdbcMapUtil.getBoolean(varMap, "P_HAVE_MANAGE_PERMS");//管理
+        Boolean pHaveDownloadPerms = JdbcMapUtil.getBoolean(varMap, "P_HAVE_DOWNLOAD_PERMS");//下载
+        Boolean pHaveCheckPerms = JdbcMapUtil.getBoolean(varMap, "P_HAVE_CHECK_PERMS");//查看
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            if (pCcMemberTreeIds != null && !pCcMemberTreeIds.isEmpty()) {
+
+                List<String> memberIdList = Arrays.asList(pCcMemberTreeIds.split(","));
+
+                for (String memberId : memberIdList) {
+                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                    String adUserId = ccPrjMember.getAdUserId();
+                    //判断数据库中是否存在权限数据
+                    Where where = new Where();
+                    where.eq("AD_USER_ID", adUserId);
+                    where.eq("CC_PROCEDURE_LEDGER_ID", csCommId);
+                    CcResultDrawingsAuth ccResultDrawingsAuthOld = CcResultDrawingsAuth.selectOneByWhere(where);
+                    if (ccResultDrawingsAuthOld != null) {
+                        continue;
+                    }
+
+                    CcResultDrawingsAuth ccResultDrawingsAuth = CcResultDrawingsAuth.newData();
+                    ccResultDrawingsAuth.setAdUserId(adUserId);
+                    ccResultDrawingsAuth.setCcProcedureLedgerId(csCommId);
+                    ccResultDrawingsAuth.setHaveCheckPerms(pHaveCheckPerms);
+                    ccResultDrawingsAuth.setHaveDownloadPerms(pHaveDownloadPerms);
+                    ccResultDrawingsAuth.setHaveManagePerms(pHaveManagePerms);
+                    ccResultDrawingsAuth.insertById();
+                }
+            }
+        }
+    }
+
+    /**
+     * 成果图纸下载
+     */
+    public void resultDrawingsDownload(){
+
+//        InvokeActResult invokeActResult=new InvokeActResult();
+//        invokeActResult.fileToProcessList=new ArrayList<>();
+//        InvokeActResult.FileToProcess fileToProcess = new InvokeActResult.FileToProcess();
+//        invokeActResult.fileToProcessList.add(fileToProcess);
+//
+//        fileToProcess.fileIdList= Arrays.asList(fileId);
+//        fileToProcess.processType= InvokeActResult.FileToProcess.ProcessType.DOWNLOAD;
+//        ExtJarHelper.setReturnValue(invokeActResult);
+
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.fileToProcessList = new ArrayList<>();
+        InvokeActResult.FileToProcess fileToProcess = new InvokeActResult.FileToProcess();
+        invokeActResult.fileToProcessList.add(fileToProcess);
+        fileToProcess.fileIdList = new ArrayList<>();
+
+        ArrayList<String> fileIdList = new ArrayList<>();
+        for(EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()){
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            fileIdList.add(valueMap.get("CC_ATTACHMENTS").toString());
+//            fileToProcess.fileIdList.add(valueMap.get("CC_ATTACHMENTS").toString());
+        }
+
+        fileToProcess.fileIdList = fileIdList;
+        fileToProcess.processType = InvokeActResult.FileToProcess.ProcessType.DOWNLOAD;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 }

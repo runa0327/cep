@@ -246,7 +246,16 @@ public class InspectionExt {
                 processName = "安全巡检";
                 break;
         }
-        myJdbcTemplate.update("UPDATE wf_process_instance pi JOIN cc_qs_inspection t ON pi.ENTITY_RECORD_ID = t.id SET pi.NAME = JSON_SET(pi.NAME, '$.ZH_CN', CONCAT(?, SUBSTRING(JSON_UNQUOTE(JSON_EXTRACT(pi.NAME, '$.ZH_CN')), CHAR_LENGTH('质安巡检') + 1))) WHERE t.id = ?", processName, csCommId);
+
+        String prjId = valueMap.get("CC_PRJ_ID").toString();
+        CcPrj ccPrj = CcPrj.selectById(prjId);
+        String prjName = ccPrj.getName();
+        //判断项目名称是json字符串
+        if (ccPrj.getName().startsWith("{")) {
+            prjName = com.bid.ext.utils.JsonUtil.getCN(ccPrj.getName()) ;
+        }
+
+        myJdbcTemplate.update("UPDATE wf_process_instance pi JOIN cc_qs_inspection t ON pi.ENTITY_RECORD_ID = t.id SET pi.NAME = JSON_SET(pi.NAME, '$.ZH_CN', CONCAT(?, '-', ?, SUBSTRING(JSON_UNQUOTE(JSON_EXTRACT(pi.NAME, '$.ZH_CN')), CHAR_LENGTH('质安巡检') + 1))) WHERE t.id = ?", processName,prjName, csCommId);
     }
 
     /**
