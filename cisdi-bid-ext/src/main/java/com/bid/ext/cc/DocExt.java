@@ -399,6 +399,9 @@ public class DocExt {
      * 批量上传VR全景，格式要求jpg和png
      */
     public void uploadVrFileBatch() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String orgId = loginInfo.currentOrgInfo.id;
+
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
         String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
@@ -429,7 +432,7 @@ public class DocExt {
             Map<String, Object> map = myJdbcTemplate.queryForMap(sql);
             String urlHead = JdbcMapUtil.getString(map, "name");
             String sessionId = ExtJarHelper.getLoginInfo().sessionId;
-            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+//            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
 //            String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
 
 //            BufferedImage originalImage = ImageIO.read(new URL(url));
@@ -442,7 +445,28 @@ public class DocExt {
             int year = now.getYear();
             String month = String.format("%02d", now.getMonthValue());
             String day = String.format("%02d", now.getDayOfMonth());
-            String previewPath = flPath.getDir() + year + "/" + month + "/" + day + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
+//            String previewPath = flPath.getDir() + year + "/" + month + "/" + day + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
+
+            String dir = flPath.getDir();
+            if (dir.contains(SharedConstants.PLACE_HOLDER_ORG_ID)) {
+                // 不必采用(?i)忽略大小写，都是后端写入与解析的，必定保持统一：
+                dir = dir.replaceAll(/*"(?i)" +*/ SharedConstants.PLACE_HOLDER_ORG_ID, orgId);
+            }
+
+            if (dir.contains("@OID")) {
+                // 不必采用(?i)忽略大小写，都是后端写入与解析的，必定保持统一：
+                dir = dir.replaceAll(/*"(?i)" +*/ "@OID", orgId);
+            }
+            String dirFile = dir + year + "/" + month + "/" + day;
+            //判断目录是否存在
+            if(!checkFileExists(dirFile)){
+                cn.hutool.core.io.FileUtil.mkdir(dirFile);
+            }
+
+            String previewPath = dirFile + "/" + ccDocFile.getId() + "_preview." + flFile.getExt();
+
+
+
             BufferedImage originalImage = null;
             BufferedImage outputImage = null;
             try {
