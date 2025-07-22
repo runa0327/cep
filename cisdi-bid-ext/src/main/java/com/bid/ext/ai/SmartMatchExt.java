@@ -210,9 +210,10 @@ public class SmartMatchExt {
             log.info("typeId: " + typeId);
             log.info("pointId: " + pointId);
             log.info("score: " + score);
+            log.info("normalized:" + normalizeScore(score));
 
             BigDecimal target = new BigDecimal("0.6");
-            BigDecimal scoreValue = new BigDecimal(score);
+            BigDecimal scoreValue = new BigDecimal(normalizeScore(score));
             if (scoreValue.compareTo(target) < 0) {
                 Crud.from("CC_QS_INSPECTION").where().eq("ID", csCommId).update()
                         .set("CC_QS_ISSUE_POINT_TYPE_ID", null)
@@ -246,6 +247,28 @@ public class SmartMatchExt {
             e.printStackTrace();
         }
 
+    }
+
+    public String normalizeScore(String score) {
+        if (score == null) {
+            return "0.00";
+        }
+
+        // 先按英文逗号分隔，再按中文逗号分隔
+        String[] parts = score.split("[,，]");
+        if (parts.length > 0) {
+            String first = parts[0].trim();
+            // 校验是否为小数
+            try {
+                // 用 BigDecimal 避免精度问题（可选）
+                new BigDecimal(first);
+                return first;
+            } catch (NumberFormatException e) {
+                // 若第一段不是合法小数，则返回原串
+                return score;
+            }
+        }
+        return score;
     }
 
     public void smartDA() {
