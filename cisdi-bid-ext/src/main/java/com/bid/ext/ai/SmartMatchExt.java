@@ -28,12 +28,24 @@ import java.util.*;
 public class SmartMatchExt {
 
     private static String API_KEY_F = "app-FQemEEe1MIuc7jsmR1rjS5SS"; // 模糊查询助手
-    private static String API_KEY_A = "app-GSWig6ReLvfwihTemtUhXLaw"; // 智能分析助手
+//    private static String API_KEY_A = "app-GSWig6ReLvfwihTemtUhXLaw"; // 智能分析助手
+    private static String API_KEY_A = "app-IA5ccAIplB0SYe1y9MgmjctE"; // 智能分析助手
     private static String BASE_URL = "http://119.84.70.174";
 //    private static String PLATFORM_URL = "http://8.137.116.250/qygly-gateway";
     private static String PLATFORM_URL = "https://ceecip.com/qygly-gateway";
+//    private static String PLATFORM_URL = getPlatformUrl();
+
+    private  static String getPlatformUrl(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String sql = "SELECT SETTING_VALUE FROM ad_sys_setting where code = 'GATEWAY_URL' ";
+        List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql);
+
+        return (String) queryForList.get(0).get("SETTING_VALUE");
+
+    }
 
     public void fuzzymatch() {
+        PLATFORM_URL = getPlatformUrl();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         Map<String, Object> valueMap = entityRecordList.get(0).valueMap;
@@ -132,7 +144,7 @@ public class SmartMatchExt {
         headers.setBearerAuth(API_KEY_F);
         requestBody.put("data", data);
         requestBody.put("inputs", Collections.emptyMap());
-        requestBody.put("query", "场景:" + data + "\n" + "要点:" + scenario);
+        requestBody.put("query", "要点:" + data + "\n" + "场景:" + scenario);
         requestBody.put("response_mode", "blocking");
         requestBody.put("conversation_id", "");
         requestBody.put("user", user);
@@ -272,6 +284,7 @@ public class SmartMatchExt {
     }
 
     public void smartDA() {
+        PLATFORM_URL = getPlatformUrl();
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.urlToOpenList = new ArrayList<>();
         UrlToOpen urlToOpen = new UrlToOpen();
