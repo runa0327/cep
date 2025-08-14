@@ -13,6 +13,7 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,7 +22,7 @@ import java.util.*;
 
 import static com.bid.ext.cc.StructNodeExt.replaceIdsAndInsert;
 
-
+@Slf4j
 public class PlanExt {
 
     /**
@@ -257,7 +258,9 @@ public class PlanExt {
             BigDecimal seqNo = BigDecimal.ZERO;
             // 对于每一个模板结构节点，将其作为子节点插入
             for (Map<String, Object> node : list) {
+                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
                 insertWbsNode(node, seqNo, true);
+                myJdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
                 seqNo = seqNo.add(BigDecimal.ONE);
             }
         }
