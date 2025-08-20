@@ -328,7 +328,7 @@ public class SmartMatchExt {
         if (fileBytes != null) {
             fileId = uploadFile(
                     fileBytes,
-                    "/data/qygly/downloaded_file.xlsx", // 指定文件名（需带后缀）
+                    "downloaded_file.xlsx", // 指定文件名（需带后缀）
                     userName                  // 用户名
             );
         }
