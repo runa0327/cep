@@ -14,6 +14,7 @@
         <module>anhui-sso</module>
         <module>cisdi-bid-job</module>
         <module>cisdi-microservice</module>
+        <module>ccis-auth</module>
     </modules>
 
     <properties>

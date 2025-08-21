@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.ru.RuQzInspectionDangerLevelMapper">
+
+
+    <select id="selectOneByZh" resultType="com.pms.bid.job.domain.qingZhu.RuQzInspectionDangerLevel">
+        SELECT  id,`name`,remark,RU_QZ_INSPECTION_TYPE ruQzInspectionType
+        from
+             ru_qz_inspection_danger_level  T
+        where  T.`NAME`->>'$.ZH_CN'=#{zhName}
+            and T.RU_QZ_INSPECTION_TYPE=1
+    </select>
+
+</mapper>

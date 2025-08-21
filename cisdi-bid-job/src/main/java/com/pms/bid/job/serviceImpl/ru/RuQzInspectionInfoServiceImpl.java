@@ -181,11 +181,12 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                         ruQzInspectionInfo.setRuQzInspectionProjectLocation(projectLocation);
                         String dangerLevel = (String)entries1.get("dangerLevel");//隐患等级
                         if (StringUtils.hasLength(dangerLevel)){ //隐患等级
-                            LambdaQueryWrapper<RuQzInspectionDangerLevel> levelLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                            levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getName,dangerLevel);
-                            levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getRuQzInspectionType,1);
-                            RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOne(levelLambdaQueryWrapper);
-
+//                            LambdaQueryWrapper<RuQzInspectionDangerLevel> levelLambdaQueryWrapper = new LambdaQueryWrapper<>();
+//                            levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getName,dangerLevel);
+//                            levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getRuQzInspectionType,1);
+//                            RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOne(levelLambdaQueryWrapper);
+                            log.info(dangerLevel+"level");
+                            RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOneByZh(dangerLevel);
                             if(ruQzInspectionDangerLevel==null){
                                 ruQzInspectionInfo.setRuQzInspectionDangerLevelId("1888887369215811584");
                             }else{
@@ -200,9 +201,12 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                         String checkResult = (String)entries1.get("checkResult");//巡检内容
                         ruQzInspectionInfo.setRuQzInspectionCheckResult(checkResult);//巡检结果
                         if(StringUtils.hasLength(checkResult)) {
-                            LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                            resultLambdaQueryWrapper.eq(RuQzInspectionResult::getRemark,checkResult);
-                            RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
+//                            LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
+//                            resultLambdaQueryWrapper.eq(RuQzInspectionResult::getRemark,checkResult);
+//                            RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
+                            log.info(checkResult+"checkResult");
+                            RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOneByZh(checkResult);
+
                             if (ruQzInspectionResult!=null){
                                 System.out.println(ruQzInspectionResult);
                                 ruQzInspectionInfo.setRuQzInspectionResultId(ruQzInspectionResult.getId());
@@ -236,20 +240,23 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                             String[] split = checkItems.split("/");
 
                                 String str = split[0];
+                                log.error(str+"item");
 
-                                LambdaQueryWrapper<RuQzInspectionItem> itemWrapper = new LambdaQueryWrapper<>();
-                                itemWrapper.eq(RuQzInspectionItem::getName,str);
-                                itemWrapper.eq(RuQzInspectionItem::getRuQzInspectionType,1);
-                                RuQzInspectionItem inspectionItem = inspectionItemMapper.selectOne(itemWrapper);
+//                                LambdaQueryWrapper<RuQzInspectionItem> itemWrapper = new LambdaQueryWrapper<>();
+//                                itemWrapper.eq(RuQzInspectionItem::getName,str);
+//                                itemWrapper.eq(RuQzInspectionItem::getRuQzInspectionType,1);
+//                                RuQzInspectionItem inspectionItem = inspectionItemMapper.selectOne(itemWrapper);
+//                                RuQzInspectionItem inspectionItem = inspectionItemMapper.selectOneByZh(str);
+                                List<RuQzInspectionItem>  inspectionItems = inspectionItemMapper.selectListByZh(str);
 
-                                if (inspectionItem==null){ //没有匹配的数据
+                                if (inspectionItems.size()<1){ //没有匹配的数据
                                     System.out.println(str+";;");
                                     break;
                                 }
 
-                            if (inspectionItem!=null){
-
-                                ruQzInspectionInfo.setRuQzInspectionItemId(inspectionItem.getId());
+                            if (inspectionItems.size()>0){
+                                System.out.println(inspectionItems.get(0).getName());
+                                ruQzInspectionInfo.setRuQzInspectionItemId(inspectionItems.get(0).getId());
                             }else{
                                 ruQzInspectionInfo.setRuQzInspectionItemId("1888851802825105408");//巡检项
                             }
@@ -381,9 +388,11 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                             String dangerLevel = (String) entries1.get("dangerLevel");//隐患等级
                             if (StringUtils.hasLength(dangerLevel)){ //隐患等级
                                 LambdaQueryWrapper<RuQzInspectionDangerLevel> levelLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                                levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getName,dangerLevel);
-                                levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getRuQzInspectionType,1);
-                                RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOne(levelLambdaQueryWrapper);
+//                                levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getName,dangerLevel);
+//                                levelLambdaQueryWrapper.eq(RuQzInspectionDangerLevel::getRuQzInspectionType,1);
+//                                RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOne(levelLambdaQueryWrapper);
+                                log.info(dangerLevel+"level");
+                                RuQzInspectionDangerLevel ruQzInspectionDangerLevel = inspectionDangerLevelMapper.selectOneByZh(dangerLevel);
 
                                 if(ruQzInspectionDangerLevel==null){
                                     info.setRuQzInspectionDangerLevelId("1888887369215811584");
@@ -413,9 +422,11 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
 
                                 info.setRuQzInspectionCheckResult(checkResult);//巡检结果
                                 if(StringUtils.hasLength(checkResult)) {
-                                    LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                                    resultLambdaQueryWrapper.eq(RuQzInspectionResult::getRemark,checkResult);
-                                    RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
+//                                    LambdaQueryWrapper<RuQzInspectionResult> resultLambdaQueryWrapper = new LambdaQueryWrapper<>();
+//                                    resultLambdaQueryWrapper.eq(RuQzInspectionResult::getRemark,checkResult);
+//                                    RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOne(resultLambdaQueryWrapper);
+                                    log.info(checkResult+"result");
+                                    RuQzInspectionResult ruQzInspectionResult = inspectionResultMapper.selectOneByZh(checkResult);
                                     if (ruQzInspectionResult!=null){
 
                                         info.setRuQzInspectionResultId(ruQzInspectionResult.getId());
@@ -468,6 +479,9 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
                                     LambdaQueryWrapper<RuQzInspectionInfoReplay> queryReplayWrapper = new LambdaQueryWrapper();
                                     queryReplayWrapper.eq(RuQzInspectionInfoReplay::getRuQzInspectionRepRecordId,replayRecordId);
                                     queryReplayWrapper.eq(RuQzInspectionInfoReplay::getRuQzInspectionReplayType,replayType);
+                                    queryReplayWrapper.eq(RuQzInspectionInfoReplay::getRuQzInspectionRepCreateTime,createTime);
+
+                                    log.info(replayRecordId+"recordId");
                                     RuQzInspectionInfoReplay ruQzInspectionInfoReplay1 = inspectionInfoReplayMapper.selectOne(queryReplayWrapper);
 
                                     if (ruQzInspectionInfoReplay1==null) {//记录不存在
