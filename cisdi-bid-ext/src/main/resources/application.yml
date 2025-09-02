@@ -2,12 +2,23 @@ spring:
   application:
     name: demo-ext
   datasource:
-    username: qygly
-    password: Qygly@123456
-    # 注意更改ip和db：
-    url: jdbc:mysql://8.137.116.250:3306/test240511?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
-    #    type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    current:
+      username: qygly
+      password: Qygly@123456
+      # 注意更改ip和db：
+      #多数据源时使用jdbc-url而非url：
+      jdbc-url: jdbc:mysql://8.137.116.250:3306/test240511?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&allowMultiQueries=true&allowMultiQueries=true
+      #    type: com.alibaba.druid.pool.DruidDataSource
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    main:
+      username: qygly
+      password: Qygly@123456
+      # 注意更改ip和db：
+      #多数据源时使用jdbc-url而非url：
+      jdbc-url: jdbc:mysql://8.137.116.250:3306/main?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&allowMultiQueries=true&allowMultiQueries=true
+      #    type: com.alibaba.druid.pool.DruidDataSource
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
   redis:
     #    单机启用host、port：
     host: 8.137.116.250
