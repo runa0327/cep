@@ -16,6 +16,7 @@ public class TestStuExt {
 
         // 访问主应用数据库：
         MyJdbcTemplate mainMyJdbcTemplate = ExtJarHelper.Main.getMyJdbcTemplate();
+        // MyNamedParameterJdbcTemplate mainMyNamedParameterJdbcTemplate = ExtJarHelper.Main.getMyNamedParameterJdbcTemplate();
         mainMyJdbcTemplate.update("update ad_user t set t.remark='123' where t.code='admin'");
     }
 }
