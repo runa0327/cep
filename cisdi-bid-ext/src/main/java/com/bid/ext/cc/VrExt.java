@@ -4,6 +4,7 @@ import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.CcVr;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
+import com.bid.ext.utils.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -152,6 +153,8 @@ public class VrExt {
         String ccPrjId = JdbcMapUtil.getString(inputMap, "ccPrjId");
         String sqlPanoMonth;
         String sqlPanoLst;
+
+        String currentLangId = ExtJarHelper.getLoginInfo().currentLangId;//当前语言
         //国际化去掉中文
 //        if (SharedUtil.isEmpty(ccPrjId)) {
 //            sqlPanoMonth = "SELECT DISTINCT (DATE_FORMAT( CC_DOC_DATE, '%Y-%m' )) CC_PANO_MONTH, CONCAT( YEAR ( CC_DOC_DATE ), '年', MONTH ( CC_DOC_DATE ), '月' ) CC_PANO_RET_MONTH FROM CC_DOC_FILE WHERE CC_DOC_DATE IS NOT NULL AND (IFNULL(@P_CC_PRJ_IDS, '0') LIKE CONCAT('%', CC_PRJ_ID, '%')) ORDER BY CC_PANO_MONTH DESC";
@@ -215,6 +218,13 @@ public class VrExt {
 
             for (Map<String, Object> ccVr : ccVrs) {
                 String name = JdbcMapUtil.getString(ccVr, "NAME");
+                //解析json字符串
+                //判断字符串是否为json字符串
+                if (name.startsWith("{")) {
+                    Map<String, String> nameJson = JsonUtil.fromJson(name, Map.class);
+                    name = nameJson.get(currentLangId);
+                }
+
                 String vrDate = JdbcMapUtil.getString(ccVr, "CC_DOC_DATE");
                 String ccVrYearMonth = JdbcMapUtil.getString(ccVr, "CC_YEAR_MONTH");
                 String ccVrAttachment = JdbcMapUtil.getString(ccVr, "CC_ATTACHMENT");
@@ -304,6 +314,7 @@ public class VrExt {
         Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String ccPrjId = JdbcMapUtil.getString(inputMap, "ccPrjId");
+        String currentLangId = ExtJarHelper.getLoginInfo().currentLangId;//当前语言
 
         // 新增：获取 selectedFolders 参数（字符串列表）
         List<String> selectedFolders = null;
@@ -405,6 +416,12 @@ public class VrExt {
 
             for (Map<String, Object> ccVr : ccVrs) {
                 String name = JdbcMapUtil.getString(ccVr, "NAME");
+                //解析json字符串
+                //判断字符串是否为json字符串
+                if (name.startsWith("{")) {
+                    Map<String, String> nameJson = JsonUtil.fromJson(name, Map.class);
+                    name = nameJson.get(currentLangId);
+                }
                 String vrDate = JdbcMapUtil.getString(ccVr, "CC_DOC_DATE");
                 String ccVrYearMonth = JdbcMapUtil.getString(ccVr, "CC_YEAR_MONTH");
                 String ccVrAttachment = JdbcMapUtil.getString(ccVr, "CC_ATTACHMENT");

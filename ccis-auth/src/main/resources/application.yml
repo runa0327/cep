@@ -1,0 +1,8 @@
+server:
+  port: 21113
+  servlet:
+    context-path: /ccis-auth
+
+spring:
+  application:
+    name: ccis-auth

@@ -169,6 +169,12 @@ public class ShareController {
 
                 String name = JdbcMapUtil.getString(map, "NAME");
 
+                //判断字符串是否为json字符串
+                if (name.startsWith("{")) {
+                    Map<String, String> nameJson = JsonUtil.fromJson(name, Map.class);
+                    name = nameJson.get("ZH_CN");//默认都显示中文
+                }
+
                 // 创建单个全景项
                 Map<String, Object> panoItem = new HashMap<>();
                 panoItem.put("CC_VR_ATTACHMENT_ID", ccVrAttachmentId);

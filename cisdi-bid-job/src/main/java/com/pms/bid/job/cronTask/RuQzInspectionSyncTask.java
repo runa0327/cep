@@ -39,7 +39,7 @@ public class RuQzInspectionSyncTask {
             inspectionAttService.syncQzInspectionAtt();
             log.error("同步巡检性质-结束");
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage()+e.getStackTrace());
             log.error("同步巡检性质");
         }
     }
@@ -60,9 +60,9 @@ public class RuQzInspectionSyncTask {
 @Scheduled(fixedRate = 1000*60*60*12)
     public void syncInspectionInfo(){
         try {
-            log.error(" 同步巡检列表-开始");
+            log.info(" 同步巡检列表-开始");
             inspectionInfoService.syncQzInspectionInfo();
-            log.error("同步巡检列表-结束");
+            log.info("同步巡检列表-结束");
         } catch (Exception e) {
             log.error(e.getMessage());
             log.error("同步巡检列表失败");

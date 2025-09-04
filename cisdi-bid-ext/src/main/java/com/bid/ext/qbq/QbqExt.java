@@ -1377,35 +1377,35 @@ public class QbqExt {
             String osReleaseFile = "/etc/os-release";
             String distro = null;
 
-            try (BufferedReader br = new BufferedReader(new FileReader(osReleaseFile))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if (line.startsWith("ID=")) {
-                        distro = line.split("=")[1].replace("\"", "").trim();
-                        break;
-                    }
-                }
-            } catch (IOException e) {
-                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unableToReadSystemInfo", e);
-                throw new BaseException(message);
-            }
-
-            if (distro == null) {
-                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unrecognizedLinuxDistro");
-                throw new BaseException(message);
-            }
+//            try (BufferedReader br = new BufferedReader(new FileReader(osReleaseFile))) {
+//                String line;
+//                while ((line = br.readLine()) != null) {
+//                    if (line.startsWith("ID=")) {
+//                        distro = line.split("=")[1].replace("\"", "").trim();
+//                        break;
+//                    }
+//                }
+//            } catch (IOException e) {
+//                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unableToReadSystemInfo", e);
+//                throw new BaseException(message);
+//            }
+//
+//            if (distro == null) {
+//                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unrecognizedLinuxDistro");
+//                throw new BaseException(message);
+//            }
 
             // 根据发行版设置 code
-            String code;
-//            String code="LIBRE_PATH_CENTOS";
-            if (distro.contains("centos")) {
-                code = "LIBRE_PATH_CENTOS";
-            } else if (distro.contains("ubuntu")) {
-                code = "LIBRE_PATH_UBUNTU";
-            } else {
-                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unsupportedLinuxDistro", distro);
-                throw new BaseException(message);
-            }
+//            String code;
+            String code="LIBRE_PATH_CENTOS";
+//            if (distro.contains("centos")) {
+//                code = "LIBRE_PATH_CENTOS";
+//            } else if (distro.contains("ubuntu")) {
+//                code = "LIBRE_PATH_UBUNTU";
+//            } else {
+//                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.unsupportedLinuxDistro", distro);
+//                throw new BaseException(message);
+//            }
 
             // 构造 SQL 语句
             String sql = "select SETTING_VALUE from AD_SYS_SETTING where code = '" + code + "'";
@@ -1417,10 +1417,10 @@ public class QbqExt {
                 String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.libreOfficePathNotFound", code);
                 throw new BaseException(message);
             }
-            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
+//            String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
 //            String libreOfficePath = "D:/Program Files/LibreOffice/program/soffice.exe";
-//            String libreOfficePath = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
+            String libreOfficePath = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
 
             // 调用 LibreOffice 进行 DOCX 转 PDF
             ProcessBuilder builder = new ProcessBuilder();
@@ -1572,7 +1572,7 @@ public class QbqExt {
     }
 
 
-    //变更签证签署任务发起
+    //固定人员发起签署，变更签证签署任务发起
     public void genChangeSignTask(){
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE,30); //过期时间30天
@@ -1627,6 +1627,412 @@ public class QbqExt {
             throw new BaseException("文件地址获取失败");
         }
     }
+
+
+    private  void   signTaskCreate(List<QbqBody.User> users,EntityRecord entityRecord ,int year,String month,String day,LoginInfo loginInfo,String type,String deadlineTime){
+
+        String entityCode = null;
+
+        // 获取属性：
+        Where attWhere = new Where();
+        AdAtt adAtt = null;
+
+        attWhere.eq(AdAtt.Cols.CODE, CcDesignChangeQbq.Cols.CC_ATTACHMENTS);
+        adAtt = AdAtt.selectOneByWhere(attWhere);
+
+        if("Type0".equals(type)){
+            entityCode = "CC_DESIGN_CHANGE_QBQ_SING";
+        }else if("Type1".equals(type)){
+            entityCode = "CC_DESIGN_CHANGE_QBQ_ORDER";
+        }else{
+            entityCode = "CC_DESIGN_CHANGE_QBQ_ATTACHMENT";
+        }
+
+        // 获取路径：
+        Where pathWhere = new Where();
+        pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
+        FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        String csCommId = entityRecord.csCommId;
+
+        WfProcessInstance wfProcessInstance = WfProcessInstance.selectOneByWhere(new Where().eq(WfProcessInstance.Cols.ENTITY_RECORD_ID, csCommId));
+        String wfProcessInstanceId = wfProcessInstance.getId();
+
+        //文件签署发起前，获取流程中的人员信息（检查人员信息是否配置正确）
+        List<QbqBody.User> userList = null;
+        if("Type0".equals(type)){
+            userList = users;
+        }else if("Type1".equals(type)){
+            userList = users;
+        }
+
+        String fileName = null;
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        byte[] word = null;
+        if("Type0".equals(type)){
+            LocalDate trxDate = JdbcMapUtil.getLocalDate(valueMap, "TRX_DATE");
+            int trxDateYear = trxDate.getYear();
+            String trxDateMonth = String.format("%02d", trxDate.getMonthValue());
+            String trxDateDay = String.format("%02d", trxDate.getDayOfMonth());
+
+            String name = JdbcMapUtil.getString(valueMap, "NAME");
+            String ccBidNo = JdbcMapUtil.getString(valueMap, "CC_BID_NO");
+            String part = JdbcMapUtil.getString(valueMap, "PART");
+            String ccConstructionDrawingId = JdbcMapUtil.getString(valueMap, "CC_CONSTRUCTION_DRAWING_ID");
+            String mainReason = JdbcMapUtil.getString(valueMap, "MAIN_REASON");
+            String changeReason = JdbcMapUtil.getString(valueMap, "CHANGE_REASON");
+            String supervisoryComment = JdbcMapUtil.getString(valueMap, "SUPERVISORY_COMMENT");
+            String designComment = JdbcMapUtil.getString(valueMap, "DESIGN_COMMENT");
+            String constructionComment = JdbcMapUtil.getString(valueMap, "CONSTRUCTION_COMMENT");
+
+            fileName = name + "工程施工联系单";
+
+            map.put("NAME", name);
+            map.put("year", trxDateYear);
+            map.put("month", trxDateMonth);
+            map.put("day", trxDateDay);
+            map.put("CC_BID_NO", ccBidNo);
+            map.put("PART", part);
+            map.put("CC_CONSTRUCTION_DRAWING_ID", ccConstructionDrawingId);
+            map.put("MAIN_REASON", mainReason);
+            map.put("CHANGE_REASON", changeReason);
+            map.put("SUPERVISORY_COMMENT", supervisoryComment);
+            map.put("DESIGN_COMMENT", designComment);
+            map.put("CONSTRUCTION_COMMENT", constructionComment);
+
+            word = DownloadUtils.createWord(map, "acceptance_demo.docx");
+        }else if("Type1".equals(type)){
+
+            String projectName = JdbcMapUtil.getString(valueMap, "NAME");
+            String ccBidNo = JdbcMapUtil.getString(valueMap, "CC_BID_NO");
+            String name = JdbcMapUtil.getString(valueMap, "CC_NAME_OF_CHANGE_ITEM");
+            String ccAttachment = JdbcMapUtil.getString(valueMap, "CC_DESIGN_CHANGE_ATTACHMENT");
+            FlFile flFile1 = FlFile.selectById(ccAttachment);
+            String ccAttachmentName = flFile1.getName();
+
+            fileName = name + "工程变更指令";
+
+            map.put("projectName", projectName);
+            map.put("bidNo", ccBidNo);
+            map.put("name", name);
+            map.put("fileName", ccAttachmentName);
+            map.put("year", year);
+            map.put("month", month);
+            map.put("day", day);
+
+            word = DownloadUtils.createWord(map, "changeOrder.docx");
+        }
+
+        byte[] b = convertFileToPDF(word,"docx");
+
+        FlFile flFile = FlFile.newData();
+
+        // 将String写入文件，覆盖模式，字符集为UTF-8x``
+        String fileId = flFile.getId();
+
+        // 构建文件名和路径
+//        String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
+
+        String path = "/Users/hejialun/Documents/new-ql/"+fileId+".pdf";
+
+        saveWordToFile(b, path);
+        boolean fileExists = checkFileExists(path);
+        if (fileExists) {
+            //获取文件属性
+            File file = new File(path);
+            long bytes = file.length();
+            double kilobytes = bytes / 1024.0;
+
+            BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
+            String dspSize = String.format("%d KB", Math.round(kilobytes));
+            flFile.setCrtUserId(loginInfo.userInfo.id);
+            flFile.setLastModiUserId(loginInfo.userInfo.id);
+            flFile.setFlPathId(flPath.getId());
+            flFile.setCode(fileId);
+            flFile.setName(fileName);
+            flFile.setExt("pdf");
+            flFile.setDspName(fileName + ".pdf");
+            flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+            flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
+            flFile.setSizeKb(sizeKb);
+            flFile.setDspSize(dspSize);
+            flFile.setUploadDttm(LocalDateTime.now());
+            flFile.setPhysicalLocation(path);
+            flFile.setOriginFilePhysicalLocation(path);
+//                flFile.setIsPublicRead(flPath.getIsPublicRead());
+            flFile.setIsPublicRead(false);
+            flFile.insertById();
+
+            if("Type0".equals(type)) {
+                //发起签署，工程联系单Type0，变更指令 Type1，
+                sendSignTask( type,userList, fileId, wfProcessInstanceId, csCommId,entityCode,deadlineTime);
+            }else if("Type1".equals(type)){
+                //发起签署，工程联系单Type0，变更指令 Type1，
+                sendSignTask( type,userList, fileId, wfProcessInstanceId, csCommId,entityCode,deadlineTime);
+            }
+
+        } else {
+            if("Type0".equals(type)) {
+                changeSignStatus("IF", "CC_DESIGN_CHANGE_QBQ","CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID", csCommId);//签署状态变为发起失败
+            }else if("Type1".equals(type)) {
+                changeSignStatus("IF", "CC_DESIGN_CHANGE_QBQ","CC_DESIGN_CHANGE_SIGN_STATUS_ID", csCommId);//签署状态变为发起失败
+            }
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileNotFound", path);
+            throw new BaseException(message);
+        }
+
+    }
+
+    /**
+     * 发起签署
+     */
+    private void sendSignTask(String type, List<QbqBody.User> userList, String fileId, String wfProcessInstanceId, String csCommId,String entityCode,String deadlineTime) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        FlFile flFile = FlFile.selectById(fileId);
+        String physicalLocation = flFile.getPhysicalLocation();
+        String dspName = flFile.getDspName();
+
+        WfProcessInstance wfProcessInstance = WfProcessInstance.selectById(wfProcessInstanceId);
+
+        String wfProcessInstanceName = wfProcessInstance.getName();
+        JSONObject entries = JSONUtil.parseObj(wfProcessInstanceName);
+        String zh_cn = entries.getStr("ZH_CN");
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("signTaskType", "Type2");
+        requestBody.put("filePhysicalLocation", physicalLocation);//签署文件路径
+        requestBody.put("fileDspName", dspName);//签署文件名称
+        requestBody.put("wfProcInstId", wfProcessInstanceId);//签署任务流程id
+        requestBody.put("wfProcInstName", zh_cn);//签署任务名称
+        requestBody.put("userList", userList);//签署人员列表
+        if ("Type0".equals(type)) {
+            requestBody.put("bisId", csCommId+"lxd");//业务数据Id
+            requestBody.put("taskName", "工程联系单-"+zh_cn);//签署任务名称
+        }else if ("Type1".equals(type)){
+            requestBody.put("bisId", csCommId+"bgzl");//业务数据Id
+            requestBody.put("taskName", "工程变更指令-"+zh_cn);//签署任务名称
+        }
+
+        //设置发布人，为流程发起人,已完成流程中的 任务 操作为提交的操作人
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String queryPublisher  =  "SELECT   wt.AD_USER_ID,wt.ACT_DATETIME,u.EXTRA_INFO,u.MOBILE from   wf_task wt,wf_node wn , ad_user u ,ad_act aa  where  wt.ad_act_id=aa.id AND aa.`name`->>'$.ZH_CN'='提交' AND   wt.wf_node_id=wn.id  and  wn.node_type='START_EVENT' and wt.WF_PROCESS_INSTANCE_ID=? AND  wt.ad_user_id=u.id  ORDER BY  wt.ACT_DATETIME DESC  LIMIT 0,1";
+        List<Map<String, Object>> maps = myJdbcTemplate.queryForList(queryPublisher, wfProcessInstanceId);
+
+        for(Map<String, Object> map :maps){ //只有一数据，为起始节点操作人
+            String userId = (String) map.get("AD_USER_ID");
+            String tel = (String) map.get("MOBILE");
+            String extraInfo = (String) map.get("EXTRA_INFO");
+            JSONObject extraInfoObejct = JSONUtil.parseObj(extraInfo);
+
+            String realName = extraInfoObejct.get("realName",String.class);
+            String idCard = extraInfoObejct.get("idCard",String.class);
+
+            requestBody.put("publisherId",userId);//发布人id
+            requestBody.put("publisherName",realName);//发布人姓名
+            requestBody.put("publisherTel",tel);//发布人手机号
+            requestBody.put("publisherCardType","111");//发布人证件类型，111：身份证
+            requestBody.put("publisherCardNo",idCard);//发布人身份证号
+            requestBody.put("deadlineTime",deadlineTime);//过期时间
+        }
+
+        // 将 Map 转换为 JSON 字符串
+        String jsonBody = JsonUtil.toJson(requestBody);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+
+        // 发送上传请求
+        String uploadFileUrl = "http://localhost:9999/qbq/uploadFileAndCreateFreeSignTask";
+        ResponseEntity<String> response = null;
+        try{
+            response = restTemplate.exchange(uploadFileUrl, HttpMethod.POST, entity, String.class);
+        }catch (HttpServerErrorException e) {
+            if("Type0".equals(type)) {
+                changeSignStatus("IF", "CC_DESIGN_CHANGE_QBQ","CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID", csCommId);//签署状态变为发起失败
+            }else if("Type1".equals(type)) {
+                changeSignStatus("IF", "CC_DESIGN_CHANGE_QBQ","CC_DESIGN_CHANGE_SIGN_STATUS_ID", csCommId);//签署状态变为发起失败
+            }
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message);
+        }
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            if("Type0".equals(type)) {
+                changeSignStatus("IF", "CC_DESIGN_CHANGE_QBQ","CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID", csCommId);//签署状态变为发起失败
+            }else if("Type1".equals(type)) {
+                changeSignStatus("IF", "CC_DESIGN_CHANGE_QBQ","CC_DESIGN_CHANGE_SIGN_STATUS_ID", csCommId);//签署状态变为发起失败
+            }
+            String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileUploadFailed");
+            throw new BaseException(message);
+        }
+
+        // 获取任务ID
+        String taskCode = response.getBody();
+        // 保存任务ID
+        TaskToBusiData taskToBusiData = TaskToBusiData.newData();
+        taskToBusiData.setTaskCode(taskCode);
+        taskToBusiData.setEntCode(entityCode);
+        taskToBusiData.setEntityRecordId(csCommId);
+        taskToBusiData.setCcSignOriginalFile(fileId);
+        taskToBusiData.setIsCurrent(true);
+        taskToBusiData.insertById();
+
+        if("Type0".equals(type)) {
+            changeSignStatus("SI", "CC_DESIGN_CHANGE_QBQ","CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID", csCommId);//签署状态变为签署中
+        }else if("Type1".equals(type)) {
+            changeSignStatus("SI", "CC_DESIGN_CHANGE_QBQ","CC_DESIGN_CHANGE_SIGN_STATUS_ID", csCommId);//签署状态变为签署中
+        }
+    }
+
+    private void changeSignStatus(String status,String entityCode,String column,String  csCommId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        int update = myJdbcTemplate.update("update " + entityCode + " t set t."+column+" = ? where t.id=?", status, csCommId);
+        log.info("已更新：{}", update);
+
+    }
+
+
+    /**
+     * 生成工程变更指令(新)
+     */
+    public void createChangeOrderTask() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE,30); //过期时间30天
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String deadlineTime = simpleDateFormat.format(calendar.getTime());
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        String month = String.format("%02d", now.getMonthValue());
+        String day = String.format("%02d", now.getDayOfMonth());
+
+        String queryUsers  =  "\n" +
+                "SELECT   PM.ad_user_id ,u.EXTRA_INFO,U.MOBILE,U.`NAME`,cc.`NAME`->>'$.ZH_CN' COMPANY_NAME ,cc.ID COMPANY_ID FROM  CC_DESIGN_CHANGE_VISA_SIGNER DCS , cc_prj_member  PM , AD_USER U , cc_company CC WHERE  DCS.CC_SIGNER=PM.ID AND  PM.AD_USER_ID = U.ID AND PM.CC_COMPANY_ID= CC.ID";
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            List<QbqBody.User> users = getUserBySql(queryUsers,"CC_DESIGN_CHANGE_QBQ","CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID",entityRecord.csCommId);
+            if(users.size()<1){
+                throw new BaseException("工程变更指令签署人员未设置，请设置");
+            }
+            signTaskCreate(users,entityRecord,year,month,day,loginInfo,"Type1",deadlineTime);
+        }
+
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+
+    }
+
+    //变更申请完成，生成变更签证，发起签署(新)
+    public void createChangeSignTask() {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE,30); //过期时间30天
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String deadlineTime = simpleDateFormat.format(calendar.getTime());
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        String month = String.format("%02d", now.getMonthValue());
+        String day = String.format("%02d", now.getDayOfMonth());
+
+        String queryUsers  =  "\n" +
+                "SELECT   PM.ad_user_id ,u.EXTRA_INFO,U.MOBILE,U.`NAME`,cc.`NAME`->>'$.ZH_CN' COMPANY_NAME ,cc.ID COMPANY_ID FROM  CC_DESIGN_CHANGE_REQUEST_SIGNER   DCS , cc_prj_member  PM , AD_USER U , cc_company CC WHERE  DCS.CC_SIGNER=PM.ID AND  PM.AD_USER_ID = U.ID AND PM.CC_COMPANY_ID= CC.ID";
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            List<QbqBody.User> users = getUserBySql(queryUsers,"CC_DESIGN_CHANGE_QBQ","CC_CHANGE_SIGN_DEMONSTRATE_STATUS_ID",entityRecord.csCommId);
+
+            if(users.size()<1){
+                throw new BaseException("工程联系单签署人员未设置，请设置");
+            }
+
+            signTaskCreate(users,entityRecord,year,month,day,loginInfo,"Type0",deadlineTime);
+
+        }
+
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+
+    public List<QbqBody.User> getUserBySql(String sql,String entCode,String entItem,String csCommId){
+
+        List<QbqBody.User> userList = new ArrayList<>();
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+
+        List<Map<String, Object>> maps = myJdbcTemplate.queryForList(sql);
+
+        for (Map<String, Object> map:maps){
+
+            String adUserId = (String)map.get("AD_USER_ID");
+            String extraInfo = (String)map.get("EXTRA_INFO");
+            String phoneNum = (String)map.get("MOBILE");
+            String name = (String)map.get("USER_NAME");
+            String companyId = (String)map.get("COMPANY_ID");
+            String companyName = (String)map.get("COMPANY_NAME");
+
+            JSONObject entries = JSONUtil.parseObj(name);
+
+            String currentLangId = I18nUtil.getCurrentLangId();
+
+            String  userName = entries.getStr(currentLangId);
+
+            if (!StringUtils.hasText(extraInfo)){
+                changeSignStatus("IF",entCode,entItem,csCommId);//签署状态变为发起失败
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qbq.userRealNameIsNull",userName);
+                throw new BaseException(message);
+            }
+
+            JSONObject extraInfoObejct = JSONUtil.parseObj(extraInfo);
+
+            String realName = extraInfoObejct.get("realName",String.class);
+            String idCard = extraInfoObejct.get("idCard",String.class);
+
+            if (!StringUtils.hasText(realName) ){
+                changeSignStatus("IF",entCode,entItem,csCommId);//签署状态变为发起失败
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qbq.userRealNameIsNull",userName);
+                throw new BaseException(message);
+            }
+            if ( !StringUtils.hasText(idCard) ){
+                changeSignStatus("IF",entCode,entItem,csCommId);//签署状态变为发起失败
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qbq.userIdCardIsNull",userName);
+                throw new BaseException(message);
+            }
+            if ( !StringUtils.hasText(phoneNum)){
+                changeSignStatus("IF",entCode,entItem,csCommId);//签署状态变为发起失败
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.qbq.userMobileNull",userName);
+                throw new BaseException(message);
+            }
+
+            QbqBody.User user = new QbqBody.User();
+            user.setId(adUserId);
+            user.setName(realName);
+            user.setIdCardNo(idCard);
+            user.setTel(phoneNum);
+
+            user.setSignatoryId(companyId);
+            user.setSignatoryName(companyName);
+
+
+            userList.add(user);
+        }
+        return  userList;
+    }
+
+
 
 
 }

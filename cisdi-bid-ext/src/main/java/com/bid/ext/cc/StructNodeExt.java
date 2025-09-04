@@ -577,7 +577,6 @@ public class StructNodeExt {
                 idMapping.put(oldId, newId);
                 node.put("ID", newId);
             }
-
             // 第二步：更新每个节点的父节点 ID
             for (Map<String, Object> node : nodes) {
                 String oldParentId = (String) node.get("CC_PRJ_STRUCT_NODE_PID");
@@ -1308,6 +1307,7 @@ public class StructNodeExt {
 
     /**
      * 成果图纸权限，上传用户拥有成果图纸的所有权限（授权、下载、查看）
+     *
      * @param id 成果图纸ID（前期手续ID）
      */
     private void addAuth(String id) {
@@ -1329,7 +1329,7 @@ public class StructNodeExt {
     private void updatePreviousVersion(String ccDrawingUpdateRecordId) {
         CcDrawingUpdateRecord ccDrawingUpdateRecord = CcDrawingUpdateRecord.selectById(ccDrawingUpdateRecordId);
         String ccDesignInquiId = ccDrawingUpdateRecord.getCcDesignInquiId();
-        if(ccDesignInquiId == null){
+        if (ccDesignInquiId == null) {
             return;
         }
         Where where = new Where();
@@ -3659,7 +3659,7 @@ public class StructNodeExt {
         ccPrjStructNode.setCcConstructProgressPlanId(ccConstructProgressPlanId);
 
         //模型构件关联
-        if(varMap.containsKey("P_CC_BIM_MODEL_COMPONENTS_IDS")){
+        if (varMap.containsKey("P_CC_BIM_MODEL_COMPONENTS_IDS")) {
             String bimModelComponentsIds = JdbcMapUtil.getString(varMap, "P_CC_BIM_MODEL_COMPONENTS_IDS");
             ccPrjStructNode.setCcBimModelComponentsIds(bimModelComponentsIds);
         }
@@ -3683,22 +3683,22 @@ public class StructNodeExt {
 
                 String bimComponentsIds = null;//初始化构件ID
                 //节点和构件关联表数据插入
-                if(wbsType.equals("CONSTRUCT")){
+                if (wbsType.equals("CONSTRUCT")) {
                     //暂时只针对施工计划
-                    if(varMap.containsKey("P_CC_BIM_MODEL_COMPONENTS_IDS") && varMap.get("P_CC_BIM_MODEL_COMPONENTS_IDS") != null){
-                        bimComponentsIds =  varMap.get("P_CC_BIM_MODEL_COMPONENTS_IDS").toString();
+                    if (varMap.containsKey("P_CC_BIM_MODEL_COMPONENTS_IDS") && varMap.get("P_CC_BIM_MODEL_COMPONENTS_IDS") != null) {
+                        bimComponentsIds = varMap.get("P_CC_BIM_MODEL_COMPONENTS_IDS").toString();
 //                        structNodeRelateBimModelComponent(ccPrjStructNode.getId(),ccPrjStructNode.getCcBimModelComponentsIds());
                         ccPrjStructNode.setCcBimModelComponentsIds(bimComponentsIds);
-                    }else{
+                    } else {
                         ccPrjStructNode.setCcBimModelComponentsIds(null);
                     }
                     boolean rel = false;//是否关联构件
                     //判断新增时是否关联了父级节点
-                    if(varMap.containsKey("P_FA_STRUCT_NODE_ID") && varMap.get("P_FA_STRUCT_NODE_ID") != null){
+                    if (varMap.containsKey("P_FA_STRUCT_NODE_ID") && varMap.get("P_FA_STRUCT_NODE_ID") != null) {
                         //关联了父级节点
                         //判断父节点是否关联构件
-                        if(valueMap.containsKey("CC_IS_REL_BIM_MODEL_COMPONENT")){
-                            if(valueMap.get("CC_IS_REL_BIM_MODEL_COMPONENT") != null){
+                        if (valueMap.containsKey("CC_IS_REL_BIM_MODEL_COMPONENT")) {
+                            if (valueMap.get("CC_IS_REL_BIM_MODEL_COMPONENT") != null) {
                                 rel = JdbcMapUtil.getBoolean(valueMap, "CC_IS_REL_BIM_MODEL_COMPONENT");
                             }
                         }
@@ -3709,8 +3709,8 @@ public class StructNodeExt {
                 ccPrjStructNode.insertById();
 
                 //进度节点数据插入后，在插入构件关联数据
-                if(bimComponentsIds!= null){
-                    structNodeRelateBimModelComponent(ccPrjStructNode.getId(),bimComponentsIds);
+                if (bimComponentsIds != null) {
+                    structNodeRelateBimModelComponent(ccPrjStructNode.getId(), bimComponentsIds);
                 }
             }
         } else {
@@ -3724,7 +3724,8 @@ public class StructNodeExt {
 
     /**
      * 施工计划节点关联模型构件关联表数据插入
-     * @param id 施工计划节点ID
+     *
+     * @param id                      施工计划节点ID
      * @param ccBimModelComponentsIds 模型构件ID
      */
     private void structNodeRelateBimModelComponent(String id, String ccBimModelComponentsIds) {

@@ -10,7 +10,8 @@ public class FlPath extends  BaseDomain{
 
     private String  id;
 
-    @TableField("FILE_ATTACHMENT_URL")
+//    @TableField("FILE_ATTACHMENT_URL")
+    @TableField("DIR")
     private String  fileAttachmentUrl;
 
 }

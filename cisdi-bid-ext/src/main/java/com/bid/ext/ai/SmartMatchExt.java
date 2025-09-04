@@ -80,7 +80,7 @@ public class SmartMatchExt {
             throw new BaseException("项目类型错误");
         }
 
-        String sql = "SELECT ID, NAME FROM CC_QS_ISSUE_POINT_TYPE WHERE CC_QS_INSPECTION_TYPE_ID = ? AND CC_PRJ_TYPE_ID = ?";
+        String sql = "SELECT ID, IF(JSON_VALID(NAME),NAME->>'$.ZH_CN',NAME) AS NAME FROM CC_QS_ISSUE_POINT_TYPE WHERE CC_QS_INSPECTION_TYPE_ID = ? AND CC_PRJ_TYPE_ID = ?";
         List<Map<String, Object>> queryForList = myJdbcTemplate.queryForList(sql, ccQsInspectionTypeId, prjTypeId);
         if (CollectionUtils.isEmpty(queryForList)) {
             throw new BaseException("没有找到问题分类.");
@@ -90,7 +90,7 @@ public class SmartMatchExt {
         for (Map<String, Object> queryForMap : queryForList) {
             String name = JdbcMapUtil.getString(queryForMap, "NAME");
             String typeId = JdbcMapUtil.getString(queryForMap, "ID");
-            String pointSql = "SELECT ID,NAME FROM CC_QS_ISSUE_POINT WHERE CC_QS_ISSUE_POINT_TYPE_ID = ?";
+            String pointSql = "SELECT ID, IF(JSON_VALID(NAME),NAME->>'$.ZH_CN',NAME) AS NAME FROM CC_QS_ISSUE_POINT WHERE CC_QS_ISSUE_POINT_TYPE_ID = ?";
             List<Map<String, Object>> queryForList1 = myJdbcTemplate.queryForList(pointSql, typeId);
             for (Map<String, Object> stringObjectMap : queryForList1) {
                 String subId = JdbcMapUtil.getString(stringObjectMap, "ID");
@@ -328,7 +328,7 @@ public class SmartMatchExt {
         if (fileBytes != null) {
             fileId = uploadFile(
                     fileBytes,
-                    "/data/qygly/downloaded_file.xlsx", // 指定文件名（需带后缀）
+                    "downloaded_file.xlsx", // 指定文件名（需带后缀）
                     userName                  // 用户名
             );
         }
