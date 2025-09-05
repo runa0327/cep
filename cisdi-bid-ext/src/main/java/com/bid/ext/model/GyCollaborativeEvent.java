@@ -7,7 +7,6 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 变更签证。
+ * 协同任务。
  */
-public class CcChangeSign {
+public class GyCollaborativeEvent {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcChangeSign> modelHelper = new ModelHelper<>("CC_CHANGE_SIGN", new CcChangeSign());
+    private static final ModelHelper<GyCollaborativeEvent> modelHelper = new ModelHelper<>("GY_COLLABORATIVE_EVENT", new GyCollaborativeEvent());
 
     /**
      * 待更新的列。
@@ -39,7 +38,7 @@ public class CcChangeSign {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_CHANGE_SIGN";
+    public static final String ENT_CODE = "GY_COLLABORATIVE_EVENT";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -48,10 +47,6 @@ public class CcChangeSign {
     // <editor-fold>
 
     public static class Cols {
-        /**
-         * 项目。
-         */
-        public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
          * ID。
          */
@@ -97,10 +92,6 @@ public class CcChangeSign {
          */
         public static final String CODE = "CODE";
         /**
-         * 名称。
-         */
-        public static final String NAME = "NAME";
-        /**
          * 备注。
          */
         public static final String REMARK = "REMARK";
@@ -113,103 +104,51 @@ public class CcChangeSign {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 变更签证类型。
+         * 名称。
          */
-        public static final String CC_CHANGE_SIGN_TYPE_ID = "CC_CHANGE_SIGN_TYPE_ID";
+        public static final String NAME = "NAME";
         /**
-         * 变更编号。
+         * 项目。
          */
-        public static final String GY_CHANGE_NUMBER = "GY_CHANGE_NUMBER";
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * 项目参建方公司。
+         * 协同事项类别。
          */
-        public static final String CC_PARTY_COMPANY_ID = "CC_PARTY_COMPANY_ID";
+        public static final String GY_EVENT_CATEGORY_ID = "GY_EVENT_CATEGORY_ID";
         /**
-         * 业务日期。
+         * 负责人。
          */
-        public static final String TRX_DATE = "TRX_DATE";
+        public static final String GY_COLLABORATIVE_PERSON_IN_CHARGE = "GY_COLLABORATIVE_PERSON_IN_CHARGE";
         /**
-         * 签证类目。
+         * 事项发起日期。
          */
-        public static final String CC_VISA_CATEGORY = "CC_VISA_CATEGORY";
+        public static final String GY_EVENT_LAUNCH_DATE = "GY_EVENT_LAUNCH_DATE";
         /**
-         * 部位。
+         * 计划完成日期。
          */
-        public static final String PART = "PART";
+        public static final String GY_EVENT_PLAN_COMPLETED_DATE = "GY_EVENT_PLAN_COMPLETED_DATE";
         /**
-         * 变更签证目的。
+         * 计划完成日期。
          */
-        public static final String CC_CHANGE_SIGN_PURPOSE_IDS = "CC_CHANGE_SIGN_PURPOSE_IDS";
+        public static final String GY_EVENT_ACTUAL_COMPLETED_DATE = "GY_EVENT_ACTUAL_COMPLETED_DATE";
         /**
-         * 变更签证金额增减。
+         * 延迟时间（天）。
          */
-        public static final String CC_CHANGE_SIGN_AMT_DIRECTION_ID = "CC_CHANGE_SIGN_AMT_DIRECTION_ID";
+        public static final String GY_EVENT_DELAY_DAY = "GY_EVENT_DELAY_DAY";
         /**
-         * 变更签证工期增减。
+         * 协同事项状态。
          */
-        public static final String CC_CHANGE_SIGN_DUARATION_DIRECTION_ID = "CC_CHANGE_SIGN_DUARATION_DIRECTION_ID";
+        public static final String GY_EVENT_STATUS_ID = "GY_EVENT_STATUS_ID";
         /**
-         * 变更原因。
+         * 进展描述。
          */
-        public static final String CHANGE_REASON = "CHANGE_REASON";
-        /**
-         * 金额变化值（元）。
-         */
-        public static final String AMT_CHANGE_VALUE = "AMT_CHANGE_VALUE";
-        /**
-         * 天数变化值（天）。
-         */
-        public static final String DUARATION_CHANGE_VALUE = "DUARATION_CHANGE_VALUE";
-        /**
-         * 变更内容。
-         */
-        public static final String CHANGE_CONTENT = "CHANGE_CONTENT";
-        /**
-         * 附件。
-         */
-        public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
+        public static final String GY_PROGRESSF_DESCRIPTION = "GY_PROGRESSF_DESCRIPTION";
     }
 
     // </editor-fold>
 
     // 各个属性及setter、getter：
     // <editor-fold>
-
-    /**
-     * 项目。
-     */
-    private String ccPrjId;
-
-    /**
-     * 获取：项目。
-     */
-    public String getCcPrjId() {
-        return this.ccPrjId;
-    }
-
-    /**
-     * 设置：项目。
-     */
-    public CcChangeSign setCcPrjId(String ccPrjId) {
-        if (this.ccPrjId == null && ccPrjId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjId != null && ccPrjId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
-                this.ccPrjId = ccPrjId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjId = ccPrjId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ID");
-            }
-        }
-        return this;
-    }
 
     /**
      * ID。
@@ -226,7 +165,7 @@ public class CcChangeSign {
     /**
      * 设置：ID。
      */
-    public CcChangeSign setId(String id) {
+    public GyCollaborativeEvent setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -262,7 +201,7 @@ public class CcChangeSign {
     /**
      * 设置：版本。
      */
-    public CcChangeSign setVer(Integer ver) {
+    public GyCollaborativeEvent setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -298,7 +237,7 @@ public class CcChangeSign {
     /**
      * 设置：时间戳。
      */
-    public CcChangeSign setTs(LocalDateTime ts) {
+    public GyCollaborativeEvent setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -334,7 +273,7 @@ public class CcChangeSign {
     /**
      * 设置：是否预设。
      */
-    public CcChangeSign setIsPreset(Boolean isPreset) {
+    public GyCollaborativeEvent setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -370,7 +309,7 @@ public class CcChangeSign {
     /**
      * 设置：创建日期时间。
      */
-    public CcChangeSign setCrtDt(LocalDateTime crtDt) {
+    public GyCollaborativeEvent setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -406,7 +345,7 @@ public class CcChangeSign {
     /**
      * 设置：创建用户。
      */
-    public CcChangeSign setCrtUserId(String crtUserId) {
+    public GyCollaborativeEvent setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -442,7 +381,7 @@ public class CcChangeSign {
     /**
      * 设置：最后修改日期时间。
      */
-    public CcChangeSign setLastModiDt(LocalDateTime lastModiDt) {
+    public GyCollaborativeEvent setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -478,7 +417,7 @@ public class CcChangeSign {
     /**
      * 设置：最后修改用户。
      */
-    public CcChangeSign setLastModiUserId(String lastModiUserId) {
+    public GyCollaborativeEvent setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -514,7 +453,7 @@ public class CcChangeSign {
     /**
      * 设置：记录状态。
      */
-    public CcChangeSign setStatus(String status) {
+    public GyCollaborativeEvent setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -550,7 +489,7 @@ public class CcChangeSign {
     /**
      * 设置：锁定流程实例。
      */
-    public CcChangeSign setLkWfInstId(String lkWfInstId) {
+    public GyCollaborativeEvent setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -586,7 +525,7 @@ public class CcChangeSign {
     /**
      * 设置：代码。
      */
-    public CcChangeSign setCode(String code) {
+    public GyCollaborativeEvent setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -608,42 +547,6 @@ public class CcChangeSign {
     }
 
     /**
-     * 名称。
-     */
-    private String name;
-
-    /**
-     * 获取：名称。
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * 设置：名称。
-     */
-    public CcChangeSign setName(String name) {
-        if (this.name == null && name == null) {
-            // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 备注。
      */
     private String remark;
@@ -658,7 +561,7 @@ public class CcChangeSign {
     /**
      * 设置：备注。
      */
-    public CcChangeSign setRemark(String remark) {
+    public GyCollaborativeEvent setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -694,7 +597,7 @@ public class CcChangeSign {
     /**
      * 设置：快捷码。
      */
-    public CcChangeSign setFastCode(String fastCode) {
+    public GyCollaborativeEvent setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -730,7 +633,7 @@ public class CcChangeSign {
     /**
      * 设置：图标。
      */
-    public CcChangeSign setIconFileGroupId(String iconFileGroupId) {
+    public GyCollaborativeEvent setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -752,504 +655,360 @@ public class CcChangeSign {
     }
 
     /**
-     * 变更签证类型。
+     * 名称。
      */
-    private String ccChangeSignTypeId;
+    private String name;
 
     /**
-     * 获取：变更签证类型。
+     * 获取：名称。
      */
-    public String getCcChangeSignTypeId() {
-        return this.ccChangeSignTypeId;
+    public String getName() {
+        return this.name;
     }
 
     /**
-     * 设置：变更签证类型。
+     * 设置：名称。
      */
-    public CcChangeSign setCcChangeSignTypeId(String ccChangeSignTypeId) {
-        if (this.ccChangeSignTypeId == null && ccChangeSignTypeId == null) {
+    public GyCollaborativeEvent setName(String name) {
+        if (this.name == null && name == null) {
             // 均为null，不做处理。
-        } else if (this.ccChangeSignTypeId != null && ccChangeSignTypeId != null) {
+        } else if (this.name != null && name != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccChangeSignTypeId.compareTo(ccChangeSignTypeId) != 0) {
-                this.ccChangeSignTypeId = ccChangeSignTypeId;
-                if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_TYPE_ID")) {
-                    this.toUpdateCols.add("CC_CHANGE_SIGN_TYPE_ID");
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccChangeSignTypeId = ccChangeSignTypeId;
-            if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_TYPE_ID")) {
-                this.toUpdateCols.add("CC_CHANGE_SIGN_TYPE_ID");
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
             }
         }
         return this;
     }
 
     /**
-     * 变更编号。
+     * 项目。
      */
-    private String gyChangeNumber;
+    private String ccPrjId;
 
     /**
-     * 获取：变更编号。
+     * 获取：项目。
      */
-    public String getGyChangeNumber() {
-        return this.gyChangeNumber;
+    public String getCcPrjId() {
+        return this.ccPrjId;
     }
 
     /**
-     * 设置：变更编号。
+     * 设置：项目。
      */
-    public CcChangeSign setGyChangeNumber(String gyChangeNumber) {
-        if (this.gyChangeNumber == null && gyChangeNumber == null) {
+    public GyCollaborativeEvent setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
             // 均为null，不做处理。
-        } else if (this.gyChangeNumber != null && gyChangeNumber != null) {
+        } else if (this.ccPrjId != null && ccPrjId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.gyChangeNumber.compareTo(gyChangeNumber) != 0) {
-                this.gyChangeNumber = gyChangeNumber;
-                if (!this.toUpdateCols.contains("GY_CHANGE_NUMBER")) {
-                    this.toUpdateCols.add("GY_CHANGE_NUMBER");
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.gyChangeNumber = gyChangeNumber;
-            if (!this.toUpdateCols.contains("GY_CHANGE_NUMBER")) {
-                this.toUpdateCols.add("GY_CHANGE_NUMBER");
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
             }
         }
         return this;
     }
 
     /**
-     * 项目参建方公司。
+     * 协同事项类别。
      */
-    private String ccPartyCompanyId;
+    private String gyEventCategoryId;
 
     /**
-     * 获取：项目参建方公司。
+     * 获取：协同事项类别。
      */
-    public String getCcPartyCompanyId() {
-        return this.ccPartyCompanyId;
+    public String getGyEventCategoryId() {
+        return this.gyEventCategoryId;
     }
 
     /**
-     * 设置：项目参建方公司。
+     * 设置：协同事项类别。
      */
-    public CcChangeSign setCcPartyCompanyId(String ccPartyCompanyId) {
-        if (this.ccPartyCompanyId == null && ccPartyCompanyId == null) {
+    public GyCollaborativeEvent setGyEventCategoryId(String gyEventCategoryId) {
+        if (this.gyEventCategoryId == null && gyEventCategoryId == null) {
             // 均为null，不做处理。
-        } else if (this.ccPartyCompanyId != null && ccPartyCompanyId != null) {
+        } else if (this.gyEventCategoryId != null && gyEventCategoryId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccPartyCompanyId.compareTo(ccPartyCompanyId) != 0) {
-                this.ccPartyCompanyId = ccPartyCompanyId;
-                if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_ID")) {
-                    this.toUpdateCols.add("CC_PARTY_COMPANY_ID");
+            if (this.gyEventCategoryId.compareTo(gyEventCategoryId) != 0) {
+                this.gyEventCategoryId = gyEventCategoryId;
+                if (!this.toUpdateCols.contains("GY_EVENT_CATEGORY_ID")) {
+                    this.toUpdateCols.add("GY_EVENT_CATEGORY_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccPartyCompanyId = ccPartyCompanyId;
-            if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_ID")) {
-                this.toUpdateCols.add("CC_PARTY_COMPANY_ID");
+            this.gyEventCategoryId = gyEventCategoryId;
+            if (!this.toUpdateCols.contains("GY_EVENT_CATEGORY_ID")) {
+                this.toUpdateCols.add("GY_EVENT_CATEGORY_ID");
             }
         }
         return this;
     }
 
     /**
-     * 业务日期。
+     * 负责人。
      */
-    private LocalDate trxDate;
+    private String gyCollaborativePersonInCharge;
 
     /**
-     * 获取：业务日期。
+     * 获取：负责人。
      */
-    public LocalDate getTrxDate() {
-        return this.trxDate;
+    public String getGyCollaborativePersonInCharge() {
+        return this.gyCollaborativePersonInCharge;
     }
 
     /**
-     * 设置：业务日期。
+     * 设置：负责人。
      */
-    public CcChangeSign setTrxDate(LocalDate trxDate) {
-        if (this.trxDate == null && trxDate == null) {
+    public GyCollaborativeEvent setGyCollaborativePersonInCharge(String gyCollaborativePersonInCharge) {
+        if (this.gyCollaborativePersonInCharge == null && gyCollaborativePersonInCharge == null) {
             // 均为null，不做处理。
-        } else if (this.trxDate != null && trxDate != null) {
+        } else if (this.gyCollaborativePersonInCharge != null && gyCollaborativePersonInCharge != null) {
             // 均非null，判定不等，再做处理：
-            if (this.trxDate.compareTo(trxDate) != 0) {
-                this.trxDate = trxDate;
-                if (!this.toUpdateCols.contains("TRX_DATE")) {
-                    this.toUpdateCols.add("TRX_DATE");
+            if (this.gyCollaborativePersonInCharge.compareTo(gyCollaborativePersonInCharge) != 0) {
+                this.gyCollaborativePersonInCharge = gyCollaborativePersonInCharge;
+                if (!this.toUpdateCols.contains("GY_COLLABORATIVE_PERSON_IN_CHARGE")) {
+                    this.toUpdateCols.add("GY_COLLABORATIVE_PERSON_IN_CHARGE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.trxDate = trxDate;
-            if (!this.toUpdateCols.contains("TRX_DATE")) {
-                this.toUpdateCols.add("TRX_DATE");
+            this.gyCollaborativePersonInCharge = gyCollaborativePersonInCharge;
+            if (!this.toUpdateCols.contains("GY_COLLABORATIVE_PERSON_IN_CHARGE")) {
+                this.toUpdateCols.add("GY_COLLABORATIVE_PERSON_IN_CHARGE");
             }
         }
         return this;
     }
 
     /**
-     * 签证类目。
+     * 事项发起日期。
      */
-    private String ccVisaCategory;
+    private LocalDate gyEventLaunchDate;
 
     /**
-     * 获取：签证类目。
+     * 获取：事项发起日期。
      */
-    public String getCcVisaCategory() {
-        return this.ccVisaCategory;
+    public LocalDate getGyEventLaunchDate() {
+        return this.gyEventLaunchDate;
     }
 
     /**
-     * 设置：签证类目。
+     * 设置：事项发起日期。
      */
-    public CcChangeSign setCcVisaCategory(String ccVisaCategory) {
-        if (this.ccVisaCategory == null && ccVisaCategory == null) {
+    public GyCollaborativeEvent setGyEventLaunchDate(LocalDate gyEventLaunchDate) {
+        if (this.gyEventLaunchDate == null && gyEventLaunchDate == null) {
             // 均为null，不做处理。
-        } else if (this.ccVisaCategory != null && ccVisaCategory != null) {
+        } else if (this.gyEventLaunchDate != null && gyEventLaunchDate != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccVisaCategory.compareTo(ccVisaCategory) != 0) {
-                this.ccVisaCategory = ccVisaCategory;
-                if (!this.toUpdateCols.contains("CC_VISA_CATEGORY")) {
-                    this.toUpdateCols.add("CC_VISA_CATEGORY");
+            if (this.gyEventLaunchDate.compareTo(gyEventLaunchDate) != 0) {
+                this.gyEventLaunchDate = gyEventLaunchDate;
+                if (!this.toUpdateCols.contains("GY_EVENT_LAUNCH_DATE")) {
+                    this.toUpdateCols.add("GY_EVENT_LAUNCH_DATE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccVisaCategory = ccVisaCategory;
-            if (!this.toUpdateCols.contains("CC_VISA_CATEGORY")) {
-                this.toUpdateCols.add("CC_VISA_CATEGORY");
+            this.gyEventLaunchDate = gyEventLaunchDate;
+            if (!this.toUpdateCols.contains("GY_EVENT_LAUNCH_DATE")) {
+                this.toUpdateCols.add("GY_EVENT_LAUNCH_DATE");
             }
         }
         return this;
     }
 
     /**
-     * 部位。
+     * 计划完成日期。
      */
-    private String part;
+    private LocalDate gyEventPlanCompletedDate;
 
     /**
-     * 获取：部位。
+     * 获取：计划完成日期。
      */
-    public String getPart() {
-        return this.part;
+    public LocalDate getGyEventPlanCompletedDate() {
+        return this.gyEventPlanCompletedDate;
     }
 
     /**
-     * 设置：部位。
+     * 设置：计划完成日期。
      */
-    public CcChangeSign setPart(String part) {
-        if (this.part == null && part == null) {
+    public GyCollaborativeEvent setGyEventPlanCompletedDate(LocalDate gyEventPlanCompletedDate) {
+        if (this.gyEventPlanCompletedDate == null && gyEventPlanCompletedDate == null) {
             // 均为null，不做处理。
-        } else if (this.part != null && part != null) {
+        } else if (this.gyEventPlanCompletedDate != null && gyEventPlanCompletedDate != null) {
             // 均非null，判定不等，再做处理：
-            if (this.part.compareTo(part) != 0) {
-                this.part = part;
-                if (!this.toUpdateCols.contains("PART")) {
-                    this.toUpdateCols.add("PART");
+            if (this.gyEventPlanCompletedDate.compareTo(gyEventPlanCompletedDate) != 0) {
+                this.gyEventPlanCompletedDate = gyEventPlanCompletedDate;
+                if (!this.toUpdateCols.contains("GY_EVENT_PLAN_COMPLETED_DATE")) {
+                    this.toUpdateCols.add("GY_EVENT_PLAN_COMPLETED_DATE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.part = part;
-            if (!this.toUpdateCols.contains("PART")) {
-                this.toUpdateCols.add("PART");
+            this.gyEventPlanCompletedDate = gyEventPlanCompletedDate;
+            if (!this.toUpdateCols.contains("GY_EVENT_PLAN_COMPLETED_DATE")) {
+                this.toUpdateCols.add("GY_EVENT_PLAN_COMPLETED_DATE");
             }
         }
         return this;
     }
 
     /**
-     * 变更签证目的。
+     * 计划完成日期。
      */
-    private String ccChangeSignPurposeIds;
+    private LocalDate gyEventActualCompletedDate;
 
     /**
-     * 获取：变更签证目的。
+     * 获取：计划完成日期。
      */
-    public String getCcChangeSignPurposeIds() {
-        return this.ccChangeSignPurposeIds;
+    public LocalDate getGyEventActualCompletedDate() {
+        return this.gyEventActualCompletedDate;
     }
 
     /**
-     * 设置：变更签证目的。
+     * 设置：计划完成日期。
      */
-    public CcChangeSign setCcChangeSignPurposeIds(String ccChangeSignPurposeIds) {
-        if (this.ccChangeSignPurposeIds == null && ccChangeSignPurposeIds == null) {
+    public GyCollaborativeEvent setGyEventActualCompletedDate(LocalDate gyEventActualCompletedDate) {
+        if (this.gyEventActualCompletedDate == null && gyEventActualCompletedDate == null) {
             // 均为null，不做处理。
-        } else if (this.ccChangeSignPurposeIds != null && ccChangeSignPurposeIds != null) {
+        } else if (this.gyEventActualCompletedDate != null && gyEventActualCompletedDate != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccChangeSignPurposeIds.compareTo(ccChangeSignPurposeIds) != 0) {
-                this.ccChangeSignPurposeIds = ccChangeSignPurposeIds;
-                if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_PURPOSE_IDS")) {
-                    this.toUpdateCols.add("CC_CHANGE_SIGN_PURPOSE_IDS");
+            if (this.gyEventActualCompletedDate.compareTo(gyEventActualCompletedDate) != 0) {
+                this.gyEventActualCompletedDate = gyEventActualCompletedDate;
+                if (!this.toUpdateCols.contains("GY_EVENT_ACTUAL_COMPLETED_DATE")) {
+                    this.toUpdateCols.add("GY_EVENT_ACTUAL_COMPLETED_DATE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccChangeSignPurposeIds = ccChangeSignPurposeIds;
-            if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_PURPOSE_IDS")) {
-                this.toUpdateCols.add("CC_CHANGE_SIGN_PURPOSE_IDS");
+            this.gyEventActualCompletedDate = gyEventActualCompletedDate;
+            if (!this.toUpdateCols.contains("GY_EVENT_ACTUAL_COMPLETED_DATE")) {
+                this.toUpdateCols.add("GY_EVENT_ACTUAL_COMPLETED_DATE");
             }
         }
         return this;
     }
 
     /**
-     * 变更签证金额增减。
+     * 延迟时间（天）。
      */
-    private String ccChangeSignAmtDirectionId;
+    private Integer gyEventDelayDay;
 
     /**
-     * 获取：变更签证金额增减。
+     * 获取：延迟时间（天）。
      */
-    public String getCcChangeSignAmtDirectionId() {
-        return this.ccChangeSignAmtDirectionId;
+    public Integer getGyEventDelayDay() {
+        return this.gyEventDelayDay;
     }
 
     /**
-     * 设置：变更签证金额增减。
+     * 设置：延迟时间（天）。
      */
-    public CcChangeSign setCcChangeSignAmtDirectionId(String ccChangeSignAmtDirectionId) {
-        if (this.ccChangeSignAmtDirectionId == null && ccChangeSignAmtDirectionId == null) {
+    public GyCollaborativeEvent setGyEventDelayDay(Integer gyEventDelayDay) {
+        if (this.gyEventDelayDay == null && gyEventDelayDay == null) {
             // 均为null，不做处理。
-        } else if (this.ccChangeSignAmtDirectionId != null && ccChangeSignAmtDirectionId != null) {
+        } else if (this.gyEventDelayDay != null && gyEventDelayDay != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccChangeSignAmtDirectionId.compareTo(ccChangeSignAmtDirectionId) != 0) {
-                this.ccChangeSignAmtDirectionId = ccChangeSignAmtDirectionId;
-                if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_AMT_DIRECTION_ID")) {
-                    this.toUpdateCols.add("CC_CHANGE_SIGN_AMT_DIRECTION_ID");
+            if (this.gyEventDelayDay.compareTo(gyEventDelayDay) != 0) {
+                this.gyEventDelayDay = gyEventDelayDay;
+                if (!this.toUpdateCols.contains("GY_EVENT_DELAY_DAY")) {
+                    this.toUpdateCols.add("GY_EVENT_DELAY_DAY");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccChangeSignAmtDirectionId = ccChangeSignAmtDirectionId;
-            if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_AMT_DIRECTION_ID")) {
-                this.toUpdateCols.add("CC_CHANGE_SIGN_AMT_DIRECTION_ID");
+            this.gyEventDelayDay = gyEventDelayDay;
+            if (!this.toUpdateCols.contains("GY_EVENT_DELAY_DAY")) {
+                this.toUpdateCols.add("GY_EVENT_DELAY_DAY");
             }
         }
         return this;
     }
 
     /**
-     * 变更签证工期增减。
+     * 协同事项状态。
      */
-    private String ccChangeSignDuarationDirectionId;
+    private String gyEventStatusId;
 
     /**
-     * 获取：变更签证工期增减。
+     * 获取：协同事项状态。
      */
-    public String getCcChangeSignDuarationDirectionId() {
-        return this.ccChangeSignDuarationDirectionId;
+    public String getGyEventStatusId() {
+        return this.gyEventStatusId;
     }
 
     /**
-     * 设置：变更签证工期增减。
+     * 设置：协同事项状态。
      */
-    public CcChangeSign setCcChangeSignDuarationDirectionId(String ccChangeSignDuarationDirectionId) {
-        if (this.ccChangeSignDuarationDirectionId == null && ccChangeSignDuarationDirectionId == null) {
+    public GyCollaborativeEvent setGyEventStatusId(String gyEventStatusId) {
+        if (this.gyEventStatusId == null && gyEventStatusId == null) {
             // 均为null，不做处理。
-        } else if (this.ccChangeSignDuarationDirectionId != null && ccChangeSignDuarationDirectionId != null) {
+        } else if (this.gyEventStatusId != null && gyEventStatusId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccChangeSignDuarationDirectionId.compareTo(ccChangeSignDuarationDirectionId) != 0) {
-                this.ccChangeSignDuarationDirectionId = ccChangeSignDuarationDirectionId;
-                if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_DUARATION_DIRECTION_ID")) {
-                    this.toUpdateCols.add("CC_CHANGE_SIGN_DUARATION_DIRECTION_ID");
+            if (this.gyEventStatusId.compareTo(gyEventStatusId) != 0) {
+                this.gyEventStatusId = gyEventStatusId;
+                if (!this.toUpdateCols.contains("GY_EVENT_STATUS_ID")) {
+                    this.toUpdateCols.add("GY_EVENT_STATUS_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccChangeSignDuarationDirectionId = ccChangeSignDuarationDirectionId;
-            if (!this.toUpdateCols.contains("CC_CHANGE_SIGN_DUARATION_DIRECTION_ID")) {
-                this.toUpdateCols.add("CC_CHANGE_SIGN_DUARATION_DIRECTION_ID");
+            this.gyEventStatusId = gyEventStatusId;
+            if (!this.toUpdateCols.contains("GY_EVENT_STATUS_ID")) {
+                this.toUpdateCols.add("GY_EVENT_STATUS_ID");
             }
         }
         return this;
     }
 
     /**
-     * 变更原因。
+     * 进展描述。
      */
-    private String changeReason;
+    private String gyProgressfDescription;
 
     /**
-     * 获取：变更原因。
+     * 获取：进展描述。
      */
-    public String getChangeReason() {
-        return this.changeReason;
+    public String getGyProgressfDescription() {
+        return this.gyProgressfDescription;
     }
 
     /**
-     * 设置：变更原因。
+     * 设置：进展描述。
      */
-    public CcChangeSign setChangeReason(String changeReason) {
-        if (this.changeReason == null && changeReason == null) {
+    public GyCollaborativeEvent setGyProgressfDescription(String gyProgressfDescription) {
+        if (this.gyProgressfDescription == null && gyProgressfDescription == null) {
             // 均为null，不做处理。
-        } else if (this.changeReason != null && changeReason != null) {
+        } else if (this.gyProgressfDescription != null && gyProgressfDescription != null) {
             // 均非null，判定不等，再做处理：
-            if (this.changeReason.compareTo(changeReason) != 0) {
-                this.changeReason = changeReason;
-                if (!this.toUpdateCols.contains("CHANGE_REASON")) {
-                    this.toUpdateCols.add("CHANGE_REASON");
+            if (this.gyProgressfDescription.compareTo(gyProgressfDescription) != 0) {
+                this.gyProgressfDescription = gyProgressfDescription;
+                if (!this.toUpdateCols.contains("GY_PROGRESSF_DESCRIPTION")) {
+                    this.toUpdateCols.add("GY_PROGRESSF_DESCRIPTION");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.changeReason = changeReason;
-            if (!this.toUpdateCols.contains("CHANGE_REASON")) {
-                this.toUpdateCols.add("CHANGE_REASON");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 金额变化值（元）。
-     */
-    private BigDecimal amtChangeValue;
-
-    /**
-     * 获取：金额变化值（元）。
-     */
-    public BigDecimal getAmtChangeValue() {
-        return this.amtChangeValue;
-    }
-
-    /**
-     * 设置：金额变化值（元）。
-     */
-    public CcChangeSign setAmtChangeValue(BigDecimal amtChangeValue) {
-        if (this.amtChangeValue == null && amtChangeValue == null) {
-            // 均为null，不做处理。
-        } else if (this.amtChangeValue != null && amtChangeValue != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.amtChangeValue.compareTo(amtChangeValue) != 0) {
-                this.amtChangeValue = amtChangeValue;
-                if (!this.toUpdateCols.contains("AMT_CHANGE_VALUE")) {
-                    this.toUpdateCols.add("AMT_CHANGE_VALUE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.amtChangeValue = amtChangeValue;
-            if (!this.toUpdateCols.contains("AMT_CHANGE_VALUE")) {
-                this.toUpdateCols.add("AMT_CHANGE_VALUE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 天数变化值（天）。
-     */
-    private Integer duarationChangeValue;
-
-    /**
-     * 获取：天数变化值（天）。
-     */
-    public Integer getDuarationChangeValue() {
-        return this.duarationChangeValue;
-    }
-
-    /**
-     * 设置：天数变化值（天）。
-     */
-    public CcChangeSign setDuarationChangeValue(Integer duarationChangeValue) {
-        if (this.duarationChangeValue == null && duarationChangeValue == null) {
-            // 均为null，不做处理。
-        } else if (this.duarationChangeValue != null && duarationChangeValue != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.duarationChangeValue.compareTo(duarationChangeValue) != 0) {
-                this.duarationChangeValue = duarationChangeValue;
-                if (!this.toUpdateCols.contains("DUARATION_CHANGE_VALUE")) {
-                    this.toUpdateCols.add("DUARATION_CHANGE_VALUE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.duarationChangeValue = duarationChangeValue;
-            if (!this.toUpdateCols.contains("DUARATION_CHANGE_VALUE")) {
-                this.toUpdateCols.add("DUARATION_CHANGE_VALUE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 变更内容。
-     */
-    private String changeContent;
-
-    /**
-     * 获取：变更内容。
-     */
-    public String getChangeContent() {
-        return this.changeContent;
-    }
-
-    /**
-     * 设置：变更内容。
-     */
-    public CcChangeSign setChangeContent(String changeContent) {
-        if (this.changeContent == null && changeContent == null) {
-            // 均为null，不做处理。
-        } else if (this.changeContent != null && changeContent != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.changeContent.compareTo(changeContent) != 0) {
-                this.changeContent = changeContent;
-                if (!this.toUpdateCols.contains("CHANGE_CONTENT")) {
-                    this.toUpdateCols.add("CHANGE_CONTENT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.changeContent = changeContent;
-            if (!this.toUpdateCols.contains("CHANGE_CONTENT")) {
-                this.toUpdateCols.add("CHANGE_CONTENT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 附件。
-     */
-    private String ccAttachments;
-
-    /**
-     * 获取：附件。
-     */
-    public String getCcAttachments() {
-        return this.ccAttachments;
-    }
-
-    /**
-     * 设置：附件。
-     */
-    public CcChangeSign setCcAttachments(String ccAttachments) {
-        if (this.ccAttachments == null && ccAttachments == null) {
-            // 均为null，不做处理。
-        } else if (this.ccAttachments != null && ccAttachments != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccAttachments.compareTo(ccAttachments) != 0) {
-                this.ccAttachments = ccAttachments;
-                if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                    this.toUpdateCols.add("CC_ATTACHMENTS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccAttachments = ccAttachments;
-            if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                this.toUpdateCols.add("CC_ATTACHMENTS");
+            this.gyProgressfDescription = gyProgressfDescription;
+            if (!this.toUpdateCols.contains("GY_PROGRESSF_DESCRIPTION")) {
+                this.toUpdateCols.add("GY_PROGRESSF_DESCRIPTION");
             }
         }
         return this;
@@ -1342,8 +1101,8 @@ public class CcChangeSign {
      *
      * @return
      */
-    public static CcChangeSign newData() {
-        CcChangeSign obj = modelHelper.newData();
+    public static GyCollaborativeEvent newData() {
+        GyCollaborativeEvent obj = modelHelper.newData();
         return obj;
     }
 
@@ -1352,8 +1111,8 @@ public class CcChangeSign {
      *
      * @return
      */
-    public static CcChangeSign insertData() {
-        CcChangeSign obj = modelHelper.insertData();
+    public static GyCollaborativeEvent insertData() {
+        GyCollaborativeEvent obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1365,8 +1124,8 @@ public class CcChangeSign {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcChangeSign selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcChangeSign obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static GyCollaborativeEvent selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        GyCollaborativeEvent obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1376,7 +1135,7 @@ public class CcChangeSign {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcChangeSign selectById(String id) {
+    public static GyCollaborativeEvent selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1388,8 +1147,8 @@ public class CcChangeSign {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcChangeSign> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcChangeSign> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<GyCollaborativeEvent> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<GyCollaborativeEvent> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1399,7 +1158,7 @@ public class CcChangeSign {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcChangeSign> selectByIds(List<String> ids) {
+    public static List<GyCollaborativeEvent> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1411,8 +1170,8 @@ public class CcChangeSign {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcChangeSign> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcChangeSign> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<GyCollaborativeEvent> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<GyCollaborativeEvent> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1422,7 +1181,7 @@ public class CcChangeSign {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcChangeSign> selectByWhere(Where where) {
+    public static List<GyCollaborativeEvent> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1434,10 +1193,10 @@ public class CcChangeSign {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcChangeSign selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcChangeSign> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static GyCollaborativeEvent selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<GyCollaborativeEvent> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcChangeSign.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用GyCollaborativeEvent.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1449,7 +1208,7 @@ public class CcChangeSign {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcChangeSign selectOneByWhere(Where where) {
+    public static GyCollaborativeEvent selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1563,7 +1322,7 @@ public class CcChangeSign {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcChangeSign fromModel, CcChangeSign toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(GyCollaborativeEvent fromModel, GyCollaborativeEvent toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1573,7 +1332,7 @@ public class CcChangeSign {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcChangeSign fromModel, CcChangeSign toModel) {
+    public static void copyCols(GyCollaborativeEvent fromModel, GyCollaborativeEvent toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 
