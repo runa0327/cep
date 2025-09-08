@@ -24,8 +24,8 @@ public class TestPersonExt {
         String colsForStu;
         String colsForTeacher;
         if (fetchExtEntDataParam.fetchType == FetchExtEntDataParam.FetchType.FETCH_DATA) {
-            colsForStu = "t.id,t.ver,t.code,t.name,t.remark,t.STATUS,t.AD_STATUS_IDS,t.TEST_BOOL,t.TEST_INT,t.TEST_DOUBLE,t.TEST_DATE,t.TEST_TIME,t.TEST_DTTM,t.TEST_FILE_GROUP_ID,t.TEST_PSD,t.TEST_CATE_ID,t.TEST_CATE_IDS,'S' TEST_PERSON_TYPE_ID";
-            colsForTeacher = "t.id,t.ver,t.code,t.name,t.remark,null,null,null,null,null,null,null,null,null,null,null,null,'T'";
+            colsForStu = "t.id,t.code,t.name,t.remark,t.STATUS,t.AD_STATUS_IDS,t.TEST_BOOL,t.TEST_INT,t.TEST_DOUBLE,t.TEST_DATE,t.TEST_TIME,t.TEST_DTTM,t.TEST_FILE_GROUP_ID,t.TEST_PSD,t.TEST_CATE_ID,t.TEST_CATE_IDS,'S' TEST_PERSON_TYPE_ID";
+            colsForTeacher = "t.id,t.code,t.name,t.remark,null,null,null,null,null,null,null,null,null,null,null,null,'T'";
         } else if (fetchExtEntDataParam.fetchType == FetchExtEntDataParam.FetchType.FETCH_ROW_COUNT) {
             colsForStu = "t.id";
             colsForTeacher = "t.id";
