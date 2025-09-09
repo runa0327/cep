@@ -1,4 +1,4 @@
-package com.bid.ext.test;
+package demo.ext.test;
 
 import cn.hutool.core.util.IdUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;

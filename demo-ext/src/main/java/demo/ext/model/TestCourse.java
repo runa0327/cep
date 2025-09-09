@@ -1,4 +1,4 @@
-package com.bid.ext.model;
+package demo.ext.model;
 
 import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
