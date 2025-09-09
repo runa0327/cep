@@ -1,9 +1,9 @@
-package com.bid.ext.test;
+package demo.ext.test;
 
-import com.bid.ext.model.TestCourse;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import demo.ext.model.TestCourse;
 
 import java.util.UUID;
 
