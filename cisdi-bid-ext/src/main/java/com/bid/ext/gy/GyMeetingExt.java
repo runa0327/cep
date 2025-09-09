@@ -35,8 +35,8 @@ public class GyMeetingExt {
         //获取上传的excel文件
         String prjId = varMap.get("PRJ_ID").toString();
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/国药/导入模版/会议管理导入模板_副本.xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/国药/导入模版/会议管理导入模板_副本.xlsx";
 
         try {
             FileInputStream file = new FileInputStream(new File(filePath));
@@ -60,9 +60,9 @@ public class GyMeetingExt {
 
                     //会议类型
                     String  meetingCategory = (String)getCellValue(row,1,String.class,false);
-                    List<Map<String, Object>> meetingCategoryList = myJdbcTemplate.queryForList("SELECT ID FROM  CC_MEETING_TYPE WHERE  `NAME`= ? ",meetingCategory);
+                    List<Map<String, Object>> meetingCategoryList = myJdbcTemplate.queryForList("SELECT ID FROM  CC_MEETING_TYPE WHERE  `NAME`->>'$.ZH_CN'= ? OR `NAME`= ?",meetingCategory,meetingCategory);
                     if (meetingCategoryList == null || meetingCategoryList.size()<1){
-                        throw new BaseException("第"+(row.getRowNum()+1)+"行,第2列会议类型填写错误");
+                        throw new BaseException("第"+(row.getRowNum()+1)+"行,'会议类型'填写错误");
                     }
                     String meetingCategoryId = (String)meetingCategoryList.get(0).get("ID");
                     meeting.setCcMeetingTypeId(meetingCategoryId);
