@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.ext.jar.helper.util.I18nUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.ad.login.PrincipalInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -633,5 +634,47 @@ public class BimModelRelExt {
                 }
             }
         }
+    }
+
+    /**
+     * 删除所有关联关系(系统管理员删除所有，非系统管理员删除自己创建的)
+     */
+    public void deleteAllRel(){
+
+        Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
+        String ccDocFileId = JdbcMapUtil.getString(inputMap, "ccDocFileId");
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
+        Where where = new Where();
+        //获取用户角色
+        ArrayList<PrincipalInfo> principalInfos = (ArrayList<PrincipalInfo>) loginInfo.currentPrincipalInfoList;
+        //判断是否为管理员用户
+        boolean isSysAdmin = false;
+        if(principalInfos != null && !principalInfos.isEmpty()){
+            for (PrincipalInfo principalInfo : principalInfos) {
+                if(principalInfo.type.equals("AD_ROLE") && principalInfo.code.equals("SYS_ADMIN")){
+                    //系统管理角色
+                    isSysAdmin = true;
+                    break;
+                }
+            }
+        }
+
+        if(isSysAdmin){
+            //删除所有关联关系
+            where.eq("ENT_CODE", "CC_QS_INSPECTION");
+            where.eq("CC_DOC_FILE_ID", ccDocFileId);
+            where.eq("CC_DOC_FILE_TYPE_ID", "BIM");
+        }else{
+            //非系统管理角色,只能删除自己关联的数据
+            where.eq("ENT_CODE", "CC_QS_INSPECTION");
+            where.eq("CC_DOC_FILE_ID", ccDocFileId);
+            where.eq("CC_DOC_FILE_TYPE_ID", "BIM");
+            where.eq("CRT_USER_ID", userId);
+        }
+
+        CcDocFileToBusiData.deleteByWhere(where);
     }
 }
