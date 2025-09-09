@@ -15,6 +15,7 @@
         <module>cisdi-bid-job</module>
         <module>cisdi-microservice</module>
         <module>ccis-auth</module>
+        <module>demo-ext</module>
     </modules>
 
     <properties>
