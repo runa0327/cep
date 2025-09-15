@@ -90,21 +90,31 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
             throw new BaseException("token为空");
         }
 
-        syncSafeInspectionInfo(token);//同步安全巡检
+
+        Integer safeInspectionInfoTotal = getSafeInspectionInfoTotal(token);//获取数据总数
+
+        int number = safeInspectionInfoTotal / 50;
+         number  += (safeInspectionInfoTotal % 50 > 0 ? 1 : 0);
+
+        for(int i = 0; i<number ; i++){
+            syncSafeInspectionInfo(token);//同步安全巡检
+        }
 
     }
 
     /**
-     * 获取巡检列表
+     * 获取数据总数
      * @param token
      */
-    private void syncSafeInspectionInfo(String token)  {
-        String  requestUrl =  "https://open.qingzhuyun.com/api/inspect/getSafetyListPage";
+    private Integer getSafeInspectionInfoTotal(String token) {
 
+        Integer  total = 0;
+
+        String requestUrl = "https://open.qingzhuyun.com/api/inspect/getSafetyListPage";
         Map<String, Object> requestMap = new HashMap<>();//请求参数，只包含
         requestMap.put("projectId", "d16f0c99b8b54feb96b3b7422c3755a0");//轻筑项目ID
-        requestMap.put("pageNum",1);//页码
-        requestMap.put("pageSize",9999);//大小
+        requestMap.put("pageNum", 1);//页码
+        requestMap.put("pageSize", 50);//大小
 
         HttpHeaders translateHeaders = new HttpHeaders();
         translateHeaders.set("auth-token", token);
@@ -118,6 +128,47 @@ public class RuQzInspectionInfoServiceImpl implements RuQzInspectionInfoService 
             JSONObject body = JSONUtil.parseObj(response.getBody());
             JSONObject res = body.getJSONObject("data");
             JSONObject data = res.getJSONObject("data");
+
+             total = (Integer) data.get("total");
+
+        }
+
+        return total;
+    }
+
+
+    /**
+     * 获取巡检列表
+     * @param token
+     */
+    private void syncSafeInspectionInfo(String token)  {
+
+
+
+        String  requestUrl =  "https://open.qingzhuyun.com/api/inspect/getSafetyListPage";
+
+        Map<String, Object> requestMap = new HashMap<>();//请求参数，只包含
+        requestMap.put("projectId", "d16f0c99b8b54feb96b3b7422c3755a0");//轻筑项目ID
+        requestMap.put("pageNum",1);//页码
+        requestMap.put("pageSize",50);//大小
+
+        HttpHeaders translateHeaders = new HttpHeaders();
+        translateHeaders.set("auth-token", token);
+        translateHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+
+
+        // 设置请求体
+        HttpEntity<Map> translateEntity = new HttpEntity<>(requestMap, translateHeaders);
+        ResponseEntity<String> response = restTemplate.exchange(requestUrl, HttpMethod.POST, translateEntity, String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            JSONObject body = JSONUtil.parseObj(response.getBody());
+            JSONObject res = body.getJSONObject("data");
+            JSONObject data = res.getJSONObject("data");
+
+            Object total = data.get("total");
+
             JSONArray dataList = data.getJSONArray("dataList");
 
             if (dataList==null) {

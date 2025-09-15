@@ -59,11 +59,11 @@ public class GyChangeManageExt {
 
                     //变更签证类型
                     String  signTypeString = (String)getCellValue(row,1,String.class,false);
-                    Map<String, Object> changeSignTypeMap = myJdbcTemplate.queryForMap("SELECT ID FROM CC_CHANGE_SIGN_TYPE  WHERE  `NAME`->>'$.ZH_CN'= ?", signTypeString);
-                    if (changeSignTypeMap == null){
-                        throw new BaseException("变更签证类型填写错误");
+                    List<Map<String, Object>> changeSignTypeMaps = myJdbcTemplate.queryForList("SELECT ID FROM CC_CHANGE_SIGN_TYPE  WHERE  `NAME`->>'$.ZH_CN'= ? OR  `NAME`= ?", signTypeString, signTypeString);
+                    if (changeSignTypeMaps == null || changeSignTypeMaps.size()<1){
+                        throw new BaseException("第"+(row.getRowNum()+1)+"行，'变更签证类型'填写错误");
                     }
-                    String changeSignTypeId = (String)changeSignTypeMap.get("ID");
+                    String changeSignTypeId = (String) changeSignTypeMaps.get(0).get("ID");
                     ccChangeSign.setCcChangeSignTypeId(changeSignTypeId);
 
                     //变更编号
@@ -72,9 +72,9 @@ public class GyChangeManageExt {
 
                     //申报单位
                     String  reportCompany = (String)getCellValue(row,3,String.class,false);
-                    List<Map<String, Object>> companyList = myJdbcTemplate.queryForList("SELECT ID FROM  cc_party_company  WHERE  CC_COMPANY_ID IN (SELECT ID  FROM  cc_company WHERE `NAME`->>'$.ZH_CN'= ? ) AND  CC_PRJ_ID = ?",reportCompany,prjId);
+                    List<Map<String, Object>> companyList = myJdbcTemplate.queryForList("SELECT ID FROM  cc_party_company  WHERE  CC_COMPANY_ID IN (SELECT ID  FROM  cc_company WHERE `NAME`->>'$.ZH_CN'= ? OR  `NAME`= ? ) AND  CC_PRJ_ID = ?",reportCompany,reportCompany,prjId);
                     if (companyList == null || companyList.size()<1){
-                        throw new BaseException("申报单位填写错误");
+                        throw new BaseException("第"+(row.getRowNum()+1)+"行，'申报单位'填写错误");
                     }
                     String companyId = (String)companyList.get(0).get("ID");
                     ccChangeSign.setCcPartyCompanyId(companyId);
@@ -94,9 +94,9 @@ public class GyChangeManageExt {
                     //金额
                     String  amtDirection =   (String)getCellValue(row,7,String.class,true);
                     if(StringUtils.hasLength(amtDirection)) {
-                        List<Map<String, Object>> amtDirections = myJdbcTemplate.queryForList("select ID FROM CC_CHANGE_SIGN_AMT_DIRECTION  WHERE `NAME`->>'$.ZH_CN'= ? ", amtDirection);
+                        List<Map<String, Object>> amtDirections = myJdbcTemplate.queryForList("select ID FROM CC_CHANGE_SIGN_AMT_DIRECTION  WHERE `NAME`->>'$.ZH_CN'= ? OR `NAME`= ? ", amtDirection, amtDirection);
                         if (amtDirections == null || amtDirections.size() < 1) {
-                            throw new BaseException("金额填写错误，请填写'增加'或'减少'");
+                            throw new BaseException("第"+(row.getRowNum()+1)+"行，'金额'填写错误，请填写'增加'或'减少'");
                         }
                         String amtDirectionId = (String) amtDirections.get(0).get("ID");
                         ccChangeSign.setCcChangeSignAmtDirectionId(amtDirectionId);
@@ -114,9 +114,9 @@ public class GyChangeManageExt {
                     //工期
                     String   increaseOrDecreaseInDuration =   (String)getCellValue(row,9,String.class,true);
                     if (StringUtils.hasLength(increaseOrDecreaseInDuration)) {
-                        List<Map<String, Object>> queryDurations = myJdbcTemplate.queryForList("SELECT ID FROM  CC_CHANGE_SIGN_DUARATION_DIRECTION  WHERE `NAME`->>'$.ZH_CN'=?", increaseOrDecreaseInDuration);
+                        List<Map<String, Object>> queryDurations = myJdbcTemplate.queryForList("SELECT ID FROM  CC_CHANGE_SIGN_DUARATION_DIRECTION  WHERE `NAME`->>'$.ZH_CN'=? OR `NAME`=?", increaseOrDecreaseInDuration,increaseOrDecreaseInDuration);
                         if (queryDurations == null || queryDurations.size() < 1) {
-                            throw new BaseException("金额填写错误，请填写'增加'或'减少'");
+                            throw new BaseException("第"+(row.getRowNum()+1)+"行，'金额'填写错误，请填写'增加'或'减少'");
                         }
                         String durationId = (String) queryDurations.get(0).get("ID");
                         ccChangeSign.setCcChangeSignDuarationDirectionId(durationId);
@@ -200,9 +200,9 @@ public class GyChangeManageExt {
 
                     //申报单位
                     String  reportCompany = (String)getCellValue(row,2,String.class,false);
-                    List<Map<String, Object>> companyList = myJdbcTemplate.queryForList("SELECT ID FROM  cc_party_company  WHERE  CC_COMPANY_ID IN (SELECT ID  FROM  cc_company WHERE `NAME`->>'$.ZH_CN'= ? ) AND  CC_PRJ_ID = ?",reportCompany,prjId);
+                    List<Map<String, Object>> companyList = myJdbcTemplate.queryForList("SELECT ID FROM  cc_party_company  WHERE  CC_COMPANY_ID IN (SELECT ID  FROM  cc_company WHERE `NAME`->>'$.ZH_CN'= ? OR `NAME` = ?) AND  CC_PRJ_ID = ?",reportCompany,reportCompany,prjId);
                     if (companyList == null || companyList.size()<1){
-                        throw new BaseException("申报单位填写错误");
+                        throw new BaseException("第"+(row.getRowNum()+1)+"列，'申报单位'填写错误");
                     }
                     String companyId = (String)companyList.get(0).get("ID");
                     personnelChange.setGyReprotUnit(companyId);
@@ -277,9 +277,9 @@ public class GyChangeManageExt {
 
                     //申报单位
                     String  reportCompany = (String)getCellValue(row,2,String.class,false);
-                    List<Map<String, Object>> companyList = myJdbcTemplate.queryForList("SELECT ID FROM  cc_party_company  WHERE  CC_COMPANY_ID IN (SELECT ID  FROM  cc_company WHERE `NAME`->>'$.ZH_CN'= ? ) AND  CC_PRJ_ID = ?",reportCompany,prjId);
+                    List<Map<String, Object>> companyList = myJdbcTemplate.queryForList("SELECT ID FROM  cc_party_company  WHERE  CC_COMPANY_ID IN (SELECT ID  FROM  cc_company WHERE `NAME`->>'$.ZH_CN'= ? OR  `NAME`= ?) AND  CC_PRJ_ID = ?",reportCompany,reportCompany,prjId);
                     if (companyList == null || companyList.size()<1){
-                        throw new BaseException("申报单位填写错误");
+                        throw new BaseException("第"+(row.getRowNum()+1)+"行，'申报单位'填写错误");
                     }
                     String companyId = (String)companyList.get(0).get("ID");
                     changeNegotiation.setGyReprotUnit(companyId);
@@ -291,9 +291,9 @@ public class GyChangeManageExt {
                     //金额
                     String  amtDirection =   (String)getCellValue(row,4,String.class,true);
                     if(StringUtils.hasLength(amtDirection)) {
-                        List<Map<String, Object>> amtDirections = myJdbcTemplate.queryForList("select ID FROM CC_CHANGE_SIGN_AMT_DIRECTION  WHERE `NAME`->>'$.ZH_CN'= ? ", amtDirection);
+                        List<Map<String, Object>> amtDirections = myJdbcTemplate.queryForList("select ID FROM CC_CHANGE_SIGN_AMT_DIRECTION  WHERE `NAME`->>'$.ZH_CN'= ? OR `NAME`= ?", amtDirection ,amtDirection);
                         if (amtDirections == null || amtDirections.size() < 1) {
-                            throw new BaseException("金额填写错误，请填写'增加'或'减少'");
+                            throw new BaseException("第"+(row.getRowNum()+1)+"行，'金额'填写错误，请填写'增加'或'减少'");
                         }
                         String amtDirectionId = (String) amtDirections.get(0).get("ID");
                         changeNegotiation.setCcChangeSignAmtDirectionId(amtDirectionId);
@@ -311,9 +311,9 @@ public class GyChangeManageExt {
                     //工期
                     String   increaseOrDecreaseInDuration =   (String)getCellValue(row,6,String.class,true);
                     if (StringUtils.hasLength(increaseOrDecreaseInDuration)) {
-                        List<Map<String, Object>> queryDurations = myJdbcTemplate.queryForList("SELECT ID FROM  CC_CHANGE_SIGN_DUARATION_DIRECTION  WHERE `NAME`->>'$.ZH_CN'=?", increaseOrDecreaseInDuration);
+                        List<Map<String, Object>> queryDurations = myJdbcTemplate.queryForList("SELECT ID FROM  CC_CHANGE_SIGN_DUARATION_DIRECTION  WHERE `NAME`->>'$.ZH_CN'=? OR `NAME`= ?", increaseOrDecreaseInDuration,increaseOrDecreaseInDuration);
                         if (queryDurations == null || queryDurations.size() < 1) {
-                            throw new BaseException("金额填写错误，请填写'增加'或'减少'");
+                            throw new BaseException("第"+(row.getRowNum()+1)+"行，'金额'填写错误，请填写'增加'或'减少'");
                         }
                         String durationId = (String) queryDurations.get(0).get("ID");
                         changeNegotiation.setCcChangeSignDuarationDirectionId(durationId);

@@ -35,8 +35,8 @@ public class GyCollaborativeExt {
         //获取上传的excel文件
         String prjId = varMap.get("PRJ_ID").toString();
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/国药/导入模版/协同任务导入模板_副本.xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/国药/导入模版/协同任务导入模板_副本.xlsx";
 
         try {
             FileInputStream file = new FileInputStream(new File(filePath));
@@ -60,8 +60,11 @@ public class GyCollaborativeExt {
 
                     //事务类别
                     String  eventCategory = (String)getCellValue(row,1,String.class,false);
-                    Map<String, Object> eventCateMap = myJdbcTemplate.queryForMap("SELECT ID FROM GY_EVENT_CATEGORY  WHERE  `NAME`->>'$.ZH_CN'=?", eventCategory);
-                    String eventCate = (String)eventCateMap.get("ID");
+                    List<Map<String, Object>> eventCateMaps = myJdbcTemplate.queryForList("SELECT ID FROM GY_EVENT_CATEGORY  WHERE  `NAME`->>'$.ZH_CN'=? OR `NAME`=?", eventCategory ,eventCategory);
+                    if (eventCateMaps == null || eventCateMaps.size() < 1) {
+                        throw new BaseException("第"+row.getRowNum()+1+"行，'事务类别'列填写错误");
+                    }
+                    String eventCate = (String)eventCateMaps.get(0).get("ID");
                     collaborativeEvent.setGyEventCategoryId(eventCate);
 
                     //负责人
@@ -85,7 +88,7 @@ public class GyCollaborativeExt {
                     if(StringUtils.hasLength(status)) {
                         List<Map<String, Object>> statusMaps = myJdbcTemplate.queryForList("SELECT ID FROM GY_EVENT_STATUS  WHERE  `NAME`->>'$.ZH_CN'=? ", status);
                         if (statusMaps == null || statusMaps.size() < 1) {
-                            throw new BaseException("第"+row.getRowNum()+1+"行，第7列状态列填写错误");
+                            throw new BaseException("第"+row.getRowNum()+1+"行，'状态'列填写错误");
                         }
                         String statusId = (String) statusMaps.get(0).get("ID");
                         collaborativeEvent.setGyEventStatusId(statusId);
