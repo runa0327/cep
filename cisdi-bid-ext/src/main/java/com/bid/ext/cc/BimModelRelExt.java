@@ -643,7 +643,11 @@ public class BimModelRelExt {
 
         Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
         String ccDocFileId = JdbcMapUtil.getString(inputMap, "ccDocFileId");
-
+        //要判断是否有ccQsInspectionType
+        String ccQsInspectionType = "";//aq:质量，safe:安全
+        if(inputMap.containsKey("ccQsInspectionType")){
+            ccQsInspectionType = JdbcMapUtil.getString(inputMap, "ccQsInspectionType");//质安巡检类型：安全/质量
+        }
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
 
@@ -654,27 +658,69 @@ public class BimModelRelExt {
         boolean isSysAdmin = false;
         if(principalInfos != null && !principalInfos.isEmpty()){
             for (PrincipalInfo principalInfo : principalInfos) {
-                if(principalInfo.type.equals("AD_ROLE") && principalInfo.code.equals("SYS_ADMIN")){
+                if(principalInfo.type.name().equals("AD_ROLE") && principalInfo.code.equals("SYS_ADMIN")){
                     //系统管理角色
                     isSysAdmin = true;
                     break;
                 }
             }
         }
+        //判断ccQsInspectionType是否为空字符串
+        String sql = "SELECT * FROM cc_doc_file_to_busi_data df ";
+        if(!SharedUtil.isEmpty(ccQsInspectionType)){
+            sql += " LEFT JOIN cc_qs_inspection qi on df.ENT_CODE = 'CC_QS_INSPECTION' AND df.ENTITY_RECORD_ID = qi.ID WHERE ";
+            if(ccQsInspectionType.equals("aq")){
+                //质量
+                sql += " qi.CC_QS_INSPECTION_TYPE_ID = '1750796211883540480' ";
+            }else if(ccQsInspectionType.equals("safe")){
+                //安全
+                sql += " qi.CC_QS_INSPECTION_TYPE_ID = '1750796258457092096' ";
+            }
 
-        if(isSysAdmin){
-            //删除所有关联关系
-            where.eq("ENT_CODE", "CC_QS_INSPECTION");
-            where.eq("CC_DOC_FILE_ID", ccDocFileId);
-            where.eq("CC_DOC_FILE_TYPE_ID", "BIM");
-        }else{
-            //非系统管理角色,只能删除自己关联的数据
-            where.eq("ENT_CODE", "CC_QS_INSPECTION");
-            where.eq("CC_DOC_FILE_ID", ccDocFileId);
-            where.eq("CC_DOC_FILE_TYPE_ID", "BIM");
-            where.eq("CRT_USER_ID", userId);
+
+            sql += " AND df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM'";
+
+            if(!isSysAdmin){
+                sql += " AND df.CRT_USER_ID = ?";
+            }
         }
 
-        CcDocFileToBusiData.deleteByWhere(where);
+//        if(isSysAdmin){
+//            //删除所有关联关系
+//            where.eq("ENT_CODE", "CC_QS_INSPECTION");
+//            where.eq("CC_DOC_FILE_ID", ccDocFileId);
+//            where.eq("CC_DOC_FILE_TYPE_ID", "BIM");
+//        }else{
+//            //非系统管理角色,只能删除自己关联的数据
+//            where.eq("ENT_CODE", "CC_QS_INSPECTION");
+//            where.eq("CC_DOC_FILE_ID", ccDocFileId);
+//            where.eq("CC_DOC_FILE_TYPE_ID", "BIM");
+//            where.eq("CRT_USER_ID", userId);
+//        }
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        //删除关联关系表后，还要更新巡检表，不然数据无法重新关联
+        List<Map<String, Object>> list = null ;
+        if(isSysAdmin){
+            list = myJdbcTemplate.queryForList(sql, ccDocFileId);
+        }else{
+            list = myJdbcTemplate.queryForList(sql, ccDocFileId, userId);
+        }
+
+        //删除关联关系表后，还要更新巡检表，不然数据无法重新关联
+//        List<CcDocFileToBusiData> list = CcDocFileToBusiData.selectByWhere(where);
+
+        if(list != null && list.size() > 0){
+            for(Map<String, Object> map : list){
+                String Id = map.get("ENTITY_RECORD_ID").toString();//巡检ID
+                CcQsInspection ccQsInspection = CcQsInspection.selectById(Id);
+                ccQsInspection.setCcBimModelComponentsId(null);
+                ccQsInspection.updateById();
+
+                CcDocFileToBusiData.deleteById(map.get("ID").toString());//删除关联表数据，防止冗余数据
+            }
+        }
+
+//        CcDocFileToBusiData.deleteByWhere(where);//删除关联表数据，防止冗余数据
     }
 }
