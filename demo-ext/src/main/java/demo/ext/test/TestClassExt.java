@@ -93,7 +93,7 @@ public class TestClassExt {
             List<LinkResult> childResultList = new ArrayList<>();
             linkResult.childResultListMap.put(viewPartCode, childResultList);
 
-            // 修改已有各条：
+            // 修改已有各条（暂无效果）：
             {
                 List<EntityRecord> teacherList = casData.childData == null ? null : casData.childData.get(viewPartCode);
                 if (SharedUtil.notEmpty(teacherList)) {
@@ -103,7 +103,7 @@ public class TestClassExt {
 
                         childResult.csCommId = teacher.csCommId;
 
-                        // 修改无需processType，设置attMap即可：
+                        // 修改时无需processType，直接设置attMap即可：
                         // childResult.processType = LinkResultProcessType.CREATE;
                         // childResult.processType = LinkResultProcessType.DELETE;
                         childResult.attMap = new LinkedHashMap<>();
@@ -114,6 +114,21 @@ public class TestClassExt {
                             linkResultAtt.data.value = "999";
                         }
 
+                    });
+                }
+            }
+
+            // 删除已有各条：
+            {
+                List<EntityRecord> teacherList = casData.childData == null ? null : casData.childData.get(viewPartCode);
+                if (SharedUtil.notEmpty(teacherList)) {
+                    teacherList.forEach(teacher -> {
+                        LinkResult childResult = new LinkResult();
+                        childResultList.add(childResult);
+
+                        childResult.csCommId = teacher.csCommId;
+
+                        childResult.processType = LinkResultProcessType.DELETE;
                     });
                 }
             }
