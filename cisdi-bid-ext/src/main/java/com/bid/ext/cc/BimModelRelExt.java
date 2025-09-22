@@ -668,14 +668,31 @@ public class BimModelRelExt {
         //判断ccQsInspectionType是否为空字符串
         String sql = "SELECT * FROM cc_doc_file_to_busi_data df ";
         if(!SharedUtil.isEmpty(ccQsInspectionType)){
-            sql += " LEFT JOIN cc_qs_inspection qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
-            sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_QS_INSPECTION' ";
+//            sql += " LEFT JOIN cc_qs_inspection qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
+//            sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_QS_INSPECTION' ";
             if(ccQsInspectionType.equals("qa")){
                 //质量
+                sql += " LEFT JOIN cc_qs_inspection qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
+                sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_QS_INSPECTION' ";
                 sql += " AND qi.CC_QS_INSPECTION_TYPE_ID = '1750796211883540480' ";
             }else if(ccQsInspectionType.equals("safe")){
                 //安全
+                sql += " LEFT JOIN cc_qs_inspection qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
+                sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_QS_INSPECTION' ";
+
                 sql += " AND qi.CC_QS_INSPECTION_TYPE_ID = '1750796258457092096' ";
+            }else if(ccQsInspectionType.equals("deed")){
+                //事记
+                sql += " LEFT JOIN CC_EVENT qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
+                sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_EVENT' ";
+            }else if(ccQsInspectionType.equals("doc")) {
+                //文档
+                sql += " LEFT JOIN CC_DOC_FILE qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
+                sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_DOC_FILE' ";
+            }else{
+                //合同
+                sql += " LEFT JOIN CC_PO qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
+                sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_PO' ";
             }
 
             if(!isSysAdmin){
