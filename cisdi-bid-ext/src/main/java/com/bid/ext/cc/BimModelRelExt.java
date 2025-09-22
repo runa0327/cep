@@ -668,17 +668,15 @@ public class BimModelRelExt {
         //判断ccQsInspectionType是否为空字符串
         String sql = "SELECT * FROM cc_doc_file_to_busi_data df ";
         if(!SharedUtil.isEmpty(ccQsInspectionType)){
-            sql += " LEFT JOIN cc_qs_inspection qi on df.ENT_CODE = 'CC_QS_INSPECTION' AND df.ENTITY_RECORD_ID = qi.ID WHERE ";
-            if(ccQsInspectionType.equals("aq")){
+            sql += " LEFT JOIN cc_qs_inspection qi on df.ENTITY_RECORD_ID = qi.ID WHERE ";
+            sql += " df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM' AND df.ENT_CODE = 'CC_QS_INSPECTION' ";
+            if(ccQsInspectionType.equals("qa")){
                 //质量
-                sql += " qi.CC_QS_INSPECTION_TYPE_ID = '1750796211883540480' ";
+                sql += " AND qi.CC_QS_INSPECTION_TYPE_ID = '1750796211883540480' ";
             }else if(ccQsInspectionType.equals("safe")){
                 //安全
-                sql += " qi.CC_QS_INSPECTION_TYPE_ID = '1750796258457092096' ";
+                sql += " AND qi.CC_QS_INSPECTION_TYPE_ID = '1750796258457092096' ";
             }
-
-
-            sql += " AND df.CC_DOC_FILE_ID = ? AND df.CC_DOC_FILE_TYPE_ID = 'BIM'";
 
             if(!isSysAdmin){
                 sql += " AND df.CRT_USER_ID = ?";
