@@ -133,6 +133,10 @@ public class CcPrjStructNode {
          */
         public static final String CC_IS_REL_BIM_MODEL_COMPONENT = "CC_IS_REL_BIM_MODEL_COMPONENT";
         /**
+         * 跳转url。
+         */
+        public static final String REDIRECT_URL = "REDIRECT_URL";
+        /**
          * 产品负责人。
          */
         public static final String PBS_CHIEF_USER_ID = "PBS_CHIEF_USER_ID";
@@ -1046,6 +1050,42 @@ public class CcPrjStructNode {
             this.ccIsRelBimModelComponent = ccIsRelBimModelComponent;
             if (!this.toUpdateCols.contains("CC_IS_REL_BIM_MODEL_COMPONENT")) {
                 this.toUpdateCols.add("CC_IS_REL_BIM_MODEL_COMPONENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 跳转url。
+     */
+    private String redirectUrl;
+
+    /**
+     * 获取：跳转url。
+     */
+    public String getRedirectUrl() {
+        return this.redirectUrl;
+    }
+
+    /**
+     * 设置：跳转url。
+     */
+    public CcPrjStructNode setRedirectUrl(String redirectUrl) {
+        if (this.redirectUrl == null && redirectUrl == null) {
+            // 均为null，不做处理。
+        } else if (this.redirectUrl != null && redirectUrl != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.redirectUrl.compareTo(redirectUrl) != 0) {
+                this.redirectUrl = redirectUrl;
+                if (!this.toUpdateCols.contains("REDIRECT_URL")) {
+                    this.toUpdateCols.add("REDIRECT_URL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.redirectUrl = redirectUrl;
+            if (!this.toUpdateCols.contains("REDIRECT_URL")) {
+                this.toUpdateCols.add("REDIRECT_URL");
             }
         }
         return this;
