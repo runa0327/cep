@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "支付申请", "ZH_CN": "支付申请", "ZH_TW": "支付申请"}。
+ * 支付申请。
  */
 public class CcPayReq {
 
@@ -49,111 +49,119 @@ public class CcPayReq {
 
     public static class Cols {
         /**
-         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+         * 项目。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+         * ID。
          */
         public static final String ID = "ID";
         /**
-         * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+         * 版本。
          */
         public static final String VER = "VER";
         /**
-         * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+         * 时间戳。
          */
         public static final String TS = "TS";
         /**
-         * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+         * 是否预设。
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+         * 创建日期时间。
          */
         public static final String CRT_DT = "CRT_DT";
         /**
-         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+         * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+         * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
         /**
-         * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+         * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+         * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+         * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+         * 代码。
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         * 名称。
          */
         public static final String NAME = "NAME";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         * 备注。
          */
         public static final String REMARK = "REMARK";
         /**
-         * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+         * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
         /**
-         * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+         * 图标。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+         * 监理单位工程师。
          */
-        public static final String PARTY_A = "PARTY_A";
+        public static final String CC_PROCESS_SUPERVISE_USER_IDS = "CC_PROCESS_SUPERVISE_USER_IDS";
         /**
-         * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+         * 管理单位工程师。
          */
-        public static final String PARTY_A_CONTACT_NAME = "PARTY_A_CONTACT_NAME";
+        public static final String CC_PROCESS_MANAGEMENT_USER_IDS = "CC_PROCESS_MANAGEMENT_USER_IDS";
         /**
-         * {"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
-         */
-        public static final String PARTY_A_CONTACT_PHONE = "PARTY_A_CONTACT_PHONE";
-        /**
-         * {"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-         */
-        public static final String PARTY_B = "PARTY_B";
-        /**
-         * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-         */
-        public static final String PARTY_B_CONTACT_NAME = "PARTY_B_CONTACT_NAME";
-        /**
-         * {"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-         */
-        public static final String PARTY_B_CONTACT_PHONE = "PARTY_B_CONTACT_PHONE";
-        /**
-         * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-         */
-        public static final String CC_PRJ_CBS_TEMPALTE_NODE_ID = "CC_PRJ_CBS_TEMPALTE_NODE_ID";
-        /**
-         * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+         * 采购合同。
          */
         public static final String CC_PO_ID = "CC_PO_ID";
         /**
-         * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+         * 甲方。
+         */
+        public static final String PARTY_A = "PARTY_A";
+        /**
+         * 甲方联系人姓名。
+         */
+        public static final String PARTY_A_CONTACT_NAME = "PARTY_A_CONTACT_NAME";
+        /**
+         * 甲方联系人电话。
+         */
+        public static final String PARTY_A_CONTACT_PHONE = "PARTY_A_CONTACT_PHONE";
+        /**
+         * 乙方。
+         */
+        public static final String PARTY_B = "PARTY_B";
+        /**
+         * 乙方联系人姓名。
+         */
+        public static final String PARTY_B_CONTACT_NAME = "PARTY_B_CONTACT_NAME";
+        /**
+         * 乙方联系人电话。
+         */
+        public static final String PARTY_B_CONTACT_PHONE = "PARTY_B_CONTACT_PHONE";
+        /**
+         * 项目CBS模板。
+         */
+        public static final String CC_PRJ_CBS_TEMPALTE_NODE_ID = "CC_PRJ_CBS_TEMPALTE_NODE_ID";
+        /**
+         * 附件。
          */
         public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
         /**
-         * {"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
+         * 业务日期。
          */
         public static final String TRX_DATE = "TRX_DATE";
         /**
-         * {"EN": "业务金额（元）", "ZH_CN": "业务金额（元）", "ZH_TW": "业务金额（元）"}。
+         * 业务金额（元）。
          */
         public static final String TRX_AMT = "TRX_AMT";
     }
@@ -164,19 +172,19 @@ public class CcPayReq {
     // <editor-fold>
 
     /**
-     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 项目。
      */
     private String ccPrjId;
 
     /**
-     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 获取：项目。
      */
     public String getCcPrjId() {
         return this.ccPrjId;
     }
 
     /**
-     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 设置：项目。
      */
     public CcPayReq setCcPrjId(String ccPrjId) {
         if (this.ccPrjId == null && ccPrjId == null) {
@@ -200,19 +208,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * ID。
      */
     private String id;
 
     /**
-     * 获取：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 获取：ID。
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 设置：ID。
      */
     public CcPayReq setId(String id) {
         if (this.id == null && id == null) {
@@ -236,19 +244,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 版本。
      */
     private Integer ver;
 
     /**
-     * 获取：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 获取：版本。
      */
     public Integer getVer() {
         return this.ver;
     }
 
     /**
-     * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 设置：版本。
      */
     public CcPayReq setVer(Integer ver) {
         if (this.ver == null && ver == null) {
@@ -272,19 +280,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 时间戳。
      */
     private LocalDateTime ts;
 
     /**
-     * 获取：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 获取：时间戳。
      */
     public LocalDateTime getTs() {
         return this.ts;
     }
 
     /**
-     * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 设置：时间戳。
      */
     public CcPayReq setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
@@ -308,19 +316,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 是否预设。
      */
     private Boolean isPreset;
 
     /**
-     * 获取：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 获取：是否预设。
      */
     public Boolean getIsPreset() {
         return this.isPreset;
     }
 
     /**
-     * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 设置：是否预设。
      */
     public CcPayReq setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
@@ -344,19 +352,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 创建日期时间。
      */
     private LocalDateTime crtDt;
 
     /**
-     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 获取：创建日期时间。
      */
     public LocalDateTime getCrtDt() {
         return this.crtDt;
     }
 
     /**
-     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 设置：创建日期时间。
      */
     public CcPayReq setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
@@ -380,19 +388,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 创建用户。
      */
     private String crtUserId;
 
     /**
-     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 获取：创建用户。
      */
     public String getCrtUserId() {
         return this.crtUserId;
     }
 
     /**
-     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 设置：创建用户。
      */
     public CcPayReq setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
@@ -416,19 +424,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
 
     /**
-     * 获取：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 获取：最后修改日期时间。
      */
     public LocalDateTime getLastModiDt() {
         return this.lastModiDt;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 设置：最后修改日期时间。
      */
     public CcPayReq setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
@@ -452,19 +460,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 最后修改用户。
      */
     private String lastModiUserId;
 
     /**
-     * 获取：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 获取：最后修改用户。
      */
     public String getLastModiUserId() {
         return this.lastModiUserId;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 设置：最后修改用户。
      */
     public CcPayReq setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
@@ -488,19 +496,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 记录状态。
      */
     private String status;
 
     /**
-     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 获取：记录状态。
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 设置：记录状态。
      */
     public CcPayReq setStatus(String status) {
         if (this.status == null && status == null) {
@@ -524,19 +532,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 锁定流程实例。
      */
     private String lkWfInstId;
 
     /**
-     * 获取：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 获取：锁定流程实例。
      */
     public String getLkWfInstId() {
         return this.lkWfInstId;
     }
 
     /**
-     * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 设置：锁定流程实例。
      */
     public CcPayReq setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
@@ -560,19 +568,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 代码。
      */
     private String code;
 
     /**
-     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 获取：代码。
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 设置：代码。
      */
     public CcPayReq setCode(String code) {
         if (this.code == null && code == null) {
@@ -596,19 +604,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 名称。
      */
     private String name;
 
     /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 获取：名称。
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 设置：名称。
      */
     public CcPayReq setName(String name) {
         if (this.name == null && name == null) {
@@ -632,19 +640,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 备注。
      */
     private String remark;
 
     /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 获取：备注。
      */
     public String getRemark() {
         return this.remark;
     }
 
     /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 设置：备注。
      */
     public CcPayReq setRemark(String remark) {
         if (this.remark == null && remark == null) {
@@ -668,19 +676,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 快捷码。
      */
     private String fastCode;
 
     /**
-     * 获取：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 获取：快捷码。
      */
     public String getFastCode() {
         return this.fastCode;
     }
 
     /**
-     * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 设置：快捷码。
      */
     public CcPayReq setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
@@ -704,19 +712,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 图标。
      */
     private String iconFileGroupId;
 
     /**
-     * 获取：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 获取：图标。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 设置：图标。
      */
     public CcPayReq setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
@@ -740,271 +748,91 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     * 监理单位工程师。
      */
-    private String partyA;
+    private String ccProcessSuperviseUserIds;
 
     /**
-     * 获取：{"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     * 获取：监理单位工程师。
      */
-    public String getPartyA() {
-        return this.partyA;
+    public String getCcProcessSuperviseUserIds() {
+        return this.ccProcessSuperviseUserIds;
     }
 
     /**
-     * 设置：{"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     * 设置：监理单位工程师。
      */
-    public CcPayReq setPartyA(String partyA) {
-        if (this.partyA == null && partyA == null) {
+    public CcPayReq setCcProcessSuperviseUserIds(String ccProcessSuperviseUserIds) {
+        if (this.ccProcessSuperviseUserIds == null && ccProcessSuperviseUserIds == null) {
             // 均为null，不做处理。
-        } else if (this.partyA != null && partyA != null) {
+        } else if (this.ccProcessSuperviseUserIds != null && ccProcessSuperviseUserIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.partyA.compareTo(partyA) != 0) {
-                this.partyA = partyA;
-                if (!this.toUpdateCols.contains("PARTY_A")) {
-                    this.toUpdateCols.add("PARTY_A");
+            if (this.ccProcessSuperviseUserIds.compareTo(ccProcessSuperviseUserIds) != 0) {
+                this.ccProcessSuperviseUserIds = ccProcessSuperviseUserIds;
+                if (!this.toUpdateCols.contains("CC_PROCESS_SUPERVISE_USER_IDS")) {
+                    this.toUpdateCols.add("CC_PROCESS_SUPERVISE_USER_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.partyA = partyA;
-            if (!this.toUpdateCols.contains("PARTY_A")) {
-                this.toUpdateCols.add("PARTY_A");
+            this.ccProcessSuperviseUserIds = ccProcessSuperviseUserIds;
+            if (!this.toUpdateCols.contains("CC_PROCESS_SUPERVISE_USER_IDS")) {
+                this.toUpdateCols.add("CC_PROCESS_SUPERVISE_USER_IDS");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     * 管理单位工程师。
      */
-    private String partyAContactName;
+    private String ccProcessManagementUserIds;
 
     /**
-     * 获取：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     * 获取：管理单位工程师。
      */
-    public String getPartyAContactName() {
-        return this.partyAContactName;
+    public String getCcProcessManagementUserIds() {
+        return this.ccProcessManagementUserIds;
     }
 
     /**
-     * 设置：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     * 设置：管理单位工程师。
      */
-    public CcPayReq setPartyAContactName(String partyAContactName) {
-        if (this.partyAContactName == null && partyAContactName == null) {
+    public CcPayReq setCcProcessManagementUserIds(String ccProcessManagementUserIds) {
+        if (this.ccProcessManagementUserIds == null && ccProcessManagementUserIds == null) {
             // 均为null，不做处理。
-        } else if (this.partyAContactName != null && partyAContactName != null) {
+        } else if (this.ccProcessManagementUserIds != null && ccProcessManagementUserIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.partyAContactName.compareTo(partyAContactName) != 0) {
-                this.partyAContactName = partyAContactName;
-                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
-                    this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+            if (this.ccProcessManagementUserIds.compareTo(ccProcessManagementUserIds) != 0) {
+                this.ccProcessManagementUserIds = ccProcessManagementUserIds;
+                if (!this.toUpdateCols.contains("CC_PROCESS_MANAGEMENT_USER_IDS")) {
+                    this.toUpdateCols.add("CC_PROCESS_MANAGEMENT_USER_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.partyAContactName = partyAContactName;
-            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
-                this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+            this.ccProcessManagementUserIds = ccProcessManagementUserIds;
+            if (!this.toUpdateCols.contains("CC_PROCESS_MANAGEMENT_USER_IDS")) {
+                this.toUpdateCols.add("CC_PROCESS_MANAGEMENT_USER_IDS");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
-     */
-    private String partyAContactPhone;
-
-    /**
-     * 获取：{"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
-     */
-    public String getPartyAContactPhone() {
-        return this.partyAContactPhone;
-    }
-
-    /**
-     * 设置：{"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
-     */
-    public CcPayReq setPartyAContactPhone(String partyAContactPhone) {
-        if (this.partyAContactPhone == null && partyAContactPhone == null) {
-            // 均为null，不做处理。
-        } else if (this.partyAContactPhone != null && partyAContactPhone != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.partyAContactPhone.compareTo(partyAContactPhone) != 0) {
-                this.partyAContactPhone = partyAContactPhone;
-                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
-                    this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.partyAContactPhone = partyAContactPhone;
-            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
-                this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-     */
-    private String partyB;
-
-    /**
-     * 获取：{"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-     */
-    public String getPartyB() {
-        return this.partyB;
-    }
-
-    /**
-     * 设置：{"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-     */
-    public CcPayReq setPartyB(String partyB) {
-        if (this.partyB == null && partyB == null) {
-            // 均为null，不做处理。
-        } else if (this.partyB != null && partyB != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.partyB.compareTo(partyB) != 0) {
-                this.partyB = partyB;
-                if (!this.toUpdateCols.contains("PARTY_B")) {
-                    this.toUpdateCols.add("PARTY_B");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.partyB = partyB;
-            if (!this.toUpdateCols.contains("PARTY_B")) {
-                this.toUpdateCols.add("PARTY_B");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-     */
-    private String partyBContactName;
-
-    /**
-     * 获取：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-     */
-    public String getPartyBContactName() {
-        return this.partyBContactName;
-    }
-
-    /**
-     * 设置：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-     */
-    public CcPayReq setPartyBContactName(String partyBContactName) {
-        if (this.partyBContactName == null && partyBContactName == null) {
-            // 均为null，不做处理。
-        } else if (this.partyBContactName != null && partyBContactName != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.partyBContactName.compareTo(partyBContactName) != 0) {
-                this.partyBContactName = partyBContactName;
-                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
-                    this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.partyBContactName = partyBContactName;
-            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
-                this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-     */
-    private String partyBContactPhone;
-
-    /**
-     * 获取：{"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-     */
-    public String getPartyBContactPhone() {
-        return this.partyBContactPhone;
-    }
-
-    /**
-     * 设置：{"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-     */
-    public CcPayReq setPartyBContactPhone(String partyBContactPhone) {
-        if (this.partyBContactPhone == null && partyBContactPhone == null) {
-            // 均为null，不做处理。
-        } else if (this.partyBContactPhone != null && partyBContactPhone != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.partyBContactPhone.compareTo(partyBContactPhone) != 0) {
-                this.partyBContactPhone = partyBContactPhone;
-                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
-                    this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.partyBContactPhone = partyBContactPhone;
-            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
-                this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-     */
-    private String ccPrjCbsTempalteNodeId;
-
-    /**
-     * 获取：{"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-     */
-    public String getCcPrjCbsTempalteNodeId() {
-        return this.ccPrjCbsTempalteNodeId;
-    }
-
-    /**
-     * 设置：{"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-     */
-    public CcPayReq setCcPrjCbsTempalteNodeId(String ccPrjCbsTempalteNodeId) {
-        if (this.ccPrjCbsTempalteNodeId == null && ccPrjCbsTempalteNodeId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjCbsTempalteNodeId != null && ccPrjCbsTempalteNodeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjCbsTempalteNodeId.compareTo(ccPrjCbsTempalteNodeId) != 0) {
-                this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
-                if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
-            if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
-                this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     * 采购合同。
      */
     private String ccPoId;
 
     /**
-     * 获取：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     * 获取：采购合同。
      */
     public String getCcPoId() {
         return this.ccPoId;
     }
 
     /**
-     * 设置：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     * 设置：采购合同。
      */
     public CcPayReq setCcPoId(String ccPoId) {
         if (this.ccPoId == null && ccPoId == null) {
@@ -1028,19 +856,271 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     * 甲方。
+     */
+    private String partyA;
+
+    /**
+     * 获取：甲方。
+     */
+    public String getPartyA() {
+        return this.partyA;
+    }
+
+    /**
+     * 设置：甲方。
+     */
+    public CcPayReq setPartyA(String partyA) {
+        if (this.partyA == null && partyA == null) {
+            // 均为null，不做处理。
+        } else if (this.partyA != null && partyA != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyA.compareTo(partyA) != 0) {
+                this.partyA = partyA;
+                if (!this.toUpdateCols.contains("PARTY_A")) {
+                    this.toUpdateCols.add("PARTY_A");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyA = partyA;
+            if (!this.toUpdateCols.contains("PARTY_A")) {
+                this.toUpdateCols.add("PARTY_A");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 甲方联系人姓名。
+     */
+    private String partyAContactName;
+
+    /**
+     * 获取：甲方联系人姓名。
+     */
+    public String getPartyAContactName() {
+        return this.partyAContactName;
+    }
+
+    /**
+     * 设置：甲方联系人姓名。
+     */
+    public CcPayReq setPartyAContactName(String partyAContactName) {
+        if (this.partyAContactName == null && partyAContactName == null) {
+            // 均为null，不做处理。
+        } else if (this.partyAContactName != null && partyAContactName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyAContactName.compareTo(partyAContactName) != 0) {
+                this.partyAContactName = partyAContactName;
+                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
+                    this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyAContactName = partyAContactName;
+            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
+                this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 甲方联系人电话。
+     */
+    private String partyAContactPhone;
+
+    /**
+     * 获取：甲方联系人电话。
+     */
+    public String getPartyAContactPhone() {
+        return this.partyAContactPhone;
+    }
+
+    /**
+     * 设置：甲方联系人电话。
+     */
+    public CcPayReq setPartyAContactPhone(String partyAContactPhone) {
+        if (this.partyAContactPhone == null && partyAContactPhone == null) {
+            // 均为null，不做处理。
+        } else if (this.partyAContactPhone != null && partyAContactPhone != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyAContactPhone.compareTo(partyAContactPhone) != 0) {
+                this.partyAContactPhone = partyAContactPhone;
+                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
+                    this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyAContactPhone = partyAContactPhone;
+            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
+                this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 乙方。
+     */
+    private String partyB;
+
+    /**
+     * 获取：乙方。
+     */
+    public String getPartyB() {
+        return this.partyB;
+    }
+
+    /**
+     * 设置：乙方。
+     */
+    public CcPayReq setPartyB(String partyB) {
+        if (this.partyB == null && partyB == null) {
+            // 均为null，不做处理。
+        } else if (this.partyB != null && partyB != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyB.compareTo(partyB) != 0) {
+                this.partyB = partyB;
+                if (!this.toUpdateCols.contains("PARTY_B")) {
+                    this.toUpdateCols.add("PARTY_B");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyB = partyB;
+            if (!this.toUpdateCols.contains("PARTY_B")) {
+                this.toUpdateCols.add("PARTY_B");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 乙方联系人姓名。
+     */
+    private String partyBContactName;
+
+    /**
+     * 获取：乙方联系人姓名。
+     */
+    public String getPartyBContactName() {
+        return this.partyBContactName;
+    }
+
+    /**
+     * 设置：乙方联系人姓名。
+     */
+    public CcPayReq setPartyBContactName(String partyBContactName) {
+        if (this.partyBContactName == null && partyBContactName == null) {
+            // 均为null，不做处理。
+        } else if (this.partyBContactName != null && partyBContactName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyBContactName.compareTo(partyBContactName) != 0) {
+                this.partyBContactName = partyBContactName;
+                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
+                    this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyBContactName = partyBContactName;
+            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
+                this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 乙方联系人电话。
+     */
+    private String partyBContactPhone;
+
+    /**
+     * 获取：乙方联系人电话。
+     */
+    public String getPartyBContactPhone() {
+        return this.partyBContactPhone;
+    }
+
+    /**
+     * 设置：乙方联系人电话。
+     */
+    public CcPayReq setPartyBContactPhone(String partyBContactPhone) {
+        if (this.partyBContactPhone == null && partyBContactPhone == null) {
+            // 均为null，不做处理。
+        } else if (this.partyBContactPhone != null && partyBContactPhone != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyBContactPhone.compareTo(partyBContactPhone) != 0) {
+                this.partyBContactPhone = partyBContactPhone;
+                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
+                    this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyBContactPhone = partyBContactPhone;
+            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
+                this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目CBS模板。
+     */
+    private String ccPrjCbsTempalteNodeId;
+
+    /**
+     * 获取：项目CBS模板。
+     */
+    public String getCcPrjCbsTempalteNodeId() {
+        return this.ccPrjCbsTempalteNodeId;
+    }
+
+    /**
+     * 设置：项目CBS模板。
+     */
+    public CcPayReq setCcPrjCbsTempalteNodeId(String ccPrjCbsTempalteNodeId) {
+        if (this.ccPrjCbsTempalteNodeId == null && ccPrjCbsTempalteNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjCbsTempalteNodeId != null && ccPrjCbsTempalteNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjCbsTempalteNodeId.compareTo(ccPrjCbsTempalteNodeId) != 0) {
+                this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
+                if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
+            if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件。
      */
     private String ccAttachments;
 
     /**
-     * 获取：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     * 获取：附件。
      */
     public String getCcAttachments() {
         return this.ccAttachments;
     }
 
     /**
-     * 设置：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
+     * 设置：附件。
      */
     public CcPayReq setCcAttachments(String ccAttachments) {
         if (this.ccAttachments == null && ccAttachments == null) {
@@ -1064,19 +1144,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
+     * 业务日期。
      */
     private LocalDate trxDate;
 
     /**
-     * 获取：{"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
+     * 获取：业务日期。
      */
     public LocalDate getTrxDate() {
         return this.trxDate;
     }
 
     /**
-     * 设置：{"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
+     * 设置：业务日期。
      */
     public CcPayReq setTrxDate(LocalDate trxDate) {
         if (this.trxDate == null && trxDate == null) {
@@ -1100,19 +1180,19 @@ public class CcPayReq {
     }
 
     /**
-     * {"EN": "业务金额（元）", "ZH_CN": "业务金额（元）", "ZH_TW": "业务金额（元）"}。
+     * 业务金额（元）。
      */
     private BigDecimal trxAmt;
 
     /**
-     * 获取：{"EN": "业务金额（元）", "ZH_CN": "业务金额（元）", "ZH_TW": "业务金额（元）"}。
+     * 获取：业务金额（元）。
      */
     public BigDecimal getTrxAmt() {
         return this.trxAmt;
     }
 
     /**
-     * 设置：{"EN": "业务金额（元）", "ZH_CN": "业务金额（元）", "ZH_TW": "业务金额（元）"}。
+     * 设置：业务金额（元）。
      */
     public CcPayReq setTrxAmt(BigDecimal trxAmt) {
         if (this.trxAmt == null && trxAmt == null) {
