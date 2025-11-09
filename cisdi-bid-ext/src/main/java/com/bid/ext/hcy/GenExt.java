@@ -3,6 +3,7 @@ package com.bid.ext.hcy;
 import com.bid.ext.config.FlPathConfig;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.DownloadUtils;
+import com.bid.ext.utils.JsonUtil;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.data.Pictures;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -33,7 +34,7 @@ import java.util.*;
 public class GenExt {
 
     /**
-     * 生成pdf
+     * 生成工程联系单
      */
     public void genWorkConcatFormPdf() {
 
@@ -63,9 +64,13 @@ public class GenExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
 
             //项目名称
-            String prjName = fetchNameFromTable("CC_PRJ",
-                    valueMap.get("CC_PRJ_ID").toString(),
-                    loginInfo.currentLangId.toString());
+//            String prjName = fetchNameFromTable("CC_PRJ",
+//                    valueMap.get("CC_PRJ_ID").toString(),
+//                    loginInfo.currentLangId.toString());//
+//
+            String ccPrjId = (String)valueMap.get("CC_PRJ_ID");
+            CcPrj ccPrj = CcPrj.selectById(ccPrjId);
+            String prjName = JsonUtil.getCN(ccPrj.getFullName());
 
             //接收单位
             String receivingUnit = fetchNameFromTable("CC_PARTY_COMPANY",
@@ -83,7 +88,7 @@ public class GenExt {
                     loginInfo.currentLangId.toString());
             String ccUnitNames = "";
             for (Map<String, Object> ccUnit:ccUnits) {
-                ccUnitNames+=ccUnit.get("name/n");
+                ccUnitNames+=ccUnit.get("name\n");
             }
 
             //事由
@@ -182,6 +187,10 @@ public class GenExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    //监理通知单
+
+
+
     public static void saveWordToFile(byte[] wordContent, String outputPath) {
         try {
             // 创建一个File对象，代表输出路径
@@ -263,8 +272,7 @@ public class GenExt {
             }
             String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
-//            String libreOfficePath = "D:/Program Files/LibreOffice/program/soffice.exe";
-
+//            String libreOfficePath = "E:\\Program Files\\LibreOffice\\program\\soffice.exe";
             // 调用 LibreOffice 进行 DOCX 转 PDF
             ProcessBuilder builder = new ProcessBuilder();
             builder.command(libreOfficePath, "--convert-to", "pdf:writer_pdf_Export", tempDocx.toString(), "--outdir", tempPdf.getParent().toString());
