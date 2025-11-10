@@ -261,15 +261,18 @@ public class GenExt {
             }
 
             //抄送单位
-            List<Map<String, Object>> ccUnits = fetchNamesFromTable("CC_PARTY_COMPANY",
-                    valueMap.get("HC_WCF_CC_UNIT").toString(),
-                    loginInfo.currentLangId.toString());
             String ccUnitNames = "";
-            for (int i = 0; i < ccUnits.size(); i++) {
-                if (i>0) {
-                    ccUnitNames += "\n\t\t"+ccUnits.get(i).get("name") ;
-                }else{
-                    ccUnitNames += ccUnits.get(i).get("name") ;
+            if(valueMap.get("HC_WCF_CC_UNIT")!=null) {
+                List<Map<String, Object>> ccUnits = fetchNamesFromTable("CC_PARTY_COMPANY",
+                        valueMap.get("HC_WCF_CC_UNIT").toString(),
+                        loginInfo.currentLangId.toString());
+
+                for (int i = 0; i < ccUnits.size(); i++) {
+                    if (i > 0) {
+                        ccUnitNames += "\n\t\t" + ccUnits.get(i).get("name");
+                    } else {
+                        ccUnitNames += ccUnits.get(i).get("name");
+                    }
                 }
             }
 
