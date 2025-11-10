@@ -152,6 +152,10 @@ public class CcCriticalPrjPlan {
          */
         public static final String CC_PROCESS_SUPERVISE_USER_IDS = "CC_PROCESS_SUPERVISE_USER_IDS";
         /**
+         * 管理单位工程师。
+         */
+        public static final String CC_PROCESS_MANAGEMENT_USER_IDS = "CC_PROCESS_MANAGEMENT_USER_IDS";
+        /**
          * 危大工程类别。
          */
         public static final String CC_CRITICAL_PRJ_TYPE_ID = "CC_CRITICAL_PRJ_TYPE_ID";
@@ -1317,6 +1321,42 @@ public class CcCriticalPrjPlan {
             this.ccProcessSuperviseUserIds = ccProcessSuperviseUserIds;
             if (!this.toUpdateCols.contains("CC_PROCESS_SUPERVISE_USER_IDS")) {
                 this.toUpdateCols.add("CC_PROCESS_SUPERVISE_USER_IDS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 管理单位工程师。
+     */
+    private String ccProcessManagementUserIds;
+
+    /**
+     * 获取：管理单位工程师。
+     */
+    public String getCcProcessManagementUserIds() {
+        return this.ccProcessManagementUserIds;
+    }
+
+    /**
+     * 设置：管理单位工程师。
+     */
+    public CcCriticalPrjPlan setCcProcessManagementUserIds(String ccProcessManagementUserIds) {
+        if (this.ccProcessManagementUserIds == null && ccProcessManagementUserIds == null) {
+            // 均为null，不做处理。
+        } else if (this.ccProcessManagementUserIds != null && ccProcessManagementUserIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccProcessManagementUserIds.compareTo(ccProcessManagementUserIds) != 0) {
+                this.ccProcessManagementUserIds = ccProcessManagementUserIds;
+                if (!this.toUpdateCols.contains("CC_PROCESS_MANAGEMENT_USER_IDS")) {
+                    this.toUpdateCols.add("CC_PROCESS_MANAGEMENT_USER_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccProcessManagementUserIds = ccProcessManagementUserIds;
+            if (!this.toUpdateCols.contains("CC_PROCESS_MANAGEMENT_USER_IDS")) {
+                this.toUpdateCols.add("CC_PROCESS_MANAGEMENT_USER_IDS");
             }
         }
         return this;
