@@ -19,6 +19,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import com.tencentcloudapi.csip.v20221121.models.VULRiskAdvanceCFGList;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -38,7 +39,6 @@ public class GenExt {
      */
     public void genWorkConcatFormPdf() {
 
-
         InvokeActResult invokeActResult = new InvokeActResult();
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
@@ -47,7 +47,6 @@ public class GenExt {
         int year = now.getYear();
         String month = String.format("%02d", now.getMonthValue());
         String day = String.format("%02d", now.getDayOfMonth());
-
 
         for (EntityRecord entityRecord : entityRecordList) {
 
@@ -87,8 +86,12 @@ public class GenExt {
                     valueMap.get("HC_WCF_CC_UNIT").toString(),
                     loginInfo.currentLangId.toString());
             String ccUnitNames = "";
-            for (Map<String, Object> ccUnit:ccUnits) {
-                ccUnitNames+=ccUnit.get("name\n");
+            for (int i = 0; i < ccUnits.size(); i++) {
+                if (i>0) {
+                    ccUnitNames += "\n\t"+ccUnits.get(i).get("name") ;
+                }else{
+                    ccUnitNames += ccUnits.get(i).get("name") ;
+                }
             }
 
             //事由
@@ -101,7 +104,9 @@ public class GenExt {
             String  projectDepartment = (String) valueMap.get("HC_WCF_PRJ_NAME");
 
             //日期
-            LocalDate concatDate = (LocalDate) valueMap.get("HC_WCF_CONCAT_DATE");
+            String concatDateStr = (String) valueMap.get("HC_WCF_CONCAT_DATE");
+
+            LocalDate concatDate = LocalDate.parse(concatDateStr);
 
             //问题图片
             String issuesImgId = null;
@@ -111,7 +116,7 @@ public class GenExt {
             List<Map<String, Object>> imageEntries = fetchAndFormatImagesByPl(issuesImgId);
 
             Map<String, Object> map = new HashMap<String, Object>();
-
+            map.put("number","　　　　");
             map.put("csCommId", entityRecord.csCommId);
 //            map.put("year", year);
             map.put("prjName", prjName);
@@ -129,11 +134,22 @@ public class GenExt {
             map.put("projectDepartment", projectDepartment);
 //            图片
             map.put("imgs", imageEntries);
+            //日期
+            map.put("year",concatDate.getYear());
+            map.put("month",String.format("%02d", concatDate.getMonthValue()));
+            map.put("day",String.format("%02d",concatDate.getDayOfMonth()));
 
             MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
             String sql = "SELECT  f.PHYSICAL_LOCATION as physicalLocation from  fl_file  f,hc_work_concat_form_file_template t WHERE  t.ATTACHMENT LIKE   CONCAT('%',f.ID,'%') limit 0,1";
             Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap(sql);
             String   flLocation = (String) stringObjectMap.get("physicalLocation");
+
+            if(!StringUtils.hasLength(flLocation)){
+                String errMsg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.workConcatFormTemplate.notSet");
+                throw new  BaseException(errMsg);
+            }
+
+//            flLocation = "/Users/hejialun/Documents/航材院/workConcatFormTemplate2.docx";
 
             byte[] word = DownloadUtils.createWordByResource(map, flLocation);
 
@@ -146,6 +162,7 @@ public class GenExt {
 
             // 构建文件名和路径
             String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
+//             path = "/Users/hejialun/Documents/航材院/test/" + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
             saveWordToFile(b, path);
             boolean fileExists = checkFileExists(path);
             if (fileExists) {
@@ -175,6 +192,159 @@ public class GenExt {
                 flFile.insertById();
 
                 // 将文件ID设置到CC_QS_NOTICE_ID上：
+                HcWorkConcatForm workConcatForm = HcWorkConcatForm.selectById(EntityRecordUtil.getId(entityRecord));
+                workConcatForm.setCcAttachment(fileId);
+                workConcatForm.updateById();
+            } else {
+                String message = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.gczx.ql.fileNotFound", path);
+                throw new BaseException(message);
+            }
+        }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 生成监理通知单
+     */
+    public void genSupNotice() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+
+
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        String month = String.format("%02d", now.getMonthValue());
+        String day = String.format("%02d", now.getDayOfMonth());
+
+
+        for (EntityRecord entityRecord : entityRecordList) {
+            // 获取属性：
+            Where attWhere = new Where();
+            attWhere.eq(AdAtt.Cols.CODE, CcQsInspection.Cols.CC_QS_NOTICE_ID);
+            AdAtt adAtt = AdAtt.selectOneByWhere(attWhere);
+
+            // 获取路径：
+            Where pathWhere = new Where();
+            pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
+            FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+//            String prjName = fetchNameFromTable("CC_PRJ",
+//                    valueMap.get("CC_PRJ_ID").toString(),
+//                    loginInfo.currentLangId.toString());
+
+            String ccPrjId = (String)valueMap.get("CC_PRJ_ID");
+            CcPrj ccPrj = CcPrj.selectById(ccPrjId);
+            String prjName = JsonUtil.getCN(ccPrj.getFullName());
+
+            Object ccQsIssuePointTypeId = valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID");
+            String issuePointTypeName = null;
+            if (!SharedUtil.isEmpty(ccQsIssuePointTypeId)) {
+                issuePointTypeName = fetchNameFromTable("CC_QS_ISSUE_POINT_TYPE",
+                        valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString(),
+                        loginInfo.currentLangId.toString());
+            }
+
+            String inspectionTypeName = fetchNameFromTable("CC_QS_INSPECTION_TYPE",
+                    valueMap.get("CC_QS_INSPECTION_TYPE_ID").toString(),
+                    loginInfo.currentLangId.toString());
+
+            Object ccQsIssuePointIds = valueMap.get("CC_QS_ISSUE_POINT_IDS");
+            List<Map<String, Object>> issuePointNames = null;
+            if (!SharedUtil.isEmpty(ccQsIssuePointIds)) {
+                issuePointNames = fetchAndFormatIssuePointNames("CC_QS_ISSUE_POINT",
+                        ccQsIssuePointIds.toString(),
+                        loginInfo.currentLangId.toString());
+            }
+
+            //抄送单位
+            List<Map<String, Object>> ccUnits = fetchNamesFromTable("CC_PARTY_COMPANY",
+                    valueMap.get("HC_WCF_CC_UNIT").toString(),
+                    loginInfo.currentLangId.toString());
+            String ccUnitNames = "";
+            for (int i = 0; i < ccUnits.size(); i++) {
+                if (i>0) {
+                    ccUnitNames += "\n\t\t"+ccUnits.get(i).get("name") ;
+                }else{
+                    ccUnitNames += ccUnits.get(i).get("name") ;
+                }
+            }
+
+            String issuesImgId = null;
+            if (!SharedUtil.isEmpty(valueMap.get("CC_QS_ISSUES_IMG"))) {
+                issuesImgId = valueMap.get("CC_QS_ISSUES_IMG").toString();
+            }
+
+            List<Map<String, Object>> imageEntries = fetchAndFormatImagesByPl(issuesImgId);
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("csCommId", entityRecord.csCommId);
+            map.put("year", year);
+            map.put("prjName", prjName);
+            map.put("issuePointTypeName", issuePointTypeName);
+            map.put("inspectionTypeName", inspectionTypeName);
+            map.put("issuePointNames", issuePointNames);
+            map.put("ccUnits", ccUnitNames);
+            map.put("reason",valueMap.get("NAME"));
+            map.put("remark",valueMap.get("REMARK"));
+            map.put("imgs", imageEntries);
+
+
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+            String sql = "SELECT  f.PHYSICAL_LOCATION as physicalLocation from  fl_file  f,HC_SUP_NOTICE_FILE_TEMPLATE t WHERE  t.ATTACHMENT LIKE   CONCAT('%',f.ID,'%') limit 0,1";
+            Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap(sql);
+            String   flLocation = (String) stringObjectMap.get("physicalLocation");
+
+            if(!StringUtils.hasLength(flLocation)){
+                String errMsg = I18nUtil.buildAppI18nMessageInCurrentLang("qygly.backEnd.ext.workConcatFormTemplate.notSet");
+                throw new  BaseException(errMsg);
+            }
+
+//                        flLocation = "/Users/hejialun/Documents/航材院/supNotice.docx";
+
+            byte[] word = DownloadUtils.createWordByResource(map, flLocation);
+            byte[] b = convertWordToPDF(word);
+
+            FlFile flFile = FlFile.newData();
+
+            // 将String写入文件，覆盖模式，字符集为UTF-8x``
+            String fileId = flFile.getId();
+
+            // 构建文件名和路径
+            String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
+//            path = "/Users/hejialun/Documents/航材院/test/" + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
+            saveWordToFile(b, path);
+            boolean fileExists = checkFileExists(path);
+            if (fileExists) {
+                //获取文件属性
+                File file = new File(path);
+                long bytes = file.length();
+                double kilobytes = bytes / 1024.0;
+
+                BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
+                String dspSize = String.format("%d KB", Math.round(kilobytes));
+                flFile.setCrtUserId(loginInfo.userInfo.id);
+                flFile.setLastModiUserId(loginInfo.userInfo.id);
+                flFile.setFlPathId(flPath.getId());
+                flFile.setCode(fileId);
+                flFile.setName("监理通知单");
+                flFile.setExt("pdf");
+                flFile.setDspName("监理通知单.pdf");
+                flFile.setFileInlineUrl(FlPathConfig.FILE_INLINE_URL_FIX + "?fileId=" + fileId);
+                flFile.setFileAttachmentUrl(FlPathConfig.FILE_ATTACHMENT_URL_FIX + "?fileId=" + fileId);
+                flFile.setSizeKb(sizeKb);
+                flFile.setDspSize(dspSize);
+                flFile.setUploadDttm(LocalDateTime.now());
+                flFile.setPhysicalLocation(path);
+                flFile.setOriginFilePhysicalLocation(path);
+//                flFile.setIsPublicRead(flPath.getIsPublicRead());
+                flFile.setIsPublicRead(false);
+                flFile.insertById();
+
+                // 将文件ID设置到CC_QS_NOTICE_ID上：
                 CcQsInspection ccQsInspection = CcQsInspection.selectById(EntityRecordUtil.getId(entityRecord));
                 ccQsInspection.setCcQsNoticeId(fileId);
                 ccQsInspection.updateById();
@@ -186,8 +356,6 @@ public class GenExt {
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
-
-    //监理通知单
 
 
 
@@ -273,6 +441,7 @@ public class GenExt {
             String libreOfficePath = (String) list.get(0).get("SETTING_VALUE");
 
 //            String libreOfficePath = "E:\\Program Files\\LibreOffice\\program\\soffice.exe";
+//            String libreOfficePath = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
             // 调用 LibreOffice 进行 DOCX 转 PDF
             ProcessBuilder builder = new ProcessBuilder();
             builder.command(libreOfficePath, "--convert-to", "pdf:writer_pdf_Export", tempDocx.toString(), "--outdir", tempPdf.getParent().toString());
@@ -411,6 +580,7 @@ public class GenExt {
             FlFile flFile = FlFile.selectById(ids.get(i)); // 获取文件对象
             if (flFile != null) {
                 String physicalPath = flFile.getPhysicalLocation(); // 获取文件的物理路径
+//                physicalPath = "/Users/hejialun/Downloads/考勤管理-copy (1).png";
                 File imageFile = new File(physicalPath);
                 if (imageFile.exists()) {
                     try {

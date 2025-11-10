@@ -62,7 +62,7 @@ public class DownloadUtils {
             }
             FileInputStream inputStream = new FileInputStream(file);
             LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
-            Configure config = Configure.builder().bind("records", policy).bind("imgs", policy).build();
+            Configure config = Configure.builder().bind("imgs", policy).build();
             // 获取模板
 //            XWPFTemplate template = XWPFTemplate.compile(res.getInputStream(), config).render(params);
             XWPFTemplate template = XWPFTemplate.compile(inputStream, config).render(params);
