@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
@@ -10,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProcessExt {
@@ -17,48 +19,49 @@ public class ProcessExt {
     //支付申请流程相关扩展
 
     /**
+     * 所有需要使用监理单位工程师的流程，都需要调用该方法
      * 获取监理单位工程师
      */
     public void getSuperviseUsers() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-
+            String entCode = ExtJarHelper.getSevInfo().entityInfo.code;//表名
             String csCommId = entityRecord.csCommId;
-            CcPayReq ccPayReq = CcPayReq.selectById(csCommId);
-            String ccSuperviseUserIds = ccPayReq.getCcProcessSuperviseUserIds();
-            if (ccSuperviseUserIds != null && !ccSuperviseUserIds.isEmpty()) {
-                String[] memberIds = ccSuperviseUserIds.split(",");
-                ArrayList<String> memberIdList = new ArrayList<>(Arrays.asList(memberIds));
-                ArrayList<String> userIdList = new ArrayList<>();
-                for (String memberId : memberIdList) {
-                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
-                    String adUserId = ccPrjMember.getAdUserId();
-                    userIdList.add(adUserId);
-                }
-                ExtJarHelper.setReturnValue(userIdList);
-            }
+            String param = "cc_process_supervise_user_ids";
+
+            getUsersByParam(entCode,csCommId,param);
         }
     }
 
     /**
+     * 所有需要使用监理单位工程师的流程，都需要调用该方法
      * 获取管理单位工程师
      */
     public void getManagementUsers() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-
+            String entCode = ExtJarHelper.getSevInfo().entityInfo.code;//表名
             String csCommId = entityRecord.csCommId;
-            CcPayReq ccPayReq = CcPayReq.selectById(csCommId);
-            String ccManagementUserIds = ccPayReq.getCcProcessManagementUserIds();
-            if (ccManagementUserIds != null && !ccManagementUserIds.isEmpty()) {
-                String[] memberIds = ccManagementUserIds.split(",");
-                ArrayList<String> memberIdList = new ArrayList<>(Arrays.asList(memberIds));
-                ArrayList<String> userIdList = new ArrayList<>();
-                for (String memberId : memberIdList) {
-                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
-                    String adUserId = ccPrjMember.getAdUserId();
-                    userIdList.add(adUserId);
-                }
-                ExtJarHelper.setReturnValue(userIdList);
+            String param = "cc_process_management_user_ids";
+
+            getUsersByParam(entCode,csCommId,param);
+        }
+    }
+
+    public void getUsersByParam(String entCode,String csCommId,String param){
+        String sqlStr = "select " + param +" from " + entCode + " where ID = ?";
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        List<Map<String, Object>> ccUserIdsList = myJdbcTemplate.queryForList(sqlStr,csCommId);
+        if (!CollectionUtils.isEmpty(ccUserIdsList)) {
+            Map<String, Object> map = ccUserIdsList.get(0);
+            String ccUserIds = map.get(param).toString();
+            String[] memberIds = ccUserIds.split(",");
+            ArrayList<String> memberIdList = new ArrayList<>(Arrays.asList(memberIds));
+            ArrayList<String> userIdList = new ArrayList<>();
+            for (String memberId : memberIdList) {
+                CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                String adUserId = ccPrjMember.getAdUserId();
+                userIdList.add(adUserId);
             }
+            ExtJarHelper.setReturnValue(userIdList);
         }
     }
 
