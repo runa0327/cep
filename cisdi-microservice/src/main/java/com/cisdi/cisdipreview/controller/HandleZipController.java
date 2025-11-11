@@ -1,7 +1,9 @@
 package com.cisdi.cisdipreview.controller;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONObject;
 import com.cisdi.cisdipreview.utils.FileUtils;
+import com.cisdi.cisdipreview.utils.JsonUtil;
 import com.qygly.shared.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -138,6 +140,12 @@ public class HandleZipController {
     private void unzipAndStoreFiles(String filePath, String ccProcedureLedgerId, String attachments, String ccDrawingUpdateRecordId, String userId) throws IOException, SQLException {
         Map<String, Object> flFile = jdbcTemplate.queryForMap("select * from fl_file where id = ?", attachments);
         String zipFileName = flFile.get("NAME").toString();
+        //从数据库中读取的文件名可能是json格式，需要进行判断和提取，格式如下：{"ZH_CN": "测试zip包"}
+        if (zipFileName.contains("{")) {
+            //将字符串转化成json后提取zh_cn的值
+            Map agentMap = JsonUtil.fromJson(zipFileName, Map.class);
+            zipFileName = (String) agentMap.get("ZH_CN");
+        }
 
         // 创建 ZIP 文件根目录
         String rootDirId = createRootDirectory(zipFileName, ccProcedureLedgerId, ccDrawingUpdateRecordId, userId);
@@ -419,7 +427,7 @@ public class HandleZipController {
      * @throws SQLException SQL 异常
      */
     private Map<String, Object> getFlPathId(String attachments) throws SQLException {
-        String fileAndPathSql = "select ff.FL_PATH_ID,fp.DIR,fp.FILE_INLINE_URL,fp.FILE_ATTACHMENT_URL from fl_path fp left join fl_file ff on fp.ID = ff.FL_PATH_ID where ff.ID=?";
+        String fileAndPathSql = "select ff.FL_PATH_ID,fp.DIR,ff.FILE_INLINE_URL,ff.FILE_ATTACHMENT_URL from fl_path fp left join fl_file ff on fp.ID = ff.FL_PATH_ID where ff.ID=?";
         List<Map<String, Object>> resultList = jdbcTemplate.queryForList(fileAndPathSql, attachments);
         if (resultList.isEmpty()) {
             throw new IllegalArgumentException("文件不存在！");
