@@ -658,10 +658,14 @@ public class BimModelRelExt {
         boolean isSysAdmin = false;
         if(principalInfos != null && !principalInfos.isEmpty()){
             for (PrincipalInfo principalInfo : principalInfos) {
-                if(principalInfo.type.name().equals("AD_ROLE") && principalInfo.code.equals("SYS_ADMIN")){
-                    //系统管理角色
-                    isSysAdmin = true;
-                    break;
+                if(principalInfo.type.name().equals("AD_ROLE") ){
+                    if(principalInfo.code != null){
+                        if(principalInfo.code.equals("SYS_ADMIN")){
+                            //系统管理角色
+                            isSysAdmin = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -734,6 +738,8 @@ public class BimModelRelExt {
 
                 CcDocFileToBusiData.deleteById(map.get("ID").toString());//删除关联表数据，防止冗余数据
             }
+        }else{
+            throw new BaseException("没有可删除的关联数据！");
         }
 
 //        CcDocFileToBusiData.deleteByWhere(where);//删除关联表数据，防止冗余数据
