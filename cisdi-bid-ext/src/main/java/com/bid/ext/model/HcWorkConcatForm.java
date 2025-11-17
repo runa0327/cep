@@ -140,6 +140,10 @@ public class HcWorkConcatForm {
          */
         public static final String HC_DOCUMENT_NUMBER = "HC_DOCUMENT_NUMBER";
         /**
+         * 通知单编号。
+         */
+        public static final String HCY_TABLE_NUMBER = "HCY_TABLE_NUMBER";
+        /**
          * 附件。
          */
         public static final String ATTACHMENT = "ATTACHMENT";
@@ -977,6 +981,42 @@ public class HcWorkConcatForm {
             this.hcDocumentNumber = hcDocumentNumber;
             if (!this.toUpdateCols.contains("HC_DOCUMENT_NUMBER")) {
                 this.toUpdateCols.add("HC_DOCUMENT_NUMBER");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 通知单编号。
+     */
+    private String hcyTableNumber;
+
+    /**
+     * 获取：通知单编号。
+     */
+    public String getHcyTableNumber() {
+        return this.hcyTableNumber;
+    }
+
+    /**
+     * 设置：通知单编号。
+     */
+    public HcWorkConcatForm setHcyTableNumber(String hcyTableNumber) {
+        if (this.hcyTableNumber == null && hcyTableNumber == null) {
+            // 均为null，不做处理。
+        } else if (this.hcyTableNumber != null && hcyTableNumber != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hcyTableNumber.compareTo(hcyTableNumber) != 0) {
+                this.hcyTableNumber = hcyTableNumber;
+                if (!this.toUpdateCols.contains("HCY_TABLE_NUMBER")) {
+                    this.toUpdateCols.add("HCY_TABLE_NUMBER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hcyTableNumber = hcyTableNumber;
+            if (!this.toUpdateCols.contains("HCY_TABLE_NUMBER")) {
+                this.toUpdateCols.add("HCY_TABLE_NUMBER");
             }
         }
         return this;

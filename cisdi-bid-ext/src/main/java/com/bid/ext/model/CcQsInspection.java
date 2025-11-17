@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "EN：质安巡检", "ZH_CN": "质安巡检", "ZH_TW": "繁：质安巡检"}。
+ * 质安巡检。
  */
 public class CcQsInspection {
 
@@ -48,83 +48,83 @@ public class CcQsInspection {
 
     public static class Cols {
         /**
-         * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+         * ID。
          */
         public static final String ID = "ID";
         /**
-         * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+         * 版本。
          */
         public static final String VER = "VER";
         /**
-         * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+         * 时间戳。
          */
         public static final String TS = "TS";
         /**
-         * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+         * 是否预设。
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+         * 创建日期时间。
          */
         public static final String CRT_DT = "CRT_DT";
         /**
-         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+         * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+         * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
         /**
-         * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+         * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+         * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+         * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+         * 代码。
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         * 名称。
          */
         public static final String NAME = "NAME";
         /**
-         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+         * 项目。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+         * 快捷码。
          */
         public static final String FAST_CODE = "FAST_CODE";
         /**
-         * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+         * 图标。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+         * 项目结构节点。
          */
         public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
         /**
-         * {"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+         * 质安发起方。
          */
         public static final String CC_QS_INITIATING_POST_ID = "CC_QS_INITIATING_POST_ID";
         /**
-         * {"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
+         * 质安发布时间。
          */
         public static final String CC_QS_INSPECTION_TIME = "CC_QS_INSPECTION_TIME";
         /**
-         * {"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+         * 咨询问题。
          */
         public static final String CC_QUESTION = "CC_QUESTION";
         /**
-         * {"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+         * 咨询名称。
          */
         public static final String CC_NAME = "CC_NAME";
         /**
@@ -140,23 +140,23 @@ public class CcQsInspection {
          */
         public static final String CC_QS_INSPECTION_USER = "CC_QS_INSPECTION_USER";
         /**
-         * {"EN": "CC_QS_INSPECTION_TYPE_ID", "ZH_CN": "质安巡检类型", "ZH_TW": "繁：质安巡检类型"}。
+         * 质安巡检类型。
          */
         public static final String CC_QS_INSPECTION_TYPE_ID = "CC_QS_INSPECTION_TYPE_ID";
         /**
-         * {"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+         * 巡检部位。
          */
         public static final String CC_QS_INSPECTION_POSITION = "CC_QS_INSPECTION_POSITION";
         /**
-         * {"EN": "CC_QS_INITIATION_TYPE_ID", "ZH_CN": "质安发起类型", "ZH_TW": "繁：质安发起类型"}。
+         * 质安发起类型。
          */
         public static final String CC_QS_INITIATION_TYPE_ID = "CC_QS_INITIATION_TYPE_ID";
         /**
-         * {"EN": "CC_QS_ISSUE_POINT_TYPE_ID", "ZH_CN": "质安问题要点分类", "ZH_TW": "繁：质安问题要点分类"}。
+         * 质安问题要点分类。
          */
         public static final String CC_QS_ISSUE_POINT_TYPE_ID = "CC_QS_ISSUE_POINT_TYPE_ID";
         /**
-         * {"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+         * 质安问题等级。
          */
         public static final String CC_QS_ISSUE_LEVEL_ID = "CC_QS_ISSUE_LEVEL_ID";
         /**
@@ -168,75 +168,83 @@ public class CcQsInspection {
          */
         public static final String CC_PRJ_PBS_NODE_ID = "CC_PRJ_PBS_NODE_ID";
         /**
-         * {"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
+         * 质安问题要点（多个）。
          */
         public static final String CC_QS_ISSUE_POINT_IDS = "CC_QS_ISSUE_POINT_IDS";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         * 备注。
          */
         public static final String REMARK = "REMARK";
         /**
-         * {"EN": "RECTIFICATION_PERIOD", "ZH_CN": "整改期限", "ZH_TW": "繁：整改期限"}。
+         * 整改期限。
          */
         public static final String RECTIFICATION_PERIOD = "RECTIFICATION_PERIOD";
         /**
-         * {"EN": "CC_QS_DUTY_COMPANY", "ZH_CN": "质安责任单位", "ZH_TW": "繁：质安责任单位"}。
+         * 质安责任单位。
          */
         public static final String CC_QS_DUTY_COMPANY = "CC_QS_DUTY_COMPANY";
         /**
-         * {"EN": "CC_QS_DUTY_USER", "ZH_CN": "质安责任用户", "ZH_TW": "繁：质安责任用户"}。
+         * 质安责任用户。
          */
         public static final String CC_QS_DUTY_USER = "CC_QS_DUTY_USER";
         /**
-         * {"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+         * 安全责任人（多）。
          */
         public static final String CC_SAFE_DUTY_USER_IDS = "CC_SAFE_DUTY_USER_IDS";
         /**
-         * {"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+         * 质安责任方。
          */
         public static final String CC_QS_DUTY_POST_ID = "CC_QS_DUTY_POST_ID";
         /**
-         * {"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+         * 质安分包单位。
          */
         public static final String CC_QS_SUBCONTRACTOR_ID = "CC_QS_SUBCONTRACTOR_ID";
         /**
-         * {"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+         * 质安复核用户。
          */
         public static final String CC_QS_CHECK_USER = "CC_QS_CHECK_USER";
         /**
-         * {"EN": "CC_QS_COPY_USER", "ZH_CN": "质安抄送用户", "ZH_TW": "繁：质安抄送用户"}。
+         * 质安抄送用户。
          */
         public static final String CC_QS_COPY_USER = "CC_QS_COPY_USER";
         /**
-         * {"EN": "CC_QS_ISSUES_IMG", "ZH_CN": "质安问题图片", "ZH_TW": "繁：质安问题图片"}。
+         * 抄报单位。
+         */
+        public static final String HC_WCF_CC_UNIT = "HC_WCF_CC_UNIT";
+        /**
+         * 通知单编号。
+         */
+        public static final String HCY_TABLE_NUMBER = "HCY_TABLE_NUMBER";
+        /**
+         * 质安问题图片。
          */
         public static final String CC_QS_ISSUES_IMG = "CC_QS_ISSUES_IMG";
         /**
-         * {"EN": "ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+         * 附件。
          */
         public static final String ATTACHMENT = "ATTACHMENT";
         /**
-         * {"EN": "CC_QS_CURRENT_STATE_ID", "ZH_CN": "质安当前状态", "ZH_TW": "繁：质安当前状态"}。
+         * 质安当前状态。
          */
         public static final String CC_QS_CURRENT_STATE_ID = "CC_QS_CURRENT_STATE_ID";
         /**
-         * {"EN": "CC_QS_RECTIFY_TIME", "ZH_CN": "质安整改时间", "ZH_TW": "繁：质安整改时间"}。
+         * 质安整改时间。
          */
         public static final String CC_QS_RECTIFY_TIME = "CC_QS_RECTIFY_TIME";
         /**
-         * {"EN": "CC_QS_RECTIFY_IMG", "ZH_CN": "质安整改图片", "ZH_TW": "繁：质安整改图片"}。
+         * 质安整改图片。
          */
         public static final String CC_QS_RECTIFY_IMG = "CC_QS_RECTIFY_IMG";
         /**
-         * {"EN": "CC_QS_RECTIFY_DESC", "ZH_CN": "质安整改详述", "ZH_TW": "繁：质安整改详述"}。
+         * 质安整改详述。
          */
         public static final String CC_QS_RECTIFY_DESC = "CC_QS_RECTIFY_DESC";
         /**
-         * {"EN": "CC_QS_CHECK_TIME", "ZH_CN": "质安复核时间", "ZH_TW": "繁：质安复核时间"}。
+         * 质安复核时间。
          */
         public static final String CC_QS_CHECK_TIME = "CC_QS_CHECK_TIME";
         /**
-         * {"EN": "质安通知单", "ZH_CN": "质安通知单", "ZH_TW": "质安通知单"}。
+         * 质安通知单。
          */
         public static final String CC_QS_NOTICE_ID = "CC_QS_NOTICE_ID";
     }
@@ -247,19 +255,19 @@ public class CcQsInspection {
     // <editor-fold>
 
     /**
-     * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * ID。
      */
     private String id;
 
     /**
-     * 获取：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 获取：ID。
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
+     * 设置：ID。
      */
     public CcQsInspection setId(String id) {
         if (this.id == null && id == null) {
@@ -283,19 +291,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 版本。
      */
     private Integer ver;
 
     /**
-     * 获取：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 获取：版本。
      */
     public Integer getVer() {
         return this.ver;
     }
 
     /**
-     * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
+     * 设置：版本。
      */
     public CcQsInspection setVer(Integer ver) {
         if (this.ver == null && ver == null) {
@@ -319,19 +327,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 时间戳。
      */
     private LocalDateTime ts;
 
     /**
-     * 获取：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 获取：时间戳。
      */
     public LocalDateTime getTs() {
         return this.ts;
     }
 
     /**
-     * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
+     * 设置：时间戳。
      */
     public CcQsInspection setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
@@ -355,19 +363,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 是否预设。
      */
     private Boolean isPreset;
 
     /**
-     * 获取：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 获取：是否预设。
      */
     public Boolean getIsPreset() {
         return this.isPreset;
     }
 
     /**
-     * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
+     * 设置：是否预设。
      */
     public CcQsInspection setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
@@ -391,19 +399,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 创建日期时间。
      */
     private LocalDateTime crtDt;
 
     /**
-     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 获取：创建日期时间。
      */
     public LocalDateTime getCrtDt() {
         return this.crtDt;
     }
 
     /**
-     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     * 设置：创建日期时间。
      */
     public CcQsInspection setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
@@ -427,19 +435,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 创建用户。
      */
     private String crtUserId;
 
     /**
-     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 获取：创建用户。
      */
     public String getCrtUserId() {
         return this.crtUserId;
     }
 
     /**
-     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     * 设置：创建用户。
      */
     public CcQsInspection setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
@@ -463,19 +471,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
 
     /**
-     * 获取：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 获取：最后修改日期时间。
      */
     public LocalDateTime getLastModiDt() {
         return this.lastModiDt;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
+     * 设置：最后修改日期时间。
      */
     public CcQsInspection setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
@@ -499,19 +507,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 最后修改用户。
      */
     private String lastModiUserId;
 
     /**
-     * 获取：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 获取：最后修改用户。
      */
     public String getLastModiUserId() {
         return this.lastModiUserId;
     }
 
     /**
-     * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
+     * 设置：最后修改用户。
      */
     public CcQsInspection setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
@@ -535,19 +543,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 记录状态。
      */
     private String status;
 
     /**
-     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 获取：记录状态。
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     * 设置：记录状态。
      */
     public CcQsInspection setStatus(String status) {
         if (this.status == null && status == null) {
@@ -571,19 +579,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 锁定流程实例。
      */
     private String lkWfInstId;
 
     /**
-     * 获取：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 获取：锁定流程实例。
      */
     public String getLkWfInstId() {
         return this.lkWfInstId;
     }
 
     /**
-     * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
+     * 设置：锁定流程实例。
      */
     public CcQsInspection setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
@@ -607,19 +615,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 代码。
      */
     private String code;
 
     /**
-     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 获取：代码。
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     * 设置：代码。
      */
     public CcQsInspection setCode(String code) {
         if (this.code == null && code == null) {
@@ -643,19 +651,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 名称。
      */
     private String name;
 
     /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 获取：名称。
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     * 设置：名称。
      */
     public CcQsInspection setName(String name) {
         if (this.name == null && name == null) {
@@ -679,19 +687,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 项目。
      */
     private String ccPrjId;
 
     /**
-     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 获取：项目。
      */
     public String getCcPrjId() {
         return this.ccPrjId;
     }
 
     /**
-     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 设置：项目。
      */
     public CcQsInspection setCcPrjId(String ccPrjId) {
         if (this.ccPrjId == null && ccPrjId == null) {
@@ -715,19 +723,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 快捷码。
      */
     private String fastCode;
 
     /**
-     * 获取：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 获取：快捷码。
      */
     public String getFastCode() {
         return this.fastCode;
     }
 
     /**
-     * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
+     * 设置：快捷码。
      */
     public CcQsInspection setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
@@ -751,19 +759,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 图标。
      */
     private String iconFileGroupId;
 
     /**
-     * 获取：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 获取：图标。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
+     * 设置：图标。
      */
     public CcQsInspection setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
@@ -787,19 +795,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 项目结构节点。
      */
     private String ccPrjStructNodeId;
 
     /**
-     * 获取：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 获取：项目结构节点。
      */
     public String getCcPrjStructNodeId() {
         return this.ccPrjStructNodeId;
     }
 
     /**
-     * 设置：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     * 设置：项目结构节点。
      */
     public CcQsInspection setCcPrjStructNodeId(String ccPrjStructNodeId) {
         if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
@@ -823,19 +831,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+     * 质安发起方。
      */
     private String ccQsInitiatingPostId;
 
     /**
-     * 获取：{"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+     * 获取：质安发起方。
      */
     public String getCcQsInitiatingPostId() {
         return this.ccQsInitiatingPostId;
     }
 
     /**
-     * 设置：{"EN": "质安发起单位", "ZH_CN": "质安发起方", "ZH_TW": "质安发起单位"}。
+     * 设置：质安发起方。
      */
     public CcQsInspection setCcQsInitiatingPostId(String ccQsInitiatingPostId) {
         if (this.ccQsInitiatingPostId == null && ccQsInitiatingPostId == null) {
@@ -859,19 +867,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
+     * 质安发布时间。
      */
     private LocalDate ccQsInspectionTime;
 
     /**
-     * 获取：{"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
+     * 获取：质安发布时间。
      */
     public LocalDate getCcQsInspectionTime() {
         return this.ccQsInspectionTime;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
+     * 设置：质安发布时间。
      */
     public CcQsInspection setCcQsInspectionTime(LocalDate ccQsInspectionTime) {
         if (this.ccQsInspectionTime == null && ccQsInspectionTime == null) {
@@ -895,19 +903,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+     * 咨询问题。
      */
     private String ccQuestion;
 
     /**
-     * 获取：{"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+     * 获取：咨询问题。
      */
     public String getCcQuestion() {
         return this.ccQuestion;
     }
 
     /**
-     * 设置：{"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+     * 设置：咨询问题。
      */
     public CcQsInspection setCcQuestion(String ccQuestion) {
         if (this.ccQuestion == null && ccQuestion == null) {
@@ -931,19 +939,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+     * 咨询名称。
      */
     private String ccName;
 
     /**
-     * 获取：{"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+     * 获取：咨询名称。
      */
     public String getCcName() {
         return this.ccName;
     }
 
     /**
-     * 设置：{"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+     * 设置：咨询名称。
      */
     public CcQsInspection setCcName(String ccName) {
         if (this.ccName == null && ccName == null) {
@@ -1044,14 +1052,14 @@ public class CcQsInspection {
     private String ccQsInspectionUser;
 
     /**
-     * 获取：{"EN": "CC_QS_INSPECTION_USER", "ZH_CN": "质安巡检用户", "ZH_TW": "繁：质安巡检用户"}。
+     * 获取：质安巡检用户。
      */
     public String getCcQsInspectionUser() {
         return this.ccQsInspectionUser;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_INSPECTION_USER", "ZH_CN": "质安巡检用户", "ZH_TW": "繁：质安巡检用户"}。
+     * 设置：质安巡检用户。
      */
     public CcQsInspection setCcQsInspectionUser(String ccQsInspectionUser) {
         if (this.ccQsInspectionUser == null && ccQsInspectionUser == null) {
@@ -1075,19 +1083,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_INSPECTION_TYPE_ID", "ZH_CN": "质安巡检类型", "ZH_TW": "繁：质安巡检类型"}。
+     * 质安巡检类型。
      */
     private String ccQsInspectionTypeId;
 
     /**
-     * 获取：{"EN": "CC_QS_INSPECTION_TYPE_ID", "ZH_CN": "质安巡检类型", "ZH_TW": "繁：质安巡检类型"}。
+     * 获取：质安巡检类型。
      */
     public String getCcQsInspectionTypeId() {
         return this.ccQsInspectionTypeId;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_INSPECTION_TYPE_ID", "ZH_CN": "质安巡检类型", "ZH_TW": "繁：质安巡检类型"}。
+     * 设置：质安巡检类型。
      */
     public CcQsInspection setCcQsInspectionTypeId(String ccQsInspectionTypeId) {
         if (this.ccQsInspectionTypeId == null && ccQsInspectionTypeId == null) {
@@ -1111,19 +1119,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+     * 巡检部位。
      */
     private String ccQsInspectionPosition;
 
     /**
-     * 获取：{"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+     * 获取：巡检部位。
      */
     public String getCcQsInspectionPosition() {
         return this.ccQsInspectionPosition;
     }
 
     /**
-     * 设置：{"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+     * 设置：巡检部位。
      */
     public CcQsInspection setCcQsInspectionPosition(String ccQsInspectionPosition) {
         if (this.ccQsInspectionPosition == null && ccQsInspectionPosition == null) {
@@ -1147,19 +1155,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_INITIATION_TYPE_ID", "ZH_CN": "质安发起类型", "ZH_TW": "繁：质安发起类型"}。
+     * 质安发起类型。
      */
     private String ccQsInitiationTypeId;
 
     /**
-     * 获取：{"EN": "CC_QS_INITIATION_TYPE_ID", "ZH_CN": "质安发起类型", "ZH_TW": "繁：质安发起类型"}。
+     * 获取：质安发起类型。
      */
     public String getCcQsInitiationTypeId() {
         return this.ccQsInitiationTypeId;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_INITIATION_TYPE_ID", "ZH_CN": "质安发起类型", "ZH_TW": "繁：质安发起类型"}。
+     * 设置：质安发起类型。
      */
     public CcQsInspection setCcQsInitiationTypeId(String ccQsInitiationTypeId) {
         if (this.ccQsInitiationTypeId == null && ccQsInitiationTypeId == null) {
@@ -1183,19 +1191,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_ISSUE_POINT_TYPE_ID", "ZH_CN": "质安问题要点分类", "ZH_TW": "繁：质安问题要点分类"}。
+     * 质安问题要点分类。
      */
     private String ccQsIssuePointTypeId;
 
     /**
-     * 获取：{"EN": "CC_QS_ISSUE_POINT_TYPE_ID", "ZH_CN": "质安问题要点分类", "ZH_TW": "繁：质安问题要点分类"}。
+     * 获取：质安问题要点分类。
      */
     public String getCcQsIssuePointTypeId() {
         return this.ccQsIssuePointTypeId;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_ISSUE_POINT_TYPE_ID", "ZH_CN": "质安问题要点分类", "ZH_TW": "繁：质安问题要点分类"}。
+     * 设置：质安问题要点分类。
      */
     public CcQsInspection setCcQsIssuePointTypeId(String ccQsIssuePointTypeId) {
         if (this.ccQsIssuePointTypeId == null && ccQsIssuePointTypeId == null) {
@@ -1219,19 +1227,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+     * 质安问题等级。
      */
     private String ccQsIssueLevelId;
 
     /**
-     * 获取：{"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+     * 获取：质安问题等级。
      */
     public String getCcQsIssueLevelId() {
         return this.ccQsIssueLevelId;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_ISSUE_LEVEL_ID", "ZH_CN": "质安问题等级", "ZH_TW": "繁：质安问题等级"}。
+     * 设置：质安问题等级。
      */
     public CcQsInspection setCcQsIssueLevelId(String ccQsIssueLevelId) {
         if (this.ccQsIssueLevelId == null && ccQsIssueLevelId == null) {
@@ -1296,14 +1304,14 @@ public class CcQsInspection {
     private String ccPrjPbsNodeId;
 
     /**
-     * 获取：{"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
+     * 获取：关联的分部分项节点。
      */
     public String getCcPrjPbsNodeId() {
         return this.ccPrjPbsNodeId;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
+     * 设置：关联的分部分项节点。
      */
     public CcQsInspection setCcPrjPbsNodeId(String ccPrjPbsNodeId) {
         if (this.ccPrjPbsNodeId == null && ccPrjPbsNodeId == null) {
@@ -1327,19 +1335,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
+     * 质安问题要点（多个）。
      */
     private String ccQsIssuePointIds;
 
     /**
-     * 获取：{"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
+     * 获取：质安问题要点（多个）。
      */
     public String getCcQsIssuePointIds() {
         return this.ccQsIssuePointIds;
     }
 
     /**
-     * 设置：{"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
+     * 设置：质安问题要点（多个）。
      */
     public CcQsInspection setCcQsIssuePointIds(String ccQsIssuePointIds) {
         if (this.ccQsIssuePointIds == null && ccQsIssuePointIds == null) {
@@ -1363,19 +1371,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 备注。
      */
     private String remark;
 
     /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 获取：备注。
      */
     public String getRemark() {
         return this.remark;
     }
 
     /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     * 设置：备注。
      */
     public CcQsInspection setRemark(String remark) {
         if (this.remark == null && remark == null) {
@@ -1399,19 +1407,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "RECTIFICATION_PERIOD", "ZH_CN": "整改期限", "ZH_TW": "繁：整改期限"}。
+     * 整改期限。
      */
     private LocalDate rectificationPeriod;
 
     /**
-     * 获取：{"EN": "RECTIFICATION_PERIOD", "ZH_CN": "整改期限", "ZH_TW": "繁：整改期限"}。
+     * 获取：整改期限。
      */
     public LocalDate getRectificationPeriod() {
         return this.rectificationPeriod;
     }
 
     /**
-     * 设置：{"EN": "RECTIFICATION_PERIOD", "ZH_CN": "整改期限", "ZH_TW": "繁：整改期限"}。
+     * 设置：整改期限。
      */
     public CcQsInspection setRectificationPeriod(LocalDate rectificationPeriod) {
         if (this.rectificationPeriod == null && rectificationPeriod == null) {
@@ -1435,19 +1443,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_DUTY_COMPANY", "ZH_CN": "质安责任单位", "ZH_TW": "繁：质安责任单位"}。
+     * 质安责任单位。
      */
     private String ccQsDutyCompany;
 
     /**
-     * 获取：{"EN": "CC_QS_DUTY_COMPANY", "ZH_CN": "质安责任单位", "ZH_TW": "繁：质安责任单位"}。
+     * 获取：质安责任单位。
      */
     public String getCcQsDutyCompany() {
         return this.ccQsDutyCompany;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_DUTY_COMPANY", "ZH_CN": "质安责任单位", "ZH_TW": "繁：质安责任单位"}。
+     * 设置：质安责任单位。
      */
     public CcQsInspection setCcQsDutyCompany(String ccQsDutyCompany) {
         if (this.ccQsDutyCompany == null && ccQsDutyCompany == null) {
@@ -1471,19 +1479,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_DUTY_USER", "ZH_CN": "质安责任用户", "ZH_TW": "繁：质安责任用户"}。
+     * 质安责任用户。
      */
     private String ccQsDutyUser;
 
     /**
-     * 获取：{"EN": "CC_QS_DUTY_USER", "ZH_CN": "质安责任用户", "ZH_TW": "繁：质安责任用户"}。
+     * 获取：质安责任用户。
      */
     public String getCcQsDutyUser() {
         return this.ccQsDutyUser;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_DUTY_USER", "ZH_CN": "质安责任用户", "ZH_TW": "繁：质安责任用户"}。
+     * 设置：质安责任用户。
      */
     public CcQsInspection setCcQsDutyUser(String ccQsDutyUser) {
         if (this.ccQsDutyUser == null && ccQsDutyUser == null) {
@@ -1507,19 +1515,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+     * 安全责任人（多）。
      */
     private String ccSafeDutyUserIds;
 
     /**
-     * 获取：{"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+     * 获取：安全责任人（多）。
      */
     public String getCcSafeDutyUserIds() {
         return this.ccSafeDutyUserIds;
     }
 
     /**
-     * 设置：{"EN": "安全责任人（多）", "ZH_CN": "安全责任人（多）", "ZH_TW": "安全责任人（多）"}。
+     * 设置：安全责任人（多）。
      */
     public CcQsInspection setCcSafeDutyUserIds(String ccSafeDutyUserIds) {
         if (this.ccSafeDutyUserIds == null && ccSafeDutyUserIds == null) {
@@ -1543,19 +1551,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+     * 质安责任方。
      */
     private String ccQsDutyPostId;
 
     /**
-     * 获取：{"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+     * 获取：质安责任方。
      */
     public String getCcQsDutyPostId() {
         return this.ccQsDutyPostId;
     }
 
     /**
-     * 设置：{"EN": "质安发起方", "ZH_CN": "质安责任方", "ZH_TW": "质安发起方"}。
+     * 设置：质安责任方。
      */
     public CcQsInspection setCcQsDutyPostId(String ccQsDutyPostId) {
         if (this.ccQsDutyPostId == null && ccQsDutyPostId == null) {
@@ -1579,19 +1587,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+     * 质安分包单位。
      */
     private String ccQsSubcontractorId;
 
     /**
-     * 获取：{"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+     * 获取：质安分包单位。
      */
     public String getCcQsSubcontractorId() {
         return this.ccQsSubcontractorId;
     }
 
     /**
-     * 设置：{"EN": "质安分包单位", "ZH_CN": "质安分包单位", "ZH_TW": "质安分包单位"}。
+     * 设置：质安分包单位。
      */
     public CcQsInspection setCcQsSubcontractorId(String ccQsSubcontractorId) {
         if (this.ccQsSubcontractorId == null && ccQsSubcontractorId == null) {
@@ -1615,19 +1623,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+     * 质安复核用户。
      */
     private String ccQsCheckUser;
 
     /**
-     * 获取：{"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+     * 获取：质安复核用户。
      */
     public String getCcQsCheckUser() {
         return this.ccQsCheckUser;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_CHECK_USER", "ZH_CN": "质安复核用户", "ZH_TW": "繁：质安复核用户"}。
+     * 设置：质安复核用户。
      */
     public CcQsInspection setCcQsCheckUser(String ccQsCheckUser) {
         if (this.ccQsCheckUser == null && ccQsCheckUser == null) {
@@ -1651,19 +1659,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_COPY_USER", "ZH_CN": "质安抄送用户", "ZH_TW": "繁：质安抄送用户"}。
+     * 质安抄送用户。
      */
     private String ccQsCopyUser;
 
     /**
-     * 获取：{"EN": "CC_QS_COPY_USER", "ZH_CN": "质安抄送用户", "ZH_TW": "繁：质安抄送用户"}。
+     * 获取：质安抄送用户。
      */
     public String getCcQsCopyUser() {
         return this.ccQsCopyUser;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_COPY_USER", "ZH_CN": "质安抄送用户", "ZH_TW": "繁：质安抄送用户"}。
+     * 设置：质安抄送用户。
      */
     public CcQsInspection setCcQsCopyUser(String ccQsCopyUser) {
         if (this.ccQsCopyUser == null && ccQsCopyUser == null) {
@@ -1687,19 +1695,91 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_ISSUES_IMG", "ZH_CN": "质安问题图片", "ZH_TW": "繁：质安问题图片"}。
+     * 抄报单位。
+     */
+    private String hcWcfCcUnit;
+
+    /**
+     * 获取：抄报单位。
+     */
+    public String getHcWcfCcUnit() {
+        return this.hcWcfCcUnit;
+    }
+
+    /**
+     * 设置：抄报单位。
+     */
+    public CcQsInspection setHcWcfCcUnit(String hcWcfCcUnit) {
+        if (this.hcWcfCcUnit == null && hcWcfCcUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.hcWcfCcUnit != null && hcWcfCcUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hcWcfCcUnit.compareTo(hcWcfCcUnit) != 0) {
+                this.hcWcfCcUnit = hcWcfCcUnit;
+                if (!this.toUpdateCols.contains("HC_WCF_CC_UNIT")) {
+                    this.toUpdateCols.add("HC_WCF_CC_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hcWcfCcUnit = hcWcfCcUnit;
+            if (!this.toUpdateCols.contains("HC_WCF_CC_UNIT")) {
+                this.toUpdateCols.add("HC_WCF_CC_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 通知单编号。
+     */
+    private String hcyTableNumber;
+
+    /**
+     * 获取：通知单编号。
+     */
+    public String getHcyTableNumber() {
+        return this.hcyTableNumber;
+    }
+
+    /**
+     * 设置：通知单编号。
+     */
+    public CcQsInspection setHcyTableNumber(String hcyTableNumber) {
+        if (this.hcyTableNumber == null && hcyTableNumber == null) {
+            // 均为null，不做处理。
+        } else if (this.hcyTableNumber != null && hcyTableNumber != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hcyTableNumber.compareTo(hcyTableNumber) != 0) {
+                this.hcyTableNumber = hcyTableNumber;
+                if (!this.toUpdateCols.contains("HCY_TABLE_NUMBER")) {
+                    this.toUpdateCols.add("HCY_TABLE_NUMBER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hcyTableNumber = hcyTableNumber;
+            if (!this.toUpdateCols.contains("HCY_TABLE_NUMBER")) {
+                this.toUpdateCols.add("HCY_TABLE_NUMBER");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 质安问题图片。
      */
     private String ccQsIssuesImg;
 
     /**
-     * 获取：{"EN": "CC_QS_ISSUES_IMG", "ZH_CN": "质安问题图片", "ZH_TW": "繁：质安问题图片"}。
+     * 获取：质安问题图片。
      */
     public String getCcQsIssuesImg() {
         return this.ccQsIssuesImg;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_ISSUES_IMG", "ZH_CN": "质安问题图片", "ZH_TW": "繁：质安问题图片"}。
+     * 设置：质安问题图片。
      */
     public CcQsInspection setCcQsIssuesImg(String ccQsIssuesImg) {
         if (this.ccQsIssuesImg == null && ccQsIssuesImg == null) {
@@ -1723,19 +1803,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 附件。
      */
     private String attachment;
 
     /**
-     * 获取：{"EN": "ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 获取：附件。
      */
     public String getAttachment() {
         return this.attachment;
     }
 
     /**
-     * 设置：{"EN": "ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 设置：附件。
      */
     public CcQsInspection setAttachment(String attachment) {
         if (this.attachment == null && attachment == null) {
@@ -1759,19 +1839,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_CURRENT_STATE_ID", "ZH_CN": "质安当前状态", "ZH_TW": "繁：质安当前状态"}。
+     * 质安当前状态。
      */
     private String ccQsCurrentStateId;
 
     /**
-     * 获取：{"EN": "CC_QS_CURRENT_STATE_ID", "ZH_CN": "质安当前状态", "ZH_TW": "繁：质安当前状态"}。
+     * 获取：质安当前状态。
      */
     public String getCcQsCurrentStateId() {
         return this.ccQsCurrentStateId;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_CURRENT_STATE_ID", "ZH_CN": "质安当前状态", "ZH_TW": "繁：质安当前状态"}。
+     * 设置：质安当前状态。
      */
     public CcQsInspection setCcQsCurrentStateId(String ccQsCurrentStateId) {
         if (this.ccQsCurrentStateId == null && ccQsCurrentStateId == null) {
@@ -1795,19 +1875,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_RECTIFY_TIME", "ZH_CN": "质安整改时间", "ZH_TW": "繁：质安整改时间"}。
+     * 质安整改时间。
      */
     private LocalDate ccQsRectifyTime;
 
     /**
-     * 获取：{"EN": "CC_QS_RECTIFY_TIME", "ZH_CN": "质安整改时间", "ZH_TW": "繁：质安整改时间"}。
+     * 获取：质安整改时间。
      */
     public LocalDate getCcQsRectifyTime() {
         return this.ccQsRectifyTime;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_RECTIFY_TIME", "ZH_CN": "质安整改时间", "ZH_TW": "繁：质安整改时间"}。
+     * 设置：质安整改时间。
      */
     public CcQsInspection setCcQsRectifyTime(LocalDate ccQsRectifyTime) {
         if (this.ccQsRectifyTime == null && ccQsRectifyTime == null) {
@@ -1831,19 +1911,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_RECTIFY_IMG", "ZH_CN": "质安整改图片", "ZH_TW": "繁：质安整改图片"}。
+     * 质安整改图片。
      */
     private String ccQsRectifyImg;
 
     /**
-     * 获取：{"EN": "CC_QS_RECTIFY_IMG", "ZH_CN": "质安整改图片", "ZH_TW": "繁：质安整改图片"}。
+     * 获取：质安整改图片。
      */
     public String getCcQsRectifyImg() {
         return this.ccQsRectifyImg;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_RECTIFY_IMG", "ZH_CN": "质安整改图片", "ZH_TW": "繁：质安整改图片"}。
+     * 设置：质安整改图片。
      */
     public CcQsInspection setCcQsRectifyImg(String ccQsRectifyImg) {
         if (this.ccQsRectifyImg == null && ccQsRectifyImg == null) {
@@ -1867,19 +1947,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_RECTIFY_DESC", "ZH_CN": "质安整改详述", "ZH_TW": "繁：质安整改详述"}。
+     * 质安整改详述。
      */
     private String ccQsRectifyDesc;
 
     /**
-     * 获取：{"EN": "CC_QS_RECTIFY_DESC", "ZH_CN": "质安整改详述", "ZH_TW": "繁：质安整改详述"}。
+     * 获取：质安整改详述。
      */
     public String getCcQsRectifyDesc() {
         return this.ccQsRectifyDesc;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_RECTIFY_DESC", "ZH_CN": "质安整改详述", "ZH_TW": "繁：质安整改详述"}。
+     * 设置：质安整改详述。
      */
     public CcQsInspection setCcQsRectifyDesc(String ccQsRectifyDesc) {
         if (this.ccQsRectifyDesc == null && ccQsRectifyDesc == null) {
@@ -1903,19 +1983,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_CHECK_TIME", "ZH_CN": "质安复核时间", "ZH_TW": "繁：质安复核时间"}。
+     * 质安复核时间。
      */
     private LocalDate ccQsCheckTime;
 
     /**
-     * 获取：{"EN": "CC_QS_CHECK_TIME", "ZH_CN": "质安复核时间", "ZH_TW": "繁：质安复核时间"}。
+     * 获取：质安复核时间。
      */
     public LocalDate getCcQsCheckTime() {
         return this.ccQsCheckTime;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_CHECK_TIME", "ZH_CN": "质安复核时间", "ZH_TW": "繁：质安复核时间"}。
+     * 设置：质安复核时间。
      */
     public CcQsInspection setCcQsCheckTime(LocalDate ccQsCheckTime) {
         if (this.ccQsCheckTime == null && ccQsCheckTime == null) {
@@ -1939,19 +2019,19 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "质安通知单", "ZH_CN": "质安通知单", "ZH_TW": "质安通知单"}。
+     * 质安通知单。
      */
     private String ccQsNoticeId;
 
     /**
-     * 获取：{"EN": "质安通知单", "ZH_CN": "质安通知单", "ZH_TW": "质安通知单"}。
+     * 获取：质安通知单。
      */
     public String getCcQsNoticeId() {
         return this.ccQsNoticeId;
     }
 
     /**
-     * 设置：{"EN": "质安通知单", "ZH_CN": "质安通知单", "ZH_TW": "质安通知单"}。
+     * 设置：质安通知单。
      */
     public CcQsInspection setCcQsNoticeId(String ccQsNoticeId) {
         if (this.ccQsNoticeId == null && ccQsNoticeId == null) {
