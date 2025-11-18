@@ -144,6 +144,10 @@ public class HcWorkConcatForm {
          */
         public static final String HCY_TABLE_NUMBER = "HCY_TABLE_NUMBER";
         /**
+         * 资料编号。
+         */
+        public static final String HCY_FORM_DATA_NUMBER = "HCY_FORM_DATA_NUMBER";
+        /**
          * 附件。
          */
         public static final String ATTACHMENT = "ATTACHMENT";
@@ -1017,6 +1021,42 @@ public class HcWorkConcatForm {
             this.hcyTableNumber = hcyTableNumber;
             if (!this.toUpdateCols.contains("HCY_TABLE_NUMBER")) {
                 this.toUpdateCols.add("HCY_TABLE_NUMBER");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 资料编号。
+     */
+    private String hcyFormDataNumber;
+
+    /**
+     * 获取：资料编号。
+     */
+    public String getHcyFormDataNumber() {
+        return this.hcyFormDataNumber;
+    }
+
+    /**
+     * 设置：资料编号。
+     */
+    public HcWorkConcatForm setHcyFormDataNumber(String hcyFormDataNumber) {
+        if (this.hcyFormDataNumber == null && hcyFormDataNumber == null) {
+            // 均为null，不做处理。
+        } else if (this.hcyFormDataNumber != null && hcyFormDataNumber != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hcyFormDataNumber.compareTo(hcyFormDataNumber) != 0) {
+                this.hcyFormDataNumber = hcyFormDataNumber;
+                if (!this.toUpdateCols.contains("HCY_FORM_DATA_NUMBER")) {
+                    this.toUpdateCols.add("HCY_FORM_DATA_NUMBER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hcyFormDataNumber = hcyFormDataNumber;
+            if (!this.toUpdateCols.contains("HCY_FORM_DATA_NUMBER")) {
+                this.toUpdateCols.add("HCY_FORM_DATA_NUMBER");
             }
         }
         return this;

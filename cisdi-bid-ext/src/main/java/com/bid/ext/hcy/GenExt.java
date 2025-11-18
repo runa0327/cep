@@ -99,6 +99,11 @@ public class GenExt {
             if(!SharedUtil.isEmpty(valueMap.get("HCY_TABLE_NUMBER"))){
                 tableNumber = (String) valueMap.get("HCY_TABLE_NUMBER");
             }
+            //资料编号
+            String  dataNumber =  "";
+            if(!SharedUtil.isEmpty(valueMap.get("HCY_FORM_DATA_NUMBER"))){
+                dataNumber = (String) valueMap.get("HCY_FORM_DATA_NUMBER");
+            }
 
             //事由
             String  reason = (String) valueMap.get("HC_WCF_REASON");
@@ -132,6 +137,8 @@ public class GenExt {
             map.put("ccUnits",ccUnitNames);
             //通知单编号
             map.put("tableNumber", tableNumber);
+            //资料编号
+            map.put("dataNumber", dataNumber);
             //事由
             map.put("reason", reason);
             //内容
@@ -290,6 +297,12 @@ public class GenExt {
                 tableNumber = (String) valueMap.get("HCY_TABLE_NUMBER");
             }
 
+            //资料编号
+            String  dataNumber =  "";
+            if(!SharedUtil.isEmpty(valueMap.get("HCY_FORM_DATA_NUMBER"))){
+                dataNumber = (String) valueMap.get("HCY_FORM_DATA_NUMBER");
+            }
+
             String issuesImgId = null;
             if (!SharedUtil.isEmpty(valueMap.get("CC_QS_ISSUES_IMG"))) {
                 issuesImgId = valueMap.get("CC_QS_ISSUES_IMG").toString();
@@ -302,6 +315,7 @@ public class GenExt {
             map.put("year", year);
             map.put("prjName", prjName);
             map.put("tableNumber",tableNumber);
+            map.put("dataNumber",dataNumber);
             map.put("issuePointTypeName", issuePointTypeName);
             map.put("inspectionTypeName", inspectionTypeName);
             map.put("issuePointNames", issuePointNames);
