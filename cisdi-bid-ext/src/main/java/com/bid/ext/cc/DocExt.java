@@ -20,6 +20,7 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.springframework.util.CollectionUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -81,8 +82,103 @@ public class DocExt {
         if (null != pCcPrjIds) {
             MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 //        String pCcPrjIds = "1790672761571196928,1790697187691937792";
-            String sql = "SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME FROM CC_PRJ P LEFT JOIN CC_PRJ_MEMBER M ON P.ID = M.CC_PRJ_ID AND M.AD_USER_ID = @UID LEFT JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? WHERE @P_CC_PRJ_IDS IS NOT NULL AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%') UNION SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME FROM CC_PRJ P LEFT JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? WHERE @P_CC_PRJ_IDS IS NOT NULL AND @RCODES LIKE '%ADMIN%' AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%')";
+            String sql = "SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME " +
+                    "FROM CC_PRJ P LEFT JOIN CC_PRJ_MEMBER M ON P.ID = M.CC_PRJ_ID AND M.AD_USER_ID = @UID LEFT " +
+                    "JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? " +
+                    "WHERE @P_CC_PRJ_IDS IS NOT NULL AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%') " +
+                    "UNION SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME " +
+                    "FROM CC_PRJ P LEFT JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? " +
+                    "WHERE @P_CC_PRJ_IDS IS NOT NULL AND @RCODES LIKE '%ADMIN%' AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%')";
             resultMapList = myJdbcTemplate.queryForList(sql, type, true, type, true);
+            resultMap.put("anyPrjs", "1");
+            log.info(resultMapList.toString());
+        } else {
+            resultMap.put("anyPrjs", "0");
+        }
+        resultMap.put("results", resultMapList);
+        ExtJarHelper.setReturnValue(resultMap);
+
+    }
+
+
+
+    /**
+     * 获取最新预览文件ID
+     */
+    public void getLatestPreviewCommId() {
+        Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
+        String type = JdbcMapUtil.getString(inputMap, "type");
+
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcPrjIds = JdbcMapUtil.getString(varMap, "P_CC_PRJ_IDS");
+        Map<String, Object> resultMap = new HashMap<>();
+//        List<Map<String, Object>> resultMapList = null;
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        if (null != pCcPrjIds) {
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+//        String pCcPrjIds = "1790672761571196928,1790697187691937792";
+            String sql = "SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME " +
+                    "FROM CC_PRJ P LEFT JOIN CC_PRJ_MEMBER M ON P.ID = M.CC_PRJ_ID AND M.AD_USER_ID = @UID LEFT " +
+                    "JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? " +
+                    "WHERE @P_CC_PRJ_IDS IS NOT NULL AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%') " +
+                    "UNION SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME " +
+                    "FROM CC_PRJ P LEFT JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? " +
+                    "WHERE @P_CC_PRJ_IDS IS NOT NULL AND @RCODES LIKE '%ADMIN%' AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%')";
+            List<Map<String, Object>> resultMapList = myJdbcTemplate.queryForList(sql, type, true, type, true);
+            resultMap.put("anyPrjs", "1");
+            log.info(resultMapList.toString());
+
+            for (Map<String, Object> map : resultMapList) {
+                //当前项目是否含有默认VR文件
+                if(map.containsKey("ID") && map.get("ID") != null){
+                    //含有默认
+                    CcDocFile ccDocFile = CcDocFile.selectById(map.get("ID").toString());
+                    String s = "select F.ID, F.CC_PRJ_ID, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME from cc_doc_file F " +
+                            "left join cc_prj P on p.ID = F.CC_PRJ_ID where F.CC_PRJ_ID = ? and F.CC_DOC_DIR_ID = ? and F.CC_DOC_FILE_TYPE_ID = ? " +
+                            "and F.IS_DEFAULT = ? and F.CC_DOC_DATE is not null order by F.CC_DOC_DATE desc,F.LAST_MODI_DT desc limit 1";
+                    //查询结果可能为null
+                    List<Map<String, Object>> rMap = myJdbcTemplate.queryForList(s, ccDocFile.getCcPrjId(), ccDocFile.getCcDocDirId(), ccDocFile.getCcDocFileTypeId(), false);
+                    if (CollectionUtils.isEmpty(rMap)) {
+                        mapList.add(map);
+                    }else{
+                        mapList.add(rMap.get(0));
+                    }
+                }else{
+                    //不含默认，直接返回
+                    mapList.add(map);
+                }
+            }
+        } else {
+            resultMap.put("anyPrjs", "0");
+        }
+        resultMap.put("results", mapList);
+        ExtJarHelper.setReturnValue(resultMap);
+
+    }
+
+    /**
+     * 获取最新预览文件ID
+     */
+    public void getLatestPreviewCommId__() {
+        Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
+        String type = JdbcMapUtil.getString(inputMap, "type");
+
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcPrjIds = JdbcMapUtil.getString(varMap, "P_CC_PRJ_IDS");
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, Object>> resultMapList = null;
+        if (null != pCcPrjIds) {
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+//        String pCcPrjIds = "1790672761571196928,1790697187691937792";
+            String sql = "(SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, F.CRT_DT, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME " +
+                    "FROM CC_PRJ P LEFT JOIN CC_PRJ_MEMBER M ON P.ID = M.CC_PRJ_ID AND M.AD_USER_ID = @UID " +
+                    "LEFT JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? " +
+                    "WHERE @P_CC_PRJ_IDS IS NOT NULL AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%') ORDER BY CRT_DT DESC LIMIT 1 ) " +
+                    "UNION (SELECT DISTINCT P.ID AS CC_PRJ_ID, F.ID, F.CRT_DT, JSON_UNQUOTE(JSON_EXTRACT(P.NAME, '$.ZH_CN')) AS NAME " +
+                    "FROM CC_PRJ P LEFT JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = P.ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? " +
+                    "WHERE @P_CC_PRJ_IDS IS NOT NULL AND @RCODES LIKE '%ADMIN%' AND @P_CC_PRJ_IDS LIKE CONCAT('%', P.ID, '%') ORDER BY CRT_DT DESC LIMIT 1 ) ";
+
+            resultMapList = myJdbcTemplate.queryForList(sql, type, false, type, false);
             resultMap.put("anyPrjs", "1");
             log.info(resultMapList.toString());
         } else {
