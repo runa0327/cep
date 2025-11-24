@@ -208,18 +208,6 @@ public class CcQsInspection {
          */
         public static final String CC_QS_COPY_USER = "CC_QS_COPY_USER";
         /**
-         * 抄报单位。
-         */
-        public static final String HC_WCF_CC_UNIT = "HC_WCF_CC_UNIT";
-        /**
-         * 通知单编号。
-         */
-        public static final String HCY_TABLE_NUMBER = "HCY_TABLE_NUMBER";
-        /**
-         * 资料编号。
-         */
-        public static final String HCY_FORM_DATA_NUMBER = "HCY_FORM_DATA_NUMBER";
-        /**
          * 质安问题图片。
          */
         public static final String CC_QS_ISSUES_IMG = "CC_QS_ISSUES_IMG";
@@ -1693,114 +1681,6 @@ public class CcQsInspection {
             this.ccQsCopyUser = ccQsCopyUser;
             if (!this.toUpdateCols.contains("CC_QS_COPY_USER")) {
                 this.toUpdateCols.add("CC_QS_COPY_USER");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 抄报单位。
-     */
-    private String hcWcfCcUnit;
-
-    /**
-     * 获取：抄报单位。
-     */
-    public String getHcWcfCcUnit() {
-        return this.hcWcfCcUnit;
-    }
-
-    /**
-     * 设置：抄报单位。
-     */
-    public CcQsInspection setHcWcfCcUnit(String hcWcfCcUnit) {
-        if (this.hcWcfCcUnit == null && hcWcfCcUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.hcWcfCcUnit != null && hcWcfCcUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hcWcfCcUnit.compareTo(hcWcfCcUnit) != 0) {
-                this.hcWcfCcUnit = hcWcfCcUnit;
-                if (!this.toUpdateCols.contains("HC_WCF_CC_UNIT")) {
-                    this.toUpdateCols.add("HC_WCF_CC_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hcWcfCcUnit = hcWcfCcUnit;
-            if (!this.toUpdateCols.contains("HC_WCF_CC_UNIT")) {
-                this.toUpdateCols.add("HC_WCF_CC_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 通知单编号。
-     */
-    private String hcyTableNumber;
-
-    /**
-     * 获取：通知单编号。
-     */
-    public String getHcyTableNumber() {
-        return this.hcyTableNumber;
-    }
-
-    /**
-     * 设置：通知单编号。
-     */
-    public CcQsInspection setHcyTableNumber(String hcyTableNumber) {
-        if (this.hcyTableNumber == null && hcyTableNumber == null) {
-            // 均为null，不做处理。
-        } else if (this.hcyTableNumber != null && hcyTableNumber != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hcyTableNumber.compareTo(hcyTableNumber) != 0) {
-                this.hcyTableNumber = hcyTableNumber;
-                if (!this.toUpdateCols.contains("HCY_TABLE_NUMBER")) {
-                    this.toUpdateCols.add("HCY_TABLE_NUMBER");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hcyTableNumber = hcyTableNumber;
-            if (!this.toUpdateCols.contains("HCY_TABLE_NUMBER")) {
-                this.toUpdateCols.add("HCY_TABLE_NUMBER");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 资料编号。
-     */
-    private String hcyFormDataNumber;
-
-    /**
-     * 获取：资料编号。
-     */
-    public String getHcyFormDataNumber() {
-        return this.hcyFormDataNumber;
-    }
-
-    /**
-     * 设置：资料编号。
-     */
-    public CcQsInspection setHcyFormDataNumber(String hcyFormDataNumber) {
-        if (this.hcyFormDataNumber == null && hcyFormDataNumber == null) {
-            // 均为null，不做处理。
-        } else if (this.hcyFormDataNumber != null && hcyFormDataNumber != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hcyFormDataNumber.compareTo(hcyFormDataNumber) != 0) {
-                this.hcyFormDataNumber = hcyFormDataNumber;
-                if (!this.toUpdateCols.contains("HCY_FORM_DATA_NUMBER")) {
-                    this.toUpdateCols.add("HCY_FORM_DATA_NUMBER");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hcyFormDataNumber = hcyFormDataNumber;
-            if (!this.toUpdateCols.contains("HCY_FORM_DATA_NUMBER")) {
-                this.toUpdateCols.add("HCY_FORM_DATA_NUMBER");
             }
         }
         return this;
