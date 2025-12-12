@@ -63,6 +63,7 @@ public class LoginExt {
         LoginExtResult result = new LoginExtResult();
         result.changedGlobalVarMap = new LinkedHashMap<>();
         result.changedGlobalVarMap.put("P_CC_PRJ_IDS", cc_prj_ids);
+        result.changedGlobalVarMap.put("P_CC_PRJ_TO_VIEW_IDS", cc_prj_ids);
         ExtJarHelper.setReturnValue(result);
 
     }
