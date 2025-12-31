@@ -22,7 +22,7 @@ public class UserAuthImpl implements UserAuth {
     public Map<String, Object> userLogin(UserLoginInfo userLoginInfo) {
         Map<String, Object> result = new HashMap<>();
 
-        String url  =  "http://qtwins.cisdi.com.cn/prod-api/auth/loginUniAddress";
+        String url  =  "https://qtwins1.cisdi.com.cn/prod-api/auth/loginUniAddress";
 
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
